@@ -1,10 +1,4 @@
-# 📅 Nền Tảng Quản Lý Đặt Lịch Họp & Tài Nguyên Thông Minh
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
-[![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Mobile-blue)](#)
-[![License](https://img.shields.io/badge/license-MIT-green)](#)
-
----
 
 ## 🌟 Tầm Nhìn Sản Phẩm (Product Vision)
 
@@ -56,25 +50,5 @@ Nền tảng giúp doanh nghiệp tối ưu hóa việc phân bổ phòng họp,
 | **Third-party Sync** | Đồng bộ liên tục với Google Workspace và Microsoft 365. |
 | **Admin Dashboard** | Thống kê hiệu suất, quản lý danh mục phòng và lịch bảo trì thiết bị. |
 
----
 
-## 🛠️ Công Nghệ Sử Dụng (Tech Stack Gợi Ý)
 
-* **Frontend:** React.js / Next.js / React Native (Mobile)
-* **Backend:** Node.js (NestJS) / Python (FastAPI) / Go
-* **Database:** PostgreSQL / MySQL, Redis (Caching & Concurrency Lock)
-* **Integrations:** Google Calendar API, Microsoft Graph API
-* **DevOps:** Docker, Docker Compose, GitHub Actions
-
----
-
-## ⚙️ Cài Đặt Và Khởi Chạy Nhanh (Getting Started)
-
-### 1. Yêu cầu môi trường
-* Node.js >= 18.x
-* Docker & Docker Compose
-
-### 2. Clone repository
-```bash
-git clone [https://github.com/](https://github.com/)<your-username>/<your-repo-name>.git
-cd <your-repo-name>
