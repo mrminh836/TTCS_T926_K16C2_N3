@@ -1,0 +1,36 @@
+name: CI Pipeline
+
+# Tự động kích hoạt khi có Push hoặc Pull Request vào nhánh main và develop
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Bước 1: Kéo mã nguồn về máy ảo GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Bước 2: Cài đặt môi trường Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # Bước 3: Cài đặt các thư viện (dependencies)
+      - name: Install dependencies
+        run: npm install
+
+      # Bước 4: Kiểm tra xem code có build được không
+      - name: Build Project
+        run: npm run build --if-present
+
+      # Bước 5: Tự động chạy Unit Test
+      - name: Run Unit Tests
+        run: npm test --if-present
