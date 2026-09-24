@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Cuộc họp</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>📅 Quản lý Cuộc họp</h1>
+  </header>
+
+  <main>
+    <section id="meetings-section" class="page active">
+
+      <!-- Thanh công cụ: tìm kiếm, lọc, thêm mới -->
+      <div class="toolbar">
+        <input
+          type="text"
+          id="search-meeting"
+          placeholder="Tìm kiếm cuộc họp..."
+        />
+
+        <select id="filter-status">
+          <option value="">Tất cả trạng thái</option>
+          <option value="scheduled">Sắp diễn ra</option>
+          <option value="in-progress">Đang diễn ra</option>
+          <option value="completed">Đã hoàn thành</option>
+          <option value="cancelled">Đã hủy</option>
+        </select>
+
+        <button id="btn-add-meeting" class="btn-primary">+ Thêm cuộc họp</button>
+      </div>
+
+      <!-- Danh sách cuộc họp -->
+      <table id="meetings-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tiêu đề</th>
+            <th>Ngày giờ</th>
+            <th>Địa điểm / Link</th>
+            <th>Người tham gia</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="meetings-list">
+          <!-- Dữ liệu render bằng main.js -->
+        </tbody>
+      </table>
+
+      <p id="empty-state" class="empty-state hidden">
+        Chưa có cuộc họp nào. Nhấn "Thêm cuộc họp" để bắt đầu.
+      </p>
+    </section>
+  </main>
+
+  <!-- ===== MODAL THÊM / SỬA CUỘC HỌP ===== -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 id="modal-title">Thêm cuộc họp</h3>
+      <form id="meeting-form">
+        <input type="hidden" id="meeting-id" />
+
+        <label for="meeting-title">Tiêu đề</label>
+        <input type="text" id="meeting-title" required />
+
+        <label for="meeting-date">Ngày</label>
+        <input type="date" id="meeting-date" required />
+
+        <label for="meeting-time">Giờ</label>
+        <input type="time" id="meeting-time" required />
+
+        <label for="meeting-location">Địa điểm / Link họp</label>
+        <input type="text" id="meeting-location" placeholder="Phòng họp A hoặc link Google Meet" />
+
+        <label for="meeting-participants">Người tham gia (cách nhau bằng dấu phẩy)</label>
+        <input type="text" id="meeting-participants" placeholder="Nguyễn A, Trần B, Lê C" />
+
+        <label for="meeting-status">Trạng thái</label>
+        <select id="meeting-status">
+          <option value="scheduled">Sắp diễn ra</option>
+          <option value="in-progress">Đang diễn ra</option>
+          <option value="completed">Đã hoàn thành</option>
+          <option value="cancelled">Đã hủy</option>
+        </select>
+
+        <label for="meeting-notes">Ghi chú / Nội dung</label>
+        <textarea id="meeting-notes" rows="4" placeholder="Nội dung chính, mục tiêu cuộc họp..."></textarea>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Lưu</button>
+          <button type="button" id="btn-cancel" class="btn-secondary">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL XEM CHI TIẾT ===== -->
+  <div id="detail-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h3>Chi tiết cuộc họp</h3>
+      <div id="detail-content"></div>
+      <div class="modal-actions">
+        <button type="button" id="btn-close-detail" class="btn-secondary">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
