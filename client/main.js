@@ -1,20 +1,14 @@
-/* =====================================================
-   PRODUCT BACKLOG - MEETING MANAGEMENT
-   JavaScript thuần
-   Có:
-   - Router Base
-   - Home
-   - Meetings
-   - 404
-   - CRUD Meeting
-   - Search
-   - Filter
-   ===================================================== */
+// =====================================================
+// PRODUCT BACKLOG - MEETING MANAGEMENT
+// JavaScript thuần
+// Bootstrap 5 + Bootstrap Icons
+// Router Base + CRUD + Search + Filter
+// =====================================================
 
 
-/* =====================================================
-   1. DATA
-===================================================== */
+// =====================================================
+// 1. DỮ LIỆU
+// =====================================================
 
 let meetings = [
   {
@@ -62,9 +56,19 @@ let meetings = [
 ];
 
 
-/* =====================================================
-   2. ROUTER BASE
-===================================================== */
+// =====================================================
+// 2. BIẾN TOÀN CỤC
+// =====================================================
+
+const app = document.getElementById("app");
+
+const modalOverlay = document.getElementById("modal-overlay");
+const detailOverlay = document.getElementById("detail-overlay");
+
+
+// =====================================================
+// 3. ROUTER
+// =====================================================
 
 const routes = {
   "/": renderHome,
@@ -73,19 +77,8 @@ const routes = {
 };
 
 
-/*
-  Lấy route hiện tại từ URL hash.
-
-  Ví dụ:
-
-  http://localhost/index.html#/
-  http://localhost/index.html#/meetings
-  http://localhost/index.html#/404
-*/
-
 function getCurrentRoute() {
-
-  let hash = window.location.hash;
+  const hash = window.location.hash;
 
   if (!hash || hash === "#") {
     return "/";
@@ -95,43 +88,25 @@ function getCurrentRoute() {
 }
 
 
-/*
-  Router chính
-*/
-
 function router() {
-
   const route = getCurrentRoute();
 
-  const renderFunction =
-    routes[route] || routes["/404"];
+  const page = routes[route] || render404;
 
-  renderFunction();
+  page();
 }
 
-
-/*
-  Theo dõi thay đổi URL
-*/
 
 window.addEventListener("hashchange", router);
 
 
-/* =====================================================
-   3. APP CONTAINER
-===================================================== */
-
-const app = document.getElementById("app");
-
-
-/* =====================================================
-   4. HOME PAGE
-===================================================== */
+// =====================================================
+// 4. HOME
+// =====================================================
 
 function renderHome() {
 
   app.innerHTML = `
-
     <section class="page home-page">
 
       <div class="home-icon">
@@ -153,20 +128,18 @@ function renderHome() {
         class="btn btn-primary">
 
         <i class="bi bi-calendar3"></i>
-
         Quản lý cuộc họp
 
       </a>
 
     </section>
-
   `;
 }
 
 
-/* =====================================================
-   5. MEETING PAGE
-===================================================== */
+// =====================================================
+// 5. TRANG QUẢN LÝ CUỘC HỌP
+// =====================================================
 
 function renderMeetingsPage() {
 
@@ -192,19 +165,17 @@ function renderMeetingsPage() {
         </div>
 
         <button
+          type="button"
           id="btn-add-meeting"
           class="btn btn-primary">
 
           <i class="bi bi-plus-lg"></i>
-
           Thêm cuộc họp
 
         </button>
 
       </div>
 
-
-      <!-- TOOLBAR -->
 
       <div class="toolbar">
 
@@ -214,7 +185,6 @@ function renderMeetingsPage() {
           class="form-control"
           placeholder="Tìm kiếm cuộc họp..."
         />
-
 
         <select
           id="filter-status"
@@ -245,8 +215,6 @@ function renderMeetingsPage() {
       </div>
 
 
-      <!-- TABLE -->
-
       <div class="table-container">
 
         <table
@@ -256,21 +224,13 @@ function renderMeetingsPage() {
           <thead>
 
             <tr>
-
               <th>ID</th>
-
               <th>Tiêu đề</th>
-
               <th>Ngày giờ</th>
-
               <th>Địa điểm / Link</th>
-
               <th>Người tham gia</th>
-
               <th>Trạng thái</th>
-
               <th>Hành động</th>
-
             </tr>
 
           </thead>
@@ -288,26 +248,24 @@ function renderMeetingsPage() {
 
         <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
 
-        Chưa có cuộc họp nào.
+        Không tìm thấy cuộc họp nào.
 
       </p>
 
     </section>
-
   `;
 
 
-  // Khởi tạo sự kiện sau khi render
-
-  initializeMeetingPage();
+  // Gắn sự kiện SAU KHI HTML được render
+  setupMeetingEvents();
 
   renderMeetingTable();
 }
 
 
-/* =====================================================
-   6. 404 PAGE
-===================================================== */
+// =====================================================
+// 6. TRANG 404
+// =====================================================
 
 function render404() {
 
@@ -332,86 +290,456 @@ function render404() {
         class="btn btn-primary">
 
         <i class="bi bi-house"></i>
-
         Về trang chủ
 
       </a>
 
     </section>
-
   `;
 }
 
 
-/* =====================================================
-   7. DOM MODAL
-===================================================== */
+// =====================================================
+// 7. GẮN EVENT CHO TRANG MEETING
+// =====================================================
 
-const modalOverlay =
-  document.getElementById("modal-overlay");
+function setupMeetingEvents() {
 
-const detailOverlay =
-  document.getElementById("detail-overlay");
+  const addButton =
+    document.getElementById("btn-add-meeting");
+
+  const form =
+    document.getElementById("meeting-form");
+
+  const searchInput =
+    document.getElementById("search-meeting");
+
+  const filterSelect =
+    document.getElementById("filter-status");
+
+  const cancelButton =
+    document.getElementById("btn-cancel");
+
+  const closeModalButton =
+    document.getElementById("btn-close-modal");
+
+  const closeDetailButton =
+    document.getElementById("btn-close-detail");
+
+  const closeDetailBottom =
+    document.getElementById("btn-close-detail-bottom");
+
+  const meetingList =
+    document.getElementById("meetings-list");
 
 
-/* =====================================================
-   8. MỞ MODAL THÊM
-===================================================== */
+  // Nút thêm
+  if (addButton) {
+    addButton.addEventListener("click", openAddModal);
+  }
+
+
+  // Form
+  if (form) {
+    form.addEventListener("submit", saveMeeting);
+  }
+
+
+  // Tìm kiếm
+  if (searchInput) {
+    searchInput.addEventListener(
+      "input",
+      renderMeetingTable
+    );
+  }
+
+
+  // Lọc
+  if (filterSelect) {
+    filterSelect.addEventListener(
+      "change",
+      renderMeetingTable
+    );
+  }
+
+
+  // Hủy
+  if (cancelButton) {
+    cancelButton.addEventListener(
+      "click",
+      closeMeetingModal
+    );
+  }
+
+
+  // X nút modal
+  if (closeModalButton) {
+    closeModalButton.addEventListener(
+      "click",
+      closeMeetingModal
+    );
+  }
+
+
+  // Đóng detail
+  if (closeDetailButton) {
+    closeDetailButton.addEventListener(
+      "click",
+      closeDetailModal
+    );
+  }
+
+
+  // Đóng detail phía dưới
+  if (closeDetailBottom) {
+    closeDetailBottom.addEventListener(
+      "click",
+      closeDetailModal
+    );
+  }
+
+
+  // Các nút Sửa / Xóa / Xem
+  if (meetingList) {
+
+    meetingList.addEventListener(
+      "click",
+      handleMeetingAction
+    );
+
+  }
+}
+
+
+// =====================================================
+// 8. RENDER TABLE
+// =====================================================
+
+function renderMeetingTable() {
+
+  const list =
+    document.getElementById("meetings-list");
+
+  const table =
+    document.getElementById("meetings-table");
+
+  const empty =
+    document.getElementById("empty-state");
+
+  const searchInput =
+    document.getElementById("search-meeting");
+
+  const filterSelect =
+    document.getElementById("filter-status");
+
+
+  // Nếu không ở trang meeting thì dừng
+  if (
+    !list ||
+    !table ||
+    !empty ||
+    !searchInput ||
+    !filterSelect
+  ) {
+    return;
+  }
+
+
+  const keyword =
+    searchInput.value
+      .trim()
+      .toLowerCase();
+
+
+  const status =
+    filterSelect.value;
+
+
+  const filteredMeetings =
+    meetings.filter(meeting => {
+
+      const title =
+        meeting.title.toLowerCase();
+
+      const location =
+        (meeting.location || "")
+          .toLowerCase();
+
+      const participants =
+        meeting.participants
+          .join(" ")
+          .toLowerCase();
+
+
+      const matchSearch =
+        title.includes(keyword) ||
+        location.includes(keyword) ||
+        participants.includes(keyword);
+
+
+      const matchStatus =
+        status === "" ||
+        meeting.status === status;
+
+
+      return matchSearch && matchStatus;
+    });
+
+
+  list.innerHTML = "";
+
+
+  // Không có dữ liệu
+  if (filteredMeetings.length === 0) {
+
+    table.classList.add("hidden");
+
+    empty.classList.remove("hidden");
+
+    return;
+  }
+
+
+  table.classList.remove("hidden");
+
+  empty.classList.add("hidden");
+
+
+  // Render dữ liệu
+  filteredMeetings.forEach(meeting => {
+
+    const row =
+      document.createElement("tr");
+
+
+    row.innerHTML = `
+
+      <td data-label="ID">
+        ${meeting.id}
+      </td>
+
+      <td data-label="Tiêu đề">
+        <strong>
+          ${escapeHTML(meeting.title)}
+        </strong>
+      </td>
+
+      <td data-label="Ngày giờ">
+        ${formatDate(meeting.date)}
+        <br>
+        <small>
+          ${escapeHTML(meeting.time)}
+        </small>
+      </td>
+
+      <td data-label="Địa điểm / Link">
+        ${escapeHTML(
+          meeting.location || "Chưa cập nhật"
+        )}
+      </td>
+
+      <td data-label="Người tham gia">
+        ${escapeHTML(
+          meeting.participants.join(", ")
+        )}
+      </td>
+
+      <td data-label="Trạng thái">
+
+        <span
+          class="${getStatusClass(meeting.status)}">
+
+          ${getStatusText(meeting.status)}
+
+        </span>
+
+      </td>
+
+      <td data-label="Hành động">
+
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-info me-1"
+          data-action="detail"
+          data-id="${meeting.id}"
+          title="Xem chi tiết">
+
+          <i class="bi bi-eye"></i>
+
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary me-1"
+          data-action="edit"
+          data-id="${meeting.id}"
+          title="Chỉnh sửa">
+
+          <i class="bi bi-pencil"></i>
+
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger"
+          data-action="delete"
+          data-id="${meeting.id}"
+          title="Xóa">
+
+          <i class="bi bi-trash"></i>
+
+        </button>
+
+      </td>
+    `;
+
+
+    list.appendChild(row);
+  });
+}
+
+
+// =====================================================
+// 9. XỬ LÝ NÚT TRONG TABLE
+// =====================================================
+
+function handleMeetingAction(event) {
+
+  const button =
+    event.target.closest("button");
+
+
+  if (!button) {
+    return;
+  }
+
+
+  const action =
+    button.dataset.action;
+
+
+  const id =
+    Number(button.dataset.id);
+
+
+  if (!id) {
+    return;
+  }
+
+
+  switch (action) {
+
+    case "detail":
+      openDetailModal(id);
+      break;
+
+    case "edit":
+      openEditModal(id);
+      break;
+
+    case "delete":
+      deleteMeeting(id);
+      break;
+
+  }
+}
+
+
+// =====================================================
+// 10. THÊM CUỘC HỌP
+// =====================================================
 
 function openAddModal() {
 
-  document.getElementById("modal-title").textContent =
+  const form =
+    document.getElementById("meeting-form");
+
+  const title =
+    document.getElementById("modal-title");
+
+  const id =
+    document.getElementById("meeting-id");
+
+
+  if (!form || !title || !id) {
+    return;
+  }
+
+
+  form.reset();
+
+  id.value = "";
+
+  title.textContent =
     "Thêm cuộc họp";
 
-  document.getElementById("meeting-form").reset();
-
-  document.getElementById("meeting-id").value = "";
 
   modalOverlay.classList.remove("hidden");
 }
 
 
-/* =====================================================
-   9. MỞ MODAL SỬA
-===================================================== */
+// =====================================================
+// 11. SỬA CUỘC HỌP
+// =====================================================
 
 function openEditModal(id) {
 
-  const meeting = meetings.find(
-    item => item.id === id
-  );
+  const meeting =
+    meetings.find(
+      item => item.id === id
+    );
+
 
   if (!meeting) {
+    alert("Không tìm thấy cuộc họp.");
     return;
   }
 
 
-  document.getElementById("modal-title").textContent =
+  document.getElementById("modal-title")
+    .textContent =
     "Chỉnh sửa cuộc họp";
 
 
-  document.getElementById("meeting-id").value =
+  document.getElementById("meeting-id")
+    .value =
     meeting.id;
 
-  document.getElementById("meeting-title").value =
+
+  document.getElementById("meeting-title")
+    .value =
     meeting.title;
 
-  document.getElementById("meeting-date").value =
+
+  document.getElementById("meeting-date")
+    .value =
     meeting.date;
 
-  document.getElementById("meeting-time").value =
+
+  document.getElementById("meeting-time")
+    .value =
     meeting.time;
 
-  document.getElementById("meeting-location").value =
+
+  document.getElementById("meeting-location")
+    .value =
     meeting.location;
 
-  document.getElementById("meeting-participants").value =
+
+  document.getElementById("meeting-participants")
+    .value =
     meeting.participants.join(", ");
 
-  document.getElementById("meeting-status").value =
+
+  document.getElementById("meeting-status")
+    .value =
     meeting.status;
 
-  document.getElementById("meeting-notes").value =
+
+  document.getElementById("meeting-notes")
+    .value =
     meeting.notes;
 
 
@@ -419,29 +747,9 @@ function openEditModal(id) {
 }
 
 
-/* =====================================================
-   10. ĐÓNG MODAL
-===================================================== */
-
-function closeMeetingModal() {
-
-  modalOverlay.classList.add("hidden");
-
-  document.getElementById("meeting-form").reset();
-
-  document.getElementById("meeting-id").value = "";
-}
-
-
-function closeDetailModal() {
-
-  detailOverlay.classList.add("hidden");
-}
-
-
-/* =====================================================
-   11. LƯU CUỘC HỌP
-===================================================== */
+// =====================================================
+// 12. LƯU
+// =====================================================
 
 function saveMeeting(event) {
 
@@ -449,19 +757,31 @@ function saveMeeting(event) {
 
 
   const id =
-    document.getElementById("meeting-id").value;
+    document.getElementById("meeting-id")
+      .value;
+
 
   const title =
-    document.getElementById("meeting-title").value.trim();
+    document.getElementById("meeting-title")
+      .value
+      .trim();
+
 
   const date =
-    document.getElementById("meeting-date").value;
+    document.getElementById("meeting-date")
+      .value;
+
 
   const time =
-    document.getElementById("meeting-time").value;
+    document.getElementById("meeting-time")
+      .value;
+
 
   const location =
-    document.getElementById("meeting-location").value.trim();
+    document.getElementById("meeting-location")
+      .value
+      .trim();
+
 
   const participants =
     document.getElementById("meeting-participants")
@@ -470,11 +790,16 @@ function saveMeeting(event) {
       .map(item => item.trim())
       .filter(item => item !== "");
 
+
   const status =
-    document.getElementById("meeting-status").value;
+    document.getElementById("meeting-status")
+      .value;
+
 
   const notes =
-    document.getElementById("meeting-notes").value.trim();
+    document.getElementById("meeting-notes")
+      .value
+      .trim();
 
 
   if (!title || !date || !time) {
@@ -488,12 +813,13 @@ function saveMeeting(event) {
 
 
   // SỬA
-
   if (id) {
 
-    const index = meetings.findIndex(
-      item => item.id === Number(id)
-    );
+    const index =
+      meetings.findIndex(
+        item => item.id === Number(id)
+      );
+
 
     if (index !== -1) {
 
@@ -502,17 +828,11 @@ function saveMeeting(event) {
         id: Number(id),
 
         title,
-
         date,
-
         time,
-
         location,
-
         participants,
-
         status,
-
         notes
       };
 
@@ -521,7 +841,6 @@ function saveMeeting(event) {
   }
 
   // THÊM
-
   else {
 
     meetings.push({
@@ -529,17 +848,11 @@ function saveMeeting(event) {
       id: getNextId(),
 
       title,
-
       date,
-
       time,
-
       location,
-
       participants,
-
       status,
-
       notes
     });
 
@@ -552,9 +865,9 @@ function saveMeeting(event) {
 }
 
 
-/* =====================================================
-   12. ID MỚI
-===================================================== */
+// =====================================================
+// 13. ID MỚI
+// =====================================================
 
 function getNextId() {
 
@@ -562,62 +875,77 @@ function getNextId() {
     return 1;
   }
 
-  return Math.max(
-    ...meetings.map(item => item.id)
-  ) + 1;
+
+  return (
+    Math.max(
+      ...meetings.map(
+        meeting => meeting.id
+      )
+    ) + 1
+  );
 }
 
 
-/* =====================================================
-   13. XÓA CUỘC HỌP
-===================================================== */
+// =====================================================
+// 14. XÓA
+// =====================================================
 
 function deleteMeeting(id) {
 
-  const meeting = meetings.find(
-    item => item.id === id
-  );
+  const meeting =
+    meetings.find(
+      item => item.id === id
+    );
+
 
   if (!meeting) {
     return;
   }
 
 
-  const confirmDelete = confirm(
-    `Bạn có chắc muốn xóa cuộc họp "${meeting.title}" không?`
-  );
+  const confirmed =
+    window.confirm(
+      `Bạn có chắc muốn xóa cuộc họp "${meeting.title}" không?`
+    );
 
 
-  if (!confirmDelete) {
+  if (!confirmed) {
     return;
   }
 
 
-  meetings = meetings.filter(
-    item => item.id !== id
-  );
+  meetings =
+    meetings.filter(
+      item => item.id !== id
+    );
 
 
   renderMeetingTable();
 }
 
 
-/* =====================================================
-   14. XEM CHI TIẾT
-===================================================== */
+// =====================================================
+// 15. XEM CHI TIẾT
+// =====================================================
 
 function openDetailModal(id) {
 
-  const meeting = meetings.find(
-    item => item.id === id
-  );
+  const meeting =
+    meetings.find(
+      item => item.id === id
+    );
+
 
   if (!meeting) {
     return;
   }
 
 
-  document.getElementById("detail-content").innerHTML = `
+  const content =
+    document.getElementById("detail-content");
+
+
+  content.innerHTML = `
 
     <p>
       <strong>ID:</strong>
@@ -641,21 +969,27 @@ function openDetailModal(id) {
 
     <p>
       <strong>Địa điểm / Link:</strong>
-      ${escapeHTML(meeting.location || "Chưa cập nhật")}
+      ${escapeHTML(
+        meeting.location || "Chưa cập nhật"
+      )}
     </p>
 
     <p>
       <strong>Người tham gia:</strong>
       ${escapeHTML(
-        meeting.participants.join(", ") || "Chưa có"
+        meeting.participants.join(", ")
+        || "Chưa có"
       )}
     </p>
 
     <p>
       <strong>Trạng thái:</strong>
 
-      <span class="${getStatusClass(meeting.status)}">
+      <span
+        class="${getStatusClass(meeting.status)}">
+
         ${getStatusText(meeting.status)}
+
       </span>
 
     </p>
@@ -674,344 +1008,43 @@ function openDetailModal(id) {
 }
 
 
-/* =====================================================
-   15. RENDER TABLE
-===================================================== */
+// =====================================================
+// 16. ĐÓNG MODAL
+// =====================================================
 
-function renderMeetingTable() {
+function closeMeetingModal() {
 
-  const list =
-    document.getElementById("meetings-list");
+  modalOverlay.classList.add("hidden");
 
-  const table =
-    document.getElementById("meetings-table");
-
-  const empty =
-    document.getElementById("empty-state");
-
-
-  if (!list) {
-    return;
-  }
-
-
-  const search =
-    document.getElementById("search-meeting")
-      .value
-      .trim()
-      .toLowerCase();
-
-
-  const status =
-    document.getElementById("filter-status")
-      .value;
-
-
-  const filtered = meetings.filter(meeting => {
-
-    const matchesSearch =
-      meeting.title.toLowerCase().includes(search) ||
-
-      meeting.location.toLowerCase().includes(search) ||
-
-      meeting.participants
-        .join(" ")
-        .toLowerCase()
-        .includes(search);
-
-
-    const matchesStatus =
-      !status ||
-      meeting.status === status;
-
-
-    return matchesSearch && matchesStatus;
-
-  });
-
-
-  list.innerHTML = "";
-
-
-  if (filtered.length === 0) {
-
-    table.classList.add("hidden");
-
-    empty.classList.remove("hidden");
-
-    return;
-  }
-
-
-  table.classList.remove("hidden");
-
-  empty.classList.add("hidden");
-
-
-  filtered.forEach(meeting => {
-
-    const row =
-      document.createElement("tr");
-
-
-    row.innerHTML = `
-
-      <td data-label="ID">
-        ${meeting.id}
-      </td>
-
-      <td data-label="Tiêu đề">
-
-        <strong>
-          ${escapeHTML(meeting.title)}
-        </strong>
-
-      </td>
-
-      <td data-label="Ngày giờ">
-
-        ${formatDate(meeting.date)}
-
-        <br>
-
-        <small>
-          ${escapeHTML(meeting.time)}
-        </small>
-
-      </td>
-
-      <td data-label="Địa điểm / Link">
-
-        ${escapeHTML(
-          meeting.location || "Chưa cập nhật"
-        )}
-
-      </td>
-
-      <td data-label="Người tham gia">
-
-        ${escapeHTML(
-          meeting.participants.join(", ")
-        )}
-
-      </td>
-
-      <td data-label="Trạng thái">
-
-        <span
-          class="${getStatusClass(meeting.status)}">
-
-          ${getStatusText(meeting.status)}
-
-        </span>
-
-      </td>
-
-      <td data-label="Hành động">
-
-        <button
-          class="btn btn-sm btn-outline-info me-1"
-          data-action="detail"
-          data-id="${meeting.id}"
-          title="Xem chi tiết">
-
-          <i class="bi bi-eye"></i>
-
-        </button>
-
-
-        <button
-          class="btn btn-sm btn-outline-primary me-1"
-          data-action="edit"
-          data-id="${meeting.id}"
-          title="Chỉnh sửa">
-
-          <i class="bi bi-pencil"></i>
-
-        </button>
-
-
-        <button
-          class="btn btn-sm btn-outline-danger"
-          data-action="delete"
-          data-id="${meeting.id}"
-          title="Xóa">
-
-          <i class="bi bi-trash"></i>
-
-        </button>
-
-      </td>
-
-    `;
-
-
-    list.appendChild(row);
-
-  });
-}
-
-
-/* =====================================================
-   16. KHỞI TẠO TRANG MEETING
-===================================================== */
-
-function initializeMeetingPage() {
-
-  const btnAdd =
-    document.getElementById("btn-add-meeting");
 
   const form =
     document.getElementById("meeting-form");
 
-  const search =
-    document.getElementById("search-meeting");
 
-  const filter =
-    document.getElementById("filter-status");
-
-
-  btnAdd.addEventListener(
-    "click",
-    openAddModal
-  );
-
-
-  form.addEventListener(
-    "submit",
-    saveMeeting
-  );
-
-
-  search.addEventListener(
-    "input",
-    renderMeetingTable
-  );
-
-
-  filter.addEventListener(
-    "change",
-    renderMeetingTable
-  );
-
-
-  document
-    .getElementById("btn-cancel")
-    .addEventListener(
-      "click",
-      closeMeetingModal
-    );
-
-
-  document
-    .getElementById("btn-close-modal")
-    .addEventListener(
-      "click",
-      closeMeetingModal
-    );
-
-
-  document
-    .getElementById("btn-close-detail")
-    .addEventListener(
-      "click",
-      closeDetailModal
-    );
-
-
-  document
-    .getElementById("btn-close-detail-bottom")
-    .addEventListener(
-      "click",
-      closeDetailModal
-    );
-
-
-  document
-    .getElementById("meetings-list")
-    .addEventListener(
-      "click",
-      handleTableAction
-    );
-}
-
-
-/* =====================================================
-   17. TABLE ACTION
-===================================================== */
-
-function handleTableAction(event) {
-
-  const button =
-    event.target.closest("button");
-
-
-  if (!button) {
-    return;
+  if (form) {
+    form.reset();
   }
-
-
-  const action =
-    button.dataset.action;
 
 
   const id =
-    Number(button.dataset.id);
+    document.getElementById("meeting-id");
 
 
-  if (action === "detail") {
-
-    openDetailModal(id);
-
-  }
-
-  else if (action === "edit") {
-
-    openEditModal(id);
-
-  }
-
-  else if (action === "delete") {
-
-    deleteMeeting(id);
-
+  if (id) {
+    id.value = "";
   }
 }
 
 
-/* =====================================================
-   18. STATUS
-===================================================== */
+function closeDetailModal() {
 
-function getStatusText(status) {
-
-  const statusMap = {
-
-    scheduled: "Sắp diễn ra",
-
-    "in-progress": "Đang diễn ra",
-
-    completed: "Đã hoàn thành",
-
-    cancelled: "Đã hủy"
-
-  };
-
-
-  return statusMap[status] ||
-    "Không xác định";
+  detailOverlay.classList.add("hidden");
 }
 
 
-function getStatusClass(status) {
-
-  return `badge badge-${status}`;
-}
-
-
-/* =====================================================
-   19. FORMAT DATE
-===================================================== */
+// =====================================================
+// 17. FORMAT DATE
+// =====================================================
 
 function formatDate(date) {
 
@@ -1033,9 +1066,41 @@ function formatDate(date) {
 }
 
 
-/* =====================================================
-   20. ESCAPE HTML
-===================================================== */
+// =====================================================
+// 18. STATUS
+// =====================================================
+
+function getStatusText(status) {
+
+  const statusMap = {
+
+    scheduled: "Sắp diễn ra",
+
+    "in-progress": "Đang diễn ra",
+
+    completed: "Đã hoàn thành",
+
+    cancelled: "Đã hủy"
+
+  };
+
+
+  return (
+    statusMap[status] ||
+    "Không xác định"
+  );
+}
+
+
+function getStatusClass(status) {
+
+  return `badge badge-${status}`;
+}
+
+
+// =====================================================
+// 19. CHỐNG HTML INJECTION
+// =====================================================
 
 function escapeHTML(value) {
 
@@ -1043,9 +1108,7 @@ function escapeHTML(value) {
     value === null ||
     value === undefined
   ) {
-
     return "";
-
   }
 
 
@@ -1063,20 +1126,16 @@ function escapeHTML(value) {
 }
 
 
-/* =====================================================
-   21. CLICK OUTSIDE MODAL
-===================================================== */
+// =====================================================
+// 20. CLICK RA NGOÀI MODAL
+// =====================================================
 
 modalOverlay.addEventListener(
   "click",
-  event => {
+  function (event) {
 
-    if (
-      event.target === modalOverlay
-    ) {
-
+    if (event.target === modalOverlay) {
       closeMeetingModal();
-
     }
 
   }
@@ -1085,27 +1144,23 @@ modalOverlay.addEventListener(
 
 detailOverlay.addEventListener(
   "click",
-  event => {
+  function (event) {
 
-    if (
-      event.target === detailOverlay
-    ) {
-
+    if (event.target === detailOverlay) {
       closeDetailModal();
-
     }
 
   }
 );
 
 
-/* =====================================================
-   22. ESC ĐỂ ĐÓNG MODAL
-===================================================== */
+// =====================================================
+// 21. PHÍM ESC
+// =====================================================
 
 document.addEventListener(
   "keydown",
-  event => {
+  function (event) {
 
     if (event.key !== "Escape") {
       return;
@@ -1115,26 +1170,22 @@ document.addEventListener(
     if (
       !modalOverlay.classList.contains("hidden")
     ) {
-
       closeMeetingModal();
-
     }
 
 
     if (
       !detailOverlay.classList.contains("hidden")
     ) {
-
       closeDetailModal();
-
     }
 
   }
 );
 
 
-/* =====================================================
-   23. START ROUTER
-===================================================== */
+// =====================================================
+// 22. KHỞI ĐỘNG ROUTER
+// =====================================================
 
 router();

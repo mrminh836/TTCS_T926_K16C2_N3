@@ -158,6 +158,13 @@ body {
   min-width: 220px;
 }
 
+/* FIX: Bootstrap đặt .form-select width 100% nên ô lọc bị kéo giãn quá rộng */
+#filter-status {
+  width: auto;
+
+  min-width: 180px;
+}
+
 
 /* ==========================================
    TABLE
@@ -277,6 +284,18 @@ body {
 }
 
 .modal {
+  /* FIX: ghi đè class .modal mặc định của Bootstrap
+     (Bootstrap đặt display: none, position: fixed, height: 100%) */
+  display: block;
+
+  position: relative;
+
+  top: auto;
+
+  left: auto;
+
+  height: auto;
+
   width: 100%;
 
   max-width: 520px;
