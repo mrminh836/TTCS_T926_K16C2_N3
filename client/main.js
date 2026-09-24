@@ -1,9 +1,21 @@
-// ==========================================
-// QUẢN LÝ CUỘC HỌP - MAIN.JS
-// JavaScript thuần, không dùng thư viện
-// ==========================================
+/* =====================================================
+   PRODUCT BACKLOG - MEETING MANAGEMENT
+   JavaScript thuần
+   Có:
+   - Router Base
+   - Home
+   - Meetings
+   - 404
+   - CRUD Meeting
+   - Search
+   - Filter
+   ===================================================== */
 
-// ---------- DỮ LIỆU MẪU ----------
+
+/* =====================================================
+   1. DATA
+===================================================== */
+
 let meetings = [
   {
     id: 1,
@@ -11,359 +23,538 @@ let meetings = [
     date: "2026-09-25",
     time: "09:00",
     location: "Phòng họp A",
-    participants: ["Nguyễn Minh Lượng", "Trần Văn A", "Lê Văn B"],
+    participants: [
+      "Nguyễn Minh Lượng",
+      "Trần Văn A",
+      "Lê Văn B"
+    ],
     status: "scheduled",
     notes: "Thảo luận tiến độ phát triển giao diện."
   },
+
   {
     id: 2,
     title: "Sprint Planning",
     date: "2026-09-26",
     time: "14:00",
     location: "Google Meet",
-    participants: ["Nguyễn Minh Lượng", "Phạm Văn C"],
+    participants: [
+      "Nguyễn Minh Lượng",
+      "Phạm Văn C"
+    ],
     status: "in-progress",
     notes: "Lên kế hoạch công việc cho Sprint tiếp theo."
   },
+
   {
     id: 3,
     title: "Demo sản phẩm",
     date: "2026-09-20",
     time: "15:30",
     location: "Phòng Lab",
-    participants: ["Nguyễn Minh Lượng", "Trần Văn A"],
+    participants: [
+      "Nguyễn Minh Lượng",
+      "Trần Văn A"
+    ],
     status: "completed",
     notes: "Demo các chức năng đã hoàn thành."
   }
 ];
 
-// ---------- LẤY CÁC PHẦN TỬ HTML ----------
-const searchMeeting = document.getElementById("search-meeting");
-const filterStatus = document.getElementById("filter-status");
-const btnAddMeeting = document.getElementById("btn-add-meeting");
 
-const meetingsTable = document.getElementById("meetings-table");
-const meetingsList = document.getElementById("meetings-list");
-const emptyState = document.getElementById("empty-state");
+/* =====================================================
+   2. ROUTER BASE
+===================================================== */
 
-// Modal thêm / sửa
-const modalOverlay = document.getElementById("modal-overlay");
-const modalTitle = document.getElementById("modal-title");
-const meetingForm = document.getElementById("meeting-form");
-
-const meetingId = document.getElementById("meeting-id");
-const meetingTitle = document.getElementById("meeting-title");
-const meetingDate = document.getElementById("meeting-date");
-const meetingTime = document.getElementById("meeting-time");
-const meetingLocation = document.getElementById("meeting-location");
-const meetingParticipants = document.getElementById("meeting-participants");
-const meetingStatus = document.getElementById("meeting-status");
-const meetingNotes = document.getElementById("meeting-notes");
-
-const btnCancel = document.getElementById("btn-cancel");
-
-// Modal chi tiết
-const detailOverlay = document.getElementById("detail-overlay");
-const detailContent = document.getElementById("detail-content");
-const btnCloseDetail = document.getElementById("btn-close-detail");
+const routes = {
+  "/": renderHome,
+  "/meetings": renderMeetingsPage,
+  "/404": render404
+};
 
 
-// ==========================================
-// HÀM HỖ TRỢ
-// ==========================================
+/*
+  Lấy route hiện tại từ URL hash.
 
-// Chuyển trạng thái sang tiếng Việt
-function getStatusText(status) {
-  const statusMap = {
-    "scheduled": "Sắp diễn ra",
-    "in-progress": "Đang diễn ra",
-    "completed": "Đã hoàn thành",
-    "cancelled": "Đã hủy"
-  };
+  Ví dụ:
 
-  return statusMap[status] || "Không xác định";
+  http://localhost/index.html#/
+  http://localhost/index.html#/meetings
+  http://localhost/index.html#/404
+*/
+
+function getCurrentRoute() {
+
+  let hash = window.location.hash;
+
+  if (!hash || hash === "#") {
+    return "/";
+  }
+
+  return hash.substring(1);
 }
 
 
-// Lấy class tương ứng với trạng thái
-function getStatusClass(status) {
-  return `badge badge-${status}`;
+/*
+  Router chính
+*/
+
+function router() {
+
+  const route = getCurrentRoute();
+
+  const renderFunction =
+    routes[route] || routes["/404"];
+
+  renderFunction();
 }
 
 
-// Format ngày từ YYYY-MM-DD thành DD/MM/YYYY
-function formatDate(dateString) {
-  if (!dateString) {
-    return "";
-  }
+/*
+  Theo dõi thay đổi URL
+*/
 
-  const parts = dateString.split("-");
+window.addEventListener("hashchange", router);
 
-  if (parts.length !== 3) {
-    return dateString;
-  }
 
-  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+/* =====================================================
+   3. APP CONTAINER
+===================================================== */
+
+const app = document.getElementById("app");
+
+
+/* =====================================================
+   4. HOME PAGE
+===================================================== */
+
+function renderHome() {
+
+  app.innerHTML = `
+
+    <section class="page home-page">
+
+      <div class="home-icon">
+        <i class="bi bi-calendar-check"></i>
+      </div>
+
+      <h2>
+        Chào mừng đến với hệ thống
+        Quản lý Cuộc họp
+      </h2>
+
+      <p>
+        Quản lý, theo dõi và tổ chức các cuộc họp
+        một cách đơn giản và hiệu quả.
+      </p>
+
+      <a
+        href="#/meetings"
+        class="btn btn-primary">
+
+        <i class="bi bi-calendar3"></i>
+
+        Quản lý cuộc họp
+
+      </a>
+
+    </section>
+
+  `;
 }
 
 
-// Escape HTML để tránh chèn HTML ngoài ý muốn
-function escapeHTML(value) {
-  if (value === null || value === undefined) {
-    return "";
-  }
+/* =====================================================
+   5. MEETING PAGE
+===================================================== */
 
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+function renderMeetingsPage() {
 
+  app.innerHTML = `
 
-// ==========================================
-// RENDER DANH SÁCH CUỘC HỌP
-// ==========================================
+    <section id="meetings-section" class="page">
 
-function renderMeetings() {
-  const keyword = searchMeeting.value.trim().toLowerCase();
-  const statusFilter = filterStatus.value;
+      <div
+        class="d-flex justify-content-between
+        align-items-center mb-4">
 
-  // Lọc dữ liệu
-  const filteredMeetings = meetings.filter(function (meeting) {
+        <div>
 
-    const matchesKeyword =
-      meeting.title.toLowerCase().includes(keyword) ||
-      meeting.location.toLowerCase().includes(keyword) ||
-      meeting.participants.join(", ").toLowerCase().includes(keyword);
+          <h2 class="mb-1">
+            <i class="bi bi-calendar3"></i>
+            Danh sách cuộc họp
+          </h2>
 
-    const matchesStatus =
-      statusFilter === "" ||
-      meeting.status === statusFilter;
+          <p class="text-muted mb-0">
+            Quản lý các cuộc họp trong hệ thống
+          </p>
 
-    return matchesKeyword && matchesStatus;
-  });
-
-  // Xóa danh sách cũ
-  meetingsList.innerHTML = "";
-
-  // Không có dữ liệu
-  if (filteredMeetings.length === 0) {
-    meetingsTable.classList.add("hidden");
-    emptyState.classList.remove("hidden");
-    return;
-  }
-
-  // Có dữ liệu
-  meetingsTable.classList.remove("hidden");
-  emptyState.classList.add("hidden");
-
-  // Render từng cuộc họp
-  filteredMeetings.forEach(function (meeting) {
-
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td data-label="ID">${meeting.id}</td>
-
-      <td data-label="Tiêu đề">
-        <strong>${escapeHTML(meeting.title)}</strong>
-      </td>
-
-      <td data-label="Ngày giờ">
-        ${formatDate(meeting.date)}
-        <br>
-        <small>${escapeHTML(meeting.time)}</small>
-      </td>
-
-      <td data-label="Địa điểm / Link">
-        ${escapeHTML(meeting.location || "Chưa cập nhật")}
-      </td>
-
-      <td data-label="Người tham gia">
-        ${escapeHTML(meeting.participants.join(", "))}
-      </td>
-
-      <td data-label="Trạng thái">
-        <span class="${getStatusClass(meeting.status)}">
-          ${getStatusText(meeting.status)}
-        </span>
-      </td>
-
-      <td data-label="Hành động">
-        <button
-          class="btn-icon"
-          title="Xem chi tiết"
-          data-action="detail"
-          data-id="${meeting.id}"
-        >
-          👁️
-        </button>
+        </div>
 
         <button
-          class="btn-icon"
-          title="Chỉnh sửa"
-          data-action="edit"
-          data-id="${meeting.id}"
-        >
-          ✏️
+          id="btn-add-meeting"
+          class="btn btn-primary">
+
+          <i class="bi bi-plus-lg"></i>
+
+          Thêm cuộc họp
+
         </button>
 
-        <button
-          class="btn-icon"
-          title="Xóa"
-          data-action="delete"
-          data-id="${meeting.id}"
-        >
-          🗑️
-        </button>
-      </td>
-    `;
+      </div>
 
-    meetingsList.appendChild(row);
-  });
+
+      <!-- TOOLBAR -->
+
+      <div class="toolbar">
+
+        <input
+          type="text"
+          id="search-meeting"
+          class="form-control"
+          placeholder="Tìm kiếm cuộc họp..."
+        />
+
+
+        <select
+          id="filter-status"
+          class="form-select">
+
+          <option value="">
+            Tất cả trạng thái
+          </option>
+
+          <option value="scheduled">
+            Sắp diễn ra
+          </option>
+
+          <option value="in-progress">
+            Đang diễn ra
+          </option>
+
+          <option value="completed">
+            Đã hoàn thành
+          </option>
+
+          <option value="cancelled">
+            Đã hủy
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- TABLE -->
+
+      <div class="table-container">
+
+        <table
+          id="meetings-table"
+          class="table table-hover">
+
+          <thead>
+
+            <tr>
+
+              <th>ID</th>
+
+              <th>Tiêu đề</th>
+
+              <th>Ngày giờ</th>
+
+              <th>Địa điểm / Link</th>
+
+              <th>Người tham gia</th>
+
+              <th>Trạng thái</th>
+
+              <th>Hành động</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="meetings-list"></tbody>
+
+        </table>
+
+      </div>
+
+
+      <p
+        id="empty-state"
+        class="empty-state hidden">
+
+        <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
+
+        Chưa có cuộc họp nào.
+
+      </p>
+
+    </section>
+
+  `;
+
+
+  // Khởi tạo sự kiện sau khi render
+
+  initializeMeetingPage();
+
+  renderMeetingTable();
 }
 
 
-// ==========================================
-// MỞ MODAL THÊM CUỘC HỌP
-// ==========================================
+/* =====================================================
+   6. 404 PAGE
+===================================================== */
+
+function render404() {
+
+  app.innerHTML = `
+
+    <section class="page error-page">
+
+      <div class="error-code">
+        404
+      </div>
+
+      <h2>
+        Không tìm thấy trang
+      </h2>
+
+      <p>
+        Đường dẫn bạn truy cập không tồn tại.
+      </p>
+
+      <a
+        href="#/"
+        class="btn btn-primary">
+
+        <i class="bi bi-house"></i>
+
+        Về trang chủ
+
+      </a>
+
+    </section>
+
+  `;
+}
+
+
+/* =====================================================
+   7. DOM MODAL
+===================================================== */
+
+const modalOverlay =
+  document.getElementById("modal-overlay");
+
+const detailOverlay =
+  document.getElementById("detail-overlay");
+
+
+/* =====================================================
+   8. MỞ MODAL THÊM
+===================================================== */
 
 function openAddModal() {
 
-  modalTitle.textContent = "Thêm cuộc họp";
+  document.getElementById("modal-title").textContent =
+    "Thêm cuộc họp";
 
-  meetingForm.reset();
+  document.getElementById("meeting-form").reset();
 
-  meetingId.value = "";
+  document.getElementById("meeting-id").value = "";
 
   modalOverlay.classList.remove("hidden");
 }
 
 
-// ==========================================
-// ĐÓNG MODAL THÊM / SỬA
-// ==========================================
-
-function closeMeetingModal() {
-  modalOverlay.classList.add("hidden");
-  meetingForm.reset();
-  meetingId.value = "";
-}
-
-
-// ==========================================
-// MỞ MODAL SỬA CUỘC HỌP
-// ==========================================
+/* =====================================================
+   9. MỞ MODAL SỬA
+===================================================== */
 
 function openEditModal(id) {
 
-  const meeting = meetings.find(function (item) {
-    return item.id === id;
-  });
+  const meeting = meetings.find(
+    item => item.id === id
+  );
 
   if (!meeting) {
     return;
   }
 
-  modalTitle.textContent = "Chỉnh sửa cuộc họp";
 
-  meetingId.value = meeting.id;
-  meetingTitle.value = meeting.title;
-  meetingDate.value = meeting.date;
-  meetingTime.value = meeting.time;
-  meetingLocation.value = meeting.location;
-  meetingParticipants.value = meeting.participants.join(", ");
-  meetingStatus.value = meeting.status;
-  meetingNotes.value = meeting.notes;
+  document.getElementById("modal-title").textContent =
+    "Chỉnh sửa cuộc họp";
+
+
+  document.getElementById("meeting-id").value =
+    meeting.id;
+
+  document.getElementById("meeting-title").value =
+    meeting.title;
+
+  document.getElementById("meeting-date").value =
+    meeting.date;
+
+  document.getElementById("meeting-time").value =
+    meeting.time;
+
+  document.getElementById("meeting-location").value =
+    meeting.location;
+
+  document.getElementById("meeting-participants").value =
+    meeting.participants.join(", ");
+
+  document.getElementById("meeting-status").value =
+    meeting.status;
+
+  document.getElementById("meeting-notes").value =
+    meeting.notes;
+
 
   modalOverlay.classList.remove("hidden");
 }
 
 
-// ==========================================
-// LƯU CUỘC HỌP
-// ==========================================
+/* =====================================================
+   10. ĐÓNG MODAL
+===================================================== */
 
-meetingForm.addEventListener("submit", function (event) {
+function closeMeetingModal() {
+
+  modalOverlay.classList.add("hidden");
+
+  document.getElementById("meeting-form").reset();
+
+  document.getElementById("meeting-id").value = "";
+}
+
+
+function closeDetailModal() {
+
+  detailOverlay.classList.add("hidden");
+}
+
+
+/* =====================================================
+   11. LƯU CUỘC HỌP
+===================================================== */
+
+function saveMeeting(event) {
 
   event.preventDefault();
 
-  const title = meetingTitle.value.trim();
-  const date = meetingDate.value;
-  const time = meetingTime.value;
-  const location = meetingLocation.value.trim();
 
-  const participants = meetingParticipants.value
-    .split(",")
-    .map(function (person) {
-      return person.trim();
-    })
-    .filter(function (person) {
-      return person !== "";
-    });
+  const id =
+    document.getElementById("meeting-id").value;
 
-  const status = meetingStatus.value;
-  const notes = meetingNotes.value.trim();
+  const title =
+    document.getElementById("meeting-title").value.trim();
 
-  // Kiểm tra dữ liệu bắt buộc
+  const date =
+    document.getElementById("meeting-date").value;
+
+  const time =
+    document.getElementById("meeting-time").value;
+
+  const location =
+    document.getElementById("meeting-location").value.trim();
+
+  const participants =
+    document.getElementById("meeting-participants")
+      .value
+      .split(",")
+      .map(item => item.trim())
+      .filter(item => item !== "");
+
+  const status =
+    document.getElementById("meeting-status").value;
+
+  const notes =
+    document.getElementById("meeting-notes").value.trim();
+
+
   if (!title || !date || !time) {
-    alert("Vui lòng nhập đầy đủ Tiêu đề, Ngày và Giờ.");
+
+    alert(
+      "Vui lòng nhập đầy đủ Tiêu đề, Ngày và Giờ."
+    );
+
     return;
   }
 
-  // Nếu có ID -> cập nhật
-  if (meetingId.value) {
 
-    const id = Number(meetingId.value);
+  // SỬA
 
-    const index = meetings.findIndex(function (meeting) {
-      return meeting.id === id;
-    });
+  if (id) {
+
+    const index = meetings.findIndex(
+      item => item.id === Number(id)
+    );
 
     if (index !== -1) {
 
       meetings[index] = {
-        id: id,
-        title: title,
-        date: date,
-        time: time,
-        location: location,
-        participants: participants,
-        status: status,
-        notes: notes
+
+        id: Number(id),
+
+        title,
+
+        date,
+
+        time,
+
+        location,
+
+        participants,
+
+        status,
+
+        notes
       };
+
     }
 
-  } else {
-
-    // Nếu không có ID -> thêm mới
-    const newMeeting = {
-      id: getNextId(),
-      title: title,
-      date: date,
-      time: time,
-      location: location,
-      participants: participants,
-      status: status,
-      notes: notes
-    };
-
-    meetings.push(newMeeting);
   }
 
-  // Đóng modal
+  // THÊM
+
+  else {
+
+    meetings.push({
+
+      id: getNextId(),
+
+      title,
+
+      date,
+
+      time,
+
+      location,
+
+      participants,
+
+      status,
+
+      notes
+    });
+
+  }
+
+
   closeMeetingModal();
 
-  // Render lại danh sách
-  renderMeetings();
-});
+  renderMeetingTable();
+}
 
 
-// ==========================================
-// TẠO ID MỚI
-// ==========================================
+/* =====================================================
+   12. ID MỚI
+===================================================== */
 
 function getNextId() {
 
@@ -371,62 +562,63 @@ function getNextId() {
     return 1;
   }
 
-  const maxId = Math.max.apply(
-    null,
-    meetings.map(function (meeting) {
-      return meeting.id;
-    })
-  );
-
-  return maxId + 1;
+  return Math.max(
+    ...meetings.map(item => item.id)
+  ) + 1;
 }
 
 
-// ==========================================
-// XÓA CUỘC HỌP
-// ==========================================
+/* =====================================================
+   13. XÓA CUỘC HỌP
+===================================================== */
 
 function deleteMeeting(id) {
 
-  const meeting = meetings.find(function (item) {
-    return item.id === id;
-  });
+  const meeting = meetings.find(
+    item => item.id === id
+  );
 
   if (!meeting) {
     return;
   }
 
-  const confirmed = confirm(
+
+  const confirmDelete = confirm(
     `Bạn có chắc muốn xóa cuộc họp "${meeting.title}" không?`
   );
 
-  if (!confirmed) {
+
+  if (!confirmDelete) {
     return;
   }
 
-  meetings = meetings.filter(function (item) {
-    return item.id !== id;
-  });
 
-  renderMeetings();
+  meetings = meetings.filter(
+    item => item.id !== id
+  );
+
+
+  renderMeetingTable();
 }
 
 
-// ==========================================
-// XEM CHI TIẾT CUỘC HỌP
-// ==========================================
+/* =====================================================
+   14. XEM CHI TIẾT
+===================================================== */
 
 function openDetailModal(id) {
 
-  const meeting = meetings.find(function (item) {
-    return item.id === id;
-  });
+  const meeting = meetings.find(
+    item => item.id === id
+  );
 
   if (!meeting) {
     return;
   }
 
-  detailContent.innerHTML = `
+
+  document.getElementById("detail-content").innerHTML = `
+
     <p>
       <strong>ID:</strong>
       ${meeting.id}
@@ -454,150 +646,495 @@ function openDetailModal(id) {
 
     <p>
       <strong>Người tham gia:</strong>
-      ${escapeHTML(meeting.participants.join(", ") || "Chưa có")}
+      ${escapeHTML(
+        meeting.participants.join(", ") || "Chưa có"
+      )}
     </p>
 
     <p>
       <strong>Trạng thái:</strong>
+
       <span class="${getStatusClass(meeting.status)}">
         ${getStatusText(meeting.status)}
       </span>
+
     </p>
 
     <p>
       <strong>Ghi chú:</strong>
-      ${escapeHTML(meeting.notes || "Không có ghi chú")}
+      ${escapeHTML(
+        meeting.notes || "Không có ghi chú"
+      )}
     </p>
+
   `;
+
 
   detailOverlay.classList.remove("hidden");
 }
 
 
-// ==========================================
-// ĐÓNG MODAL CHI TIẾT
-// ==========================================
+/* =====================================================
+   15. RENDER TABLE
+===================================================== */
 
-function closeDetailModal() {
-  detailOverlay.classList.add("hidden");
+function renderMeetingTable() {
+
+  const list =
+    document.getElementById("meetings-list");
+
+  const table =
+    document.getElementById("meetings-table");
+
+  const empty =
+    document.getElementById("empty-state");
+
+
+  if (!list) {
+    return;
+  }
+
+
+  const search =
+    document.getElementById("search-meeting")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const status =
+    document.getElementById("filter-status")
+      .value;
+
+
+  const filtered = meetings.filter(meeting => {
+
+    const matchesSearch =
+      meeting.title.toLowerCase().includes(search) ||
+
+      meeting.location.toLowerCase().includes(search) ||
+
+      meeting.participants
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+
+
+    const matchesStatus =
+      !status ||
+      meeting.status === status;
+
+
+    return matchesSearch && matchesStatus;
+
+  });
+
+
+  list.innerHTML = "";
+
+
+  if (filtered.length === 0) {
+
+    table.classList.add("hidden");
+
+    empty.classList.remove("hidden");
+
+    return;
+  }
+
+
+  table.classList.remove("hidden");
+
+  empty.classList.add("hidden");
+
+
+  filtered.forEach(meeting => {
+
+    const row =
+      document.createElement("tr");
+
+
+    row.innerHTML = `
+
+      <td data-label="ID">
+        ${meeting.id}
+      </td>
+
+      <td data-label="Tiêu đề">
+
+        <strong>
+          ${escapeHTML(meeting.title)}
+        </strong>
+
+      </td>
+
+      <td data-label="Ngày giờ">
+
+        ${formatDate(meeting.date)}
+
+        <br>
+
+        <small>
+          ${escapeHTML(meeting.time)}
+        </small>
+
+      </td>
+
+      <td data-label="Địa điểm / Link">
+
+        ${escapeHTML(
+          meeting.location || "Chưa cập nhật"
+        )}
+
+      </td>
+
+      <td data-label="Người tham gia">
+
+        ${escapeHTML(
+          meeting.participants.join(", ")
+        )}
+
+      </td>
+
+      <td data-label="Trạng thái">
+
+        <span
+          class="${getStatusClass(meeting.status)}">
+
+          ${getStatusText(meeting.status)}
+
+        </span>
+
+      </td>
+
+      <td data-label="Hành động">
+
+        <button
+          class="btn btn-sm btn-outline-info me-1"
+          data-action="detail"
+          data-id="${meeting.id}"
+          title="Xem chi tiết">
+
+          <i class="bi bi-eye"></i>
+
+        </button>
+
+
+        <button
+          class="btn btn-sm btn-outline-primary me-1"
+          data-action="edit"
+          data-id="${meeting.id}"
+          title="Chỉnh sửa">
+
+          <i class="bi bi-pencil"></i>
+
+        </button>
+
+
+        <button
+          class="btn btn-sm btn-outline-danger"
+          data-action="delete"
+          data-id="${meeting.id}"
+          title="Xóa">
+
+          <i class="bi bi-trash"></i>
+
+        </button>
+
+      </td>
+
+    `;
+
+
+    list.appendChild(row);
+
+  });
 }
 
 
-// ==========================================
-// SỰ KIỆN NÚT THÊM
-// ==========================================
+/* =====================================================
+   16. KHỞI TẠO TRANG MEETING
+===================================================== */
 
-btnAddMeeting.addEventListener("click", function () {
-  openAddModal();
-});
+function initializeMeetingPage() {
 
+  const btnAdd =
+    document.getElementById("btn-add-meeting");
 
-// ==========================================
-// SỰ KIỆN NÚT HỦY
-// ==========================================
+  const form =
+    document.getElementById("meeting-form");
 
-btnCancel.addEventListener("click", function () {
-  closeMeetingModal();
-});
+  const search =
+    document.getElementById("search-meeting");
 
-
-// ==========================================
-// SỰ KIỆN NÚT ĐÓNG CHI TIẾT
-// ==========================================
-
-btnCloseDetail.addEventListener("click", function () {
-  closeDetailModal();
-});
+  const filter =
+    document.getElementById("filter-status");
 
 
-// ==========================================
-// TÌM KIẾM
-// ==========================================
-
-searchMeeting.addEventListener("input", function () {
-  renderMeetings();
-});
+  btnAdd.addEventListener(
+    "click",
+    openAddModal
+  );
 
 
-// ==========================================
-// LỌC TRẠNG THÁI
-// ==========================================
-
-filterStatus.addEventListener("change", function () {
-  renderMeetings();
-});
+  form.addEventListener(
+    "submit",
+    saveMeeting
+  );
 
 
-// ==========================================
-// XỬ LÝ CÁC NÚT HÀNH ĐỘNG TRONG TABLE
-// ==========================================
+  search.addEventListener(
+    "input",
+    renderMeetingTable
+  );
 
-meetingsList.addEventListener("click", function (event) {
 
-  const button = event.target.closest("button");
+  filter.addEventListener(
+    "change",
+    renderMeetingTable
+  );
+
+
+  document
+    .getElementById("btn-cancel")
+    .addEventListener(
+      "click",
+      closeMeetingModal
+    );
+
+
+  document
+    .getElementById("btn-close-modal")
+    .addEventListener(
+      "click",
+      closeMeetingModal
+    );
+
+
+  document
+    .getElementById("btn-close-detail")
+    .addEventListener(
+      "click",
+      closeDetailModal
+    );
+
+
+  document
+    .getElementById("btn-close-detail-bottom")
+    .addEventListener(
+      "click",
+      closeDetailModal
+    );
+
+
+  document
+    .getElementById("meetings-list")
+    .addEventListener(
+      "click",
+      handleTableAction
+    );
+}
+
+
+/* =====================================================
+   17. TABLE ACTION
+===================================================== */
+
+function handleTableAction(event) {
+
+  const button =
+    event.target.closest("button");
+
 
   if (!button) {
     return;
   }
 
-  const action = button.dataset.action;
-  const id = Number(button.dataset.id);
+
+  const action =
+    button.dataset.action;
+
+
+  const id =
+    Number(button.dataset.id);
+
 
   if (action === "detail") {
+
     openDetailModal(id);
+
   }
 
-  if (action === "edit") {
+  else if (action === "edit") {
+
     openEditModal(id);
+
   }
 
-  if (action === "delete") {
+  else if (action === "delete") {
+
     deleteMeeting(id);
+
   }
-});
+}
 
 
-// ==========================================
-// CLICK RA NGOÀI MODAL ĐỂ ĐÓNG
-// ==========================================
+/* =====================================================
+   18. STATUS
+===================================================== */
 
-modalOverlay.addEventListener("click", function (event) {
+function getStatusText(status) {
 
-  if (event.target === modalOverlay) {
-    closeMeetingModal();
+  const statusMap = {
+
+    scheduled: "Sắp diễn ra",
+
+    "in-progress": "Đang diễn ra",
+
+    completed: "Đã hoàn thành",
+
+    cancelled: "Đã hủy"
+
+  };
+
+
+  return statusMap[status] ||
+    "Không xác định";
+}
+
+
+function getStatusClass(status) {
+
+  return `badge badge-${status}`;
+}
+
+
+/* =====================================================
+   19. FORMAT DATE
+===================================================== */
+
+function formatDate(date) {
+
+  if (!date) {
+    return "";
   }
-});
 
 
-detailOverlay.addEventListener("click", function (event) {
+  const parts =
+    date.split("-");
 
-  if (event.target === detailOverlay) {
-    closeDetailModal();
+
+  if (parts.length !== 3) {
+    return date;
   }
-});
 
 
-// ==========================================
-// PHÍM ESC ĐỂ ĐÓNG MODAL
-// ==========================================
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
 
-document.addEventListener("keydown", function (event) {
 
-  if (event.key === "Escape") {
+/* =====================================================
+   20. ESCAPE HTML
+===================================================== */
 
-    if (!modalOverlay.classList.contains("hidden")) {
+function escapeHTML(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(/&/g, "&amp;")
+
+    .replace(/</g, "&lt;")
+
+    .replace(/>/g, "&gt;")
+
+    .replace(/"/g, "&quot;")
+
+    .replace(/'/g, "&#039;");
+}
+
+
+/* =====================================================
+   21. CLICK OUTSIDE MODAL
+===================================================== */
+
+modalOverlay.addEventListener(
+  "click",
+  event => {
+
+    if (
+      event.target === modalOverlay
+    ) {
+
       closeMeetingModal();
+
     }
 
-    if (!detailOverlay.classList.contains("hidden")) {
-      closeDetailModal();
-    }
   }
-});
+);
 
 
-// ==========================================
-// KHỞI CHẠY ỨNG DỤNG
-// ==========================================
+detailOverlay.addEventListener(
+  "click",
+  event => {
 
-renderMeetings();
+    if (
+      event.target === detailOverlay
+    ) {
+
+      closeDetailModal();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   22. ESC ĐỂ ĐÓNG MODAL
+===================================================== */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key !== "Escape") {
+      return;
+    }
+
+
+    if (
+      !modalOverlay.classList.contains("hidden")
+    ) {
+
+      closeMeetingModal();
+
+    }
+
+
+    if (
+      !detailOverlay.classList.contains("hidden")
+    ) {
+
+      closeDetailModal();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   23. START ROUTER
+===================================================== */
+
+router();

@@ -3,112 +3,279 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quản lý Cuộc họp</title>
+
+  <title>Quản lý Cuộc họp - ICTU</title>
+
+  <!-- Bootstrap 5 - UI Library -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Bootstrap Icons - UI Icon Library -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
+
+  <!-- CSS riêng của project -->
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+
+  <!-- ================= HEADER ================= -->
   <header class="app-header">
-    <h1>📅 Quản lý Cuộc họp</h1>
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1>
+            <i class="bi bi-calendar-event"></i>
+            Quản lý Cuộc họp
+          </h1>
+          <p class="header-subtitle">
+            Product Backlog Meeting Management - ICTU
+          </p>
+        </div>
+
+        <nav class="main-nav">
+          <a href="#/" class="nav-link-custom">
+            <i class="bi bi-house"></i>
+            Home
+          </a>
+
+          <a href="#/meetings" class="nav-link-custom">
+            <i class="bi bi-calendar3"></i>
+            Cuộc họp
+          </a>
+        </nav>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <section id="meetings-section" class="page active">
 
-      <!-- Thanh công cụ: tìm kiếm, lọc, thêm mới -->
-      <div class="toolbar">
-        <input
-          type="text"
-          id="search-meeting"
-          placeholder="Tìm kiếm cuộc họp..."
-        />
+  <!-- ================= APP ================= -->
+  <main class="container py-4">
 
-        <select id="filter-status">
-          <option value="">Tất cả trạng thái</option>
-          <option value="scheduled">Sắp diễn ra</option>
-          <option value="in-progress">Đang diễn ra</option>
-          <option value="completed">Đã hoàn thành</option>
-          <option value="cancelled">Đã hủy</option>
-        </select>
+    <!-- Router sẽ render nội dung vào đây -->
+    <div id="app"></div>
 
-        <button id="btn-add-meeting" class="btn-primary">+ Thêm cuộc họp</button>
-      </div>
-
-      <!-- Danh sách cuộc họp -->
-      <table id="meetings-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tiêu đề</th>
-            <th>Ngày giờ</th>
-            <th>Địa điểm / Link</th>
-            <th>Người tham gia</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody id="meetings-list">
-          <!-- Dữ liệu render bằng main.js -->
-        </tbody>
-      </table>
-
-      <p id="empty-state" class="empty-state hidden">
-        Chưa có cuộc họp nào. Nhấn "Thêm cuộc họp" để bắt đầu.
-      </p>
-    </section>
   </main>
 
-  <!-- ===== MODAL THÊM / SỬA CUỘC HỌP ===== -->
+
+  <!-- ================= MODAL THÊM / SỬA ================= -->
   <div id="modal-overlay" class="modal-overlay hidden">
+
     <div class="modal">
-      <h3 id="modal-title">Thêm cuộc họp</h3>
+
+      <div class="modal-header-custom">
+        <h3 id="modal-title">
+          Thêm cuộc họp
+        </h3>
+
+        <button
+          type="button"
+          id="btn-close-modal"
+          class="btn-close"
+          aria-label="Đóng">
+        </button>
+      </div>
+
       <form id="meeting-form">
-        <input type="hidden" id="meeting-id" />
 
-        <label for="meeting-title">Tiêu đề</label>
-        <input type="text" id="meeting-title" required />
+        <input
+          type="hidden"
+          id="meeting-id"
+        />
 
-        <label for="meeting-date">Ngày</label>
-        <input type="date" id="meeting-date" required />
+        <label for="meeting-title">
+          Tiêu đề
+        </label>
 
-        <label for="meeting-time">Giờ</label>
-        <input type="time" id="meeting-time" required />
+        <input
+          type="text"
+          id="meeting-title"
+          class="form-control"
+          placeholder="Nhập tiêu đề cuộc họp"
+          required
+        />
 
-        <label for="meeting-location">Địa điểm / Link họp</label>
-        <input type="text" id="meeting-location" placeholder="Phòng họp A hoặc link Google Meet" />
 
-        <label for="meeting-participants">Người tham gia (cách nhau bằng dấu phẩy)</label>
-        <input type="text" id="meeting-participants" placeholder="Nguyễn A, Trần B, Lê C" />
+        <div class="row">
 
-        <label for="meeting-status">Trạng thái</label>
-        <select id="meeting-status">
-          <option value="scheduled">Sắp diễn ra</option>
-          <option value="in-progress">Đang diễn ra</option>
-          <option value="completed">Đã hoàn thành</option>
-          <option value="cancelled">Đã hủy</option>
+          <div class="col-md-6">
+
+            <label for="meeting-date">
+              Ngày
+            </label>
+
+            <input
+              type="date"
+              id="meeting-date"
+              class="form-control"
+              required
+            />
+
+          </div>
+
+          <div class="col-md-6">
+
+            <label for="meeting-time">
+              Giờ
+            </label>
+
+            <input
+              type="time"
+              id="meeting-time"
+              class="form-control"
+              required
+            />
+
+          </div>
+
+        </div>
+
+
+        <label for="meeting-location">
+          Địa điểm / Link họp
+        </label>
+
+        <input
+          type="text"
+          id="meeting-location"
+          class="form-control"
+          placeholder="Phòng họp A hoặc link Google Meet"
+        />
+
+
+        <label for="meeting-participants">
+          Người tham gia
+        </label>
+
+        <input
+          type="text"
+          id="meeting-participants"
+          class="form-control"
+          placeholder="Nguyễn A, Trần B, Lê C"
+        />
+
+
+        <label for="meeting-status">
+          Trạng thái
+        </label>
+
+        <select
+          id="meeting-status"
+          class="form-select">
+
+          <option value="scheduled">
+            Sắp diễn ra
+          </option>
+
+          <option value="in-progress">
+            Đang diễn ra
+          </option>
+
+          <option value="completed">
+            Đã hoàn thành
+          </option>
+
+          <option value="cancelled">
+            Đã hủy
+          </option>
+
         </select>
 
-        <label for="meeting-notes">Ghi chú / Nội dung</label>
-        <textarea id="meeting-notes" rows="4" placeholder="Nội dung chính, mục tiêu cuộc họp..."></textarea>
+
+        <label for="meeting-notes">
+          Ghi chú / Nội dung
+        </label>
+
+        <textarea
+          id="meeting-notes"
+          class="form-control"
+          rows="4"
+          placeholder="Nội dung chính, mục tiêu cuộc họp...">
+        </textarea>
+
 
         <div class="modal-actions">
-          <button type="submit" class="btn-primary">Lưu</button>
-          <button type="button" id="btn-cancel" class="btn-secondary">Hủy</button>
+
+          <button
+            type="submit"
+            class="btn btn-primary">
+
+            <i class="bi bi-save"></i>
+            Lưu
+
+          </button>
+
+          <button
+            type="button"
+            id="btn-cancel"
+            class="btn btn-secondary">
+
+            Hủy
+
+          </button>
+
         </div>
+
       </form>
+
     </div>
+
   </div>
 
-  <!-- ===== MODAL XEM CHI TIẾT ===== -->
+
+  <!-- ================= MODAL CHI TIẾT ================= -->
   <div id="detail-overlay" class="modal-overlay hidden">
+
     <div class="modal">
-      <h3>Chi tiết cuộc họp</h3>
-      <div id="detail-content"></div>
-      <div class="modal-actions">
-        <button type="button" id="btn-close-detail" class="btn-secondary">Đóng</button>
+
+      <div class="modal-header-custom">
+
+        <h3>
+          <i class="bi bi-info-circle"></i>
+          Chi tiết cuộc họp
+        </h3>
+
+        <button
+          type="button"
+          id="btn-close-detail"
+          class="btn-close"
+          aria-label="Đóng">
+        </button>
+
       </div>
+
+      <div id="detail-content"></div>
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          id="btn-close-detail-bottom"
+          class="btn btn-secondary">
+
+          Đóng
+
+        </button>
+
+      </div>
+
     </div>
+
   </div>
 
+
+  <!-- Bootstrap JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+  </script>
+
+  <!-- JavaScript của project -->
   <script src="main.js"></script>
+
 </body>
 </html>
