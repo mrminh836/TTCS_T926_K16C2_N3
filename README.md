@@ -51,4 +51,130 @@ Nền tảng giúp doanh nghiệp tối ưu hóa việc phân bổ phòng họp,
 | **Admin Dashboard** | Thống kê hiệu suất, quản lý danh mục phòng và lịch bảo trì thiết bị. |
 
 
+---
 
+## 📁 Cấu Trúc Thư Mục Dự Án (Project Structure)
+
+```text
+TTCS_T926_K16C2_N3/
+├── client/                  # Frontend (SPA - HTML5, CSS3, JavaScript thuần)
+│   ├── index.html           # App Shell và giao diện chính
+│   ├── style.css            # Hệ thống màu sắc, components và responsive
+│   └── main.js              # Hash Router, logic render và CRUD cuộc họp
+│
+├── server/                  # Backend (Node.js & Express API)
+│   ├── config/              # Cấu hình kết nối MySQL pool
+│   ├── controllers/         # Xử lý logic nghiệp vụ và validation
+│   ├── models/              # Truy vấn dữ liệu MySQL, transaction & row lock
+│   ├── routes/              # Định tuyến API (/api/meetings, /api/health)
+│   ├── server.js            # Điểm khởi chạy máy chủ Express
+│   ├── package.json         # Danh sách thư viện và scripts
+│   ├── Dockerfile           # Đóng gói container Backend (node:20-alpine)
+│   └── .dockerignore        # Loại trừ file không cần thiết khi build Docker
+│
+├── database/                # Cơ sở dữ liệu (Database Schema)
+│   └── init_database.sql    # Kịch bản khởi tạo 7 bảng và dữ liệu mẫu
+│
+├── docs/                    # Tài liệu kỹ thuật & thiết kế
+│   ├── SoDo_ERD.png         # Sơ đồ quan hệ thực thể (ERD)
+│   └── related_documents.md # Hướng dẫn chi tiết kiểm thử Postman & kiến trúc
+│
+├── docker-compose.yml       # Cấu hình Docker Compose đa dịch vụ (Backend + MySQL)
+├── .env.example             # Mẫu cấu hình biến môi trường
+├── .env                     # Biến môi trường thực tế (được bảo mật trong .gitignore)
+└── README.md                # Hướng dẫn tổng quan dự án
+```
+
+---
+
+## 🐳 Hướng Dẫn Chạy Dự Án Với Docker Compose
+
+### Yêu cầu hệ thống
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (bao gồm Docker Engine & Docker Compose)
+
+### Khởi động nhanh
+
+```bash
+# 1. Clone dự án
+git clone <repository-url>
+cd TTCS_T926_K16C2_N3
+
+# 2. Tạo file .env từ mẫu
+cp .env.example .env
+# Sửa DB_PASSWORD trong .env nếu cần (mặc định: root123)
+
+# 3. Khởi động toàn bộ hệ thống (Backend + MySQL)
+docker compose up --build -d
+```
+
+> **Lần chạy đầu tiên**, MySQL sẽ tự động tạo database `meeting_management` và import đầy đủ **7 bảng** từ file `database/init_database.sql`.
+
+### Kiểm tra hệ thống
+
+Sau khi khởi động thành công, truy cập endpoint healthcheck:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+Kết quả mong đợi:
+
+```json
+{
+  "status": "ok",
+  "database": "connected"
+}
+```
+
+### Các lệnh Docker hữu ích
+
+```bash
+# Chạy ở chế độ nền (detached)
+docker compose up --build -d
+
+# Xem log
+docker compose logs -f backend
+docker compose logs -f mysql_db
+
+# Dừng & xóa container (GIỮ dữ liệu MySQL)
+docker compose down
+
+# Dừng & xóa container + XÓA dữ liệu MySQL
+docker compose down -v
+
+# Khởi động lại
+docker compose up -d
+```
+
+### Hot-reload khi phát triển
+
+Khi chạy bằng Docker Compose, thư mục `server/` được **bind mount** vào container. Mọi thay đổi code trên máy host sẽ tự động được phản ánh và server sẽ **restart ngay lập tức** nhờ `node --watch`.
+
+### Cấu hình biến môi trường
+
+| Biến | Giá trị Docker | Giá trị Local | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `DB_HOST` | `mysql_db` | `127.0.0.1` | Hostname của MySQL |
+| `DB_PORT` | `3306` | `3306` | Port MySQL |
+| `DB_USER` | `root` | `root` | Tài khoản MySQL |
+| `DB_PASSWORD` | `root123` | *(tuỳ chỉnh)* | Mật khẩu MySQL |
+| `DB_NAME` | `meeting_management` | `meeting_management` | Tên database |
+| `PORT` | `3000` | `3000` | Port Backend API |
+
+---
+
+## 🛠️ Chạy Local (Không Docker)
+
+```bash
+# 1. Di chuyển vào thư mục server và cài đặt dependencies
+cd server
+npm install
+
+# 2. Sửa .env ở thư mục gốc: đổi DB_HOST=127.0.0.1 (đảm bảo MySQL đang chạy local)
+
+# 3. Import database từ thư mục gốc
+mysql -u root -p meeting_management < ../database/init_database.sql
+
+# 4. Chạy server (hot-reload)
+npm run dev
+```

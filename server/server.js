@@ -1,7 +1,10 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const meetingRoutes = require('./routes/meetingRoutes');
+const healthRoutes = require('./routes/healthRoutes');
 
 const app = express();
 
@@ -11,6 +14,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', meetingRoutes);
+app.use('/api', healthRoutes);
 
 // Xử lý Route 404 (Không tìm thấy endpoint)
 app.use((req, res) => {
