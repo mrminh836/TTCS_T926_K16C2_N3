@@ -1,0 +1,505 @@
+/* ==========================================
+   RESET
+========================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0f4ff 0%,
+      #e8f9f5 100%
+    );
+
+  color: #2d3142;
+
+  min-height: 100vh;
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.app-header {
+  background:
+    linear-gradient(
+      90deg,
+      #5b6ee1 0%,
+      #7c5cf0 100%
+    );
+
+  color: white;
+
+  padding: 22px 32px;
+
+  box-shadow:
+    0 4px 15px rgba(91, 110, 225, 0.25);
+}
+
+.app-header h1 {
+  margin: 0;
+
+  font-size: 1.6rem;
+
+  font-weight: 700;
+}
+
+.header-subtitle {
+  margin: 4px 0 0;
+
+  opacity: 0.85;
+
+  font-size: 0.9rem;
+}
+
+
+/* ==========================================
+   NAVIGATION
+========================================== */
+
+.main-nav {
+  display: flex;
+
+  gap: 8px;
+}
+
+.nav-link-custom {
+  color: white;
+
+  text-decoration: none;
+
+  padding: 9px 14px;
+
+  border-radius: 8px;
+
+  transition: 0.2s;
+}
+
+.nav-link-custom:hover {
+  color: white;
+
+  background: rgba(255, 255, 255, 0.18);
+}
+
+
+/* ==========================================
+   PAGE
+========================================== */
+
+.page {
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 28px;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ==========================================
+   HOME
+========================================== */
+
+.home-page {
+  text-align: center;
+
+  padding: 70px 20px;
+}
+
+.home-icon {
+  font-size: 4rem;
+
+  color: #6c63ff;
+
+  margin-bottom: 20px;
+}
+
+.home-page h2 {
+  font-weight: 700;
+
+  margin-bottom: 12px;
+}
+
+.home-page p {
+  color: #73798c;
+
+  margin-bottom: 25px;
+}
+
+
+/* ==========================================
+   TOOLBAR
+========================================== */
+
+.toolbar {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-bottom: 24px;
+
+  align-items: center;
+}
+
+#search-meeting {
+  flex: 1;
+
+  min-width: 220px;
+}
+
+/* FIX: Bootstrap đặt .form-select width 100% nên ô lọc bị kéo giãn quá rộng */
+#filter-status {
+  width: auto;
+
+  min-width: 180px;
+}
+
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.table-container {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+#meetings-table {
+  width: 100%;
+
+  vertical-align: middle;
+}
+
+#meetings-table thead th {
+  color: #5b6ee1;
+
+  background: #f5f6fc;
+
+  font-size: 0.85rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+#meetings-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+#meetings-table tbody tr:hover {
+  background: #f9f9ff;
+}
+
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.badge {
+  display: inline-block;
+
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  font-size: 0.78rem;
+
+  font-weight: 600;
+}
+
+.badge-scheduled {
+  background: #e3f0ff;
+
+  color: #2f7ee0;
+}
+
+.badge-in-progress {
+  background: #fff4e0;
+
+  color: #e0a12f;
+}
+
+.badge-completed {
+  background: #e3fbe8;
+
+  color: #2fa84f;
+}
+
+.badge-cancelled {
+  background: #ffe3e6;
+
+  color: #e0472f;
+}
+
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.empty-state {
+  text-align: center;
+
+  padding: 40px 0;
+
+  color: #9099b5;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* ==========================================
+   MODAL
+========================================== */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(45, 49, 66, 0.45);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 1050;
+
+  padding: 20px;
+}
+
+.modal {
+  /* FIX: ghi đè class .modal mặc định của Bootstrap
+     (Bootstrap đặt display: none, position: fixed, height: 100%) */
+  display: block;
+
+  position: relative;
+
+  top: auto;
+
+  left: auto;
+
+  height: auto;
+
+  width: 100%;
+
+  max-width: 520px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 28px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header-custom {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+.modal h3 {
+  margin: 0;
+
+  color: #5b6ee1;
+
+  font-size: 1.25rem;
+}
+
+
+/* ==========================================
+   FORM
+========================================== */
+
+.modal form label {
+  display: block;
+
+  margin-top: 14px;
+
+  margin-bottom: 6px;
+
+  font-size: 0.85rem;
+
+  font-weight: 600;
+
+  color: #5b5f77;
+}
+
+.modal textarea {
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+
+/* ==========================================
+   DETAIL
+========================================== */
+
+#detail-content p {
+  margin-bottom: 10px;
+
+  line-height: 1.5;
+}
+
+#detail-content strong {
+  color: #5b6ee1;
+}
+
+
+/* ==========================================
+   404
+========================================== */
+
+.error-page {
+  text-align: center;
+
+  padding: 80px 20px;
+}
+
+.error-code {
+  font-size: 6rem;
+
+  font-weight: 800;
+
+  color: #6c63ff;
+
+  line-height: 1;
+}
+
+.error-page h2 {
+  margin-top: 20px;
+
+  font-weight: 700;
+}
+
+.error-page p {
+  color: #777;
+
+  margin-bottom: 25px;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 768px) {
+
+  .app-header {
+    padding: 18px 20px;
+  }
+
+  .app-header .d-flex {
+    flex-direction: column;
+
+    align-items: flex-start !important;
+
+    gap: 15px;
+  }
+
+  .main-nav {
+    width: 100%;
+  }
+
+  .page {
+    padding: 18px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  #search-meeting {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 640px) {
+
+  #meetings-table,
+  #meetings-table thead,
+  #meetings-table tbody,
+  #meetings-table th,
+  #meetings-table td,
+  #meetings-table tr {
+    display: block;
+  }
+
+  #meetings-table thead {
+    display: none;
+  }
+
+  #meetings-table tbody tr {
+    margin-bottom: 15px;
+
+    border: 1px solid #eef0f8;
+
+    border-radius: 10px;
+
+    padding: 8px;
+  }
+
+  #meetings-table tbody td {
+    border: none;
+
+    padding: 8px 12px;
+  }
+
+  #meetings-table tbody td::before {
+    content: attr(data-label);
+
+    display: block;
+
+    font-size: 0.75rem;
+
+    font-weight: 600;
+
+    color: #5b6ee1;
+
+    text-transform: uppercase;
+
+    margin-bottom: 3px;
+  }
+
+  .error-code {
+    font-size: 4rem;
+  }
+}
