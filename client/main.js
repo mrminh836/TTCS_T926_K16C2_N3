@@ -72,6 +72,7 @@ const detailOverlay = document.getElementById("detail-overlay");
 
 const routes = {
   "/": renderHome,
+  "/home": renderHome,
   "/meetings": renderMeetingsPage,
   "/404": render404
 };
@@ -88,16 +89,39 @@ function getCurrentRoute() {
 }
 
 
+function updateActiveNav(route) {
+  const navLinks = document.querySelectorAll(".nav-link-custom");
+
+  navLinks.forEach((link) => {
+    const href = link.getAttribute("href");
+    const linkRoute = href ? href.replace("#", "") : "";
+
+    const isHome =
+      (route === "/" || route === "/home") &&
+      (linkRoute === "/" || linkRoute === "/home");
+    const isMatch = route === linkRoute;
+
+    if (isHome || isMatch) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
+    }
+  });
+}
+
+
 function router() {
   const route = getCurrentRoute();
 
   const page = routes[route] || render404;
 
   page();
+  updateActiveNav(route);
 }
 
 
 window.addEventListener("hashchange", router);
+document.addEventListener("DOMContentLoaded", router);
 
 
 // =====================================================
