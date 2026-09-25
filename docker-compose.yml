@@ -1,0 +1,46 @@
+services:
+  # ---- Service Backend Node.js ----
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: meeting_backend
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount mã nguồn để hot-reload khi dev (không cần rebuild)
+      - .:/app
+      # Giữ node_modules trong container, không bị override bởi host
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---- Service MySQL 8.0 ----
+  mysql_db:
+    image: mysql:8.0
+    container_name: meeting_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root123}
+      MYSQL_DATABASE: ${DB_NAME:-meeting_management}
+    volumes:
+      # Volume bền vững cho dữ liệu MySQL
+      - mysql_data:/var/lib/mysql
+      # Tự động import schema khi khởi tạo lần đầu
+      - ./init_database.sql:/docker-entrypoint-initdb.d/init_database.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local

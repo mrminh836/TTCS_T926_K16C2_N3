@@ -51,4 +51,95 @@ Nền tảng giúp doanh nghiệp tối ưu hóa việc phân bổ phòng họp,
 | **Admin Dashboard** | Thống kê hiệu suất, quản lý danh mục phòng và lịch bảo trì thiết bị. |
 
 
+---
 
+## 🐳 Hướng Dẫn Chạy Dự Án Với Docker Compose
+
+### Yêu cầu hệ thống
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (bao gồm Docker Engine & Docker Compose)
+
+### Khởi động nhanh
+
+```bash
+# 1. Clone dự án
+git clone <repository-url>
+cd TTCS_T926_K16C2_N3
+
+# 2. Tạo file .env từ mẫu
+cp .env.example .env
+# Sửa DB_PASSWORD trong .env nếu cần (mặc định: root123)
+
+# 3. Khởi động toàn bộ hệ thống (Backend + MySQL)
+docker compose up --build
+```
+
+> **Lần chạy đầu tiên**, MySQL sẽ tự động tạo database `meeting_management` và import đầy đủ **7 bảng** từ file `init_database.sql`.
+
+### Kiểm tra hệ thống
+
+Sau khi khởi động thành công, truy cập endpoint healthcheck:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+Kết quả mong đợi:
+
+```json
+{
+  "status": "ok",
+  "database": "connected"
+}
+```
+
+### Các lệnh Docker hữu ích
+
+```bash
+# Chạy ở chế độ nền (detached)
+docker compose up --build -d
+
+# Xem log
+docker compose logs -f backend
+docker compose logs -f mysql_db
+
+# Dừng & xóa container (GIỮ dữ liệu MySQL)
+docker compose down
+
+# Dừng & xóa container + XÓA dữ liệu MySQL
+docker compose down -v
+
+# Khởi động lại
+docker compose up
+```
+
+### Hot-reload khi phát triển
+
+Khi chạy bằng Docker Compose, thư mục mã nguồn được **bind mount** vào container. Mọi thay đổi code trên máy host sẽ tự động được phản ánh và server sẽ **restart ngay lập tức** nhờ `node --watch`.
+
+### Cấu hình biến môi trường
+
+| Biến | Giá trị Docker | Giá trị Local | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `DB_HOST` | `mysql_db` | `127.0.0.1` | Hostname của MySQL |
+| `DB_PORT` | `3306` | `3306` | Port MySQL |
+| `DB_USER` | `root` | `root` | Tài khoản MySQL |
+| `DB_PASSWORD` | `root123` | *(tuỳ chỉnh)* | Mật khẩu MySQL |
+| `DB_NAME` | `meeting_management` | `meeting_management` | Tên database |
+| `PORT` | `3000` | `3000` | Port Backend API |
+
+---
+
+## 🛠️ Chạy Local (Không Docker)
+
+```bash
+# 1. Cài đặt dependencies
+npm install
+
+# 2. Sửa .env: đổi DB_HOST=127.0.0.1 (đảm bảo MySQL đang chạy local)
+
+# 3. Import database
+mysql -u root -p meeting_management < init_database.sql
+
+# 4. Chạy server (hot-reload)
+npm run dev
+```
