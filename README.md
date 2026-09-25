@@ -53,6 +53,40 @@ Nền tảng giúp doanh nghiệp tối ưu hóa việc phân bổ phòng họp,
 
 ---
 
+## 📁 Cấu Trúc Thư Mục Dự Án (Project Structure)
+
+```text
+TTCS_T926_K16C2_N3/
+├── client/                  # Frontend (SPA - HTML5, CSS3, JavaScript thuần)
+│   ├── index.html           # App Shell và giao diện chính
+│   ├── style.css            # Hệ thống màu sắc, components và responsive
+│   └── main.js              # Hash Router, logic render và CRUD cuộc họp
+│
+├── server/                  # Backend (Node.js & Express API)
+│   ├── config/              # Cấu hình kết nối MySQL pool
+│   ├── controllers/         # Xử lý logic nghiệp vụ và validation
+│   ├── models/              # Truy vấn dữ liệu MySQL, transaction & row lock
+│   ├── routes/              # Định tuyến API (/api/meetings, /api/health)
+│   ├── server.js            # Điểm khởi chạy máy chủ Express
+│   ├── package.json         # Danh sách thư viện và scripts
+│   ├── Dockerfile           # Đóng gói container Backend (node:20-alpine)
+│   └── .dockerignore        # Loại trừ file không cần thiết khi build Docker
+│
+├── database/                # Cơ sở dữ liệu (Database Schema)
+│   └── init_database.sql    # Kịch bản khởi tạo 7 bảng và dữ liệu mẫu
+│
+├── docs/                    # Tài liệu kỹ thuật & thiết kế
+│   ├── SoDo_ERD.png         # Sơ đồ quan hệ thực thể (ERD)
+│   └── related_documents.md # Hướng dẫn chi tiết kiểm thử Postman & kiến trúc
+│
+├── docker-compose.yml       # Cấu hình Docker Compose đa dịch vụ (Backend + MySQL)
+├── .env.example             # Mẫu cấu hình biến môi trường
+├── .env                     # Biến môi trường thực tế (được bảo mật trong .gitignore)
+└── README.md                # Hướng dẫn tổng quan dự án
+```
+
+---
+
 ## 🐳 Hướng Dẫn Chạy Dự Án Với Docker Compose
 
 ### Yêu cầu hệ thống
@@ -70,10 +104,10 @@ cp .env.example .env
 # Sửa DB_PASSWORD trong .env nếu cần (mặc định: root123)
 
 # 3. Khởi động toàn bộ hệ thống (Backend + MySQL)
-docker compose up --build
+docker compose up --build -d
 ```
 
-> **Lần chạy đầu tiên**, MySQL sẽ tự động tạo database `meeting_management` và import đầy đủ **7 bảng** từ file `init_database.sql`.
+> **Lần chạy đầu tiên**, MySQL sẽ tự động tạo database `meeting_management` và import đầy đủ **7 bảng** từ file `database/init_database.sql`.
 
 ### Kiểm tra hệ thống
 
@@ -109,12 +143,12 @@ docker compose down
 docker compose down -v
 
 # Khởi động lại
-docker compose up
+docker compose up -d
 ```
 
 ### Hot-reload khi phát triển
 
-Khi chạy bằng Docker Compose, thư mục mã nguồn được **bind mount** vào container. Mọi thay đổi code trên máy host sẽ tự động được phản ánh và server sẽ **restart ngay lập tức** nhờ `node --watch`.
+Khi chạy bằng Docker Compose, thư mục `server/` được **bind mount** vào container. Mọi thay đổi code trên máy host sẽ tự động được phản ánh và server sẽ **restart ngay lập tức** nhờ `node --watch`.
 
 ### Cấu hình biến môi trường
 
@@ -132,13 +166,14 @@ Khi chạy bằng Docker Compose, thư mục mã nguồn được **bind mount**
 ## 🛠️ Chạy Local (Không Docker)
 
 ```bash
-# 1. Cài đặt dependencies
+# 1. Di chuyển vào thư mục server và cài đặt dependencies
+cd server
 npm install
 
-# 2. Sửa .env: đổi DB_HOST=127.0.0.1 (đảm bảo MySQL đang chạy local)
+# 2. Sửa .env ở thư mục gốc: đổi DB_HOST=127.0.0.1 (đảm bảo MySQL đang chạy local)
 
-# 3. Import database
-mysql -u root -p meeting_management < init_database.sql
+# 3. Import database từ thư mục gốc
+mysql -u root -p meeting_management < ../database/init_database.sql
 
 # 4. Chạy server (hot-reload)
 npm run dev
