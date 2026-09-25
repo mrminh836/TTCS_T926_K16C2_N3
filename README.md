@@ -77,7 +77,10 @@ TTCS_T926_K16C2_N3/
 │
 ├── docs/                    # Tài liệu kỹ thuật & thiết kế
 │   ├── SoDo_ERD.png         # Sơ đồ quan hệ thực thể (ERD)
-│   └── related_documents.md # Hướng dẫn chi tiết kiểm thử Postman & kiến trúc
+│   ├── related_documents.md # Hướng dẫn chi tiết kiểm thử Postman & kiến trúc
+│   ├── QA_PROCESS_AND_JIRA_STANDARDS.md # Quy trình kiểm thử QA & Quản lý Bug Jira chuẩn
+│   ├── test_case_template.csv           # Biểu mẫu Test Case 10 cột chuẩn UTF-8 (Excel / Sheets)
+│   └── test_case_template.html          # Bản hiển thị trực quan biểu mẫu Test Case
 │
 ├── docker-compose.yml       # Cấu hình Docker Compose đa dịch vụ (Backend + MySQL)
 ├── .env.example             # Mẫu cấu hình biến môi trường

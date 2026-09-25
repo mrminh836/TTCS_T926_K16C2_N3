@@ -1,0 +1,48 @@
+﻿Test Case ID,Module/Feature,Tiêu đề kịch bản,Pre-conditions (Điều kiện tiên quyết),Test Steps (Các bước thực hiện),Test Data (Dữ liệu thử nghiệm),Expected Result (Kết quả mong đợi),Actual Result (Kết quả thực tế),Status (Pass/Fail/Blocked),Ghi chú / Bug ID liên kết
+TC_MEET_001,Meeting / Booking,Tạo cuộc họp và đặt phòng thành công (Chuẩn),"1. Đã đăng nhập tài khoản có quyền đặt phòng.
+2. Phòng họp ID=1 đang ở trạng thái ""Active"".
+3. Khung giờ đặt phòng trống hoàn toàn.","1. Truy cập trang Quản lý cuộc họp (/client/index.html)
+2. Bấm nút ""+ Thêm cuộc họp""
+3. Nhập tiêu đề, mô tả cuộc họp
+4. Chọn phòng ID=1, chọn ngày mai từ 09:00 đến 10:00
+5. Bấm nút ""Lưu cuộc họp""","Title: ""Họp Sprint Review K16""
+RoomID: 1
+StartTime: 2026-09-26 09:00:00
+EndTime: 2026-09-26 10:00:00
+OrganizerID: 1","Hệ thống lưu thành công vào CSDL. Trả về mã HTTP 201 Created. Danh sách cuộc họp hiển thị cuộc họp mới, đóng modal.","Hệ thống tạo thành công, có toast thông báo thành công và cập nhật bảng.",Pass,
+TC_MEET_002,Meeting / Concurrency,Chặn đặt phòng khi khung giờ bị trùng lặp (Overlap Conflict),1. Đã có cuộc họp trong phòng ID=1 từ 09:00 đến 10:00 ngày 2026-09-26.,"1. Mở modal Đặt cuộc họp
+2. Chọn cùng phòng ID=1
+3. Chọn khung giờ giao nhau: 09:30 đến 10:30 ngày 2026-09-26
+4. Bấm ""Lưu cuộc họp""","Title: ""Họp phát sinh""
+RoomID: 1
+StartTime: 2026-09-26 09:30:00
+EndTime: 2026-09-26 10:30:00","Hệ thống từ chối tạo mới. Trả về mã lỗi HTTP 409 Conflict với thông báo: ""Phòng đã có lịch họp trùng khung giờ này"".","Trả về HTTP 409, giao diện báo popup lỗi rõ ràng.",Pass,
+TC_MEET_003,Meeting / Room Validation,Chặn đặt phòng đang trong trạng thái bảo trì (Maintenance),1. Phòng ID=2 đang có trạng thái Maintenance trong DB.,"1. Mở form đặt cuộc họp
+2. Chọn phòng ID=2
+3. Chọn ngày mai 14:00 - 15:00
+4. Bấm ""Lưu cuộc họp""","RoomID: 2 (Status = Maintenance)
+StartTime: 2026-09-26 14:00:00
+EndTime: 2026-09-26 15:00:00","Hệ thống từ chối đặt phòng. Trả về HTTP 400 Bad Request kèm thông báo: ""Phòng đang bảo trì hoặc ngừng hoạt động"".",Hệ thống trả về HTTP 400 đúng thông điệp.,Pass,
+TC_MEET_004,Meeting / Date Validation,Chặn đặt cuộc họp ở thời điểm trong quá khứ,Người dùng đang ở form tạo cuộc họp.,"1. Nhập ngày giờ bắt đầu và kết thúc là thời điểm trong quá khứ (ví dụ hôm qua).
+2. Điền các trường bắt buộc khác.
+3. Bấm ""Lưu cuộc họp"".","StartTime: 2020-01-01 08:00:00
+EndTime: 2020-01-01 09:00:00","Hệ thống validation chặn lại (client validate trước hoặc server trả HTTP 400: ""Thời gian bắt đầu không thể ở quá khứ"").",Chặn thành công với HTTP 400.,Pass,
+TC_MEET_005,Meeting / Date Validation,Chặn thời gian kết thúc sớm hơn hoặc bằng thời gian bắt đầu,Người dùng đang ở form tạo cuộc họp.,"1. Chọn StartTime: 2026-09-26 10:00:00
+2. Chọn EndTime: 2026-09-26 09:00:00 (hoặc 10:00:00)
+3. Bấm ""Lưu cuộc họp""","StartTime: 10:00:00
+EndTime: 09:00:00","Hệ thống hiển thị lỗi cảnh báo: ""Thời gian kết thúc phải diễn ra sau thời gian bắt đầu"". Không gửi request hoặc Server trả về HTTP 400.","Giao diện báo đỏ trường EndTime, không cho submit.",Pass,
+TC_MEET_006,Meeting / FK Validation,Kiểm tra khi Người tổ chức (OrganizerID) không tồn tại,Không có người dùng có ID = 99999 trong bảng users.,"1. Gửi request tạo cuộc họp với OrganizerID = 99999
+2. Bấm xác nhận","OrganizerID: 99999
+RoomID: 1","Server trả về mã HTTP 404 Not Found kèm thông báo: ""Không tìm thấy thông tin Người tổ chức (Organizer)"". Server không văng lỗi 500.",Server trả HTTP 404 chuẩn.,Pass,
+TC_MEET_007,Meeting / Participants & Equip,Đặt cuộc họp có kèm danh sách Người tham gia và Thiết bị,"1. Đã có sẵn User ID=1, 2, 3 trong DB.
+2. Đã có Thiết bị ID=1 (Máy chiếu), ID=2 (Mic) trong DB.","1. Điền thông tin cuộc họp
+2. Chọn người tham gia ID=2, 3
+3. Chọn thiết bị ID=1, 2
+4. Bấm Lưu","participantIds: [2, 3]
+equipmentIds: [1, 2]","Tạo cuộc họp thành công (HTTP 201), dữ liệu được ghi đúng vào các bảng liên kết meeting_participants và booking_equipments.",Ghi nhận đầy đủ bản ghi con trong CSDL.,Pass,
+TC_MEET_008,UI / Form Meeting,"Kiểm tra Validate trường bắt buộc (Tiêu đề, Phòng, Ngày giờ)",Người dùng mở Modal tạo cuộc họp.,"1. Để trống trường Tiêu đề
+2. Bấm ""Lưu cuộc họp""","Title: """" (Rỗng)","Trường Tiêu đề hiển thị viền đỏ cảnh báo ""Vui lòng nhập tiêu đề cuộc họp"", form không submit.",Form tự focus vào ô tiêu đề và hiển thị tooltip validation HTML5.,Pass,
+TC_MEET_009,UI / Modal Meeting,"Kiểm tra thao tác đóng Modal (Nút X, nút Hủy, click bên ngoài overlay)",Modal thêm cuộc họp đang mở.,"1. Bấm nút dấu X ở góc trên bên phải
+2. Thử lại: Bấm ra ngoài vùng modal-overlay",N/A,"Modal đóng lại mượt mà, form được reset về trạng thái ban đầu, không bị lưu dữ liệu rác.","Modal đóng đúng, form reset sạch.",Pass,
+TC_MEET_010,Meeting / Error Handling,Kiểm tra bắt lỗi ngoại lệ khi mất kết nối Database,Tạm thời ngắt kết nối MySQL hoặc cấu hình sai port DB.,"1. Gửi request tạo cuộc họp từ giao diện
+2. Quan sát phản hồi hệ thống",N/A,"Hệ thống hiển thị thông báo lỗi thân thiện: ""Không thể kết nối đến máy chủ CSDL, vui lòng thử lại sau"". Không làm sập tiến trình Node.js.",Hiện thông báo lỗi kết nối máy chủ.,Pass,BUG-005 (Đã fix)
