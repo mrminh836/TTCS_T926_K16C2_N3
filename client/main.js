@@ -2104,9 +2104,9 @@ async function saveRoom(event) {
 // 6D. MODAL MÃ QR & CHI TIẾT CHECK-IN PHÒNG HỌP (US 5.2)
 // =====================================================
 
-function generateRoomQRSVG(roomCode, roomName) {
+function generateRoomQRSVG(roomCode, roomName, size = 180) {
   return `
-    <svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="display:block; border-radius: 8px;">
+    <svg viewBox="0 0 200 200" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" style="display:block; margin: 0 auto; border-radius: 8px;">
       <!-- Nền trắng -->
       <rect width="200" height="200" fill="#ffffff" />
 
@@ -2165,6 +2165,98 @@ function generateRoomQRSVG(roomCode, roomName) {
       <text x="100" y="110" font-family="monospace" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">${roomCode}</text>
     </svg>
   `;
+}
+
+// In thẻ dán cửa chuyên dụng (Chỉ in duy nhất biển phòng và mã QR Check-in)
+function printRoomDoorPlacard(roomId) {
+  const room = ROOMS.find(r => r.id === roomId) || ROOMS[0];
+  if (!room) return;
+
+  const roomCode = room.code || `RM-00${room.id}`;
+  const scale = getCapacityScale(room.capacity);
+  const printArea = document.getElementById("print-room-placard-area");
+  if (!printArea) return;
+
+  const now = new Date();
+  const printDateStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} - ${now.toLocaleDateString('vi-VN')}`;
+
+  printArea.innerHTML = `
+    <div class="placard-sheet">
+      <div class="placard-card">
+        <!-- Brand Header -->
+        <div class="placard-brand-row">
+          <div>
+            <div class="placard-inst-name">TRƯỜNG ĐẠI HỌC CNTT &amp; TRUYỀN THÔNG (ICTU)</div>
+            <div class="placard-system-title">HỆ THỐNG QUẢN LÝ PHÒNG HỌP THÔNG MINH</div>
+          </div>
+          <div class="placard-brand-badge">CHECK-IN QR</div>
+        </div>
+
+        <div class="placard-top-divider"></div>
+
+        <!-- Room Main Info -->
+        <div>
+          <div class="placard-door-label">BIỂN PHÒNG HỌP DOANH NGHIỆP</div>
+          <h1 class="placard-room-title">${escapeHTML(room.name)}</h1>
+
+          <div class="placard-meta-chips">
+            <span class="placard-chip placard-chip-code">MÃ: ${escapeHTML(roomCode)}</span>
+            <span class="placard-chip">${escapeHTML(room.floor || 'Khu phòng ban')}</span>
+            <span class="placard-chip">Sức chứa: <strong>${room.capacity} chỗ ngồi</strong></span>
+            <span class="placard-chip">${scale.scaleName}</span>
+          </div>
+        </div>
+
+        <!-- QR Code Canvas Center -->
+        <div class="placard-qr-container">
+          <div class="placard-qr-border">
+            ${generateRoomQRSVG(roomCode, room.name, 230)}
+          </div>
+          <div class="placard-qr-code-text">Mã định danh quét: <strong>${escapeHTML(room.qrCode || `QR-ROOM-00${room.id}`)}</strong></div>
+        </div>
+
+        <!-- Step Guide Check-in -->
+        <div class="placard-instructions">
+          <div class="placard-instruction-heading">
+            <i class="bi bi-phone"></i> HƯỚNG DẪN QUÉT MÃ CHECK-IN TỨC THÌ
+          </div>
+          <div class="placard-instruction-steps">
+            <div class="placard-step-item">
+              <span class="step-num">1</span>
+              <span>Dùng Camera điện thoại hoặc app ICTU Meeting quét mã QR tại cửa phòng</span>
+            </div>
+            <div class="placard-step-item">
+              <span class="step-num">2</span>
+              <span>Nhấn <strong>"Bắt đầu cuộc họp"</strong> trên màn hình để xác nhận Check-in</span>
+            </div>
+            <div class="placard-step-item">
+              <span class="step-num">3</span>
+              <span>Khi kết thúc sớm, quét lại mã để <strong>"Trả phòng trước giờ"</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="placard-warning-note">
+          ⚠️ <em>Lưu ý: Cuộc họp sẽ tự động bị hủy và nhường phòng cho nhóm khác nếu không Check-in sau 15 phút từ giờ bắt đầu.</em>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="placard-card-footer">
+          <div>
+            <strong>Ban Quản lý Tòa nhà:</strong> Hotline 0280.3846.123
+          </div>
+          <div>
+            <span>Thời điểm in: ${printDateStr}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Gọi lệnh in của trình duyệt
+  setTimeout(() => {
+    window.print();
+  }, 100);
 }
 
 // Biến toàn cục lưu trữ ID phòng đang xem chi tiết để các action buttons (Sửa, Đặt phòng) tương tác
@@ -3881,7 +3973,8 @@ if (btnCloseRoomQrBottom) {
 const btnPrintRoomQr = document.getElementById("btn-print-room-qr");
 if (btnPrintRoomQr) {
   btnPrintRoomQr.addEventListener("click", () => {
-    window.print();
+    const id = window.currentDetailRoomId || 1;
+    printRoomDoorPlacard(id);
   });
 }
 
