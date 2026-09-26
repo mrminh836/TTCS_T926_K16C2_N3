@@ -2173,7 +2173,6 @@ function printRoomDoorPlacard(roomId) {
   if (!room) return;
 
   const roomCode = room.code || `RM-00${room.id}`;
-  const scale = getCapacityScale(room.capacity);
   const printArea = document.getElementById("print-room-placard-area");
   if (!printArea) return;
 
@@ -2183,25 +2182,10 @@ function printRoomDoorPlacard(roomId) {
   printArea.innerHTML = `
     <div class="placard-sheet">
       <div class="placard-card">
-        <!-- Brand Header Căn Giữa & To Rõ -->
-        <div class="placard-brand-centered">
-          <div class="placard-inst-name">TRƯỜNG ĐẠI HỌC CNTT &amp; TRUYỀN THÔNG (ICTU)</div>
-          <div class="placard-system-title">HỆ THỐNG QUẢN LÝ PHÒNG HỌP THÔNG MINH</div>
-        </div>
-
-        <div class="placard-top-divider"></div>
-
         <!-- Room Main Info -->
         <div>
           <div class="placard-door-label">MÃ QR CHECK-IN CỬA PHÒNG</div>
           <h1 class="placard-room-title">${escapeHTML(room.name)}</h1>
-
-          <div class="placard-meta-chips">
-            <span class="placard-chip placard-chip-code">MÃ: ${escapeHTML(roomCode)}</span>
-            <span class="placard-chip">${escapeHTML(room.floor || 'Khu phòng ban')}</span>
-            <span class="placard-chip">Sức chứa: <strong>${room.capacity} chỗ ngồi</strong></span>
-            <span class="placard-chip">${scale.scaleName}</span>
-          </div>
         </div>
 
         <!-- QR Code Canvas Center -->

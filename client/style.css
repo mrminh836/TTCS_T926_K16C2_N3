@@ -3279,46 +3279,13 @@ body {
     max-width: 600px !important;
     border: 3.5px solid #0f172a !important;
     border-radius: 20px !important;
-    padding: 28px 30px !important;
+    padding: 36px 32px 30px 32px !important;
     margin: 0 auto !important;
     background: #ffffff !important;
     text-align: center !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-  }
-
-  .placard-brand-centered {
-    text-align: center !important;
-    margin-bottom: 10px !important;
-  }
-
-  .placard-inst-name {
-    font-size: 14pt !important;
-    font-weight: 900 !important;
-    color: #0f172a !important;
-    letter-spacing: 0.5px !important;
-    text-transform: uppercase !important;
-    margin: 0 0 4px 0 !important;
-    line-height: 1.3 !important;
-    text-align: center !important;
-  }
-
-  .placard-system-title {
-    font-size: 9.5pt !important;
-    color: #475569 !important;
-    text-transform: uppercase !important;
-    font-weight: 700 !important;
-    letter-spacing: 1px !important;
-    margin: 0 !important;
-    text-align: center !important;
-  }
-
-  .placard-top-divider {
-    height: 2px !important;
-    background: #0f172a !important;
-    margin: 12px auto 16px auto !important;
-    width: 100% !important;
   }
 
   .placard-door-label {
@@ -3336,29 +3303,6 @@ body {
     color: #0f172a !important;
     margin: 0 0 10px 0 !important;
     line-height: 1.2 !important;
-  }
-
-  .placard-meta-chips {
-    display: flex !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-    margin-bottom: 18px !important;
-  }
-
-  .placard-chip {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 9999px !important;
-    padding: 4px 12px !important;
-    font-size: 9pt !important;
-    color: #1e293b !important;
-  }
-
-  .placard-chip-code {
-    font-family: monospace !important;
-    font-weight: 800 !important;
-    background: #f1f5f9 !important;
-    border-color: #94a3b8 !important;
   }
 
   .placard-qr-container {
