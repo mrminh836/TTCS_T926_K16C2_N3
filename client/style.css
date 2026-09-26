@@ -2187,27 +2187,89 @@ body {
 }
 
 /* 3. Room Filter & Search Toolbar */
+/* 3. Room Filter & Search Toolbar */
 .room-filter-card {
   background: #ffffff;
   border: 1px solid var(--slate-200);
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 14px 18px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   margin-bottom: 24px;
 }
 
-.room-status-tab-btn {
+/* Search input with inner icon */
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input-wrapper .search-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--slate-400);
+  font-size: 0.95rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.search-input-wrapper .table-search-input {
+  padding-left: 38px !important;
+  padding-right: 36px;
+  height: 40px;
+  font-size: 0.88rem;
+  border-radius: 8px;
+  border: 1px solid var(--slate-200);
+  background: #ffffff;
+  width: 100%;
+  transition: all 0.15s ease;
+}
+
+.search-input-wrapper .table-search-input:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: none;
+}
+
+.btn-clear-search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
   border: none;
+  color: var(--slate-400);
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.btn-clear-search:hover {
+  color: var(--slate-600);
+}
+
+/* Status tabs */
+.room-status-tab-btn {
+  border: 1px solid transparent;
   background: transparent;
   color: var(--slate-600);
   font-size: 0.85rem;
   font-weight: 600;
-  padding: 6px 14px;
+  height: 40px;
+  padding: 0 14px;
   border-radius: 8px;
   transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .room-status-tab-btn:hover {
@@ -2218,6 +2280,7 @@ body {
 .room-status-tab-btn.active {
   background: var(--primary-600);
   color: #ffffff;
+  border-color: var(--primary-600);
   box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
@@ -2225,9 +2288,9 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: 9999px;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   background: rgba(0,0,0,0.06);
 }
@@ -2235,6 +2298,31 @@ body {
 .room-status-tab-btn.active .room-tab-count {
   background: rgba(255,255,255,0.25);
   color: #ffffff;
+}
+
+/* Toolbar controls height sync */
+#room-capacity-filter {
+  height: 40px;
+  font-size: 0.88rem;
+  border-radius: 8px;
+  border-color: var(--slate-200);
+}
+
+#btn-reset-room-filter {
+  height: 40px;
+  width: 40px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--slate-600);
+  border-color: var(--slate-200);
+}
+
+#btn-reset-room-filter:hover {
+  background: var(--slate-100);
+  color: var(--slate-900);
 }
 
 /* 4. Table Elements */
@@ -2248,6 +2336,7 @@ body {
   padding: 3px 8px;
   border-radius: 6px;
   border: 1px solid var(--slate-200);
+  letter-spacing: 0.02em;
 }
 
 .room-cell-info {
@@ -2353,21 +2442,22 @@ body {
 .room-eq-pill-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  max-width: 220px;
+  gap: 5px;
+  max-width: 230px;
 }
 
 .room-eq-pill {
   font-size: 0.72rem;
   font-weight: 500;
-  background: var(--slate-50);
-  color: var(--slate-600);
+  background: #ffffff;
+  color: var(--slate-700);
   border: 1px solid var(--slate-200);
   border-radius: 6px;
-  padding: 2px 7px;
+  padding: 3px 8px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
 .room-eq-pill i {
@@ -2386,9 +2476,11 @@ body {
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .btn-qr-view:hover {
@@ -2437,6 +2529,40 @@ body {
   border-color: #fde68a;
 }
 
+/* 5. Stitch Input With Inner Icon (Căn chỉnh icon bên trong input không bị trôi) */
+.stitch-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.stitch-input-with-icon .stitch-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--slate-400);
+  font-size: 1.05rem;
+  pointer-events: none;
+  z-index: 2;
+  line-height: 1;
+}
+
+.stitch-input-with-icon .stitch-input {
+  padding-left: 42px !important;
+}
+
+/* Modal Quản lý phòng họp Card (Stitch Enterprise Modal) */
+.room-modal-card {
+  max-width: 660px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.22);
+}
+
 /* Equipment checkbox cards in modal */
 .room-equipment-checkbox-grid {
   display: grid;
@@ -2459,12 +2585,14 @@ body {
   padding: 10px 14px;
   background: #ffffff;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
 }
 
 .eq-check-card:hover {
   border-color: var(--primary-300);
-  background: var(--primary-50);
+  background: #f8faff;
+  transform: translateY(-1px);
 }
 
 .eq-check-card input[type="checkbox"] {
@@ -2476,7 +2604,7 @@ body {
 .eq-check-card:has(input:checked) {
   border-color: var(--primary-600);
   background: #eff6ff;
-  box-shadow: 0 0 0 1px var(--primary-600);
+  box-shadow: 0 0 0 1px var(--primary-600), 0 2px 6px rgba(37, 99, 235, 0.08);
 }
 
 .eq-card-content {
@@ -2486,15 +2614,62 @@ body {
   width: 100%;
 }
 
+.eq-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.eq-check-card:has(input:checked) .eq-icon-box {
+  background: #dbeafe;
+}
+
 .eq-card-icon {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  color: var(--slate-600);
+  transition: color 0.2s ease;
+}
+
+.eq-check-card:has(input:checked) .eq-card-icon {
   color: var(--primary-600);
 }
 
 .eq-card-name {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--slate-800);
+  color: var(--slate-700);
+  transition: color 0.2s ease;
+}
+
+.eq-check-card:has(input:checked) .eq-card-name {
+  color: var(--slate-900);
+}
+
+.eq-check-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--slate-300);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.eq-check-card:has(input:checked) .eq-check-indicator {
+  background: var(--primary-600);
+  border-color: var(--primary-600);
+  color: #ffffff;
 }
 
 /* QR Code Modal Styles */

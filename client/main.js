@@ -1085,13 +1085,13 @@ function renderAdminRoomsPage() {
                 <th style="width: 44px;" class="text-center">
                   <input type="checkbox" id="check-all-rooms" class="stitch-checkbox" aria-label="Chọn tất cả phòng họp" />
                 </th>
-                <th style="width: 105px;">Mã phòng</th>
+                <th style="width: 105px;" class="text-center">Mã phòng</th>
                 <th style="min-width: 230px;">Phòng họp &amp; Vị trí</th>
                 <th style="width: 150px;">Sức chứa</th>
                 <th style="min-width: 220px;">Trang thiết bị gắn kèm</th>
-                <th style="width: 145px;">Trạng thái</th>
-                <th style="width: 125px;">Mã QR Check-in</th>
-                <th style="width: 130px;">Lịch hôm nay</th>
+                <th style="width: 145px;" class="text-center">Trạng thái</th>
+                <th style="width: 145px;" class="text-center text-nowrap">Mã QR Check-in</th>
+                <th style="width: 130px;" class="text-center">Lịch hôm nay</th>
                 <th style="width: 140px;" class="text-center">Thao tác</th>
               </tr>
             </thead>
@@ -1214,7 +1214,7 @@ function renderAdminRoomsTable() {
           <input type="checkbox" class="stitch-checkbox room-row-checkbox" value="${room.id}" aria-label="Chọn phòng ${escapeHTML(room.name)}" />
         </td>
 
-        <td>
+        <td class="text-center">
           <span class="room-code-badge">${escapeHTML(room.code || `RM-00${room.id}`)}</span>
         </td>
 
@@ -1254,11 +1254,11 @@ function renderAdminRoomsTable() {
           </div>
         </td>
 
-        <td>
+        <td class="text-center">
           ${statusBadge}
         </td>
 
-        <td>
+        <td class="text-center">
           <button
             type="button"
             class="btn-qr-view"
@@ -1270,7 +1270,7 @@ function renderAdminRoomsTable() {
           </button>
         </td>
 
-        <td>
+        <td class="text-center">
           ${meetingIndicator}
         </td>
 

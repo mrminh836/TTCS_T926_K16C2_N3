@@ -568,9 +568,9 @@
           <span id="room-global-error-text">Vui lòng kiểm tra lại các trường thông tin phòng họp.</span>
         </div>
 
-        <!-- Row 1: Tên phòng & Mã phòng -->
+        <!-- Row 1: Tên phòng & Mã phòng (Cân đối 7:5) -->
         <div class="row g-3">
-          <div class="col-md-8">
+          <div class="col-md-7">
             <div class="stitch-form-group">
               <label for="room-form-name" class="stitch-label">
                 Tên phòng họp <span class="text-danger">*</span>
@@ -591,51 +591,45 @@
             </div>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-5">
             <div class="stitch-form-group">
-              <label for="room-form-code" class="stitch-label">
-                Mã định danh
-              </label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="room-form-code" class="stitch-label m-0">Mã định danh</label>
+                <span class="stitch-hint">Tự động sinh</span>
+              </div>
               <input
                 type="text"
                 id="room-form-code"
                 name="roomCode"
-                class="form-control stitch-input font-monospace"
+                class="form-control stitch-input font-monospace bg-light"
                 placeholder="RM-001"
                 aria-label="Mã phòng họp"
                 readonly
               />
-              <small class="stitch-field-help">Tự động sinh bởi hệ thống</small>
             </div>
           </div>
         </div>
 
-        <!-- Row 2: Sức chứa, Loại phòng, Vị trí Tầng -->
+        <!-- Row 2: Vị trí / Tầng & Loại phòng họp (Cân đối 6:6) -->
         <div class="row g-3 mt-1">
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="stitch-form-group">
-              <label for="room-form-capacity" class="stitch-label">
-                Sức chứa (Chỗ ngồi) <span class="text-danger">*</span>
+              <label for="room-form-floor" class="stitch-label">
+                Vị trí / Tầng <span class="text-danger">*</span>
               </label>
-              <div class="stitch-input-with-icon">
-                <i class="bi bi-people stitch-input-icon"></i>
-                <input
-                  type="number"
-                  id="room-form-capacity"
-                  name="capacity"
-                  class="form-control stitch-input ps-5"
-                  min="1"
-                  max="500"
-                  value="15"
-                  aria-label="Sức chứa số người"
-                  required
-                />
-              </div>
-              <small class="stitch-field-help">Số người tối đa (1 - 500)</small>
+              <input
+                type="text"
+                id="room-form-floor"
+                name="floor"
+                class="form-control stitch-input"
+                placeholder="Ví dụ: Tầng 4, Tòa A"
+                aria-label="Vị trí tầng"
+                required
+              />
             </div>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-6">
             <div class="stitch-form-group">
               <label for="room-form-type" class="stitch-label">
                 Loại phòng họp <span class="text-danger">*</span>
@@ -654,32 +648,42 @@
               </select>
             </div>
           </div>
-
-          <div class="col-md-4">
-            <div class="stitch-form-group">
-              <label for="room-form-floor" class="stitch-label">
-                Vị trí / Tầng <span class="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                id="room-form-floor"
-                name="floor"
-                class="form-control stitch-input"
-                placeholder="Ví dụ: Tầng 4, Tòa A"
-                aria-label="Vị trí tầng"
-                required
-              />
-            </div>
-          </div>
         </div>
 
-        <!-- Row 3: Trạng thái & Mã QR -->
+        <!-- Row 3: Sức chứa & Trạng thái hoạt động (Cân đối 6:6) -->
         <div class="row g-3 mt-1">
           <div class="col-md-6">
             <div class="stitch-form-group">
-              <label for="room-form-status" class="stitch-label">
-                Trạng thái hoạt động <span class="text-danger">*</span>
-              </label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="room-form-capacity" class="stitch-label m-0">
+                  Sức chứa (Chỗ ngồi) <span class="text-danger">*</span>
+                </label>
+                <span class="stitch-hint">Tối đa 500</span>
+              </div>
+              <div class="stitch-input-with-icon">
+                <i class="bi bi-people-fill stitch-input-icon"></i>
+                <input
+                  type="number"
+                  id="room-form-capacity"
+                  name="capacity"
+                  class="form-control stitch-input"
+                  min="1"
+                  max="500"
+                  value="15"
+                  aria-label="Sức chứa số người"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="stitch-form-group">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="room-form-status" class="stitch-label m-0">
+                  Trạng thái hoạt động <span class="text-danger">*</span>
+                </label>
+              </div>
               <select
                 id="room-form-status"
                 name="status"
@@ -687,31 +691,35 @@
                 aria-label="Trạng thái phòng họp"
                 required>
                 <option value="Active">🟢 Sẵn sàng hoạt động (Active)</option>
-                <option value="Maintenance">🟡 Đang bảo trì / Kiểm tra (Maintenance)</option>
+                <option value="Maintenance">🟡 Đang bảo trì (Maintenance)</option>
                 <option value="Inactive">⚪ Tạm ngừng sử dụng (Inactive)</option>
               </select>
-              <small class="stitch-field-help">Phòng bảo trì sẽ không xuất hiện cho người dùng đặt lịch mới.</small>
             </div>
           </div>
+        </div>
 
-          <div class="col-md-6">
+        <!-- Row 4: Mã QR Check-in định danh (Full Width 12) -->
+        <div class="row g-3 mt-1">
+          <div class="col-12">
             <div class="stitch-form-group">
-              <label for="room-form-qrcode" class="stitch-label">
-                Mã QR Check-in
-              </label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="room-form-qrcode" class="stitch-label m-0">
+                  Mã QR Check-in định danh
+                </label>
+                <span class="stitch-hint"><i class="bi bi-shield-check text-success me-1"></i>Dùng quét mã tức thì tại cửa phòng</span>
+              </div>
               <div class="stitch-input-with-icon">
-                <i class="bi bi-qr-code stitch-input-icon"></i>
+                <i class="bi bi-qr-code-scan stitch-input-icon"></i>
                 <input
                   type="text"
                   id="room-form-qrcode"
                   name="qrCode"
-                  class="form-control stitch-input ps-5 font-monospace"
+                  class="form-control stitch-input font-monospace bg-light"
                   placeholder="QR-ROOM-001"
                   aria-label="Mã QR định danh phòng họp"
                   readonly
                 />
               </div>
-              <small class="stitch-field-help">Dùng quét mã QR Check-in tức thì tại cửa phòng</small>
             </div>
           </div>
         </div>
@@ -727,32 +735,52 @@
             <label class="eq-check-card" for="room-eq-projector">
               <input type="checkbox" id="room-eq-projector" class="room-eq-checkbox" value="Máy chiếu Full HD" />
               <div class="eq-card-content">
-                <i class="bi bi-projector-fill eq-card-icon"></i>
+                <div class="eq-icon-box">
+                  <i class="bi bi-projector-fill eq-card-icon"></i>
+                </div>
                 <span class="eq-card-name">Máy chiếu Full HD</span>
+                <div class="eq-check-indicator ms-auto">
+                  <i class="bi bi-check-lg"></i>
+                </div>
               </div>
             </label>
 
             <label class="eq-check-card" for="room-eq-tv">
               <input type="checkbox" id="room-eq-tv" class="room-eq-checkbox" value="Màn hình TV 75&quot;" />
               <div class="eq-card-content">
-                <i class="bi bi-tv-fill eq-card-icon"></i>
+                <div class="eq-icon-box">
+                  <i class="bi bi-tv-fill eq-card-icon"></i>
+                </div>
                 <span class="eq-card-name">Màn hình TV 75"</span>
+                <div class="eq-check-indicator ms-auto">
+                  <i class="bi bi-check-lg"></i>
+                </div>
               </div>
             </label>
 
             <label class="eq-check-card" for="room-eq-mic">
               <input type="checkbox" id="room-eq-mic" class="room-eq-checkbox" value="Micro &amp; Loa họp" />
               <div class="eq-card-content">
-                <i class="bi bi-mic-fill eq-card-icon"></i>
+                <div class="eq-icon-box">
+                  <i class="bi bi-mic-fill eq-card-icon"></i>
+                </div>
                 <span class="eq-card-name">Micro &amp; Loa họp</span>
+                <div class="eq-check-indicator ms-auto">
+                  <i class="bi bi-check-lg"></i>
+                </div>
               </div>
             </label>
 
             <label class="eq-check-card" for="room-eq-board">
               <input type="checkbox" id="room-eq-board" class="room-eq-checkbox" value="Bảng trắng viết" />
               <div class="eq-card-content">
-                <i class="bi bi-easel-fill eq-card-icon"></i>
+                <div class="eq-icon-box">
+                  <i class="bi bi-easel-fill eq-card-icon"></i>
+                </div>
                 <span class="eq-card-name">Bảng trắng viết</span>
+                <div class="eq-check-indicator ms-auto">
+                  <i class="bi bi-check-lg"></i>
+                </div>
               </div>
             </label>
           </div>
