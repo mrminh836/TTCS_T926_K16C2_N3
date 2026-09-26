@@ -2127,3 +2127,452 @@ body {
     font-size: 4rem;
   }
 }
+
+
+/* =====================================================
+   ADMIN ROOM MANAGEMENT (STITCH ENTERPRISE SPEC)
+   ===================================================== */
+
+/* 1. Header & Navigation Badges */
+.admin-badge-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-50);
+  color: var(--primary-700);
+  border: 1px solid var(--primary-200);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+/* 2. Room KPI Grid */
+.room-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 992px) {
+  .room-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .room-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-emerald {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.kpi-purple {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.bar-emerald {
+  background: #10b981;
+}
+
+.bar-purple {
+  background: #8b5cf6;
+}
+
+/* 3. Room Filter & Search Toolbar */
+.room-filter-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  margin-bottom: 24px;
+}
+
+.room-status-tab-btn {
+  border: none;
+  background: transparent;
+  color: var(--slate-600);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.room-status-tab-btn:hover {
+  background: var(--slate-100);
+  color: var(--slate-900);
+}
+
+.room-status-tab-btn.active {
+  background: var(--primary-600);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.room-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(0,0,0,0.06);
+}
+
+.room-status-tab-btn.active .room-tab-count {
+  background: rgba(255,255,255,0.25);
+  color: #ffffff;
+}
+
+/* 4. Table Elements */
+.room-code-badge {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--slate-100);
+  color: var(--slate-700);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--slate-200);
+}
+
+.room-cell-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.room-type-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.room-icon-board {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.room-icon-tech {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.room-icon-hall {
+  background: #faf5ff;
+  color: #9333ea;
+}
+
+.room-icon-vip {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.room-icon-default {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.room-name-text {
+  font-weight: 600;
+  color: var(--slate-900);
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.room-name-text:hover {
+  color: var(--primary-600);
+}
+
+.room-location-text {
+  font-size: 0.8rem;
+  color: var(--slate-500);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Capacity meter */
+.capacity-cell-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 110px;
+}
+
+.capacity-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--slate-800);
+}
+
+.capacity-meter {
+  height: 5px;
+  background: var(--slate-200);
+  border-radius: 9999px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.capacity-meter-bar {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.capacity-size-tag {
+  font-size: 0.7rem;
+  color: var(--slate-400);
+}
+
+/* Equipments pills */
+.room-eq-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 220px;
+}
+
+.room-eq-pill {
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--slate-50);
+  color: var(--slate-600);
+  border: 1px solid var(--slate-200);
+  border-radius: 6px;
+  padding: 2px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.room-eq-pill i {
+  font-size: 0.75rem;
+  color: var(--primary-600);
+}
+
+/* QR Code Trigger Button in Table */
+.btn-qr-view {
+  background: #f8fafc;
+  border: 1px solid var(--slate-200);
+  color: var(--slate-700);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-qr-view:hover {
+  background: var(--primary-50);
+  border-color: var(--primary-200);
+  color: var(--primary-600);
+  transform: translateY(-1px);
+}
+
+/* Table Actions */
+.btn-room-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--slate-200);
+  background: #ffffff;
+  color: var(--slate-600);
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+}
+
+.btn-room-action:hover {
+  background: var(--slate-100);
+  color: var(--slate-900);
+  border-color: var(--slate-300);
+}
+
+.btn-room-action-edit:hover {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.btn-room-action-delete:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.btn-room-action-toggle:hover {
+  background: #fffbeb;
+  color: #d97706;
+  border-color: #fde68a;
+}
+
+/* Equipment checkbox cards in modal */
+.room-equipment-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 576px) {
+  .room-equipment-checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.eq-check-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--slate-200);
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.eq-check-card:hover {
+  border-color: var(--primary-300);
+  background: var(--primary-50);
+}
+
+.eq-check-card input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.eq-check-card:has(input:checked) {
+  border-color: var(--primary-600);
+  background: #eff6ff;
+  box-shadow: 0 0 0 1px var(--primary-600);
+}
+
+.eq-card-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.eq-card-icon {
+  font-size: 1.25rem;
+  color: var(--primary-600);
+}
+
+.eq-card-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-800);
+}
+
+/* QR Code Modal Styles */
+.room-qr-modal-card {
+  max-width: 580px;
+}
+
+.qr-preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border: 2px dashed var(--slate-200);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.qr-code-svg-box {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border: 1px solid var(--slate-200);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-room-meta-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin-bottom: 4px;
+}
+
+.qr-room-meta-sub {
+  font-size: 0.85rem;
+  color: var(--slate-500);
+  margin-bottom: 8px;
+}
+
+.qr-checkin-instruction {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 0.82rem;
+  padding: 8px 14px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+/* Constraint warning in Delete Modal */
+.room-delete-modal-card {
+  max-width: 520px;
+}
+
+.room-constraint-box {
+  background: #fff1f2;
+  border: 1.5px solid #fecdd3;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.room-conflict-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #ffe4e6;
+  border-radius: 8px;
+  margin-top: 6px;
+  font-size: 0.85rem;
+}
