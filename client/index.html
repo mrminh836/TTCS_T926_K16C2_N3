@@ -531,6 +531,9 @@
               Thêm phòng họp mới
             </h3>
             <span class="stitch-badge">Admin Room Form</span>
+            <span id="room-api-status-badge" class="stitch-badge-api" title="Trạng thái kết nối API Backend">
+              <span class="api-dot-status"></span> <span id="room-api-status-text">Client Ready</span>
+            </span>
           </div>
           <p id="room-modal-subtitle" class="stitch-modal-subtitle">
             Cấu hình thông tin phòng, sức chứa, thiết bị và mã QR định danh
@@ -623,9 +626,13 @@
                 name="floor"
                 class="form-control stitch-input"
                 placeholder="Ví dụ: Tầng 4, Tòa A"
+                maxlength="100"
                 aria-label="Vị trí tầng"
                 required
               />
+              <div id="room-floor-error" class="stitch-error-text hidden">
+                <i class="bi bi-exclamation-circle me-1"></i> Vui lòng nhập vị trí hoặc tầng của phòng họp.
+              </div>
             </div>
           </div>
 
@@ -658,7 +665,7 @@
                 <label for="room-form-capacity" class="stitch-label m-0">
                   Sức chứa (Chỗ ngồi) <span class="text-danger">*</span>
                 </label>
-                <span class="stitch-hint">Tối đa 500</span>
+                <span class="stitch-hint">1 - 500 chỗ</span>
               </div>
               <div class="stitch-input-with-icon">
                 <i class="bi bi-people-fill stitch-input-icon"></i>
@@ -673,6 +680,9 @@
                   aria-label="Sức chứa số người"
                   required
                 />
+              </div>
+              <div id="room-capacity-error" class="stitch-error-text hidden">
+                <i class="bi bi-exclamation-circle me-1"></i> Sức chứa phải là số nguyên từ 1 đến 500.
               </div>
             </div>
           </div>
@@ -694,6 +704,10 @@
                 <option value="Maintenance">Đang bảo trì (Maintenance)</option>
                 <option value="Inactive">Tạm ngừng sử dụng (Inactive)</option>
               </select>
+              <div id="room-status-warning" class="room-maintenance-warning hidden mt-1">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                <span id="room-status-warning-text">Phòng đang có lịch họp sắp diễn ra.</span>
+              </div>
             </div>
           </div>
         </div>
