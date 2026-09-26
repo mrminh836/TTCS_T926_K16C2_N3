@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo cuộc họp mới - Enterprise Meeting SaaS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 p-4 md:p-8 flex flex-col items-center justify-start">
+
+  <!-- Top Context Header: SaaS Bar -->
+  <header class="w-full max-w-4xl mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white px-5 py-3.5 rounded-xl border border-slate-200/80 shadow-xs">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm shadow-blue-500/20">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-sm font-semibold text-slate-900 tracking-tight">Enterprise Sync • Meeting Suite</h1>
+        <p class="text-xs text-slate-500">Component Spec & Interactive Mockup cho Frontend Engineers</p>
+      </div>
+    </div>
+
+    <!-- State Switcher Pills -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-xs">
+      <span class="text-slate-400 font-medium mr-1 hidden lg:inline">Chế độ xem:</span>
+      <button onclick="switchState('filled')" id="btn-filled" class="state-btn px-2.5 py-1.5 rounded-md font-medium transition-all bg-blue-50 text-blue-700 border border-blue-200">
+        Dữ liệu mẫu
+      </button>
+      <button onclick="switchState('empty')" id="btn-empty" class="state-btn px-2.5 py-1.5 rounded-md font-medium text-slate-600 hover:bg-slate-50 border border-slate-200">
+        Mặc định (Trống)
+      </button>
+      <button onclick="switchState('error')" id="btn-error" class="state-btn px-2.5 py-1.5 rounded-md font-medium text-slate-600 hover:bg-slate-50 border border-slate-200">
+        Lỗi Validation
+      </button>
+      <button onclick="switchState('timeError')" id="btn-timeError" class="state-btn px-2.5 py-1.5 rounded-md font-medium text-slate-600 hover:bg-slate-50 border border-slate-200">
+        Lỗi Giờ kết thúc
+      </button>
+      <button onclick="switchState('loading')" id="btn-loading" class="state-btn px-2.5 py-1.5 rounded-md font-medium text-slate-600 hover:bg-slate-50 border border-slate-200">
+        Đang gửi (Loading)
+      </button>
+      <button onclick="switchState('success')" id="btn-success" class="state-btn px-2.5 py-1.5 rounded-md font-medium text-slate-600 hover:bg-slate-50 border border-slate-200">
+        Thành công
+      </button>
+      <button onclick="switchState('disabled')" id="btn-disabled" class="state-btn px-2.5 py-1.5 rounded-md font-medium text-slate-600 hover:bg-slate-50 border border-slate-200">
+        Vô hiệu hoá
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container: Modal Card Simulation -->
+  <main class="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden transition-all duration-200">
+
+    <!-- 1. Header Area -->
+    <div class="px-6 py-5 border-b border-slate-100 flex items-start justify-between bg-white relative">
+      <div class="pr-6">
+        <div class="flex items-center gap-2">
+          <h2 class="text-xl font-bold text-slate-900 tracking-tight">Tạo cuộc họp mới</h2>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-100/80">
+            Form Modal
+          </span>
+        </div>
+        <p class="text-sm text-slate-500 mt-1 leading-relaxed">
+          Tạo lịch họp và thiết lập thời gian cuộc họp
+        </p>
+      </div>
+      <!-- Close Button "X" -->
+      <button type="button" aria-label="Đóng modal" class="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- State 6: Success View Banner (Hidden by default, shown on 'success' state) -->
+    <div id="success-view" class="hidden px-6 py-12 text-center">
+      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 ring-8 ring-emerald-50">
+        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900">Cuộc họp đã được tạo thành công!</h3>
+      <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
+        Lịch họp <span class="font-semibold text-slate-700" id="success-title">"Họp Sprint Review nhóm K16C2"</span> đã được ghi nhận vào hệ thống.
+      </p>
+
+      <div class="mt-6 bg-slate-50 border border-slate-200/80 rounded-xl p-4 max-w-md mx-auto text-left text-xs space-y-2 text-slate-600">
+        <div class="flex justify-between">
+          <span class="text-slate-400">Thời gian:</span>
+          <span class="font-medium text-slate-800">09:00 - 10:30 (1 giờ 30 phút)</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Ngày:</span>
+          <span class="font-medium text-slate-800">26/09/2026</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Trạng thái:</span>
+          <span class="inline-flex items-center text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Đã lên lịch</span>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-center gap-3">
+        <button onclick="switchState('filled')" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+          Chỉnh sửa lại
+        </button>
+        <button onclick="switchState('empty')" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors">
+          Tạo cuộc họp khác
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Form Body (Contains the 3 main business sections) -->
+    <form id="meeting-form" class="p-6 space-y-6" onsubmit="event.preventDefault(); submitSimulation();">
+
+      <!-- Global Error Alert (for Time or Form Validation) -->
+      <div id="global-error" class="hidden p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700 text-sm">
+        <svg class="w-5 h-5 flex-shrink-0 text-red-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div>
+          <div class="font-semibold text-red-800" id="global-error-title">Thông tin chưa hợp lệ</div>
+          <div class="text-xs text-red-600 mt-0.5" id="global-error-desc">Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi tiếp tục.</div>
+        </div>
+      </div>
+
+      <!-- BUSINESS 1: Tiêu đề cuộc họp -->
+      <div class="space-y-1.5" id="group-title">
+        <div class="flex items-center justify-between">
+          <label for="meeting-title" class="block text-sm font-semibold text-slate-700">
+            Tiêu đề cuộc họp <span class="text-rose-500">*</span>
+          </label>
+          <span class="text-xs text-slate-400 font-normal">Tối đa 120 ký tự</span>
+        </div>
+
+        <div class="relative">
+          <input 
+            type="text" 
+            id="meeting-title" 
+            name="meeting_title"
+            value="Họp Sprint Review nhóm K16C2"
+            placeholder="Ví dụ: Họp Sprint Review nhóm K16C2" 
+            oninput="handleInput()"
+            class="w-full px-3.5 py-2.5 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg placeholder-slate-400 shadow-2xs transition duration-150 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+          />
+          <div id="title-error-icon" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-rose-500">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Validation message -->
+        <p id="title-error" class="hidden text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          Tiêu đề cuộc họp không được để trống.
+        </p>
+      </div>
+
+      <!-- BUSINESS 2: Mô tả/nội dung cuộc họp -->
+      <div class="space-y-1.5" id="group-desc">
+        <div class="flex items-center justify-between">
+          <label for="meeting-description" class="block text-sm font-semibold text-slate-700">
+            Mô tả
+          </label>
+          <span class="text-xs text-slate-400 font-normal">Không bắt buộc</span>
+        </div>
+
+        <div class="relative">
+          <textarea 
+            id="meeting-description" 
+            name="meeting_description"
+            rows="4" 
+            placeholder="Nhập nội dung, mục tiêu hoặc chương trình cuộc họp..." 
+            class="w-full px-3.5 py-2.5 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg placeholder-slate-400 shadow-2xs custom-scroll resize-y min-h-[96px] transition duration-150 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+          >Đánh giá kết quả Sprint và thống nhất công việc cho Sprint tiếp theo.</textarea>
+        </div>
+        <p class="text-xs text-slate-400">Cho phép nhập chi tiết agenda, mục tiêu hành động hoặc tài liệu đính kèm.</p>
+      </div>
+
+      <!-- BUSINESS 3: Khu vực Thời gian cuộc họp -->
+      <div class="p-4 bg-slate-50/80 rounded-xl border border-slate-200/90 space-y-3.5" id="group-time-section">
+        <div class="flex items-center justify-between border-b border-slate-200/60 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="p-1 rounded-md bg-blue-100/70 text-blue-700">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </span>
+            <label class="block text-sm font-semibold text-slate-800">
+              Thời gian <span class="text-rose-500">*</span>
+            </label>
+          </div>
+
+          <!-- Dynamic Duration Indicator Badge -->
+          <div id="duration-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="duration-text">Thời lượng: 1 giờ 30 phút</span>
+          </div>
+        </div>
+
+        <!-- Inputs Grid: Date + Start Time + End Time -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          <!-- Ngày họp -->
+          <div class="space-y-1">
+            <label for="meeting-date" class="block text-xs font-medium text-slate-600">
+              Ngày họp
+            </label>
+            <div class="relative">
+              <input 
+                type="date" 
+                id="meeting-date" 
+                name="meeting_date"
+                value="2026-09-26" 
+                class="w-full pl-3 pr-2.5 py-2 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg shadow-2xs focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-500/15"
+              />
+            </div>
+          </div>
+
+          <!-- Thời gian bắt đầu -->
+          <div class="space-y-1">
+            <label for="meeting-start" class="block text-xs font-medium text-slate-600">
+              Thời gian bắt đầu
+            </label>
+            <div class="relative">
+              <input 
+                type="time" 
+                id="meeting-start" 
+                name="meeting_start"
+                value="09:00" 
+                onchange="calcDuration()"
+                class="w-full px-3 py-2 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg shadow-2xs focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-500/15"
+              />
+            </div>
+          </div>
+
+          <!-- Thời gian kết thúc -->
+          <div class="space-y-1">
+            <label for="meeting-end" class="block text-xs font-medium text-slate-600">
+              Thời gian kết thúc
+            </label>
+            <div class="relative">
+              <input 
+                type="time" 
+                id="meeting-end" 
+                name="meeting_end"
+                value="10:30" 
+                onchange="calcDuration()"
+                class="w-full px-3 py-2 text-sm bg-white text-slate-900 border border-slate-300 rounded-lg shadow-2xs focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-500/15"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Time Error alert row (when end <= start) -->
+        <div id="time-error-msg" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200/90 rounded-lg p-2.5 flex items-center gap-2 font-medium">
+          <svg class="w-4 h-4 text-rose-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <span>Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.</span>
+        </div>
+      </div>
+
+      <!-- 3. Footer Action Buttons -->
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3" id="form-footer">
+        <!-- Nút phụ: Hủy -->
+        <button 
+          type="button" 
+          id="btn-cancel"
+          onclick="resetToDefaultPrompt()"
+          class="px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-300"
+        >
+          Hủy
+        </button>
+
+        <!-- Nút chính: Tạo cuộc họp (Primary Blue) -->
+        <button 
+          type="submit" 
+          id="btn-submit"
+          class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm shadow-blue-500/20 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+        >
+          <!-- Normal Icon -->
+          <svg id="submit-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+
+          <!-- Loading Spinner (Hidden by default) -->
+          <svg id="submit-spinner" class="hidden animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+
+          <span id="submit-text">Tạo cuộc họp</span>
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Frontend Developer Specs & Guidelines Card -->
+  <section class="w-full max-w-2xl mt-8 bg-white/90 backdrop-blur rounded-xl border border-slate-200/90 p-5 shadow-xs text-xs text-slate-600">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div class="font-semibold text-slate-800 flex items-center gap-2">
+        <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        Tài liệu đặc tả Frontend Implementation (State Matrix)
+      </div>
+      <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Component: &lt;CreateMeetingModal /&gt;</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+      <div>
+        <span class="font-medium text-slate-900 block mb-1">1. Quản lý State:</span>
+        <ul class="list-disc pl-4 space-y-1 text-slate-500">
+          <li><code>title</code>: string (Required)</li>
+          <li><code>description</code>: string (Optional)</li>
+          <li><code>meetingDate</code>: string (YYYY-MM-DD)</li>
+          <li><code>startTime</code> &amp; <code>endTime</code> (HH:mm)</li>
+          <li><code>duration</code>: Computed state</li>
+        </ul>
+      </div>
+      <div>
+        <span class="font-medium text-slate-900 block mb-1">2. Quy tắc Validation:</span>
+        <ul class="list-disc pl-4 space-y-1 text-slate-500">
+          <li>Title không được bỏ trống hoặc chỉ chứa khoảng trắng.</li>
+          <li><code>endTime &gt; startTime</code> trong cùng ngày.</li>
+          <li>Tự động format thời lượng: <em>"1 giờ 30 phút"</em>.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="font-medium text-slate-900 block mb-1">3. Trạng thái nút Submit:</span>
+        <ul class="list-disc pl-4 space-y-1 text-slate-500">
+          <li><strong>Hover:</strong> <code>bg-blue-700</code></li>
+          <li><strong>Loading:</strong> Spinner SVG, text "Đang tạo cuộc họp..."</li>
+          <li><strong>Disabled:</strong> <code>opacity-50 pointer-events-none</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    const titleInput = document.getElementById('meeting-title');
+    const descInput = document.getElementById('meeting-description');
+    const dateInput = document.getElementById('meeting-date');
+    const startInput = document.getElementById('meeting-start');
+    const endInput = document.getElementById('meeting-end');
+    const durationBadge = document.getElementById('duration-badge');
+    const durationText = document.getElementById('duration-text');
+    const timeErrorMsg = document.getElementById('time-error-msg');
+    const titleError = document.getElementById('title-error');
+    const titleErrorIcon = document.getElementById('title-error-icon');
+    const globalError = document.getElementById('global-error');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnCancel = document.getElementById('btn-cancel');
+    const submitText = document.getElementById('submit-text');
+    const submitSpinner = document.getElementById('submit-spinner');
+    const submitIcon = document.getElementById('submit-icon');
+    const successView = document.getElementById('success-view');
+    const meetingForm = document.getElementById('meeting-form');
+
+    function setActiveBtn(activeId) {
+      document.querySelectorAll('.state-btn').forEach(b => {
+        b.className = "state-btn px-2.5 py-1.5 rounded-md font-medium text-slate-600 hover:bg-slate-50 border border-slate-200 transition-all";
+      });
+      const active = document.getElementById(activeId);
+      if (active) {
+        active.className = "state-btn px-2.5 py-1.5 rounded-md font-medium transition-all bg-blue-50 text-blue-700 border border-blue-200";
+      }
+    }
+
+    function calcDuration() {
+      const start = startInput.value;
+      const end = endInput.value;
+      
+      if (!start || !end) {
+        durationBadge.classList.add('hidden');
+        timeErrorMsg.classList.add('hidden');
+        return true;
+      }
+
+      const [startH, startM] = start.split(':').map(Number);
+      const [endH, endM] = end.split(':').map(Number);
+
+      const startTotal = startH * 60 + startM;
+      const endTotal = endH * 60 + endM;
+      const diff = endTotal - startTotal;
+
+      if (diff <= 0) {
+        // Error state
+        timeErrorMsg.classList.remove('hidden');
+        durationBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200";
+        durationText.innerText = "Thời gian không hợp lệ";
+        endInput.classList.add('border-rose-400', 'bg-rose-50/30', 'focus:border-rose-500', 'focus:ring-rose-500/20');
+        return false;
+      } else {
+        timeErrorMsg.classList.add('hidden');
+        durationBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+        endInput.classList.remove('border-rose-400', 'bg-rose-50/30', 'focus:border-rose-500', 'focus:ring-rose-500/20');
+        
+        const hours = Math.floor(diff / 60);
+        const minutes = diff % 60;
+        let formatted = "Thời lượng: ";
+        if (hours > 0 && minutes > 0) {
+          formatted += `${hours} giờ ${minutes} phút`;
+        } else if (hours > 0) {
+          formatted += `${hours} giờ`;
+        } else {
+          formatted += `${minutes} phút`;
+        }
+        durationText.innerText = formatted;
+        durationBadge.classList.remove('hidden');
+        return true;
+      }
+    }
+
+    function handleInput() {
+      if (titleInput.value.trim().length > 0) {
+        titleError.classList.add('hidden');
+        titleErrorIcon.classList.add('hidden');
+        titleInput.classList.remove('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500/20', 'bg-rose-50/20');
+        globalError.classList.add('hidden');
+      }
+    }
+
+    function switchState(state) {
+      // Reset defaults
+      successView.classList.add('hidden');
+      meetingForm.classList.remove('hidden');
+      globalError.classList.add('hidden');
+      titleError.classList.add('hidden');
+      titleErrorIcon.classList.add('hidden');
+      timeErrorMsg.classList.add('hidden');
+      
+      titleInput.disabled = false;
+      descInput.disabled = false;
+      dateInput.disabled = false;
+      startInput.disabled = false;
+      endInput.disabled = false;
+      btnSubmit.disabled = false;
+      btnCancel.disabled = false;
+
+      btnSubmit.className = "inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm shadow-blue-500/20 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600";
+      submitSpinner.classList.add('hidden');
+      submitIcon.classList.remove('hidden');
+      submitText.innerText = "Tạo cuộc họp";
+
+      titleInput.classList.remove('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500/20', 'bg-rose-50/20', 'bg-slate-100', 'cursor-not-allowed');
+      descInput.classList.remove('bg-slate-100', 'cursor-not-allowed');
+      dateInput.classList.remove('bg-slate-100', 'cursor-not-allowed');
+      startInput.classList.remove('bg-slate-100', 'cursor-not-allowed');
+      endInput.classList.remove('bg-slate-100', 'cursor-not-allowed', 'border-rose-400', 'bg-rose-50/30', 'focus:border-rose-500', 'focus:ring-rose-500/20');
+
+      if (state === 'filled') {
+        setActiveBtn('btn-filled');
+        titleInput.value = "Họp Sprint Review nhóm K16C2";
+        descInput.value = "Đánh giá kết quả Sprint và thống nhất công việc cho Sprint tiếp theo.";
+        dateInput.value = "2026-09-26";
+        startInput.value = "09:00";
+        endInput.value = "10:30";
+        calcDuration();
+      } else if (state === 'empty') {
+        setActiveBtn('btn-empty');
+        titleInput.value = "";
+        descInput.value = "";
+        dateInput.value = "2026-09-26";
+        startInput.value = "";
+        endInput.value = "";
+        durationBadge.classList.add('hidden');
+        titleInput.focus();
+      } else if (state === 'error') {
+        setActiveBtn('btn-error');
+        titleInput.value = "";
+        titleError.classList.remove('hidden');
+        titleErrorIcon.classList.remove('hidden');
+        titleInput.classList.add('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500/20', 'bg-rose-50/20');
+        globalError.classList.remove('hidden');
+        document.getElementById('global-error-title').innerText = "Trường bắt buộc chưa nhập";
+        document.getElementById('global-error-desc').innerText = "Vui lòng nhập 'Tiêu đề cuộc họp' để hoàn tất biểu mẫu.";
+        titleInput.focus();
+      } else if (state === 'timeError') {
+        setActiveBtn('btn-timeError');
+        titleInput.value = "Họp Sprint Review nhóm K16C2";
+        startInput.value = "10:30";
+        endInput.value = "09:00";
+        calcDuration();
+        globalError.classList.remove('hidden');
+        document.getElementById('global-error-title').innerText = "Thời gian không hợp lệ";
+        document.getElementById('global-error-desc').innerText = "Thời gian kết thúc (09:00) không thể sớm hơn thời gian bắt đầu (10:30).";
+      } else if (state === 'loading') {
+        setActiveBtn('btn-loading');
+        titleInput.value = "Họp Sprint Review nhóm K16C2";
+        descInput.value = "Đánh giá kết quả Sprint và thống nhất công việc cho Sprint tiếp theo.";
+        startInput.value = "09:00";
+        endInput.value = "10:30";
+        calcDuration();
+        btnSubmit.disabled = true;
+        btnCancel.disabled = true;
+        submitSpinner.classList.remove('hidden');
+        submitIcon.classList.add('hidden');
+        submitText.innerText = "Đang tạo cuộc họp...";
+      } else if (state === 'success') {
+        setActiveBtn('btn-success');
+        meetingForm.classList.add('hidden');
+        successView.classList.remove('hidden');
+        document.getElementById('success-title').innerText = `"${titleInput.value || 'Họp Sprint Review nhóm K16C2'}"`;
+      } else if (state === 'disabled') {
+        setActiveBtn('btn-disabled');
+        titleInput.disabled = true;
+        descInput.disabled = true;
+        dateInput.disabled = true;
+        startInput.disabled = true;
+        endInput.disabled = true;
+        btnSubmit.disabled = true;
+        btnCancel.disabled = true;
+        titleInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+        descInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+        dateInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+        startInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+        endInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+      }
+    }
+
+    function submitSimulation() {
+      const isTimeValid = calcDuration();
+      if (!titleInput.value.trim()) {
+        switchState('error');
+        return;
+      }
+      if (!isTimeValid) {
+        switchState('timeError');
+        return;
+      }
+
+      // Trigger loading state then success
+      switchState('loading');
+      setTimeout(() => {
+        switchState('success');
+      }, 1200);
+    }
+
+    function resetToDefaultPrompt() {
+      switchState('filled');
+    }
+
+    // Initialize
+    calcDuration();
+  </script>
+</body>
+</html>

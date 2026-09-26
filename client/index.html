@@ -6,6 +6,11 @@
 
   <title>Quản lý Cuộc họp - ICTU</title>
 
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- Bootstrap 5 - UI Library -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -63,161 +68,273 @@
   </main>
 
 
-  <!-- ================= MODAL THÊM / SỬA ================= -->
+  <!-- ================= MODAL THÊM / SỬA (ENTERPRISE STITCH DESIGN) ================= -->
   <div id="modal-overlay" class="modal-overlay hidden">
 
-    <div class="modal">
+    <div class="modal meeting-modal-card">
 
-      <div class="modal-header-custom">
-        <h3 id="modal-title">
-          Thêm cuộc họp
-        </h3>
+      <!-- 1. Header Area -->
+      <div class="stitch-modal-header">
+        <div class="stitch-header-content">
+          <div class="stitch-title-wrapper">
+            <h3 id="modal-title" class="stitch-modal-title">
+              Tạo cuộc họp mới
+            </h3>
+            <span class="stitch-badge">
+              Form Modal
+            </span>
+          </div>
+          <p id="modal-subtitle" class="stitch-modal-subtitle">
+            Tạo lịch họp và thiết lập thời gian cuộc họp
+          </p>
+        </div>
 
         <button
           type="button"
           id="btn-close-modal"
-          class="btn-close"
-          aria-label="Đóng">
+          class="stitch-close-btn"
+          aria-label="Đóng modal">
+          <i class="bi bi-x-lg"></i>
         </button>
       </div>
 
-      <form id="meeting-form">
+      <!-- State: Success View Banner (Hiển thị sau khi tạo/cập nhật thành công) -->
+      <div id="success-view" class="stitch-success-view hidden">
+        <div class="stitch-success-icon-wrapper">
+          <i class="bi bi-check-lg"></i>
+        </div>
+        <h4 class="stitch-success-title">Cuộc họp đã được ghi nhận thành công!</h4>
+        <p class="stitch-success-desc">
+          Lịch họp <span class="fw-semibold text-dark" id="success-title">"Họp Sprint Review nhóm K16C2"</span> đã được lưu vào hệ thống.
+        </p>
+
+        <div class="stitch-summary-card">
+          <div class="stitch-summary-row">
+            <span class="text-muted">Thời gian:</span>
+            <span class="fw-medium text-dark" id="success-time-display">09:00 - 10:30 (1 giờ 30 phút)</span>
+          </div>
+          <div class="stitch-summary-row">
+            <span class="text-muted">Ngày:</span>
+            <span class="fw-medium text-dark" id="success-date-display">26/09/2026</span>
+          </div>
+          <div class="stitch-summary-row">
+            <span class="text-muted">Trạng thái:</span>
+            <span class="stitch-status-pill" id="success-status-display">Đã lên lịch</span>
+          </div>
+        </div>
+
+        <div class="stitch-success-actions">
+          <button type="button" id="btn-success-new" class="btn btn-outline-secondary stitch-btn-cancel">
+            <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp khác
+          </button>
+          <button type="button" id="btn-success-close" class="btn btn-primary stitch-btn-submit">
+            <i class="bi bi-card-checklist me-1"></i> Xem danh sách
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Form Body (Chứa 3 Business sections trọng tâm) -->
+      <form id="meeting-form" class="stitch-form-body" novalidate>
 
         <input
           type="hidden"
           id="meeting-id"
         />
 
-        <label for="meeting-title">
-          Tiêu đề
-        </label>
-
-        <input
-          type="text"
-          id="meeting-title"
-          class="form-control"
-          placeholder="Nhập tiêu đề cuộc họp"
-          required
-        />
-
-
-        <div class="row">
-
-          <div class="col-md-6">
-
-            <label for="meeting-date">
-              Ngày
-            </label>
-
-            <input
-              type="date"
-              id="meeting-date"
-              class="form-control"
-              required
-            />
-
+        <!-- Global Error Alert (Cho Validation) -->
+        <div id="global-error" class="stitch-alert-error hidden">
+          <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-0.5 fs-5"></i>
+          <div>
+            <div class="fw-semibold" id="global-error-title">Thông tin chưa hợp lệ</div>
+            <div class="small" id="global-error-desc">Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi tiếp tục.</div>
           </div>
-
-          <div class="col-md-6">
-
-            <label for="meeting-time">
-              Giờ
-            </label>
-
-            <input
-              type="time"
-              id="meeting-time"
-              class="form-control"
-              required
-            />
-
-          </div>
-
         </div>
 
+        <!-- BUSINESS 1: Tiêu đề cuộc họp -->
+        <div class="stitch-form-group" id="group-title">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label for="meeting-title" class="stitch-label">
+              Tiêu đề cuộc họp <span class="text-danger">*</span>
+            </label>
+            <span class="stitch-hint">Tối đa 120 ký tự</span>
+          </div>
 
-        <label for="meeting-location">
-          Địa điểm / Link họp
-        </label>
+          <div class="stitch-input-relative">
+            <input
+              type="text"
+              id="meeting-title"
+              name="meeting_title"
+              class="form-control stitch-input"
+              placeholder="Ví dụ: Họp Sprint Review nhóm K16C2"
+              maxlength="120"
+              required
+            />
+            <div id="title-error-icon" class="stitch-input-error-icon hidden">
+              <i class="bi bi-exclamation-circle-fill text-danger"></i>
+            </div>
+          </div>
 
-        <input
-          type="text"
-          id="meeting-location"
-          class="form-control"
-          placeholder="Phòng họp A hoặc link Google Meet"
-        />
+          <p id="title-error" class="stitch-field-error hidden">
+            <i class="bi bi-exclamation-circle-fill me-1"></i>
+            Tiêu đề cuộc họp không được để trống.
+          </p>
+        </div>
 
+        <!-- BUSINESS 2: Mô tả / Nội dung cuộc họp -->
+        <div class="stitch-form-group" id="group-desc">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label for="meeting-description" class="stitch-label">
+              Mô tả
+            </label>
+            <span class="stitch-hint">Không bắt buộc</span>
+          </div>
 
-        <label for="meeting-participants">
-          Người tham gia
-        </label>
+          <textarea
+            id="meeting-description"
+            name="meeting_description"
+            class="form-control stitch-textarea"
+            rows="4"
+            placeholder="Nhập nội dung, mục tiêu hoặc chương trình cuộc họp..."></textarea>
+          <small class="stitch-field-help">Cho phép nhập chi tiết agenda, mục tiêu hành động hoặc tài liệu đính kèm.</small>
+          <!-- Giữ input id meeting-notes ẩn để hoàn toàn tương thích ngược -->
+          <input type="hidden" id="meeting-notes" />
+        </div>
 
-        <input
-          type="text"
-          id="meeting-participants"
-          class="form-control"
-          placeholder="Nguyễn A, Trần B, Lê C"
-        />
+        <!-- BUSINESS 3: Khu vực Thời gian cuộc họp (Time Section Card) -->
+        <div class="stitch-time-card" id="group-time-section">
+          <div class="stitch-time-card-header">
+            <div class="d-flex align-items-center gap-2">
+              <span class="stitch-time-icon">
+                <i class="bi bi-clock"></i>
+              </span>
+              <label class="stitch-label m-0">
+                Thời gian <span class="text-danger">*</span>
+              </label>
+            </div>
 
+            <!-- Dynamic Duration Indicator Badge -->
+            <div id="duration-badge" class="stitch-duration-badge">
+              <span class="stitch-pulse-dot"></span>
+              <span id="duration-text">Thời lượng: 1 giờ 30 phút</span>
+            </div>
+          </div>
 
-        <label for="meeting-status">
-          Trạng thái
-        </label>
+          <!-- 3 Columns: Ngày, Giờ bắt đầu, Giờ kết thúc -->
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label for="meeting-date" class="stitch-sublabel">
+                Ngày họp
+              </label>
+              <input
+                type="date"
+                id="meeting-date"
+                name="meeting_date"
+                class="form-control stitch-input stitch-input-sm"
+                required
+              />
+            </div>
 
-        <select
-          id="meeting-status"
-          class="form-select">
+            <div class="col-12 col-md-4">
+              <label for="meeting-start" class="stitch-sublabel">
+                Thời gian bắt đầu
+              </label>
+              <input
+                type="time"
+                id="meeting-start"
+                name="meeting_start"
+                class="form-control stitch-input stitch-input-sm"
+                required
+              />
+            </div>
 
-          <option value="scheduled">
-            Sắp diễn ra
-          </option>
+            <div class="col-12 col-md-4">
+              <label for="meeting-end" class="stitch-sublabel">
+                Thời gian kết thúc
+              </label>
+              <input
+                type="time"
+                id="meeting-end"
+                name="meeting_end"
+                class="form-control stitch-input stitch-input-sm"
+                required
+              />
+            </div>
+          </div>
 
-          <option value="in-progress">
-            Đang diễn ra
-          </option>
+          <!-- Ẩn input meeting-time cũ để đồng bộ tương thích ngược -->
+          <input type="hidden" id="meeting-time" />
 
-          <option value="completed">
-            Đã hoàn thành
-          </option>
+          <!-- Time Error alert (khi end <= start) -->
+          <div id="time-error-msg" class="stitch-time-error-box hidden">
+            <i class="bi bi-exclamation-triangle-fill text-danger flex-shrink-0"></i>
+            <span>Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.</span>
+          </div>
+        </div>
 
-          <option value="cancelled">
-            Đã hủy
-          </option>
+        <!-- Accordion / Thông tin bổ sung (Địa điểm, Người tham gia, Trạng thái) -->
+        <details class="stitch-advanced-details">
+          <summary class="stitch-advanced-summary">
+            <span><i class="bi bi-sliders me-1"></i> Thiết lập bổ sung (Địa điểm, Người tham gia, Trạng thái)</span>
+            <i class="bi bi-chevron-down stitch-chevron"></i>
+          </summary>
+          <div class="stitch-advanced-body pt-3">
+            <div class="mb-3">
+              <label for="meeting-location" class="stitch-label">
+                Địa điểm / Link họp
+              </label>
+              <input
+                type="text"
+                id="meeting-location"
+                class="form-control stitch-input"
+                placeholder="Phòng họp A hoặc link Google Meet"
+              />
+            </div>
 
-        </select>
+            <div class="mb-3">
+              <label for="meeting-participants" class="stitch-label">
+                Người tham gia
+              </label>
+              <input
+                type="text"
+                id="meeting-participants"
+                class="form-control stitch-input"
+                placeholder="Nguyễn A, Trần B, Lê C"
+              />
+            </div>
 
+            <div class="mb-1" id="group-status">
+              <label for="meeting-status" class="stitch-label">
+                Trạng thái
+              </label>
+              <select
+                id="meeting-status"
+                class="form-select stitch-input">
+                <option value="scheduled">Sắp diễn ra</option>
+                <option value="in-progress">Đang diễn ra</option>
+                <option value="completed">Đã hoàn thành</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+            </div>
+          </div>
+        </details>
 
-        <label for="meeting-notes">
-          Ghi chú / Nội dung
-        </label>
-
-        <textarea
-          id="meeting-notes"
-          class="form-control"
-          rows="4"
-          placeholder="Nội dung chính, mục tiêu cuộc họp..."></textarea>
-
-
-        <div class="modal-actions">
-
-          <button
-            type="submit"
-            class="btn btn-primary">
-
-            <i class="bi bi-save"></i>
-            Lưu
-
-          </button>
-
+        <!-- 3. Footer Action Buttons -->
+        <div class="stitch-modal-footer">
           <button
             type="button"
             id="btn-cancel"
-            class="btn btn-secondary">
-
+            class="btn btn-outline-secondary stitch-btn-cancel">
             Hủy
-
           </button>
 
+          <button
+            type="submit"
+            id="btn-submit"
+            class="btn btn-primary stitch-btn-submit">
+            <i id="submit-icon" class="bi bi-plus-lg me-1"></i>
+            <span id="submit-spinner" class="spinner-border spinner-border-sm me-1 hidden" role="status" aria-hidden="true"></span>
+            <span id="submit-text">Tạo cuộc họp</span>
+          </button>
         </div>
 
       </form>

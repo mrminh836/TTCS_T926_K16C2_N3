@@ -15,7 +15,9 @@ let meetings = [
     id: 1,
     title: "Họp nhóm phát triển Frontend",
     date: "2026-09-25",
-    time: "09:00",
+    startTime: "09:00",
+    endTime: "10:30",
+    time: "09:00 - 10:30",
     location: "Phòng họp A",
     participants: [
       "Nguyễn Minh Lượng",
@@ -30,7 +32,9 @@ let meetings = [
     id: 2,
     title: "Sprint Planning",
     date: "2026-09-26",
-    time: "14:00",
+    startTime: "14:00",
+    endTime: "15:30",
+    time: "14:00 - 15:30",
     location: "Google Meet",
     participants: [
       "Nguyễn Minh Lượng",
@@ -44,7 +48,9 @@ let meetings = [
     id: 3,
     title: "Demo sản phẩm",
     date: "2026-09-20",
-    time: "15:30",
+    startTime: "15:30",
+    endTime: "16:30",
+    time: "15:30 - 16:30",
     location: "Phòng Lab",
     participants: [
       "Nguyễn Minh Lượng",
@@ -54,6 +60,69 @@ let meetings = [
     notes: "Demo các chức năng đã hoàn thành."
   }
 ];
+
+
+// =====================================================
+// TÍNH TOÁN THỜI LƯỢNG CUỘC HỌP (STITCH FORM SPEC)
+// =====================================================
+
+function calcDuration() {
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const durationBadge = document.getElementById("duration-badge");
+  const durationText = document.getElementById("duration-text");
+  const timeErrorMsg = document.getElementById("time-error-msg");
+
+  if (!startInput || !endInput || !durationBadge || !durationText || !timeErrorMsg) {
+    return true;
+  }
+
+  const start = startInput.value;
+  const end = endInput.value;
+
+  if (!start || !end) {
+    durationBadge.classList.add("hidden");
+    timeErrorMsg.classList.add("hidden");
+    endInput.classList.remove("has-error");
+    return true;
+  }
+
+  const [startH, startM] = start.split(":").map(Number);
+  const [endH, endM] = end.split(":").map(Number);
+
+  const startTotal = startH * 60 + startM;
+  const endTotal = endH * 60 + endM;
+  const diff = endTotal - startTotal;
+
+  if (diff <= 0) {
+    // Trạng thái lỗi: endTime <= startTime
+    timeErrorMsg.classList.remove("hidden");
+    durationBadge.className = "stitch-duration-badge error";
+    durationText.innerText = "Thời gian không hợp lệ";
+    endInput.classList.add("has-error");
+    durationBadge.classList.remove("hidden");
+    return false;
+  } else {
+    timeErrorMsg.classList.add("hidden");
+    durationBadge.className = "stitch-duration-badge";
+    endInput.classList.remove("has-error");
+
+    const hours = Math.floor(diff / 60);
+    const minutes = diff % 60;
+    let formatted = "";
+    if (hours > 0 && minutes > 0) {
+      formatted = `${hours} giờ ${minutes} phút`;
+    } else if (hours > 0) {
+      formatted = `${hours} giờ`;
+    } else {
+      formatted = `${minutes} phút`;
+    }
+
+    durationText.innerText = `Thời lượng: ${formatted}`;
+    durationBadge.classList.remove("hidden");
+    return true;
+  }
+}
 
 
 // =====================================================
@@ -357,13 +426,13 @@ function setupMeetingEvents() {
     document.getElementById("meetings-list");
 
 
-  // Nút thêm
+  // Nút thêm cuộc họp
   if (addButton) {
     addButton.addEventListener("click", openAddModal);
   }
 
 
-  // Form
+  // Form submit
   if (form) {
     form.addEventListener("submit", saveMeeting);
   }
@@ -396,12 +465,54 @@ function setupMeetingEvents() {
   }
 
 
-  // X nút modal
+  // Nút đóng "X" trên modal
   if (closeModalButton) {
     closeModalButton.addEventListener(
       "click",
       closeMeetingModal
     );
+  }
+
+
+  // Nút trên Success View
+  const btnSuccessNew = document.getElementById("btn-success-new");
+  if (btnSuccessNew) {
+    btnSuccessNew.addEventListener("click", openAddModal);
+  }
+
+  const btnSuccessClose = document.getElementById("btn-success-close");
+  if (btnSuccessClose) {
+    btnSuccessClose.addEventListener("click", closeMeetingModal);
+  }
+
+
+  // Live validation trên input title (gõ là tự xóa cảnh báo đỏ)
+  const titleInput = document.getElementById("meeting-title");
+  if (titleInput) {
+    titleInput.addEventListener("input", function () {
+      if (titleInput.value.trim().length > 0) {
+        const titleError = document.getElementById("title-error");
+        const titleErrorIcon = document.getElementById("title-error-icon");
+        const globalError = document.getElementById("global-error");
+        if (titleError) titleError.classList.add("hidden");
+        if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
+        titleInput.classList.remove("has-error");
+        if (globalError) globalError.classList.add("hidden");
+      }
+    });
+  }
+
+
+  // Live duration calculation khi chọn giờ bắt đầu hoặc giờ kết thúc
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  if (startInput) {
+    startInput.addEventListener("change", calcDuration);
+    startInput.addEventListener("input", calcDuration);
+  }
+  if (endInput) {
+    endInput.addEventListener("change", calcDuration);
+    endInput.addEventListener("input", calcDuration);
   }
 
 
@@ -425,12 +536,10 @@ function setupMeetingEvents() {
 
   // Các nút Sửa / Xóa / Xem
   if (meetingList) {
-
     meetingList.addEventListener(
       "click",
       handleMeetingAction
     );
-
   }
 }
 
@@ -672,35 +781,64 @@ function handleMeetingAction(event) {
 
 
 // =====================================================
-// 10. THÊM CUỘC HỌP
+// =====================================================
+// 10. THÊM CUỘC HỌP (STITCH FORM SPEC)
 // =====================================================
 
 function openAddModal() {
+  const form = document.getElementById("meeting-form");
+  const title = document.getElementById("modal-title");
+  const subtitle = document.getElementById("modal-subtitle");
+  const id = document.getElementById("meeting-id");
+  const titleInput = document.getElementById("meeting-title");
+  const descInput = document.getElementById("meeting-description") || document.getElementById("meeting-notes");
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const locationInput = document.getElementById("meeting-location");
+  const participantsInput = document.getElementById("meeting-participants");
+  const statusInput = document.getElementById("meeting-status");
+  const successView = document.getElementById("success-view");
+  const globalError = document.getElementById("global-error");
+  const titleError = document.getElementById("title-error");
+  const titleErrorIcon = document.getElementById("title-error-icon");
+  const timeErrorMsg = document.getElementById("time-error-msg");
+  const submitText = document.getElementById("submit-text");
 
-  const form =
-    document.getElementById("meeting-form");
+  if (!form) return;
 
-  const title =
-    document.getElementById("modal-title");
-
-  const id =
-    document.getElementById("meeting-id");
-
-
-  if (!form || !title || !id) {
-    return;
-  }
-
-
+  // Reset form & state
   form.reset();
+  if (id) id.value = "";
+  if (title) title.textContent = "Tạo cuộc họp mới";
+  if (subtitle) subtitle.textContent = "Tạo lịch họp và thiết lập thời gian cuộc họp";
+  if (submitText) submitText.textContent = "Tạo cuộc họp";
 
-  id.value = "";
+  // Hiển thị lại form nếu đang ở success view
+  if (form) form.classList.remove("hidden");
+  if (successView) successView.classList.add("hidden");
 
-  title.textContent =
-    "Thêm cuộc họp";
+  // Xóa sạch trạng thái lỗi
+  if (globalError) globalError.classList.add("hidden");
+  if (titleError) titleError.classList.add("hidden");
+  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
+  if (timeErrorMsg) timeErrorMsg.classList.add("hidden");
+  if (titleInput) titleInput.classList.remove("has-error");
+  if (endInput) endInput.classList.remove("has-error");
 
+  // Khởi tạo giá trị mặc định chuẩn Enterprise
+  const today = new Date().toISOString().split("T")[0];
+  if (dateInput) dateInput.value = today;
+  if (startInput) startInput.value = "09:00";
+  if (endInput) endInput.value = "10:30";
+  if (statusInput) statusInput.value = "scheduled";
+
+  calcDuration();
 
   modalOverlay.classList.remove("hidden");
+  if (titleInput) {
+    setTimeout(() => titleInput.focus(), 100);
+  }
 }
 
 
@@ -709,183 +847,239 @@ function openAddModal() {
 // =====================================================
 
 function openEditModal(id) {
-
-  const meeting =
-    meetings.find(
-      item => item.id === id
-    );
-
+  const meeting = meetings.find(item => item.id === id);
 
   if (!meeting) {
     alert("Không tìm thấy cuộc họp.");
     return;
   }
 
+  const form = document.getElementById("meeting-form");
+  const title = document.getElementById("modal-title");
+  const subtitle = document.getElementById("modal-subtitle");
+  const idInput = document.getElementById("meeting-id");
+  const titleInput = document.getElementById("meeting-title");
+  const descInput = document.getElementById("meeting-description");
+  const notesInput = document.getElementById("meeting-notes");
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const locationInput = document.getElementById("meeting-location");
+  const participantsInput = document.getElementById("meeting-participants");
+  const statusInput = document.getElementById("meeting-status");
+  const successView = document.getElementById("success-view");
+  const globalError = document.getElementById("global-error");
+  const titleError = document.getElementById("title-error");
+  const titleErrorIcon = document.getElementById("title-error-icon");
+  const timeErrorMsg = document.getElementById("time-error-msg");
+  const submitText = document.getElementById("submit-text");
 
-  document.getElementById("modal-title")
-    .textContent =
-    "Chỉnh sửa cuộc họp";
+  if (title) title.textContent = "Chỉnh sửa cuộc họp";
+  if (subtitle) subtitle.textContent = "Cập nhật thông tin và thời gian cuộc họp";
+  if (submitText) submitText.textContent = "Cập nhật cuộc họp";
 
+  if (form) form.classList.remove("hidden");
+  if (successView) successView.classList.add("hidden");
 
-  document.getElementById("meeting-id")
-    .value =
-    meeting.id;
+  // Xóa lỗi
+  if (globalError) globalError.classList.add("hidden");
+  if (titleError) titleError.classList.add("hidden");
+  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
+  if (timeErrorMsg) timeErrorMsg.classList.add("hidden");
+  if (titleInput) titleInput.classList.remove("has-error");
+  if (endInput) endInput.classList.remove("has-error");
 
+  // Điền dữ liệu
+  if (idInput) idInput.value = meeting.id;
+  if (titleInput) titleInput.value = meeting.title || "";
+  if (descInput) descInput.value = meeting.notes || meeting.description || "";
+  if (notesInput) notesInput.value = meeting.notes || "";
+  if (dateInput) dateInput.value = meeting.date || "";
 
-  document.getElementById("meeting-title")
-    .value =
-    meeting.title;
+  // Phân tích thời gian bắt đầu và kết thúc
+  let startTime = meeting.startTime;
+  let endTime = meeting.endTime;
 
+  if (!startTime || !endTime) {
+    if (meeting.time && meeting.time.includes("-")) {
+      const parts = meeting.time.split("-").map(p => p.trim());
+      startTime = parts[0] || "09:00";
+      endTime = parts[1] || "10:30";
+    } else {
+      startTime = meeting.time || "09:00";
+      endTime = "10:30";
+    }
+  }
 
-  document.getElementById("meeting-date")
-    .value =
-    meeting.date;
+  if (startInput) startInput.value = startTime;
+  if (endInput) endInput.value = endTime;
+  if (locationInput) locationInput.value = meeting.location || "";
+  if (participantsInput) participantsInput.value = (meeting.participants || []).join(", ");
+  if (statusInput) statusInput.value = meeting.status || "scheduled";
 
-
-  document.getElementById("meeting-time")
-    .value =
-    meeting.time;
-
-
-  document.getElementById("meeting-location")
-    .value =
-    meeting.location;
-
-
-  document.getElementById("meeting-participants")
-    .value =
-    meeting.participants.join(", ");
-
-
-  document.getElementById("meeting-status")
-    .value =
-    meeting.status;
-
-
-  document.getElementById("meeting-notes")
-    .value =
-    meeting.notes;
-
+  calcDuration();
 
   modalOverlay.classList.remove("hidden");
 }
 
 
 // =====================================================
-// 12. LƯU
+// 12. LƯU (VALIDATION & SUBMIT THEO STITCH SPEC)
 // =====================================================
 
 function saveMeeting(event) {
-
   event.preventDefault();
 
+  const id = document.getElementById("meeting-id").value;
+  const titleInput = document.getElementById("meeting-title");
+  const descInput = document.getElementById("meeting-description") || document.getElementById("meeting-notes");
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const locationInput = document.getElementById("meeting-location");
+  const participantsInput = document.getElementById("meeting-participants");
+  const statusInput = document.getElementById("meeting-status");
 
-  const id =
-    document.getElementById("meeting-id")
-      .value;
+  const titleError = document.getElementById("title-error");
+  const titleErrorIcon = document.getElementById("title-error-icon");
+  const globalError = document.getElementById("global-error");
+  const globalErrorTitle = document.getElementById("global-error-title");
+  const globalErrorDesc = document.getElementById("global-error-desc");
+  const btnSubmit = document.getElementById("btn-submit");
+  const submitText = document.getElementById("submit-text");
+  const submitSpinner = document.getElementById("submit-spinner");
+  const submitIcon = document.getElementById("submit-icon");
+  const successView = document.getElementById("success-view");
+  const form = document.getElementById("meeting-form");
 
+  const title = titleInput ? titleInput.value.trim() : "";
+  const date = dateInput ? dateInput.value : "";
+  const startTime = startInput ? startInput.value : "";
+  const endTime = endInput ? endInput.value : "";
+  const location = locationInput ? locationInput.value.trim() : "";
+  const notes = descInput ? descInput.value.trim() : "";
+  const status = statusInput ? statusInput.value : "scheduled";
 
-  const title =
-    document.getElementById("meeting-title")
-      .value
-      .trim();
+  const participants = participantsInput
+    ? participantsInput.value
+        .split(",")
+        .map(item => item.trim())
+        .filter(item => item !== "")
+    : [];
 
+  // Reset errors
+  if (titleError) titleError.classList.add("hidden");
+  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
+  if (titleInput) titleInput.classList.remove("has-error");
+  if (globalError) globalError.classList.add("hidden");
 
-  const date =
-    document.getElementById("meeting-date")
-      .value;
-
-
-  const time =
-    document.getElementById("meeting-time")
-      .value;
-
-
-  const location =
-    document.getElementById("meeting-location")
-      .value
-      .trim();
-
-
-  const participants =
-    document.getElementById("meeting-participants")
-      .value
-      .split(",")
-      .map(item => item.trim())
-      .filter(item => item !== "");
-
-
-  const status =
-    document.getElementById("meeting-status")
-      .value;
-
-
-  const notes =
-    document.getElementById("meeting-notes")
-      .value
-      .trim();
-
-
-  if (!title || !date || !time) {
-
-    alert(
-      "Vui lòng nhập đầy đủ Tiêu đề, Ngày và Giờ."
-    );
-
+  // 1. Validate Tiêu đề (Bắt buộc)
+  if (!title) {
+    if (titleError) titleError.classList.remove("hidden");
+    if (titleErrorIcon) titleErrorIcon.classList.remove("hidden");
+    if (titleInput) {
+      titleInput.classList.add("has-error");
+      titleInput.focus();
+    }
+    if (globalError && globalErrorTitle && globalErrorDesc) {
+      globalErrorTitle.innerText = "Trường bắt buộc chưa nhập";
+      globalErrorDesc.innerText = "Vui lòng nhập 'Tiêu đề cuộc họp' để hoàn tất biểu mẫu.";
+      globalError.classList.remove("hidden");
+    }
     return;
   }
 
+  // 2. Validate Thời gian (Bắt buộc & End > Start)
+  if (!date || !startTime || !endTime) {
+    if (globalError && globalErrorTitle && globalErrorDesc) {
+      globalErrorTitle.innerText = "Thông tin thời gian chưa đầy đủ";
+      globalErrorDesc.innerText = "Vui lòng chọn ngày họp, thời gian bắt đầu và thời gian kết thúc.";
+      globalError.classList.remove("hidden");
+    }
+    return;
+  }
 
-  // SỬA
-  if (id) {
+  const isDurationValid = calcDuration();
+  if (!isDurationValid) {
+    if (globalError && globalErrorTitle && globalErrorDesc) {
+      globalErrorTitle.innerText = "Thời gian không hợp lệ";
+      globalErrorDesc.innerText = `Thời gian kết thúc (${endTime}) không thể sớm hơn thời gian bắt đầu (${startTime}).`;
+      globalError.classList.remove("hidden");
+    }
+    return;
+  }
 
-    const index =
-      meetings.findIndex(
-        item => item.id === Number(id)
-      );
+  // 3. Trạng thái Loading giả lập mượt mà
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (submitSpinner) submitSpinner.classList.remove("hidden");
+  if (submitIcon) submitIcon.classList.add("hidden");
+  if (submitText) submitText.innerText = id ? "Đang cập nhật..." : "Đang tạo cuộc họp...";
 
+  const timeDisplay = `${startTime} - ${endTime}`;
 
-    if (index !== -1) {
-
-      meetings[index] = {
-
-        id: Number(id),
-
+  setTimeout(() => {
+    // SỬA
+    if (id) {
+      const index = meetings.findIndex(item => item.id === Number(id));
+      if (index !== -1) {
+        meetings[index] = {
+          id: Number(id),
+          title,
+          date,
+          startTime,
+          endTime,
+          time: timeDisplay,
+          location,
+          participants,
+          status,
+          notes
+        };
+      }
+    }
+    // THÊM MỚI
+    else {
+      meetings.unshift({
+        id: getNextId(),
         title,
         date,
-        time,
+        startTime,
+        endTime,
+        time: timeDisplay,
         location,
         participants,
         status,
         notes
-      };
-
+      });
     }
 
-  }
+    // Khôi phục nút submit
+    if (btnSubmit) btnSubmit.disabled = false;
+    if (submitSpinner) submitSpinner.classList.add("hidden");
+    if (submitIcon) submitIcon.classList.remove("hidden");
+    if (submitText) submitText.innerText = id ? "Cập nhật cuộc họp" : "Tạo cuộc họp";
 
-  // THÊM
-  else {
+    // Cập nhật bảng
+    renderMeetingTable();
 
-    meetings.push({
+    // Hiển thị Success View
+    if (form) form.classList.add("hidden");
+    if (successView) {
+      successView.classList.remove("hidden");
+      const successTitle = document.getElementById("success-title");
+      const successTime = document.getElementById("success-time-display");
+      const successDate = document.getElementById("success-date-display");
+      const successStatus = document.getElementById("success-status-display");
 
-      id: getNextId(),
-
-      title,
-      date,
-      time,
-      location,
-      participants,
-      status,
-      notes
-    });
-
-  }
-
-
-  closeMeetingModal();
-
-  renderMeetingTable();
+      if (successTitle) successTitle.innerText = `"${title}"`;
+      if (successTime) {
+        const durText = document.getElementById("duration-text");
+        const durLabel = durText ? durText.innerText.replace("Thời lượng: ", "") : "";
+        successTime.innerText = `${timeDisplay} (${durLabel})`;
+      }
+      if (successDate) successDate.innerText = formatDate(date);
+      if (successStatus) successStatus.innerText = getStatusText(status);
+    }
+  }, 350);
 }
 
 
@@ -1037,26 +1231,34 @@ function openDetailModal(id) {
 // =====================================================
 
 function closeMeetingModal() {
-
   modalOverlay.classList.add("hidden");
 
-
-  const form =
-    document.getElementById("meeting-form");
-
+  const form = document.getElementById("meeting-form");
+  const successView = document.getElementById("success-view");
+  const globalError = document.getElementById("global-error");
+  const titleError = document.getElementById("title-error");
+  const titleErrorIcon = document.getElementById("title-error-icon");
+  const timeErrorMsg = document.getElementById("time-error-msg");
+  const titleInput = document.getElementById("meeting-title");
+  const endInput = document.getElementById("meeting-end");
+  const id = document.getElementById("meeting-id");
 
   if (form) {
     form.reset();
+    form.classList.remove("hidden");
   }
-
-
-  const id =
-    document.getElementById("meeting-id");
-
-
+  if (successView) {
+    successView.classList.add("hidden");
+  }
   if (id) {
     id.value = "";
   }
+  if (globalError) globalError.classList.add("hidden");
+  if (titleError) titleError.classList.add("hidden");
+  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
+  if (timeErrorMsg) timeErrorMsg.classList.add("hidden");
+  if (titleInput) titleInput.classList.remove("has-error");
+  if (endInput) endInput.classList.remove("has-error");
 }
 
 
