@@ -10,12 +10,67 @@
 // 1. DỮ LIỆU CHUẨN DATABASE (ROOMS, MEETINGS, USERS)
 // =====================================================
 
-const ROOMS = [
-  { id: 1, name: "Phòng Tokyo (Tầng 4)", capacity: 20 },
-  { id: 2, name: "Phòng Silicon (Tầng 2)", capacity: 12 },
-  { id: 3, name: "Phòng Hội Nghị A", capacity: 30 },
-  { id: 4, name: "Phòng Grand Board", capacity: 50 },
-  { id: 5, name: "Phòng VIP", capacity: 10 }
+let ROOMS = [
+  {
+    id: 1,
+    code: "RM-001",
+    name: "Phòng Tokyo (Tầng 4)",
+    floor: "Tầng 4, Tòa A",
+    capacity: 20,
+    status: "Active",
+    type: "Hội nghị",
+    qrCode: "QR-ROOM-001",
+    equipments: ["Máy chiếu Full HD", "Màn hình TV 75\"", "Micro & Loa họp"],
+    description: "Phòng họp hội thảo tiêu chuẩn cao, view thoáng, cách âm tốt, chuyên tổ chức họp ban giám đốc và đối tác."
+  },
+  {
+    id: 2,
+    code: "RM-002",
+    name: "Phòng Silicon (Tầng 2)",
+    floor: "Tầng 2, Tòa B",
+    capacity: 12,
+    status: "Active",
+    type: "Nhóm / Tech",
+    qrCode: "QR-ROOM-002",
+    equipments: ["Màn hình TV 75\"", "Bảng trắng viết", "Micro & Loa họp"],
+    description: "Phòng họp nhóm kỹ thuật, trang bị bảng trắng lớn và màn hình TV cho daily sprint và pairing."
+  },
+  {
+    id: 3,
+    code: "RM-003",
+    name: "Phòng Hội Nghị A",
+    floor: "Tầng 1, Tòa Trung tâm",
+    capacity: 30,
+    status: "Active",
+    type: "Hội trường lớn",
+    qrCode: "QR-ROOM-003",
+    equipments: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\"", "Bảng trắng viết"],
+    description: "Hội trường đa năng phục vụ họp toàn thể phòng ban, đào tạo nội bộ và workshop công nghệ."
+  },
+  {
+    id: 4,
+    code: "RM-004",
+    name: "Phòng Grand Board",
+    floor: "Tầng 5, Tòa A",
+    capacity: 50,
+    status: "Maintenance",
+    type: "Đại sảnh / Board",
+    qrCode: "QR-ROOM-004",
+    equipments: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\""],
+    description: "Phòng họp cấp cao Ban Lãnh đạo, hiện đang tiến hành bảo trì nâng cấp hệ thống âm thanh vòm."
+  },
+  {
+    id: 5,
+    code: "RM-005",
+    name: "Phòng VIP",
+    floor: "Tầng 3, Tòa VIP",
+    capacity: 10,
+    status: "Active",
+    type: "VIP / Phỏng vấn",
+    qrCode: "QR-ROOM-005",
+    equipments: ["Màn hình TV 75\"", "Micro & Loa họp"],
+    description: "Không gian sang trọng, yên tĩnh, chuyên dành cho phỏng vấn lãnh đạo và tiếp khách ngoại giao."
+  }
 ];
 
 const USERS = [
@@ -321,6 +376,9 @@ const app = document.getElementById("app");
 
 const modalOverlay = document.getElementById("modal-overlay");
 const detailOverlay = document.getElementById("detail-overlay");
+const roomModalOverlay = document.getElementById("room-modal-overlay");
+const roomQrOverlay = document.getElementById("room-qr-overlay");
+const roomDeleteOverlay = document.getElementById("room-delete-overlay");
 
 
 // =====================================================
@@ -331,6 +389,8 @@ const routes = {
   "/": renderHome,
   "/home": renderHome,
   "/meetings": renderMeetingsPage,
+  "/admin/rooms": renderAdminRoomsPage,
+  "/rooms": renderAdminRoomsPage,
   "/404": render404
 };
 
@@ -415,6 +475,10 @@ function renderHome() {
           <i class="bi bi-calendar3 me-2"></i> Vào Quản lý cuộc họp
         </a>
 
+        <a href="#/admin/rooms" class="btn btn-outline-primary stitch-btn-export hero-btn-sub">
+          <i class="bi bi-door-open-fill me-1"></i> Quản lý phòng họp (Admin)
+        </a>
+
         <button type="button" onclick="openAddModal()" class="btn btn-outline-secondary stitch-btn-cancel hero-btn-sub">
           <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp mới
         </button>
@@ -450,8 +514,11 @@ function renderHome() {
           <div class="feature-icon feature-sky">
             <i class="bi bi-cpu"></i>
           </div>
-          <h3 class="feature-title">Quản Lý Phòng & Thiết Bị</h3>
+          <h3 class="feature-title">Quản Lý Phòng &amp; Thiết Bị</h3>
           <p class="feature-desc">Theo dõi trực quan trạng thái sức chứa phòng họp, máy chiếu, màn hình TV và thiết bị kèm theo.</p>
+          <a href="#/admin/rooms" class="text-primary fw-semibold small text-decoration-none mt-2 d-inline-block">
+            Vào cổng quản trị phòng &rarr;
+          </a>
         </div>
 
         <div class="feature-card">
@@ -737,6 +804,1193 @@ function render404() {
       </a>
     </section>
   `;
+}
+
+
+// =====================================================
+// 6B. TRANG QUẢN TRỊ DANH MỤC PHÒNG HỌP (ADMIN ROOMS)
+// =====================================================
+
+let roomFilterState = {
+  search: "",
+  status: "all",      // "all" | "Active" | "Maintenance" | "Inactive"
+  capacity: "all",    // "all" | "small" (<15) | "medium" (15-30) | "large" (>30)
+  sortBy: "code-asc"
+};
+
+function getFilteredRooms() {
+  return ROOMS.filter(room => {
+    // Tìm kiếm đa trường: tên, mã, tầng, loại phòng
+    if (roomFilterState.search) {
+      const q = roomFilterState.search.toLowerCase().trim();
+      const matchName = (room.name || "").toLowerCase().includes(q);
+      const matchCode = (room.code || "").toLowerCase().includes(q);
+      const matchFloor = (room.floor || "").toLowerCase().includes(q);
+      const matchType = (room.type || "").toLowerCase().includes(q);
+      if (!matchName && !matchCode && !matchFloor && !matchType) return false;
+    }
+
+    // Lọc theo trạng thái
+    if (roomFilterState.status !== "all") {
+      if (room.status !== roomFilterState.status) return false;
+    }
+
+    // Lọc theo quy mô sức chứa
+    if (roomFilterState.capacity === "small") {
+      if (room.capacity >= 15) return false;
+    } else if (roomFilterState.capacity === "medium") {
+      if (room.capacity < 15 || room.capacity > 30) return false;
+    } else if (roomFilterState.capacity === "large") {
+      if (room.capacity <= 30) return false;
+    }
+
+    return true;
+  }).sort((a, b) => {
+    if (roomFilterState.sortBy === "code-asc") return (a.code || "").localeCompare(b.code || "");
+    if (roomFilterState.sortBy === "code-desc") return (b.code || "").localeCompare(a.code || "");
+    if (roomFilterState.sortBy === "name-asc") return (a.name || "").localeCompare(b.name || "");
+    if (roomFilterState.sortBy === "capacity-desc") return b.capacity - a.capacity;
+    if (roomFilterState.sortBy === "capacity-asc") return a.capacity - b.capacity;
+    return a.id - b.id;
+  });
+}
+
+function renderAdminRoomsPage() {
+  const totalRooms = ROOMS.length;
+  const activeRooms = ROOMS.filter(r => r.status === "Active").length;
+  const maintenanceRooms = ROOMS.filter(r => r.status === "Maintenance").length;
+  const totalCapacity = ROOMS.reduce((sum, r) => sum + (Number(r.capacity) || 0), 0);
+
+  app.innerHTML = `
+    <div id="admin-rooms-section" class="admin-rooms-view-wrapper">
+
+      <!-- Breadcrumbs & Page Header -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+        <div>
+          <div class="breadcrumb-nav mb-1">
+            <span>Quản trị hệ thống</span>
+            <i class="bi bi-chevron-right breadcrumb-separator"></i>
+            <span class="breadcrumb-active">Danh mục phòng họp</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <h1 class="page-title m-0">Quản lý Danh mục Phòng họp</h1>
+            <span class="admin-badge-indicator">
+              <i class="bi bi-shield-lock-fill"></i> Admin Portal
+            </span>
+          </div>
+          <p class="page-subtitle m-0">
+            Quản trị trạng thái hoạt động, sức chứa, trang thiết bị và mã QR Check-in tức thì cho toàn bộ phòng họp doanh nghiệp.
+          </p>
+        </div>
+
+        <div class="header-action-buttons d-flex align-items-center gap-2">
+          <button type="button" id="btn-export-rooms-csv" class="btn-stitch-export" title="Xuất danh sách phòng họp ra file CSV">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            <span>Xuất CSV / Excel</span>
+          </button>
+
+          <button type="button" id="btn-add-room" class="btn-stitch-create">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Thêm phòng họp</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Overview Cards (4 Metrics) -->
+      <div class="room-kpi-grid">
+        <!-- KPI 1: Tổng số phòng -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Tổng số phòng họp</span>
+              <div class="kpi-value" id="room-kpi-total">${totalRooms}</div>
+            </div>
+            <div class="kpi-icon-box kpi-blue">
+              <i class="bi bi-door-open-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-neutral">
+              <i class="bi bi-building"></i> Toàn cơ sở
+            </span>
+            <span class="kpi-delta-text">5 tầng phòng ban</span>
+          </div>
+          <div class="kpi-bottom-bar bar-blue"></div>
+        </div>
+
+        <!-- KPI 2: Đang sẵn sàng hoạt động -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Sẵn sàng phục vụ</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="room-kpi-active">${activeRooms}</span>
+                <span class="kpi-value-unit">phòng</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box kpi-emerald">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-positive">
+              <i class="bi bi-broadcast"></i> Sẵn sàng đặt
+            </span>
+            <span class="kpi-delta-text">Không có sự cố</span>
+          </div>
+          <div class="kpi-bottom-bar bar-emerald"></div>
+        </div>
+
+        <!-- KPI 3: Đang bảo trì -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Đang bảo trì / Kiểm tra</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="room-kpi-maintenance">${maintenanceRooms}</span>
+                <span class="kpi-value-unit">phòng</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box kpi-amber">
+              <i class="bi bi-tools"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-live">
+              <span class="ping-dot-live"></span> Đang nâng cấp
+            </span>
+            <span class="kpi-delta-text">Tạm dừng nhận lịch</span>
+          </div>
+          <div class="kpi-bottom-bar bar-amber"></div>
+        </div>
+
+        <!-- KPI 4: Tổng sức chứa -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Tổng sức chứa phục vụ</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="room-kpi-capacity">${totalCapacity}</span>
+                <span class="kpi-value-unit">chỗ ngồi</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box kpi-purple">
+              <i class="bi bi-people-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-neutral">
+              <i class="bi bi-bar-chart"></i> Trung bình ${Math.round(totalCapacity / (totalRooms || 1))} chỗ/phòng
+            </span>
+            <span class="kpi-delta-text">Tối đa 50 chỗ</span>
+          </div>
+          <div class="kpi-bottom-bar bar-purple"></div>
+        </div>
+      </div>
+
+      <!-- Filter Panel & Toolbar -->
+      <div class="room-filter-card">
+        <div class="row g-3 align-items-center">
+
+          <!-- Search Input -->
+          <div class="col-lg-4 col-md-6">
+            <div class="search-input-wrapper">
+              <i class="bi bi-search search-input-icon"></i>
+              <input
+                type="text"
+                id="room-search-input"
+                class="form-control table-search-input"
+                placeholder="Tìm theo tên phòng, mã (RM-001), tầng..."
+                aria-label="Tìm kiếm phòng họp"
+                value="${escapeHTML(roomFilterState.search)}"
+              />
+              ${roomFilterState.search ? `
+                <button type="button" id="btn-clear-room-search" class="btn-clear-search" aria-label="Xóa tìm kiếm">
+                  <i class="bi bi-x-circle-fill"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Status Tabs -->
+          <div class="col-lg-5 col-md-6">
+            <div class="d-flex align-items-center gap-1 flex-wrap" role="tablist">
+              <button
+                type="button"
+                class="room-status-tab-btn ${roomFilterState.status === 'all' ? 'active' : ''}"
+                data-status="all">
+                <span>Tất cả</span>
+                <span class="room-tab-count">${totalRooms}</span>
+              </button>
+
+              <button
+                type="button"
+                class="room-status-tab-btn ${roomFilterState.status === 'Active' ? 'active' : ''}"
+                data-status="Active">
+                <span>Hoạt động</span>
+                <span class="room-tab-count">${activeRooms}</span>
+              </button>
+
+              <button
+                type="button"
+                class="room-status-tab-btn ${roomFilterState.status === 'Maintenance' ? 'active' : ''}"
+                data-status="Maintenance">
+                <span>Bảo trì</span>
+                <span class="room-tab-count">${maintenanceRooms}</span>
+              </button>
+
+              <button
+                type="button"
+                class="room-status-tab-btn ${roomFilterState.status === 'Inactive' ? 'active' : ''}"
+                data-status="Inactive">
+                <span>Tạm ngừng</span>
+                <span class="room-tab-count">${totalRooms - activeRooms - maintenanceRooms}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Capacity Dropdown & Sort -->
+          <div class="col-lg-3 col-md-12 d-flex align-items-center gap-2">
+            <select id="room-capacity-filter" class="form-select stitch-input" aria-label="Lọc theo quy mô sức chứa">
+              <option value="all" ${roomFilterState.capacity === 'all' ? 'selected' : ''}>Tất cả quy mô</option>
+              <option value="small" ${roomFilterState.capacity === 'small' ? 'selected' : ''}>Nhỏ (&lt; 15 chỗ)</option>
+              <option value="medium" ${roomFilterState.capacity === 'medium' ? 'selected' : ''}>Vừa (15 - 30 chỗ)</option>
+              <option value="large" ${roomFilterState.capacity === 'large' ? 'selected' : ''}>Lớn (&gt; 30 chỗ)</option>
+            </select>
+
+            <button type="button" id="btn-reset-room-filter" class="btn btn-outline-secondary stitch-btn-cancel flex-shrink-0" title="Đặt lại bộ lọc" aria-label="Đặt lại bộ lọc">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Admin Room Table Card -->
+      <div class="stitch-table-card">
+        <div class="stitch-table-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="stitch-table-title">Danh sách phòng họp doanh nghiệp</span>
+            <span class="stitch-table-count" id="room-table-count">Đang tải...</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="stitch-hint"><i class="bi bi-shield-check text-success me-1"></i>Đồng bộ CSDL chuẩn 3NF</span>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table stitch-table align-middle" id="admin-rooms-table">
+            <thead>
+              <tr>
+                <th style="width: 44px;" class="text-center">
+                  <input type="checkbox" id="check-all-rooms" class="stitch-checkbox" aria-label="Chọn tất cả phòng họp" />
+                </th>
+                <th style="width: 105px;" class="text-center">Mã phòng</th>
+                <th style="min-width: 230px;">Phòng họp &amp; Vị trí</th>
+                <th style="width: 150px;">Sức chứa</th>
+                <th style="min-width: 220px;">Trang thiết bị gắn kèm</th>
+                <th style="width: 145px;" class="text-center">Trạng thái</th>
+                <th style="width: 145px;" class="text-center text-nowrap">Mã QR Check-in</th>
+                <th style="width: 130px;" class="text-center">Lịch hôm nay</th>
+                <th style="width: 140px;" class="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="admin-rooms-tbody">
+              <!-- Render by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Pagination -->
+        <div class="stitch-table-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="stitch-table-info" id="room-footer-info"></div>
+          <div class="stitch-pagination d-flex align-items-center gap-1">
+            <button type="button" class="btn-page-nav disabled" aria-label="Trang trước"><i class="bi bi-chevron-left"></i></button>
+            <span class="btn-page-nav active">1</span>
+            <button type="button" class="btn-page-nav disabled" aria-label="Trang kế tiếp"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  setupAdminRoomEvents();
+  renderAdminRoomsTable();
+}
+
+function renderAdminRoomsTable() {
+  const tbody = document.getElementById("admin-rooms-tbody");
+  const countBadge = document.getElementById("room-table-count");
+  const footerInfo = document.getElementById("room-footer-info");
+
+  if (!tbody) return;
+
+  const filtered = getFilteredRooms();
+  const total = ROOMS.length;
+
+  if (countBadge) {
+    countBadge.textContent = `${filtered.length} / ${total} phòng`;
+  }
+
+  if (footerInfo) {
+    footerInfo.textContent = `Hiển thị ${filtered.length} trong tổng số ${total} phòng họp doanh nghiệp`;
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="text-center py-5">
+          <div class="empty-state-card">
+            <div class="empty-icon-box mb-3">
+              <i class="bi bi-door-closed fs-1 text-muted"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">Không tìm thấy phòng họp phù hợp</h5>
+            <p class="text-muted small mb-3">Vui lòng điều chỉnh lại từ khóa tìm kiếm hoặc bỏ chọn các điều kiện lọc.</p>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="resetRoomFilters()">
+              <i class="bi bi-arrow-counterclockwise me-1"></i> Xóa bộ lọc tìm kiếm
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+
+  tbody.innerHTML = filtered.map(room => {
+    // 1. Icon phòng theo loại
+    let iconClass = "bi-door-closed room-icon-default";
+    if (room.type === "Hội nghị") iconClass = "bi-building room-icon-board";
+    else if (room.type === "Nhóm / Tech") iconClass = "bi-laptop room-icon-tech";
+    else if (room.type === "Hội trường lớn") iconClass = "bi-megaphone room-icon-hall";
+    else if (room.type === "VIP / Phỏng vấn") iconClass = "bi-star-fill room-icon-vip";
+    else if (room.type === "Đại sảnh / Board") iconClass = "bi-award-fill room-icon-board";
+
+    // 2. Status Badge
+    let statusBadge = "";
+    if (room.status === "Active") {
+      statusBadge = `<span class="stitch-status-pill status-completed"><span class="pulse-dot-primary" style="background:#10b981;"></span> Sẵn sàng</span>`;
+    } else if (room.status === "Maintenance") {
+      statusBadge = `<span class="stitch-status-pill status-inprogress"><span class="ping-dot-live"></span> Đang bảo trì</span>`;
+    } else {
+      statusBadge = `<span class="stitch-status-pill status-cancelled">Tạm ngừng</span>`;
+    }
+
+    // 3. Equipments Pills
+    const eqList = (room.equipments || []).map(eq => {
+      let icon = "bi-check2";
+      if (eq.includes("Máy chiếu")) icon = "bi-projector-fill";
+      else if (eq.includes("TV")) icon = "bi-tv-fill";
+      else if (eq.includes("Micro")) icon = "bi-mic-fill";
+      else if (eq.includes("Bảng")) icon = "bi-easel-fill";
+      return `<span class="room-eq-pill"><i class="bi ${icon}"></i>${escapeHTML(eq)}</span>`;
+    }).join("");
+
+    // 4. Cuộc họp hôm nay
+    const todayMeetings = meetings.filter(m => 
+      (m.roomId === room.id || m.roomName === room.name) && 
+      m.date === today && 
+      m.status !== "cancelled"
+    );
+    const hasLiveMeeting = todayMeetings.some(m => m.status === "in-progress");
+
+    let meetingIndicator = "";
+    if (hasLiveMeeting) {
+      meetingIndicator = `<span class="kpi-chip-live"><span class="ping-dot-live"></span> Đang có họp</span>`;
+    } else if (todayMeetings.length > 0) {
+      meetingIndicator = `<span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold px-2 py-1">${todayMeetings.length} cuộc họp</span>`;
+    } else {
+      meetingIndicator = `<span class="text-muted small">Chưa có lịch</span>`;
+    }
+
+    // 5. Thanh đo sức chứa
+    const capPct = Math.min(100, Math.round((room.capacity / 50) * 100));
+
+    return `
+      <tr data-room-id="${room.id}">
+        <td class="text-center">
+          <input type="checkbox" class="stitch-checkbox room-row-checkbox" value="${room.id}" aria-label="Chọn phòng ${escapeHTML(room.name)}" />
+        </td>
+
+        <td class="text-center">
+          <span class="room-code-badge">${escapeHTML(room.code || `RM-00${room.id}`)}</span>
+        </td>
+
+        <td>
+          <div class="room-cell-info">
+            <div class="room-type-icon ${iconClass.split(' ')[1]}">
+              <i class="bi ${iconClass.split(' ')[0]}"></i>
+            </div>
+            <div>
+              <div class="room-name-text" onclick="openRoomQRModal(${room.id})" title="Nhấp để xem chi tiết phòng">
+                ${escapeHTML(room.name)}
+              </div>
+              <div class="room-location-text">
+                <i class="bi bi-geo-alt"></i>
+                <span>${escapeHTML(room.floor || 'Chưa định vị')} • ${escapeHTML(room.type || 'Hội nghị')}</span>
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <td>
+          <div class="capacity-cell-wrapper">
+            <div class="capacity-badge-pill">
+              <i class="bi bi-people-fill text-primary"></i>
+              <span>${room.capacity} chỗ</span>
+            </div>
+            <div class="capacity-meter" title="Sức chứa: ${room.capacity} chỗ">
+              <div class="capacity-meter-bar" style="width: ${capPct}%;"></div>
+            </div>
+            <span class="capacity-size-tag">${room.capacity < 15 ? 'Quy mô nhỏ' : (room.capacity <= 30 ? 'Quy mô vừa' : 'Quy mô lớn')}</span>
+          </div>
+        </td>
+
+        <td>
+          <div class="room-eq-pill-list">
+            ${eqList || '<span class="text-muted small">Không có</span>'}
+          </div>
+        </td>
+
+        <td class="text-center">
+          ${statusBadge}
+        </td>
+
+        <td class="text-center">
+          <button
+            type="button"
+            class="btn-qr-view"
+            onclick="openRoomQRModal(${room.id})"
+            title="Xem &amp; In mã QR Check-in phòng ${escapeHTML(room.name)}"
+            aria-label="Xem mã QR phòng ${escapeHTML(room.name)}">
+            <i class="bi bi-qr-code-scan"></i>
+            <span>${escapeHTML(room.qrCode || `QR-00${room.id}`)}</span>
+          </button>
+        </td>
+
+        <td class="text-center">
+          ${meetingIndicator}
+        </td>
+
+        <td class="text-center">
+          <div class="d-flex align-items-center justify-content-center gap-1">
+            <button
+              type="button"
+              class="btn-room-action btn-room-action-edit"
+              onclick="openEditRoomModal(${room.id})"
+              title="Chỉnh sửa thông tin phòng"
+              aria-label="Chỉnh sửa phòng ${escapeHTML(room.name)}">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+
+            <button
+              type="button"
+              class="btn-room-action btn-room-action-toggle"
+              onclick="toggleRoomStatus(${room.id})"
+              title="Chuyển trạng thái: Hoạt động &harr; Bảo trì"
+              aria-label="Đổi trạng thái phòng ${escapeHTML(room.name)}">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+
+            <button
+              type="button"
+              class="btn-room-action btn-room-action-delete"
+              onclick="confirmDeleteRoom(${room.id})"
+              title="Xóa phòng họp (Kiểm tra ràng buộc)"
+              aria-label="Xóa phòng ${escapeHTML(room.name)}">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function updateRoomKpiCards() {
+  const totalRooms = ROOMS.length;
+  const activeRooms = ROOMS.filter(r => r.status === "Active").length;
+  const maintenanceRooms = ROOMS.filter(r => r.status === "Maintenance").length;
+  const totalCapacity = ROOMS.reduce((sum, r) => sum + (Number(r.capacity) || 0), 0);
+
+  const kpiTotal = document.getElementById("room-kpi-total");
+  const kpiActive = document.getElementById("room-kpi-active");
+  const kpiMaint = document.getElementById("room-kpi-maintenance");
+  const kpiCap = document.getElementById("room-kpi-capacity");
+
+  if (kpiTotal) kpiTotal.textContent = totalRooms;
+  if (kpiActive) kpiActive.textContent = activeRooms;
+  if (kpiMaint) kpiMaint.textContent = maintenanceRooms;
+  if (kpiCap) kpiCap.textContent = totalCapacity;
+}
+
+function setupAdminRoomEvents() {
+  // 1. Tìm kiếm live
+  const searchInput = document.getElementById("room-search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      roomFilterState.search = e.target.value;
+      renderAdminRoomsTable();
+    });
+  }
+
+  // 2. Nút xóa tìm kiếm
+  const clearBtn = document.getElementById("btn-clear-room-search");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      roomFilterState.search = "";
+      const input = document.getElementById("room-search-input");
+      if (input) input.value = "";
+      renderAdminRoomsTable();
+    });
+  }
+
+  // 3. Tab trạng thái
+  document.querySelectorAll(".room-status-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".room-status-tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      roomFilterState.status = btn.dataset.status;
+      renderAdminRoomsTable();
+    });
+  });
+
+  // 4. Dropdown quy mô sức chứa
+  const capSelect = document.getElementById("room-capacity-filter");
+  if (capSelect) {
+    capSelect.addEventListener("change", (e) => {
+      roomFilterState.capacity = e.target.value;
+      renderAdminRoomsTable();
+    });
+  }
+
+  // 5. Nút đặt lại bộ lọc
+  const resetBtn = document.getElementById("btn-reset-room-filter");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      resetRoomFilters();
+    });
+  }
+
+  // 6. Nút thêm phòng mới
+  const addRoomBtn = document.getElementById("btn-add-room");
+  if (addRoomBtn) {
+    addRoomBtn.addEventListener("click", openAddRoomModal);
+  }
+
+  // 7. Nút xuất file CSV
+  const exportBtn = document.getElementById("btn-export-rooms-csv");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", exportRoomsToCSV);
+  }
+
+  // 8. Chọn tất cả checkbox
+  const checkAll = document.getElementById("check-all-rooms");
+  if (checkAll) {
+    checkAll.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      document.querySelectorAll(".room-row-checkbox").forEach(cb => {
+        cb.checked = isChecked;
+      });
+    });
+  }
+}
+
+function resetRoomFilters() {
+  roomFilterState.search = "";
+  roomFilterState.status = "all";
+  roomFilterState.capacity = "all";
+  renderAdminRoomsPage();
+}
+
+// =====================================================
+// 6C. QUẢN LÝ MODAL THÊM / SỬA PHÒNG HỌP (STITCH FORM)
+// =====================================================
+
+function openAddRoomModal() {
+  const form = document.getElementById("room-form");
+  const modalTitle = document.getElementById("room-modal-title");
+  const modalSubtitle = document.getElementById("room-modal-subtitle");
+  const submitText = document.getElementById("room-submit-text");
+  const successView = document.getElementById("room-success-view");
+  const errorAlert = document.getElementById("room-global-error");
+  const nameError = document.getElementById("room-name-error");
+
+  if (modalTitle) modalTitle.textContent = "Thêm phòng họp mới";
+  if (modalSubtitle) modalSubtitle.textContent = "Cấu hình thông tin phòng, sức chứa, thiết bị và mã QR định danh";
+  if (submitText) submitText.textContent = "Lưu phòng họp";
+
+  if (form) {
+    form.reset();
+    form.classList.remove("hidden");
+  }
+  if (successView) successView.classList.add("hidden");
+  if (errorAlert) errorAlert.classList.add("hidden");
+  if (nameError) nameError.classList.add("hidden");
+
+  // Tự sinh mã phòng mới
+  const nextId = ROOMS.reduce((max, r) => Math.max(max, r.id), 0) + 1;
+  const idInput = document.getElementById("room-form-id");
+  const codeInput = document.getElementById("room-form-code");
+  const qrInput = document.getElementById("room-form-qrcode");
+
+  if (idInput) idInput.value = "";
+  if (codeInput) codeInput.value = `RM-00${nextId}`;
+  if (qrInput) qrInput.value = `QR-ROOM-00${nextId}`;
+
+  // Reset checkboxes
+  document.querySelectorAll(".room-eq-checkbox").forEach(cb => cb.checked = false);
+
+  if (roomModalOverlay) roomModalOverlay.classList.remove("hidden");
+
+  const nameInput = document.getElementById("room-form-name");
+  if (nameInput) setTimeout(() => nameInput.focus(), 100);
+}
+
+function openEditRoomModal(roomId) {
+  const room = ROOMS.find(r => r.id === roomId);
+  if (!room) {
+    alert("Không tìm thấy thông tin phòng họp.");
+    return;
+  }
+
+  const form = document.getElementById("room-form");
+  const modalTitle = document.getElementById("room-modal-title");
+  const modalSubtitle = document.getElementById("room-modal-subtitle");
+  const submitText = document.getElementById("room-submit-text");
+  const successView = document.getElementById("room-success-view");
+  const errorAlert = document.getElementById("room-global-error");
+  const nameError = document.getElementById("room-name-error");
+
+  if (modalTitle) modalTitle.textContent = "Chỉnh sửa phòng họp";
+  if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết phòng ${room.name}`;
+  if (submitText) submitText.textContent = "Cập nhật phòng họp";
+
+  if (form) form.classList.remove("hidden");
+  if (successView) successView.classList.add("hidden");
+  if (errorAlert) errorAlert.classList.add("hidden");
+  if (nameError) nameError.classList.add("hidden");
+
+  // Điền dữ liệu vào form
+  const idInput = document.getElementById("room-form-id");
+  const nameInput = document.getElementById("room-form-name");
+  const codeInput = document.getElementById("room-form-code");
+  const capacityInput = document.getElementById("room-form-capacity");
+  const typeSelect = document.getElementById("room-form-type");
+  const floorInput = document.getElementById("room-form-floor");
+  const statusSelect = document.getElementById("room-form-status");
+  const qrInput = document.getElementById("room-form-qrcode");
+  const descInput = document.getElementById("room-form-description");
+
+  if (idInput) idInput.value = room.id;
+  if (nameInput) nameInput.value = room.name || "";
+  if (codeInput) codeInput.value = room.code || `RM-00${room.id}`;
+  if (capacityInput) capacityInput.value = room.capacity || 15;
+  if (typeSelect) typeSelect.value = room.type || "Hội nghị";
+  if (floorInput) floorInput.value = room.floor || "";
+  if (statusSelect) statusSelect.value = room.status || "Active";
+  if (qrInput) qrInput.value = room.qrCode || `QR-ROOM-00${room.id}`;
+  if (descInput) descInput.value = room.description || "";
+
+  // Checkboxes equipments
+  const roomEqs = room.equipments || [];
+  document.querySelectorAll(".room-eq-checkbox").forEach(cb => {
+    cb.checked = roomEqs.includes(cb.value);
+  });
+
+  if (roomModalOverlay) roomModalOverlay.classList.remove("hidden");
+}
+
+function closeRoomModal() {
+  if (roomModalOverlay) roomModalOverlay.classList.add("hidden");
+}
+
+function saveRoom(event) {
+  event.preventDefault();
+
+  const idInput = document.getElementById("room-form-id");
+  const nameInput = document.getElementById("room-form-name");
+  const capacityInput = document.getElementById("room-form-capacity");
+  const typeSelect = document.getElementById("room-form-type");
+  const floorInput = document.getElementById("room-form-floor");
+  const statusSelect = document.getElementById("room-form-status");
+  const descInput = document.getElementById("room-form-description");
+
+  const name = nameInput ? nameInput.value.trim() : "";
+  const capacity = capacityInput ? parseInt(capacityInput.value, 10) : 0;
+  const type = typeSelect ? typeSelect.value : "Hội nghị";
+  const floor = floorInput ? floorInput.value.trim() : "";
+  const status = statusSelect ? statusSelect.value : "Active";
+  const description = descInput ? descInput.value.trim() : "";
+
+  const errorAlert = document.getElementById("room-global-error");
+  const errorText = document.getElementById("room-global-error-text");
+  const nameError = document.getElementById("room-name-error");
+
+  // Validate tên phòng
+  if (!name) {
+    if (nameError) nameError.classList.remove("hidden");
+    if (errorAlert) {
+      errorText.textContent = "Vui lòng nhập tên phòng họp.";
+      errorAlert.classList.remove("hidden");
+    }
+    return;
+  }
+  if (nameError) nameError.classList.add("hidden");
+
+  // Validate sức chứa
+  if (isNaN(capacity) || capacity < 1) {
+    if (errorAlert) {
+      errorText.textContent = "Sức chứa phòng họp phải là số nguyên dương lớn hơn 0.";
+      errorAlert.classList.remove("hidden");
+    }
+    return;
+  }
+
+  // Danh sách thiết bị được chọn
+  const checkedEqs = [];
+  document.querySelectorAll(".room-eq-checkbox:checked").forEach(cb => {
+    checkedEqs.push(cb.value);
+  });
+
+  const isEdit = idInput && idInput.value !== "";
+  const editId = isEdit ? parseInt(idInput.value, 10) : null;
+
+  // Kiểm tra tên phòng không được trùng lặp
+  const duplicate = ROOMS.find(r => r.name.toLowerCase() === name.toLowerCase() && r.id !== editId);
+  if (duplicate) {
+    if (errorAlert) {
+      errorText.textContent = `Tên phòng họp "${name}" đã tồn tại trên hệ thống. Vui lòng chọn tên khác.`;
+      errorAlert.classList.remove("hidden");
+    }
+    return;
+  }
+
+  if (errorAlert) errorAlert.classList.add("hidden");
+
+  // Hiệu ứng spinner
+  const submitBtn = document.getElementById("btn-room-submit");
+  const submitSpinner = document.getElementById("room-submit-spinner");
+  const submitIcon = document.getElementById("room-submit-icon");
+
+  if (submitSpinner) submitSpinner.classList.remove("hidden");
+  if (submitIcon) submitIcon.classList.add("hidden");
+  if (submitBtn) submitBtn.disabled = true;
+
+  setTimeout(() => {
+    if (isEdit) {
+      const room = ROOMS.find(r => r.id === editId);
+      if (room) {
+        room.name = name;
+        room.capacity = capacity;
+        room.type = type;
+        room.floor = floor;
+        room.status = status;
+        room.equipments = checkedEqs;
+        room.description = description;
+      }
+    } else {
+      const maxId = ROOMS.reduce((max, r) => Math.max(max, r.id), 0);
+      const newId = maxId + 1;
+      const code = `RM-00${newId}`;
+      const qrCode = `QR-ROOM-00${newId}`;
+      ROOMS.push({
+        id: newId,
+        code,
+        name,
+        capacity,
+        type,
+        floor,
+        status,
+        qrCode,
+        equipments: checkedEqs,
+        description
+      });
+    }
+
+    if (submitSpinner) submitSpinner.classList.add("hidden");
+    if (submitIcon) submitIcon.classList.remove("hidden");
+    if (submitBtn) submitBtn.disabled = false;
+
+    // Hiển thị banner thành công
+    const form = document.getElementById("room-form");
+    const successView = document.getElementById("room-success-view");
+    const successTitle = document.getElementById("room-success-title");
+    const successDesc = document.getElementById("room-success-desc");
+
+    if (form) form.classList.add("hidden");
+    if (successView) {
+      successTitle.textContent = isEdit ? "Cập nhật phòng họp thành công!" : "Thêm phòng họp mới thành công!";
+      successDesc.textContent = `Phòng "${name}" (${capacity} chỗ ngồi, ${status === 'Active' ? 'Sẵn sàng hoạt động' : 'Bảo trì'}) đã được đồng bộ vào CSDL.`;
+      successView.classList.remove("hidden");
+    }
+
+    renderAdminRoomsTable();
+    updateRoomKpiCards();
+    syncMeetingRoomOptions();
+  }, 350);
+}
+
+// =====================================================
+// 6D. MODAL MÃ QR & CHI TIẾT CHECK-IN PHÒNG HỌP (US 5.2)
+// =====================================================
+
+function generateRoomQRSVG(roomCode, roomName) {
+  return `
+    <svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="display:block; border-radius: 8px;">
+      <!-- Nền trắng -->
+      <rect width="200" height="200" fill="#ffffff" />
+
+      <!-- Top-Left Finder Pattern -->
+      <rect x="15" y="15" width="45" height="45" fill="#0f172a" rx="4" />
+      <rect x="23" y="23" width="29" height="29" fill="#ffffff" rx="2" />
+      <rect x="29" y="29" width="17" height="17" fill="#2563eb" rx="2" />
+
+      <!-- Top-Right Finder Pattern -->
+      <rect x="140" y="15" width="45" height="45" fill="#0f172a" rx="4" />
+      <rect x="148" y="23" width="29" height="29" fill="#ffffff" rx="2" />
+      <rect x="154" y="29" width="17" height="17" fill="#2563eb" rx="2" />
+
+      <!-- Bottom-Left Finder Pattern -->
+      <rect x="15" y="140" width="45" height="45" fill="#0f172a" rx="4" />
+      <rect x="23" y="148" width="29" height="29" fill="#ffffff" rx="2" />
+      <rect x="29" y="154" width="17" height="17" fill="#2563eb" rx="2" />
+
+      <!-- Data & Timing Modules -->
+      <g fill="#1e293b">
+        <rect x="70" y="25" width="8" height="8" rx="1" />
+        <rect x="85" y="25" width="8" height="8" rx="1" />
+        <rect x="100" y="25" width="8" height="8" rx="1" />
+        <rect x="115" y="25" width="8" height="8" rx="1" />
+
+        <rect x="25" y="70" width="8" height="8" rx="1" />
+        <rect x="40" y="70" width="8" height="8" rx="1" />
+        <rect x="25" y="85" width="8" height="8" rx="1" />
+        <rect x="40" y="100" width="8" height="8" rx="1" />
+        <rect x="25" y="115" width="8" height="8" rx="1" />
+
+        <rect x="145" y="70" width="8" height="8" rx="1" />
+        <rect x="160" y="70" width="8" height="8" rx="1" />
+        <rect x="175" y="85" width="8" height="8" rx="1" />
+        <rect x="145" y="100" width="8" height="8" rx="1" />
+        <rect x="160" y="115" width="8" height="8" rx="1" />
+
+        <rect x="70" y="145" width="8" height="8" rx="1" />
+        <rect x="85" y="160" width="8" height="8" rx="1" />
+        <rect x="100" y="145" width="8" height="8" rx="1" />
+        <rect x="115" y="160" width="8" height="8" rx="1" />
+        <rect x="100" y="175" width="8" height="8" rx="1" />
+        <rect x="145" y="145" width="8" height="8" rx="1" />
+        <rect x="160" y="160" width="8" height="8" rx="1" />
+        <rect x="175" y="175" width="8" height="8" rx="1" />
+
+        <rect x="65" y="65" width="8" height="8" rx="1" />
+        <rect x="125" y="65" width="8" height="8" rx="1" />
+        <rect x="65" y="125" width="8" height="8" rx="1" />
+        <rect x="125" y="125" width="8" height="8" rx="1" />
+      </g>
+
+      <!-- Center Logo Box -->
+      <rect x="73" y="73" width="54" height="54" fill="#ffffff" stroke="#2563eb" stroke-width="2" rx="8" />
+      <text x="100" y="96" font-family="Inter, sans-serif" font-size="10" font-weight="bold" fill="#2563eb" text-anchor="middle">ICTU</text>
+      <text x="100" y="110" font-family="monospace" font-size="7.5" font-weight="bold" fill="#475569" text-anchor="middle">${roomCode}</text>
+    </svg>
+  `;
+}
+
+function openRoomQRModal(roomId) {
+  const room = ROOMS.find(r => r.id === roomId);
+  if (!room) return;
+
+  const content = document.getElementById("room-qr-content");
+  if (!content) return;
+
+  const roomCode = room.code || `RM-00${room.id}`;
+  const qrSvg = generateRoomQRSVG(roomCode, room.name);
+
+  // Lấy các cuộc họp sắp diễn ra tại phòng này
+  const roomMeetings = meetings.filter(m => 
+    (m.roomId === room.id || m.roomName === room.name) && 
+    m.status !== "cancelled"
+  );
+
+  content.innerHTML = `
+    <!-- QR Visual Card -->
+    <div class="qr-preview-wrapper">
+      <div class="qr-code-svg-box">
+        ${qrSvg}
+      </div>
+      <div class="qr-room-meta-title">${escapeHTML(room.name)}</div>
+      <div class="qr-room-meta-sub">
+        ${escapeHTML(room.floor || 'Khu phòng ban')} • Sức chứa: <strong>${room.capacity} chỗ ngồi</strong> • Mã: <code>${roomCode}</code>
+      </div>
+      <div class="qr-checkin-instruction">
+        <i class="bi bi-phone"></i>
+        <span>Nhân viên quét mã tại cửa phòng để Check-in xác nhận bắt đầu cuộc họp</span>
+      </div>
+    </div>
+
+    <!-- Specs Grid -->
+    <div class="row g-3 mb-4">
+      <div class="col-6">
+        <div class="p-3 bg-light rounded-3 border">
+          <div class="text-muted small mb-1">Trạng thái phòng</div>
+          <div class="fw-bold">
+            ${room.status === 'Active' ? '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Sẵn sàng hoạt động</span>' : (room.status === 'Maintenance' ? '<span class="text-warning"><i class="bi bi-tools me-1"></i>Đang bảo trì</span>' : '<span class="text-secondary">Tạm ngừng</span>')}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="p-3 bg-light rounded-3 border">
+          <div class="text-muted small mb-1">Loại phòng</div>
+          <div class="fw-bold text-dark">${escapeHTML(room.type || 'Hội nghị tiêu chuẩn')}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trang thiết bị -->
+    <div class="mb-4">
+      <div class="fw-semibold text-slate-800 small mb-2">Trang thiết bị sẵn có trong phòng:</div>
+      <div class="d-flex flex-wrap gap-2">
+        ${(room.equipments || []).map(eq => `<span class="room-eq-pill py-1 px-2"><i class="bi bi-check2-circle text-primary"></i>${escapeHTML(eq)}</span>`).join('') || '<span class="text-muted small">Chưa trang bị</span>'}
+      </div>
+    </div>
+
+    <!-- Mô tả tiện ích -->
+    ${room.description ? `
+      <div class="mb-4">
+        <div class="fw-semibold text-slate-800 small mb-1">Mô tả tiện ích:</div>
+        <p class="text-muted small mb-0 p-2 bg-light rounded border">${escapeHTML(room.description)}</p>
+      </div>
+    ` : ''}
+
+    <!-- Lịch các cuộc họp tại phòng này -->
+    <div>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-semibold text-slate-800 small">Lịch họp đã đăng ký tại phòng:</span>
+        <span class="badge bg-secondary-subtle text-secondary">${roomMeetings.length} cuộc họp</span>
+      </div>
+
+      ${roomMeetings.length === 0 ? `
+        <div class="text-muted small p-3 bg-light rounded text-center border">
+          Hiện chưa có cuộc họp nào được đặt tại phòng này. Phòng sẵn sàng phục vụ.
+        </div>
+      ` : `
+        <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+          ${roomMeetings.slice(0, 4).map(m => `
+            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <div>
+                <strong class="small d-block text-dark">${escapeHTML(m.title)}</strong>
+                <span class="text-muted small">${formatDate(m.date)} • ${m.startTime} - ${m.endTime} (${escapeHTML(m.host || 'Nguyễn Văn An')})</span>
+              </div>
+              <span class="${getStatusClass(m.status)}">${getStatusText(m.status)}</span>
+            </div>
+          `).join('')}
+        </div>
+      `}
+    </div>
+  `;
+
+  if (roomQrOverlay) roomQrOverlay.classList.remove("hidden");
+}
+
+function closeRoomQRModal() {
+  if (roomQrOverlay) roomQrOverlay.classList.add("hidden");
+}
+
+// =====================================================
+// 6E. XÓA PHÒNG & KIỂM TRA RÀNG BUỘC NGHIỆP VỤ (LUỒNG 1.3)
+// =====================================================
+
+function confirmDeleteRoom(roomId) {
+  const room = ROOMS.find(r => r.id === roomId);
+  if (!room) return;
+
+  // Kiểm tra có cuộc họp nào sắp diễn ra hoặc đang diễn ra tại phòng này không
+  const activeMeetings = meetings.filter(m => 
+    (m.roomId === roomId || m.roomName === room.name) && 
+    (m.status === "scheduled" || m.status === "in-progress")
+  );
+
+  const content = document.getElementById("room-delete-content");
+  const footer = document.getElementById("room-delete-footer");
+
+  if (!content || !footer) return;
+
+  if (activeMeetings.length > 0) {
+    // VI PHẠM RÀNG BUỘC LUỒNG 1.3: Chặn xóa phòng có lịch họp Confirmed
+    content.innerHTML = `
+      <div class="room-constraint-box">
+        <div class="d-flex align-items-start gap-3">
+          <i class="bi bi-shield-x text-danger fs-2 flex-shrink-0"></i>
+          <div>
+            <h5 class="text-danger fw-bold mb-1">Ràng buộc nghiệp vụ: Không thể xóa phòng họp</h5>
+            <p class="text-secondary small mb-2">
+              Phòng họp <strong>"${escapeHTML(room.name)}"</strong> hiện đang có <strong>${activeMeetings.length} cuộc họp</strong> đã xác nhận sắp diễn ra hoặc đang diễn ra. Theo quy chuẩn bảo đảm toàn vẹn dữ liệu hệ thống (Luồng 1.3), bạn không được phép xóa phòng này.
+            </p>
+            <div class="alert alert-warning py-2 px-3 small mb-0">
+              <i class="bi bi-lightbulb-fill text-warning me-1"></i>
+              <strong>Khuyến nghị:</strong> Bạn có thể chuyển trạng thái phòng sang <strong>"Bảo trì" (Maintenance)</strong> để tạm dừng nhận lịch mới mà không làm gián đoạn các cuộc họp đã lên lịch.
+            </div>
+          </div>
+        </div>
+
+        <div class="fw-semibold small text-slate-700 mt-3 mb-2">Danh sách cuộc họp bị ảnh hưởng:</div>
+        <div class="room-conflict-meeting-list">
+          ${activeMeetings.map(m => `
+            <div class="room-conflict-item">
+              <div>
+                <strong>${escapeHTML(m.title)}</strong>
+                <div class="text-muted small">${formatDate(m.date)} • ${m.startTime} - ${m.endTime}</div>
+              </div>
+              <span class="badge ${m.status === 'in-progress' ? 'bg-warning text-dark' : 'bg-primary'}">${m.status === 'in-progress' ? 'Đang diễn ra' : 'Sắp diễn ra'}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+
+    footer.innerHTML = `
+      <button type="button" class="btn btn-outline-secondary stitch-btn-cancel" onclick="closeRoomDeleteModal()">
+        Đóng
+      </button>
+      <button type="button" class="btn btn-warning" onclick="toggleRoomMaintenanceAndClose(${room.id})">
+        <i class="bi bi-tools me-1"></i> Chuyển sang Bảo trì ngay
+      </button>
+    `;
+  } else {
+    // Không có cuộc họp -> Cho phép xóa an toàn
+    content.innerHTML = `
+      <div class="text-center py-3">
+        <div class="mb-3">
+          <i class="bi bi-trash3-fill text-danger fs-1"></i>
+        </div>
+        <h5 class="fw-bold mb-2">Bạn có chắc chắn muốn xóa phòng họp này?</h5>
+        <p class="text-secondary mb-3">
+          Phòng họp <strong>"${escapeHTML(room.name)}"</strong> (${room.capacity} chỗ, mã <code>${room.code || `RM-00${room.id}`}</code>) sẽ bị gỡ bỏ vĩnh viễn khỏi danh mục phòng họp.
+        </p>
+        <div class="alert alert-success py-2 px-3 small d-inline-block">
+          <i class="bi bi-check-circle-fill me-1"></i> Phòng hiện không có cuộc họp nào sắp diễn ra. Thao tác xóa an toàn.
+        </div>
+      </div>
+    `;
+
+    footer.innerHTML = `
+      <button type="button" class="btn btn-outline-secondary stitch-btn-cancel" onclick="closeRoomDeleteModal()">
+        Hủy bỏ
+      </button>
+      <button type="button" class="btn btn-danger" onclick="executeDeleteRoom(${room.id})">
+        <i class="bi bi-trash3 me-1"></i> Xác nhận xóa phòng
+      </button>
+    `;
+  }
+
+  if (roomDeleteOverlay) roomDeleteOverlay.classList.remove("hidden");
+}
+
+function closeRoomDeleteModal() {
+  if (roomDeleteOverlay) roomDeleteOverlay.classList.add("hidden");
+}
+
+function executeDeleteRoom(roomId) {
+  const idx = ROOMS.findIndex(r => r.id === roomId);
+  if (idx !== -1) {
+    ROOMS.splice(idx, 1);
+  }
+
+  closeRoomDeleteModal();
+  renderAdminRoomsTable();
+  updateRoomKpiCards();
+  syncMeetingRoomOptions();
+}
+
+function toggleRoomMaintenanceAndClose(roomId) {
+  const room = ROOMS.find(r => r.id === roomId);
+  if (room) {
+    room.status = "Maintenance";
+  }
+  closeRoomDeleteModal();
+  renderAdminRoomsTable();
+  updateRoomKpiCards();
+  syncMeetingRoomOptions();
+}
+
+function toggleRoomStatus(roomId) {
+  const room = ROOMS.find(r => r.id === roomId);
+  if (!room) return;
+
+  if (room.status === "Active") {
+    room.status = "Maintenance";
+  } else {
+    room.status = "Active";
+  }
+
+  renderAdminRoomsTable();
+  updateRoomKpiCards();
+  syncMeetingRoomOptions();
+}
+
+// =====================================================
+// 6F. XUẤT CSV PHÒNG HỌP & ĐỒNG BỘ DROPDOWN
+// =====================================================
+
+function exportRoomsToCSV() {
+  const rows = [
+    ["Mã phòng", "Tên phòng họp", "Sức chứa", "Loại phòng", "Vị trí", "Trạng thái", "Mã QR Check-in", "Trang thiết bị", "Mô tả"]
+  ];
+
+  ROOMS.forEach(r => {
+    rows.push([
+      r.code || `RM-00${r.id}`,
+      r.name,
+      r.capacity,
+      r.type || "Hội nghị",
+      r.floor || "",
+      r.status === "Active" ? "Sẵn sàng hoạt động" : (r.status === "Maintenance" ? "Đang bảo trì" : "Tạm ngừng"),
+      r.qrCode || `QR-ROOM-00${r.id}`,
+      (r.equipments || []).join(", "),
+      r.description || ""
+    ]);
+  });
+
+  const csvContent = "\uFEFF" + rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Danh_sach_phong_hop_Admin_${new Date().toISOString().split("T")[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function syncMeetingRoomOptions() {
+  const roomSelect = document.getElementById("meeting-room");
+  if (roomSelect) {
+    const currentVal = roomSelect.value;
+    roomSelect.innerHTML = ROOMS.map(r => `
+      <option value="${r.id}" ${r.status !== 'Active' ? 'disabled' : ''}>
+        ${escapeHTML(r.name)} (${r.capacity} chỗ)${r.status !== 'Active' ? ' - [' + (r.status === 'Maintenance' ? 'Bảo trì' : 'Tạm ngừng') + ']' : ''}
+      </option>
+    `).join("");
+
+    if (currentVal && ROOMS.some(r => r.id === parseInt(currentVal, 10))) {
+      roomSelect.value = currentVal;
+    }
+  }
+
+  const filterRoom = document.getElementById("filter-room");
+  if (filterRoom) {
+    const currFilter = filterRoom.value;
+    filterRoom.innerHTML = `
+      <option value="all">Tất cả phòng</option>
+      ${ROOMS.map(r => `<option value="${r.id}">${escapeHTML(r.name)}</option>`).join("")}
+    `;
+    if (currFilter) filterRoom.value = currFilter;
+  }
 }
 
 // =====================================================
@@ -1896,6 +3150,77 @@ detailOverlay.addEventListener(
 );
 
 
+// Gắn sự kiện cho Modal Quản lý Phòng họp
+const roomForm = document.getElementById("room-form");
+if (roomForm) {
+  roomForm.addEventListener("submit", saveRoom);
+}
+
+const btnCloseRoomModal = document.getElementById("btn-close-room-modal");
+if (btnCloseRoomModal) {
+  btnCloseRoomModal.addEventListener("click", closeRoomModal);
+}
+
+const btnRoomCancel = document.getElementById("btn-room-cancel");
+if (btnRoomCancel) {
+  btnRoomCancel.addEventListener("click", closeRoomModal);
+}
+
+const btnRoomSuccessClose = document.getElementById("btn-room-success-close");
+if (btnRoomSuccessClose) {
+  btnRoomSuccessClose.addEventListener("click", closeRoomModal);
+}
+
+// Modal QR Check-in
+const btnCloseRoomQr = document.getElementById("btn-close-room-qr");
+if (btnCloseRoomQr) {
+  btnCloseRoomQr.addEventListener("click", closeRoomQRModal);
+}
+
+const btnCloseRoomQrBottom = document.getElementById("btn-close-room-qr-bottom");
+if (btnCloseRoomQrBottom) {
+  btnCloseRoomQrBottom.addEventListener("click", closeRoomQRModal);
+}
+
+const btnPrintRoomQr = document.getElementById("btn-print-room-qr");
+if (btnPrintRoomQr) {
+  btnPrintRoomQr.addEventListener("click", () => {
+    window.print();
+  });
+}
+
+// Modal Delete Room
+const btnCloseRoomDelete = document.getElementById("btn-close-room-delete");
+if (btnCloseRoomDelete) {
+  btnCloseRoomDelete.addEventListener("click", closeRoomDeleteModal);
+}
+
+// Click ra ngoài modal
+if (roomModalOverlay) {
+  roomModalOverlay.addEventListener("click", function (event) {
+    if (event.target === roomModalOverlay) {
+      closeRoomModal();
+    }
+  });
+}
+
+if (roomQrOverlay) {
+  roomQrOverlay.addEventListener("click", function (event) {
+    if (event.target === roomQrOverlay) {
+      closeRoomQRModal();
+    }
+  });
+}
+
+if (roomDeleteOverlay) {
+  roomDeleteOverlay.addEventListener("click", function (event) {
+    if (event.target === roomDeleteOverlay) {
+      closeRoomDeleteModal();
+    }
+  });
+}
+
+
 // =====================================================
 // 21. PHÍM ESC
 // =====================================================
@@ -1922,12 +3247,31 @@ document.addEventListener(
       closeDetailModal();
     }
 
+    if (
+      roomModalOverlay && !roomModalOverlay.classList.contains("hidden")
+    ) {
+      closeRoomModal();
+    }
+
+    if (
+      roomQrOverlay && !roomQrOverlay.classList.contains("hidden")
+    ) {
+      closeRoomQRModal();
+    }
+
+    if (
+      roomDeleteOverlay && !roomDeleteOverlay.classList.contains("hidden")
+    ) {
+      closeRoomDeleteModal();
+    }
+
   }
 );
 
 
 // =====================================================
-// 22. KHỞI ĐỘNG ROUTER
+// 22. KHỞI ĐỘNG ROUTER & ĐỒNG BỘ CSDL
 // =====================================================
 
+syncMeetingRoomOptions();
 router();
