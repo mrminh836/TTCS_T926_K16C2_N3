@@ -2402,14 +2402,87 @@ body {
   gap: 4px;
 }
 
-/* Capacity meter */
+/* =====================================================
+   CAPACITY BADGE & GAUGE COMPONENT (STITCH SPEC)
+   4 Tiers: sm (<15), md (15-30), lg (31-50), xl (>50)
+   ===================================================== */
 .capacity-cell-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 110px;
+  gap: 5px;
+  min-width: 120px;
 }
 
+/* Base Capacity Tag / Badge Component */
+.capacity-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.capacity-tag i {
+  font-size: 0.85rem;
+}
+
+.capacity-tag-pill {
+  border-radius: 9999px;
+  padding: 3px 10px;
+}
+
+.capacity-tag-lg-size {
+  padding: 6px 14px;
+  font-size: 0.88rem;
+  border-radius: 10px;
+}
+
+/* Tier 1: Quy mô nhỏ (< 15 chỗ) - Sky theme */
+.capacity-tag-sm {
+  background: #f0f9ff;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+.capacity-tag-sm i {
+  color: #0284c7;
+}
+
+/* Tier 2: Quy mô vừa (15 - 30 chỗ) - Blue theme */
+.capacity-tag-md {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+.capacity-tag-md i {
+  color: #2563eb;
+}
+
+/* Tier 3: Quy mô lớn (31 - 50 chỗ) - Purple theme */
+.capacity-tag-lg {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border-color: #ddd6fe;
+}
+.capacity-tag-lg i {
+  color: #7c3aed;
+}
+
+/* Tier 4: Đại sảnh / Hội trường (> 50 chỗ) - Amber theme */
+.capacity-tag-xl {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+.capacity-tag-xl i {
+  color: #d97706;
+}
+
+/* Legacy & Table Inline Pill */
 .capacity-badge-pill {
   display: inline-flex;
   align-items: center;
@@ -2420,22 +2493,44 @@ body {
 }
 
 .capacity-meter {
-  height: 5px;
-  background: var(--slate-200);
+  height: 6px;
+  background: var(--slate-100);
   border-radius: 9999px;
   overflow: hidden;
   width: 100%;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .capacity-meter-bar {
   height: 100%;
   border-radius: 9999px;
   background: linear-gradient(90deg, #3b82f6, #2563eb);
+  transition: width 0.4s ease;
+}
+
+.capacity-meter-bar-sm {
+  background: linear-gradient(90deg, #38bdf8, #0284c7);
+}
+
+.capacity-meter-bar-md {
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
+}
+
+.capacity-meter-bar-lg {
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+}
+
+.capacity-meter-bar-xl {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
 }
 
 .capacity-size-tag {
   font-size: 0.7rem;
-  color: var(--slate-400);
+  font-weight: 500;
+  color: var(--slate-500);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Equipments pills */
@@ -2672,30 +2767,330 @@ body {
   color: #ffffff;
 }
 
-/* QR Code Modal Styles */
-.room-qr-modal-card {
-  max-width: 580px;
+/* =====================================================
+   ROOM DETAIL MODAL & DOOR PLACARD (STITCH SPEC)
+   ===================================================== */
+.room-qr-modal-card,
+.room-detail-modal-card {
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
 }
 
-.qr-preview-wrapper {
+.room-detail-modal-card .stitch-modal-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.room-detail-modal-card .stitch-detail-body {
+  overflow-y: auto !important;
+  flex: 1 1 auto;
+  padding: 24px;
+}
+
+.room-detail-modal-card .stitch-modal-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--slate-100);
+  background: #ffffff;
+  padding: 16px 24px;
+}
+
+/* Room Hero Banner in Modal */
+.room-detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 14px;
+  border: 1px solid var(--slate-200);
+  margin-bottom: 20px;
+}
+
+.room-hero-icon-box {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.room-hero-info {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.room-hero-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.room-hero-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.room-hero-code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #ffffff;
+  color: var(--slate-700);
+  border: 1px solid var(--slate-300);
+  border-radius: 6px;
+  padding: 2px 7px;
+  letter-spacing: 0.5px;
+}
+
+.room-hero-sub {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--slate-500);
+}
+
+.room-hero-sub span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Live Status Pulse in Room Hero */
+.room-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.room-status-indicator.ready {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.room-status-indicator.ready .pulse-dot {
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: roomPulse 2s infinite;
+}
+
+.room-status-indicator.maintenance {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.room-status-indicator.maintenance .pulse-dot {
+  background: #f59e0b;
+}
+
+.room-status-indicator.busy {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+.room-status-indicator.busy .pulse-dot {
+  background: #ef4444;
+  animation: roomPulse 1.5s infinite;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+@keyframes roomPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Section Header in Room Detail */
+.room-section-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--slate-800);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.room-section-title i {
+  color: var(--primary-600);
+  font-size: 1rem;
+}
+
+/* Block 1: Specs Metric Grid */
+.room-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.spec-metric-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.spec-metric-card:hover {
+  border-color: var(--slate-300);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+
+.spec-metric-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--slate-400);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.spec-metric-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.spec-metric-sub {
+  font-size: 0.72rem;
+  color: var(--slate-500);
+}
+
+/* Capacity Gauge Showcase Card */
+.capacity-gauge-showcase {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.capacity-gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.capacity-gauge-track {
+  height: 8px;
+  background: var(--slate-100);
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  margin-bottom: 8px;
+}
+
+.capacity-gauge-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.capacity-gauge-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--slate-400);
+}
+
+/* Block 2: Amenities Grid */
+.room-amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.room-amenity-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--slate-700);
+  transition: all 0.2s ease;
+}
+
+.room-amenity-card:hover {
+  background: var(--slate-50);
+  border-color: var(--slate-300);
+}
+
+.room-amenity-card i {
+  color: var(--primary-600);
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.room-amenity-card .amenity-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Block 3: QR Placard Card */
+.qr-placard-wrapper {
+  background: #ffffff;
+  border: 1.5px dashed var(--slate-300);
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #ffffff;
-  border: 2px dashed var(--slate-200);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 20px;
   text-align: center;
+  margin-bottom: 20px;
+  background-image: radial-gradient(var(--slate-200) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 .qr-code-svg-box {
   background: #ffffff;
-  padding: 16px;
+  padding: 14px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--slate-200);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2705,26 +3100,166 @@ body {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--slate-900);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .qr-room-meta-sub {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--slate-500);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .qr-checkin-instruction {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   color: #166534;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   padding: 8px 14px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-weight: 500;
+}
+
+/* Block 4: Live Schedule Timeline */
+.room-timeline-container {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.room-timeline-header {
+  padding: 10px 14px;
+  background: var(--slate-50);
+  border-bottom: 1px solid var(--slate-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--slate-700);
+}
+
+.room-timeline-list {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.room-timeline-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-left: 6px;
+}
+
+.room-timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary-600);
+  margin-top: 5px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.room-timeline-dot.in-progress {
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.room-timeline-body {
+  flex-grow: 1;
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.room-timeline-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-800);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-timeline-meta {
+  font-size: 0.74rem;
+  color: var(--slate-500);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Empty Schedule State with Quick Book CTA */
+.room-timeline-empty {
+  padding: 24px 16px;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.room-timeline-empty-icon {
+  font-size: 1.8rem;
+  color: #10b981;
+  margin-bottom: 6px;
+}
+
+.room-timeline-empty-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--slate-800);
+  margin-bottom: 4px;
+}
+
+.room-timeline-empty-sub {
+  font-size: 0.78rem;
+  color: var(--slate-500);
+  margin-bottom: 12px;
+}
+
+/* Print Optimization for Door Placard */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #room-qr-overlay,
+  #room-qr-overlay * {
+    visibility: visible;
+  }
+  #room-qr-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: transparent !important;
+  }
+  .room-qr-modal-card {
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+  }
+  .stitch-modal-header,
+  .stitch-modal-footer,
+  .room-timeline-container {
+    display: none !important;
+  }
+  .qr-placard-wrapper {
+    border: 2px solid #000000 !important;
+    padding: 30px !important;
+  }
 }
 
 /* Constraint warning in Delete Modal */

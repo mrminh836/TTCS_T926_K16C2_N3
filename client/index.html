@@ -841,19 +841,19 @@
 
   <!-- ================= MODAL XEM CHI TIẾT & MÃ QR CHECK-IN PHÒNG HỌP ================= -->
   <div id="room-qr-overlay" class="modal-overlay hidden">
-    <div class="modal meeting-modal-card room-qr-modal-card">
+    <div class="modal meeting-modal-card room-qr-modal-card room-detail-modal-card">
 
       <div class="stitch-modal-header">
         <div class="stitch-header-content">
           <div class="stitch-title-wrapper">
             <h3 id="room-qr-modal-title" class="stitch-modal-title">
-              <i class="bi bi-qr-code text-primary me-2"></i>
-              Mã QR &amp; Chi tiết Phòng họp
+              <i class="bi bi-door-open-fill text-primary me-2"></i>
+              Chi tiết Phòng họp &amp; Mã QR Check-in
             </h3>
-            <span class="stitch-badge">Check-in QR</span>
+            <span id="room-detail-modal-badge" class="stitch-badge">Hồ sơ phòng</span>
           </div>
           <p id="room-qr-modal-subtitle" class="stitch-modal-subtitle">
-            Quét mã để check-in tức thì tại cửa phòng hoặc xem tình trạng phòng theo thời gian thực
+            Thông số sức chứa, trang thiết bị kỹ thuật, mã QR cửa phòng và dòng thời gian lịch họp
           </p>
         </div>
 
@@ -861,29 +861,45 @@
           type="button"
           id="btn-close-room-qr"
           class="stitch-close-btn"
-          aria-label="Đóng modal mã QR">
+          aria-label="Đóng modal chi tiết phòng">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
 
       <div id="room-qr-content" class="stitch-detail-body p-4">
-        <!-- Nội dung chi tiết và mã QR động sẽ render ở đây qua JavaScript -->
+        <!-- Nội dung chi tiết, badge sức chứa và mã QR động render qua JavaScript -->
       </div>
 
-      <div class="stitch-modal-footer">
-        <button
-          type="button"
-          id="btn-print-room-qr"
-          class="btn btn-outline-primary stitch-btn-export">
-          <i class="bi bi-printer me-1"></i> In mã QR dán cửa
-        </button>
+      <div class="stitch-modal-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <button
+            type="button"
+            id="btn-print-room-qr"
+            class="btn btn-outline-primary stitch-btn-export">
+            <i class="bi bi-printer me-1"></i> In mã QR dán cửa
+          </button>
+          <button
+            type="button"
+            id="btn-edit-room-from-detail"
+            class="btn btn-outline-secondary">
+            <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa phòng
+          </button>
+        </div>
 
-        <button
-          type="button"
-          id="btn-close-room-qr-bottom"
-          class="btn btn-outline-secondary stitch-btn-cancel">
-          Đóng
-        </button>
+        <div class="d-flex align-items-center gap-2">
+          <button
+            type="button"
+            id="btn-close-room-qr-bottom"
+            class="btn btn-outline-secondary stitch-btn-cancel">
+            Đóng
+          </button>
+          <button
+            type="button"
+            id="btn-book-room-from-detail"
+            class="btn btn-primary stitch-btn-submit">
+            <i class="bi bi-calendar-plus me-1"></i> Đặt lịch phòng này
+          </button>
+        </div>
       </div>
 
     </div>
