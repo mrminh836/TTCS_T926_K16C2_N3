@@ -2751,3 +2751,84 @@ body {
   margin-top: 6px;
   font-size: 0.85rem;
 }
+
+/* =====================================================
+   ROOM FORM VALIDATION & API SYNC STYLES (STITCH SPEC)
+===================================================== */
+.stitch-error-text {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.stitch-input.has-error,
+.stitch-input.is-invalid {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+.stitch-input.has-error:focus,
+.stitch-input.is-invalid:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+}
+
+.room-maintenance-warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.stitch-badge-api {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  transition: all 0.2s ease;
+}
+
+.stitch-badge-api.offline {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
+.api-dot-status {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  display: inline-block;
+}
+
+.stitch-badge-api.offline .api-dot-status {
+  background: #94a3b8;
+}
+
+@keyframes stitchShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.stitch-shake {
+  animation: stitchShake 0.35s ease-in-out;
+}

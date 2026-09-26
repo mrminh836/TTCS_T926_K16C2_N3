@@ -1406,17 +1406,409 @@ function resetRoomFilters() {
 }
 
 // =====================================================
-// 6C. QUẢN LÝ MODAL THÊM / SỬA PHÒNG HỌP (STITCH FORM)
+// 6B. ROOM API SERVICE (RESTful WITH GRACEFUL FALLBACK)
+// =====================================================
+
+const ROOM_API_URL = "http://localhost:3000/api/rooms";
+
+const RoomAPI = {
+  isBackendConnected: false,
+
+  async checkHealth() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const res = await fetch("http://localhost:3000/api/health", { signal: controller.signal });
+      clearTimeout(timeoutId);
+      this.isBackendConnected = res.ok;
+    } catch {
+      this.isBackendConnected = false;
+    }
+    this.updateStatusBadge();
+    return this.isBackendConnected;
+  },
+
+  updateStatusBadge() {
+    const badge = document.getElementById("room-api-status-badge");
+    const text = document.getElementById("room-api-status-text");
+    if (!badge || !text) return;
+    if (this.isBackendConnected) {
+      badge.classList.remove("offline");
+      badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật";
+      text.textContent = "API Live (Port 3000)";
+    } else {
+      badge.classList.add("offline");
+      badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
+      text.textContent = "Client Fallback";
+    }
+  },
+
+  async getAll() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch(ROOM_API_URL, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        this.updateStatusBadge();
+        return { success: true, data: json.data || json, isFallback: false };
+      }
+    } catch (err) {
+      this.isBackendConnected = false;
+      this.updateStatusBadge();
+    }
+    return { success: true, data: ROOMS, isFallback: true };
+  },
+
+  async create(roomData) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(ROOM_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(roomData),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        this.updateStatusBadge();
+        const createdRoom = json.data || json;
+        ROOMS.push(createdRoom);
+        persistRoomsToStorage();
+        return { success: true, data: createdRoom, isFallback: false };
+      }
+    } catch (err) {
+      console.warn("Backend API offline hoặc timeout, chuyển sang Local Store Fallback:", err);
+      this.isBackendConnected = false;
+      this.updateStatusBadge();
+    }
+
+    // Local Fallback
+    const maxId = ROOMS.reduce((max, r) => Math.max(max, r.id), 0);
+    const newId = maxId + 1;
+    const newRoom = {
+      id: newId,
+      code: roomData.code || `RM-00${newId}`,
+      name: roomData.name,
+      capacity: Number(roomData.capacity),
+      type: roomData.type,
+      floor: roomData.floor,
+      status: roomData.status,
+      qrCode: roomData.qrCode || `QR-ROOM-00${newId}`,
+      equipments: roomData.equipments || [],
+      description: roomData.description || ""
+    };
+    ROOMS.push(newRoom);
+    persistRoomsToStorage();
+    return { success: true, data: newRoom, isFallback: true };
+  },
+
+  async update(id, roomData) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(`${ROOM_API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(roomData),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        this.updateStatusBadge();
+        const updated = json.data || json;
+        const idx = ROOMS.findIndex(r => r.id === id);
+        if (idx !== -1) ROOMS[idx] = updated;
+        persistRoomsToStorage();
+        return { success: true, data: updated, isFallback: false };
+      }
+    } catch (err) {
+      console.warn("Backend API offline hoặc timeout, chuyển sang Local Store Fallback:", err);
+      this.isBackendConnected = false;
+      this.updateStatusBadge();
+    }
+
+    // Local Fallback
+    const room = ROOMS.find(r => r.id === id);
+    if (room) {
+      room.name = roomData.name;
+      room.capacity = Number(roomData.capacity);
+      room.type = roomData.type;
+      room.floor = roomData.floor;
+      room.status = roomData.status;
+      room.equipments = roomData.equipments || [];
+      room.description = roomData.description || "";
+      persistRoomsToStorage();
+    }
+    return { success: true, data: room, isFallback: true };
+  }
+};
+
+function persistRoomsToStorage() {
+  try {
+    localStorage.setItem("STITCH_ROOMS_DATA", JSON.stringify(ROOMS));
+  } catch (e) {
+    console.warn("Lỗi khi lưu phòng vào localStorage:", e);
+  }
+}
+
+function loadPersistedRooms() {
+  try {
+    const saved = localStorage.getItem("STITCH_ROOMS_DATA");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        ROOMS = parsed;
+      }
+    }
+  } catch (e) {
+    console.warn("Lỗi khi đọc phòng từ localStorage:", e);
+  }
+}
+
+// =====================================================
+// 6C. FORM VALIDATION NGHIỆP VỤ PHÒNG HỌP (STITCH SPEC)
+// =====================================================
+
+function validateRoomForm(editId = null) {
+  const nameInput = document.getElementById("room-form-name");
+  const capacityInput = document.getElementById("room-form-capacity");
+  const floorInput = document.getElementById("room-form-floor");
+  const typeSelect = document.getElementById("room-form-type");
+  const statusSelect = document.getElementById("room-form-status");
+  const descInput = document.getElementById("room-form-description");
+
+  const globalError = document.getElementById("room-global-error");
+  const globalErrorText = document.getElementById("room-global-error-text");
+  const nameError = document.getElementById("room-name-error");
+  const floorError = document.getElementById("room-floor-error");
+  const capacityError = document.getElementById("room-capacity-error");
+  const statusWarning = document.getElementById("room-status-warning");
+  const statusWarningText = document.getElementById("room-status-warning-text");
+
+  // Xóa trạng thái lỗi cũ
+  clearRoomFormErrors();
+
+  let isValid = true;
+  let firstErrorField = null;
+
+  const name = nameInput ? nameInput.value.trim() : "";
+  const capacity = capacityInput ? parseInt(capacityInput.value, 10) : NaN;
+  const floor = floorInput ? floorInput.value.trim() : "";
+  const type = typeSelect ? typeSelect.value : "Hội nghị";
+  const status = statusSelect ? statusSelect.value : "Active";
+  const description = descInput ? descInput.value.trim() : "";
+
+  // 1. Kiểm tra Tên phòng họp (Bắt buộc, 2-100 ký tự, không chứa thẻ HTML, duy nhất)
+  if (!name) {
+    isValid = false;
+    showFieldError(nameInput, nameError, "Tên phòng họp không được để trống.");
+    if (!firstErrorField) firstErrorField = nameInput;
+  } else if (name.length < 2) {
+    isValid = false;
+    showFieldError(nameInput, nameError, "Tên phòng họp quá ngắn (tối thiểu 2 ký tự).");
+    if (!firstErrorField) firstErrorField = nameInput;
+  } else if (name.length > 100) {
+    isValid = false;
+    showFieldError(nameInput, nameError, "Tên phòng họp không được vượt quá 100 ký tự (chuẩn CSDL).");
+    if (!firstErrorField) firstErrorField = nameInput;
+  } else if (/[<>]/.test(name)) {
+    isValid = false;
+    showFieldError(nameInput, nameError, "Tên phòng họp không được chứa ký tự đặc biệt nguy hiểm (<, >).");
+    if (!firstErrorField) firstErrorField = nameInput;
+  } else {
+    // Kiểm tra trùng lặp tên phòng họp (Unique Constraint)
+    const duplicate = ROOMS.find(r => r.name.trim().toLowerCase() === name.toLowerCase() && r.id !== editId);
+    if (duplicate) {
+      isValid = false;
+      showFieldError(nameInput, nameError, `Tên phòng "${name}" đã tồn tại trên hệ thống. Vui lòng chọn tên khác.`);
+      if (!firstErrorField) firstErrorField = nameInput;
+    }
+  }
+
+  // 2. Kiểm tra Vị trí / Tầng (Bắt buộc, tối đa 100 ký tự)
+  if (!floor) {
+    isValid = false;
+    showFieldError(floorInput, floorError, "Vui lòng nhập vị trí hoặc tầng của phòng họp.");
+    if (!firstErrorField) firstErrorField = floorInput;
+  } else if (floor.length > 100) {
+    isValid = false;
+    showFieldError(floorInput, floorError, "Vị trí / Tầng không được vượt quá 100 ký tự.");
+    if (!firstErrorField) firstErrorField = floorInput;
+  }
+
+  // 3. Kiểm tra Sức chứa (Bắt buộc, số nguyên dương từ 1 đến 500)
+  if (isNaN(capacity)) {
+    isValid = false;
+    showFieldError(capacityInput, capacityError, "Sức chứa phòng họp phải là chữ số hợp lệ.");
+    if (!firstErrorField) firstErrorField = capacityInput;
+  } else if (capacity < 1 || capacity > 500) {
+    isValid = false;
+    showFieldError(capacityInput, capacityError, "Sức chứa phải nằm trong khoảng từ 1 đến 500 chỗ ngồi.");
+    if (!firstErrorField) firstErrorField = capacityInput;
+  }
+
+  // 4. Kiểm tra Loại phòng họp
+  const validTypes = ["Hội nghị", "Nhóm / Tech", "Hội trường lớn", "Đại sảnh / Board", "VIP / Phỏng vấn"];
+  if (!validTypes.includes(type)) {
+    isValid = false;
+    if (globalErrorText) globalErrorText.textContent = "Loại phòng họp không hợp lệ.";
+  }
+
+  // 5. Cảnh báo nghiệp vụ khi chuyển sang Maintenance hoặc Inactive nếu đang có lịch họp
+  if (status !== "Active" && editId) {
+    const today = new Date().toISOString().split("T")[0];
+    const hasUpcomingMeetings = meetings.some(m => 
+      (m.roomId === editId || m.roomName === name) && 
+      m.date >= today && 
+      m.status !== "cancelled"
+    );
+    if (hasUpcomingMeetings && statusWarning && statusWarningText) {
+      statusWarningText.textContent = `Lưu ý: Phòng đang có cuộc họp sắp tới. Đổi sang "${status === 'Maintenance' ? 'Bảo trì' : 'Tạm ngừng'}" có thể ảnh hưởng đến người dùng.`;
+      statusWarning.classList.remove("hidden");
+    }
+  }
+
+  // Phản hồi giao diện nếu có lỗi
+  if (!isValid) {
+    if (globalError) {
+      globalError.classList.remove("hidden");
+      if (globalErrorText) globalErrorText.textContent = "Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi lưu.";
+    }
+    const formCard = document.querySelector(".room-modal-card");
+    if (formCard) {
+      formCard.classList.remove("stitch-shake");
+      void formCard.offsetWidth; // Trigger reflow để kích hoạt lại animation
+      formCard.classList.add("stitch-shake");
+    }
+    if (firstErrorField) {
+      firstErrorField.focus();
+    }
+  }
+
+  // Danh sách trang thiết bị được chọn
+  const checkedEqs = [];
+  document.querySelectorAll(".room-eq-checkbox:checked").forEach(cb => {
+    checkedEqs.push(cb.value);
+  });
+
+  return {
+    isValid,
+    data: {
+      name,
+      capacity,
+      floor,
+      type,
+      status,
+      description,
+      equipments: checkedEqs
+    }
+  };
+}
+
+function showFieldError(inputEl, errorEl, message) {
+  if (inputEl) {
+    inputEl.classList.add("is-invalid", "has-error");
+  }
+  if (errorEl) {
+    errorEl.innerHTML = `<i class="bi bi-exclamation-circle me-1"></i> ${escapeHTML(message)}`;
+    errorEl.classList.remove("hidden");
+  }
+}
+
+function clearRoomFormErrors() {
+  const globalError = document.getElementById("room-global-error");
+  if (globalError) globalError.classList.add("hidden");
+
+  const statusWarning = document.getElementById("room-status-warning");
+  if (statusWarning) statusWarning.classList.add("hidden");
+
+  ["room-form-name", "room-form-capacity", "room-form-floor", "room-form-type", "room-form-status"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("is-invalid", "has-error");
+  });
+
+  ["room-name-error", "room-floor-error", "room-capacity-error"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+}
+
+function setupRoomFormValidationEvents() {
+  const nameInput = document.getElementById("room-form-name");
+  const floorInput = document.getElementById("room-form-floor");
+  const capInput = document.getElementById("room-form-capacity");
+  const statusSelect = document.getElementById("room-form-status");
+
+  if (nameInput) {
+    nameInput.addEventListener("input", () => {
+      nameInput.classList.remove("is-invalid", "has-error");
+      const err = document.getElementById("room-name-error");
+      if (err) err.classList.add("hidden");
+      const globalError = document.getElementById("room-global-error");
+      if (globalError) globalError.classList.add("hidden");
+    });
+  }
+
+  if (floorInput) {
+    floorInput.addEventListener("input", () => {
+      floorInput.classList.remove("is-invalid", "has-error");
+      const err = document.getElementById("room-floor-error");
+      if (err) err.classList.add("hidden");
+    });
+  }
+
+  if (capInput) {
+    capInput.addEventListener("input", () => {
+      capInput.classList.remove("is-invalid", "has-error");
+      const err = document.getElementById("room-capacity-error");
+      if (err) err.classList.add("hidden");
+    });
+  }
+
+  if (statusSelect) {
+    statusSelect.addEventListener("change", () => {
+      const idInput = document.getElementById("room-form-id");
+      const editId = idInput && idInput.value ? parseInt(idInput.value, 10) : null;
+      const statusWarning = document.getElementById("room-status-warning");
+      const statusWarningText = document.getElementById("room-status-warning-text");
+      if (statusSelect.value !== "Active" && editId) {
+        const today = new Date().toISOString().split("T")[0];
+        const hasUpcomingMeetings = meetings.some(m => 
+          m.roomId === editId && m.date >= today && m.status !== "cancelled"
+        );
+        if (hasUpcomingMeetings && statusWarning && statusWarningText) {
+          statusWarningText.textContent = `Lưu ý: Phòng đang có cuộc họp sắp tới. Đổi sang "${statusSelect.value === 'Maintenance' ? 'Bảo trì' : 'Tạm ngừng'}" có thể ảnh hưởng người dùng.`;
+          statusWarning.classList.remove("hidden");
+        } else if (statusWarning) {
+          statusWarning.classList.add("hidden");
+        }
+      } else if (statusWarning) {
+        statusWarning.classList.add("hidden");
+      }
+    });
+  }
+}
+
+// =====================================================
+// 6D. QUẢN LÝ MODAL THÊM / SỬA PHÒNG HỌP (STITCH FORM)
 // =====================================================
 
 function openAddRoomModal() {
+  RoomAPI.checkHealth();
+
   const form = document.getElementById("room-form");
   const modalTitle = document.getElementById("room-modal-title");
   const modalSubtitle = document.getElementById("room-modal-subtitle");
   const submitText = document.getElementById("room-submit-text");
   const successView = document.getElementById("room-success-view");
-  const errorAlert = document.getElementById("room-global-error");
-  const nameError = document.getElementById("room-name-error");
 
   if (modalTitle) modalTitle.textContent = "Thêm phòng họp mới";
   if (modalSubtitle) modalSubtitle.textContent = "Cấu hình thông tin phòng, sức chứa, thiết bị và mã QR định danh";
@@ -1427,8 +1819,9 @@ function openAddRoomModal() {
     form.classList.remove("hidden");
   }
   if (successView) successView.classList.add("hidden");
-  if (errorAlert) errorAlert.classList.add("hidden");
-  if (nameError) nameError.classList.add("hidden");
+
+  // Xóa toàn bộ lỗi cũ
+  clearRoomFormErrors();
 
   // Tự sinh mã phòng mới
   const nextId = ROOMS.reduce((max, r) => Math.max(max, r.id), 0) + 1;
@@ -1440,7 +1833,7 @@ function openAddRoomModal() {
   if (codeInput) codeInput.value = `RM-00${nextId}`;
   if (qrInput) qrInput.value = `QR-ROOM-00${nextId}`;
 
-  // Reset checkboxes
+  // Reset checkboxes thiết bị
   document.querySelectorAll(".room-eq-checkbox").forEach(cb => cb.checked = false);
 
   if (roomModalOverlay) roomModalOverlay.classList.remove("hidden");
@@ -1450,6 +1843,8 @@ function openAddRoomModal() {
 }
 
 function openEditRoomModal(roomId) {
+  RoomAPI.checkHealth();
+
   const room = ROOMS.find(r => r.id === roomId);
   if (!room) {
     alert("Không tìm thấy thông tin phòng họp.");
@@ -1461,8 +1856,6 @@ function openEditRoomModal(roomId) {
   const modalSubtitle = document.getElementById("room-modal-subtitle");
   const submitText = document.getElementById("room-submit-text");
   const successView = document.getElementById("room-success-view");
-  const errorAlert = document.getElementById("room-global-error");
-  const nameError = document.getElementById("room-name-error");
 
   if (modalTitle) modalTitle.textContent = "Chỉnh sửa phòng họp";
   if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết phòng ${room.name}`;
@@ -1470,8 +1863,9 @@ function openEditRoomModal(roomId) {
 
   if (form) form.classList.remove("hidden");
   if (successView) successView.classList.add("hidden");
-  if (errorAlert) errorAlert.classList.add("hidden");
-  if (nameError) nameError.classList.add("hidden");
+
+  // Xóa toàn bộ lỗi cũ
+  clearRoomFormErrors();
 
   // Điền dữ liệu vào form
   const idInput = document.getElementById("room-form-id");
@@ -1501,120 +1895,59 @@ function openEditRoomModal(roomId) {
   });
 
   if (roomModalOverlay) roomModalOverlay.classList.remove("hidden");
+
+  if (nameInput) setTimeout(() => nameInput.focus(), 100);
 }
 
 function closeRoomModal() {
   if (roomModalOverlay) roomModalOverlay.classList.add("hidden");
+  clearRoomFormErrors();
 }
 
-function saveRoom(event) {
+async function saveRoom(event) {
   event.preventDefault();
 
   const idInput = document.getElementById("room-form-id");
-  const nameInput = document.getElementById("room-form-name");
-  const capacityInput = document.getElementById("room-form-capacity");
-  const typeSelect = document.getElementById("room-form-type");
-  const floorInput = document.getElementById("room-form-floor");
-  const statusSelect = document.getElementById("room-form-status");
-  const descInput = document.getElementById("room-form-description");
-
-  const name = nameInput ? nameInput.value.trim() : "";
-  const capacity = capacityInput ? parseInt(capacityInput.value, 10) : 0;
-  const type = typeSelect ? typeSelect.value : "Hội nghị";
-  const floor = floorInput ? floorInput.value.trim() : "";
-  const status = statusSelect ? statusSelect.value : "Active";
-  const description = descInput ? descInput.value.trim() : "";
-
-  const errorAlert = document.getElementById("room-global-error");
-  const errorText = document.getElementById("room-global-error-text");
-  const nameError = document.getElementById("room-name-error");
-
-  // Validate tên phòng
-  if (!name) {
-    if (nameError) nameError.classList.remove("hidden");
-    if (errorAlert) {
-      errorText.textContent = "Vui lòng nhập tên phòng họp.";
-      errorAlert.classList.remove("hidden");
-    }
-    return;
-  }
-  if (nameError) nameError.classList.add("hidden");
-
-  // Validate sức chứa
-  if (isNaN(capacity) || capacity < 1) {
-    if (errorAlert) {
-      errorText.textContent = "Sức chứa phòng họp phải là số nguyên dương lớn hơn 0.";
-      errorAlert.classList.remove("hidden");
-    }
-    return;
-  }
-
-  // Danh sách thiết bị được chọn
-  const checkedEqs = [];
-  document.querySelectorAll(".room-eq-checkbox:checked").forEach(cb => {
-    checkedEqs.push(cb.value);
-  });
-
   const isEdit = idInput && idInput.value !== "";
   const editId = isEdit ? parseInt(idInput.value, 10) : null;
 
-  // Kiểm tra tên phòng không được trùng lặp
-  const duplicate = ROOMS.find(r => r.name.toLowerCase() === name.toLowerCase() && r.id !== editId);
-  if (duplicate) {
-    if (errorAlert) {
-      errorText.textContent = `Tên phòng họp "${name}" đã tồn tại trên hệ thống. Vui lòng chọn tên khác.`;
-      errorAlert.classList.remove("hidden");
-    }
+  // 1. Chạy bộ Validation nghiệp vụ
+  const validation = validateRoomForm(editId);
+  if (!validation.isValid) {
     return;
   }
 
-  if (errorAlert) errorAlert.classList.add("hidden");
+  const roomData = validation.data;
 
-  // Hiệu ứng spinner
+  // 2. Hiệu ứng loading trên nút submit
   const submitBtn = document.getElementById("btn-room-submit");
   const submitSpinner = document.getElementById("room-submit-spinner");
   const submitIcon = document.getElementById("room-submit-icon");
+  const submitText = document.getElementById("room-submit-text");
 
   if (submitSpinner) submitSpinner.classList.remove("hidden");
   if (submitIcon) submitIcon.classList.add("hidden");
   if (submitBtn) submitBtn.disabled = true;
+  if (submitText) submitText.textContent = "Đang lưu dữ liệu...";
 
-  setTimeout(() => {
+  try {
+    let result;
     if (isEdit) {
-      const room = ROOMS.find(r => r.id === editId);
-      if (room) {
-        room.name = name;
-        room.capacity = capacity;
-        room.type = type;
-        room.floor = floor;
-        room.status = status;
-        room.equipments = checkedEqs;
-        room.description = description;
-      }
+      result = await RoomAPI.update(editId, roomData);
     } else {
-      const maxId = ROOMS.reduce((max, r) => Math.max(max, r.id), 0);
-      const newId = maxId + 1;
-      const code = `RM-00${newId}`;
-      const qrCode = `QR-ROOM-00${newId}`;
-      ROOMS.push({
-        id: newId,
-        code,
-        name,
-        capacity,
-        type,
-        floor,
-        status,
-        qrCode,
-        equipments: checkedEqs,
-        description
-      });
+      const nextId = ROOMS.reduce((max, r) => Math.max(max, r.id), 0) + 1;
+      roomData.code = `RM-00${nextId}`;
+      roomData.qrCode = `QR-ROOM-00${nextId}`;
+      result = await RoomAPI.create(roomData);
     }
 
+    // 3. Tắt trạng thái loading
     if (submitSpinner) submitSpinner.classList.add("hidden");
     if (submitIcon) submitIcon.classList.remove("hidden");
     if (submitBtn) submitBtn.disabled = false;
+    if (submitText) submitText.textContent = isEdit ? "Cập nhật phòng họp" : "Lưu phòng họp";
 
-    // Hiển thị banner thành công
+    // 4. Hiển thị banner thành công
     const form = document.getElementById("room-form");
     const successView = document.getElementById("room-success-view");
     const successTitle = document.getElementById("room-success-title");
@@ -1623,14 +1956,32 @@ function saveRoom(event) {
     if (form) form.classList.add("hidden");
     if (successView) {
       successTitle.textContent = isEdit ? "Cập nhật phòng họp thành công!" : "Thêm phòng họp mới thành công!";
-      successDesc.textContent = `Phòng "${name}" (${capacity} chỗ ngồi, ${status === 'Active' ? 'Sẵn sàng hoạt động' : 'Bảo trì'}) đã được đồng bộ vào CSDL.`;
+      const syncStatus = result.isFallback 
+        ? "Đã lưu vào bộ nhớ cục bộ (Local Store Fallback - Tự động đồng bộ CSDL)"
+        : "Đã đồng bộ trực tiếp vào CSDL Backend";
+      successDesc.innerHTML = `Phòng <strong>"${escapeHTML(roomData.name)}"</strong> (${roomData.capacity} chỗ ngồi, ${roomData.status}) • <span class="text-success"><i class="bi bi-shield-check me-1"></i>${syncStatus}</span>`;
       successView.classList.remove("hidden");
     }
 
+    // 5. Cập nhật Bảng, KPI và Form Đặt lịch cuộc họp
     renderAdminRoomsTable();
     updateRoomKpiCards();
     syncMeetingRoomOptions();
-  }, 350);
+
+  } catch (error) {
+    console.error("Lỗi khi lưu phòng:", error);
+    if (submitSpinner) submitSpinner.classList.add("hidden");
+    if (submitIcon) submitIcon.classList.remove("hidden");
+    if (submitBtn) submitBtn.disabled = false;
+    if (submitText) submitText.textContent = isEdit ? "Cập nhật phòng họp" : "Lưu phòng họp";
+
+    const globalError = document.getElementById("room-global-error");
+    const globalErrorText = document.getElementById("room-global-error-text");
+    if (globalError) {
+      if (globalErrorText) globalErrorText.textContent = "Có lỗi xảy ra trong quá trình lưu phòng. Vui lòng thử lại.";
+      globalError.classList.remove("hidden");
+    }
+  }
 }
 
 // =====================================================
@@ -3273,5 +3624,8 @@ document.addEventListener(
 // 22. KHỞI ĐỘNG ROUTER & ĐỒNG BỘ CSDL
 // =====================================================
 
+loadPersistedRooms();
+setupRoomFormValidationEvents();
+RoomAPI.checkHealth();
 syncMeetingRoomOptions();
 router();
