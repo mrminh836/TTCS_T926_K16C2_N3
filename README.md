@@ -1,4 +1,7 @@
+# 🏢 HỆ THỐNG QUẢN LÝ LỊCH HỌP DOANH NGHIỆP (ENTERPRISE SYNC MEETING SUITE)
+> **Mã học phần: TTCS_T926_K16C2_N3 • Trường Đại học Công nghệ Thông tin & Truyền thông (ICTU)**
 
+---
 
 ## 🌟 Tầm Nhìn Sản Phẩm (Product Vision)
 
@@ -6,50 +9,35 @@
 
 Nền tảng giúp doanh nghiệp tối ưu hóa việc phân bổ phòng họp, trang thiết bị và thời gian, đảm bảo các cuộc họp được tổ chức hiệu quả, đúng lúc và đúng chỗ.
 
-### Giá trị cốt lõi hướng tới:
-* **Loại bỏ hoàn toàn xung đột:** Chấm dứt tình trạng đặt trùng phòng hoặc chồng chéo lịch trình.
-* **Minh bạch tài nguyên:** Quản lý rõ ràng trạng thái phòng họp, máy chiếu, thiết bị hội nghị theo thời gian thực.
-* **Tích hợp liền mạch:** Đồng bộ dữ liệu 2 chiều với Google Calendar, Microsoft Outlook và hệ sinh thái ERP/HRM.
-* **Trải nghiệm tối ưu:** Đơn giản hóa các thao tác đặt phòng, gửi lời mời và phối hợp công việc cho nhân viên.
+### Giá trị cốt lõi:
+* **Loại bỏ hoàn toàn xung đột:** Cơ chế khóa dòng độc quyền triệt tiêu 100% tình trạng đặt trùng phòng (Double-booking / Race Condition).
+* **Minh bạch tài nguyên:** Quản lý rõ ràng trạng thái phòng họp, sức chứa và danh mục thiết bị kỹ thuật (máy chiếu, micro, màn hình TV, bảng trắng) theo thời gian thực.
+* **Trải nghiệm tối ưu (Stitch Design):** Giao diện Single Page Application (SPA) hiện đại, trực quan, hỗ trợ tính thời lượng tự động và xuất báo cáo chuẩn Excel.
+* **Kiến trúc bền vững:** Phân tầng chuẩn MVC, API RESTful bảo mật và cơ sở dữ liệu MySQL chuẩn 3NF.
 
 ---
 
 ## 🎯 Mục Tiêu Sản Phẩm (Product Goals)
 
-### 1. Tối ưu hóa quy trình đặt lịch
-* Đặt, thay đổi hoặc hủy lịch họp chỉ trong vài thao tác đơn giản.
-* Thuật toán gợi ý khung giờ họp tối ưu dựa trên thời gian trống của toàn bộ người tham dự.
-
-### 2. Quản lý hiệu quả phòng họp & thiết bị
-* Phân bổ phòng họp hợp lý, giảm thiểu tỷ lệ "phòng trống ảo" (đặt nhưng không dùng).
-* Cho phép chọn kèm trang thiết bị phục vụ (máy chiếu, micro, bảng vẽ, camera họp trực tuyến).
-
-### 3. Nâng cao trải nghiệm người dùng
-* **Hỗ trợ đa nền tảng:** Giao diện Responsive tối ưu trên cả Web và Ứng dụng Di động (Mobile App).
-* **Đồng bộ tự động:** Kết nối trực tiếp với lịch cá nhân (Google Calendar, Microsoft Outlook).
-* **Thông báo thông minh:** Tự động gửi lời nhắc trước giờ họp qua Email/Push Notification để tránh lỡ họp.
-
-### 4. Báo cáo và phân tích thông minh (Analytics)
-* Báo cáo tần suất sử dụng chi tiết theo từng phòng họp và thiết bị.
-* Đo lường tỷ lệ trễ hẹn, hủy họp hoặc phòng đặt nhưng không check-in, cung cấp dữ liệu hỗ trợ cải thiện văn hóa họp của tổ chức.
-
-### 5. Hiện đại hóa và mở rộng tích hợp
-* **Chatbot trợ lý ảo:** Đặt lịch hoặc tra cứu phòng trống tức thì qua tin nhắn.
-* **Check-in/Check-out bằng mã QR:** Xác thực sự hiện diện thực tế tại cửa phòng họp.
-* **Kết nối ERP/HRM:** Đồng bộ sơ đồ tổ chức, danh sách nhân sự và quyền hạn tự động.
+1. **Tối ưu hóa quy trình đặt lịch:** Thao tác đặt, cập nhật hoặc hủy lịch họp chỉ trong vài cú nhấp chuột với biểu mẫu modal chuẩn Stitch SaaS.
+2. **Quản lý hiệu quả phòng họp & thiết bị:** Theo dõi chính xác sức chứa và gắn kèm thiết bị phòng họp tương ứng với từng lượt đặt.
+3. **Nâng cao trải nghiệm người dùng:** Giao diện Responsive trên mọi kích thước màn hình, tìm kiếm live tức thì, lọc đa tiêu chí và thông báo trạng thái trực quan.
+4. **Báo cáo và phân tích thông minh:** Thống kê các chỉ số KPI cuộc họp (tổng số, sắp diễn ra, đang diễn ra) và xuất file CSV UTF-8 mở trực tiếp trên Excel không bị lỗi font tiếng Việt.
+5. **Tiêu chuẩn kiểm thử & QA chuyên nghiệp:** Tài liệu hóa toàn diện quy trình kiểm thử 10 cột, Postman Collection tự động và quản lý Bug chuẩn Jira Software.
 
 ---
 
 ## 🚀 Các Tính Năng Nổi Bật (Key Features)
 
-| Phân hệ | Mô tả tính năng |
-| :--- | :--- |
-| **Booking Hub** | Tìm kiếm phòng theo sức chứa, thiết bị và đặt phòng tức thời. |
-| **Smart Scheduler** | Tự động quét lịch biểu để tìm ra khoảng trống phù hợp cho nhóm. |
-| **QR Check-in** | Tự động hủy phòng và giải phóng tài nguyên nếu sau 10-15 phút không quét QR. |
-| **Third-party Sync** | Đồng bộ liên tục với Google Workspace và Microsoft 365. |
-| **Admin Dashboard** | Thống kê hiệu suất, quản lý danh mục phòng và lịch bảo trì thiết bị. |
-
+| Phân hệ | Mô tả tính năng | Công nghệ phụ trách |
+| :--- | :--- | :--- |
+| **Meeting Scheduler** | Form tạo/sửa cuộc họp, tự động tính thời lượng, validation chặn giờ kết thúc trước giờ bắt đầu, Success View Banner. | Frontend (`client/main.js`, `index.html`) |
+| **Concurrency Shield** | Chống đặt trùng phòng bằng Transaction và khóa dòng `SELECT ... FOR UPDATE` trên MySQL. | Backend (`server/models/meetingModel.js`) |
+| **Strict Time Validator** | Chặn đặt lịch trong quá khứ, kiểm tra thời lượng từ 5 phút đến 24 giờ. | Backend Middleware (`meetingValidator.js`) |
+| **Resource Allocator** | Điều phối phòng họp (5 phòng: 10 - 50 chỗ) và gắn thiết bị (máy chiếu, TV, mic, bảng trắng). | Fullstack (Database + Model + Form UI) |
+| **Multi-Filter & Search**| Tab lọc trạng thái, dropdown lọc theo phòng họp và ô tìm kiếm live đa trường. | Frontend (`client/main.js`) |
+| **Excel / CSV Exporter** | Xuất báo cáo danh sách cuộc họp có gắn tiền tố `\uFEFF` (BOM UTF-8) đọc chuẩn trên Excel. | Frontend (`client/main.js`) |
+| **Containerization** | Đóng gói toàn bộ Backend và Database thành cụm Docker Compose chạy độc lập. | Docker (`docker-compose.yml`, `Dockerfile`) |
 
 ---
 
@@ -57,127 +45,239 @@ Nền tảng giúp doanh nghiệp tối ưu hóa việc phân bổ phòng họp,
 
 ```text
 TTCS_T926_K16C2_N3/
-├── client/                  # Frontend (SPA - HTML5, CSS3, JavaScript thuần)
-│   ├── index.html           # App Shell và giao diện chính
-│   ├── style.css            # Hệ thống màu sắc, components và responsive
-│   └── main.js              # Hash Router, logic render và CRUD cuộc họp
+├── .agents/                 # Bộ quy chuẩn Agent & Skills cho phát triển dự án
+│   └── skills/
+│       └── fe-development-guide/
+│           └── SKILL.md     # Cẩm nang quy chuẩn code Frontend & Stitch Design System
 │
-├── server/                  # Backend (Node.js & Express API)
-│   ├── config/              # Cấu hình kết nối MySQL pool
-│   ├── controllers/         # Xử lý logic nghiệp vụ và validation
-│   ├── models/              # Truy vấn dữ liệu MySQL, transaction & row lock
+├── client/                  # Frontend (SPA - HTML5, CSS3, JavaScript thuần)
+│   ├── index.html           # App Shell: Navbar, Container <div id="app">, Modal Forms
+│   ├── style.css            # Hệ thống Stitch Design Tokens, Components, Animations
+│   └── main.js              # Hash Router, Local Store, Live Duration, CRUD, CSV Export
+│
+├── server/                  # Backend (Node.js & Express RESTful API)
+│   ├── config/              # Kết nối MySQL Pool (timezone +07:00)
+│   ├── controllers/         # meetingController.js (Xử lý HTTP Request/Response)
+│   ├── models/              # meetingModel.js (Transaction, Row Lock & Overlap Check)
 │   ├── routes/              # Định tuyến API (/api/meetings, /api/health)
+│   ├── validators/          # meetingValidator.js (Xác thực dữ liệu đầu vào nghiêm ngặt)
 │   ├── server.js            # Điểm khởi chạy máy chủ Express
-│   ├── package.json         # Danh sách thư viện và scripts
-│   ├── Dockerfile           # Đóng gói container Backend (node:20-alpine)
-│   └── .dockerignore        # Loại trừ file không cần thiết khi build Docker
+│   ├── package.json         # Danh sách dependencies (express, mysql2, cors, dotenv)
+│   ├── Dockerfile           # Đóng gói image Node.js 20 Alpine
+│   └── .dockerignore        # Loại trừ node_modules khi build image
 │
 ├── database/                # Cơ sở dữ liệu (Database Schema)
-│   └── init_database.sql    # Kịch bản khởi tạo 7 bảng và dữ liệu mẫu
+│   └── init_database.sql    # Kịch bản DDL/DML khởi tạo 7 bảng và dữ liệu mẫu
 │
-├── docs/                    # Tài liệu kỹ thuật & thiết kế
-│   ├── SoDo_ERD.png         # Sơ đồ quan hệ thực thể (ERD)
-│   ├── related_documents.md # Hướng dẫn chi tiết kiểm thử Postman & kiến trúc
+├── docs/                    # Tài liệu kỹ thuật, kiến trúc & đặc tả nghiệp vụ
+│   ├── LUONG_HOAT_DONG_HE_THONG.docx  # [MỚI] File Word đặc tả chi tiết toàn bộ luồng hoạt động
+│   ├── LUONG_HOAT_DONG_HE_THONG.md    # [MỚI] Bản Markdown đặc tả luồng hoạt động kèm sơ đồ Mermaid
+│   ├── FE_DEVELOPMENT_GUIDE.md        # [MỚI] Hướng dẫn quy chuẩn lập trình Frontend
 │   ├── QA_PROCESS_AND_JIRA_STANDARDS.md # Quy trình kiểm thử QA & Quản lý Bug Jira chuẩn
-│   ├── test_case_template.csv           # Biểu mẫu Test Case 10 cột chuẩn UTF-8 (Excel / Sheets)
-│   └── test_case_template.html          # Bản hiển thị trực quan biểu mẫu Test Case
+│   ├── related_documents.md           # Hướng dẫn chi tiết kiểm thử Postman & kiến trúc
+│   ├── test_case_template.csv         # Biểu mẫu Test Case 10 cột chuẩn UTF-8
+│   ├── test_case_template.html        # Bản hiển thị trực quan biểu mẫu Test Case
+│   └── SoDo_ERD.png                   # Sơ đồ quan hệ thực thể (ERD)
 │
-├── docker-compose.yml       # Cấu hình Docker Compose đa dịch vụ (Backend + MySQL)
-├── .env.example             # Mẫu cấu hình biến môi trường
-├── .env                     # Biến môi trường thực tế (được bảo mật trong .gitignore)
-└── README.md                # Hướng dẫn tổng quan dự án
+├── docker-compose.yml       # Cấu hình khởi chạy cụm dịch vụ (Node.js + MySQL 8.0)
+├── .env.example             # Mẫu biến môi trường
+├── .env                     # Biến môi trường thực tế (bảo mật trong .gitignore)
+└── README.md                # Tài liệu tổng quan dự án
 ```
 
 ---
 
-## 🐳 Hướng Dẫn Chạy Dự Án Với Docker Compose
+## 🔄 Toàn Bộ Luồng Hoạt Động Của Hệ Thống (System Workflows)
 
-### Yêu cầu hệ thống
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (bao gồm Docker Engine & Docker Compose)
+> 💡 **Chi tiết đầy đủ:** Xem tại file Word [docs/LUONG_HOAT_DONG_HE_THONG.docx](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.docx) hoặc bản trực tuyến [docs/LUONG_HOAT_DONG_HE_THONG.md](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.md).
 
-### Khởi động nhanh
+### 1. Luồng Đặt phòng & Tạo cuộc họp (Booking Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Nhân viên (Employee)
+    participant UI as Giao diện Modal (Frontend)
+    participant API as Backend (Validator & Controller)
+    participant Model as meetingModel.js
+    participant DB as MySQL Database (7 Bảng)
+
+    User->>UI: 1. Nhấn nút "+ Tạo cuộc họp mới"
+    UI->>UI: Mở Modal, prefill ngày hôm nay và mốc giờ 09:00 - 10:30
+    User->>UI: 2. Nhập tiêu đề (<=200 ký tự), phòng họp, người tổ chức, thiết bị
+    UI->>UI: Live Duration Calculator tính thời lượng và kiểm tra end > start
+    User->>UI: 3. Nhấn "Tạo cuộc họp"
+    UI->>UI: Client Validation (kiểm tra tiêu đề không rỗng)
+    alt Tiêu đề để trống
+        UI-->>User: Viền đỏ trường tiêu đề, hiển thị Alert thông báo lỗi
+    else Dữ liệu hợp lệ
+        UI->>UI: Kích hoạt loading spinner, disable nút submit
+        UI->>API: Gửi POST /api/meetings (JSON Payload)
+        API->>API: Middleware kiểm tra kiểu dữ liệu, chặn giờ quá khứ, min 5 phút
+        API->>Model: Gọi Meeting.create(meetingData)
+        Model->>DB: beginTransaction()
+        Model->>DB: 1. Kiểm tra Organizer tồn tại trong Users
+        Model->>DB: 2. SELECT ... FROM rooms WHERE RoomID = ? FOR UPDATE (Khóa phòng)
+        Model->>DB: 3. Quét Overlap Check trên meetings & bookings
+        alt Phòng đã có người đặt trong khung giờ
+            Model->>DB: rollback()
+            Model-->>API: Báo lỗi 409 Conflict
+            API-->>UI: HTTP 409: "Phòng họp đã có người đặt trong khung giờ này"
+            UI-->>User: Hiển thị lỗi xung đột lịch, cho phép chọn giờ khác
+        else Phòng trống & Khả dụng
+            Model->>DB: 4. INSERT INTO meetings
+            Model->>DB: 5. INSERT INTO bookings (Status = 'Confirmed')
+            Model->>DB: 6. INSERT INTO meeting_participants
+            Model->>DB: 7. INSERT INTO booking_equipments
+            Model->>DB: commit()
+            Model-->>API: Trả về meetingId, bookingId
+            API-->>UI: HTTP 201 Created
+            UI->>UI: Hiển thị Success View Banner tóm tắt cuộc họp
+            UI->>UI: Cập nhật ngay Bảng danh sách & 3 thẻ thống kê KPI
+            UI-->>User: Xác nhận cuộc họp thành công, tùy chọn xem danh sách
+        end
+    end
+```
+
+### 2. Thuật toán kiểm tra trùng lịch (Overlap Checking)
+Hai cuộc họp trên cùng một phòng bị coi là **xung đột** khi thỏa mãn công thức:
+$$\text{StartTime}_A < \text{EndTime}_B \quad \text{AND} \quad \text{EndTime}_A > \text{StartTime}_B$$
+
+```sql
+SELECT m.MeetingID, m.Title, m.StartTime, m.EndTime
+FROM meetings m
+JOIN bookings b ON m.MeetingID = b.MeetingID
+WHERE b.RoomID = ? 
+  AND b.BookingStatus = 'Confirmed'
+  AND (m.StartTime < ?) AND (m.EndTime > ?);
+```
+
+### 3. Vòng đời trạng thái cuộc họp (Meeting Lifecycle)
+
+```mermaid
+stateDiagram-v2
+    [*] --> Scheduled: Tạo mới cuộc họp thành công (HTTP 201)
+    Scheduled --> In_Progress: Tới thời điểm StartTime (Đang diễn ra)
+    Scheduled --> Cancelled: Người tổ chức hủy cuộc họp
+    In_Progress --> Completed: Vượt quá thời điểm EndTime (Đã kết thúc)
+    In_Progress --> Cancelled: Hủy đột xuất
+    Cancelled --> [*]: Phòng họp và thiết bị được giải phóng
+    Completed --> [*]: Lưu trữ lịch sử báo cáo & KPI
+```
+
+---
+
+## 🗄️ Cấu Trúc Cơ Sở Dữ Liệu (Database Schema)
+
+Cơ sở dữ liệu gồm **7 bảng** chuẩn hóa 3NF trong `database/init_database.sql`:
+
+```mermaid
+erDiagram
+    Users ||--o{ Meetings : "tổ chức (OrganizerID)"
+    Users ||--o{ Meeting_Participants : "tham gia (UserID)"
+    Meetings ||--o{ Bookings : "tạo (MeetingID)"
+    Meetings ||--o{ Meeting_Participants : "gồm (MeetingID)"
+    Rooms ||--o{ Bookings : "được đặt (RoomID)"
+    Bookings ||--o{ Booking_Equipments : "kèm theo (BookingID)"
+    Equipments ||--o{ Booking_Equipments : "sử dụng (EquipmentID)"
+
+    Users {
+        int UserID PK
+        varchar FullName
+        varchar Email
+        varchar Role
+    }
+    Rooms {
+        int RoomID PK
+        varchar RoomName
+        int Capacity
+        varchar Status
+    }
+    Meetings {
+        int MeetingID PK
+        varchar Title
+        text Description
+        datetime StartTime
+        datetime EndTime
+        int OrganizerID FK
+        boolean IsRecurring
+    }
+    Bookings {
+        int BookingID PK
+        int MeetingID FK
+        int RoomID FK
+        varchar BookingStatus
+    }
+    Equipments {
+        int EquipmentID PK
+        varchar EquipmentName
+        varchar Type
+        varchar Status
+    }
+```
+
+---
+
+## 🐳 Hướng Dẫn Cài Đặt & Khởi Chạy Dự Án
+
+### Cách 1: Khởi chạy nhanh bằng Docker Compose (Khuyến nghị)
+
+Yêu cầu: Đã cài đặt [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```bash
-# 1. Clone dự án
-git clone <repository-url>
+# 1. Clone mã nguồn
+git clone https://github.com/mrminh836/TTCS_T926_K16C2_N3.git
 cd TTCS_T926_K16C2_N3
 
-# 2. Tạo file .env từ mẫu
+# 2. Tạo file biến môi trường từ mẫu
 cp .env.example .env
-# Sửa DB_PASSWORD trong .env nếu cần (mặc định: root123)
 
-# 3. Khởi động toàn bộ hệ thống (Backend + MySQL)
+# 3. Khởi động toàn bộ dịch vụ (Backend API + MySQL)
 docker compose up --build -d
 ```
 
-> **Lần chạy đầu tiên**, MySQL sẽ tự động tạo database `meeting_management` và import đầy đủ **7 bảng** từ file `database/init_database.sql`.
+> **Ghi chú:** Khi chạy lần đầu, container MySQL tự động import kịch bản CSDL từ `database/init_database.sql`.
 
-### Kiểm tra hệ thống
-
-Sau khi khởi động thành công, truy cập endpoint healthcheck:
-
+Kiểm tra trạng thái máy chủ:
 ```bash
 curl http://localhost:3000/api/health
+# Kết quả: {"status":"ok","database":"connected"}
 ```
 
-Kết quả mong đợi:
+### Cách 2: Khởi chạy Local (Không dùng Docker)
 
-```json
-{
-  "status": "ok",
-  "database": "connected"
-}
-```
-
-### Các lệnh Docker hữu ích
+**Yêu cầu:** Node.js >= 18, MySQL Server >= 8.0.
 
 ```bash
-# Chạy ở chế độ nền (detached)
-docker compose up --build -d
+# 1. Khởi tạo CSDL MySQL
+mysql -u root -p meeting_management < database/init_database.sql
 
-# Xem log
-docker compose logs -f backend
-docker compose logs -f mysql_db
+# 2. Cài đặt dependencies và chạy Backend API
+cd server
+npm install
+npm run dev
 
-# Dừng & xóa container (GIỮ dữ liệu MySQL)
-docker compose down
-
-# Dừng & xóa container + XÓA dữ liệu MySQL
-docker compose down -v
-
-# Khởi động lại
-docker compose up -d
+# 3. Khởi chạy Frontend
+# Mở thư mục client/ bằng Live Server trong VS Code (chạy trên cổng 5500)
+# Hoặc truy cập: http://localhost:5500/#/meetings
 ```
-
-### Hot-reload khi phát triển
-
-Khi chạy bằng Docker Compose, thư mục `server/` được **bind mount** vào container. Mọi thay đổi code trên máy host sẽ tự động được phản ánh và server sẽ **restart ngay lập tức** nhờ `node --watch`.
-
-### Cấu hình biến môi trường
-
-| Biến | Giá trị Docker | Giá trị Local | Mô tả |
-| :--- | :--- | :--- | :--- |
-| `DB_HOST` | `mysql_db` | `127.0.0.1` | Hostname của MySQL |
-| `DB_PORT` | `3306` | `3306` | Port MySQL |
-| `DB_USER` | `root` | `root` | Tài khoản MySQL |
-| `DB_PASSWORD` | `root123` | *(tuỳ chỉnh)* | Mật khẩu MySQL |
-| `DB_NAME` | `meeting_management` | `meeting_management` | Tên database |
-| `PORT` | `3000` | `3000` | Port Backend API |
 
 ---
 
-## 🛠️ Chạy Local (Không Docker)
+## 📚 Danh Mục Tài Liệu Kỹ Thuật (Documentation Index)
 
-```bash
-# 1. Di chuyển vào thư mục server và cài đặt dependencies
-cd server
-npm install
+| Tài liệu | Định dạng | Nội dung chính |
+| :--- | :---: | :--- |
+| **Đặc tả luồng hoạt động hệ thống** | [.docx](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.docx) / [.md](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.md) | Toàn bộ 5 luồng hoạt động chi tiết, thuật toán Overlap, cơ chế khóa dòng và ma trận ánh xạ FE-BE-DB. |
+| **Cẩm nang phát triển Frontend** | [.md](file:///d:/TTCS_T926_K16C2_N3/.agents/skills/fe-development-guide/SKILL.md) | Bộ quy chuẩn UI/UX, Design tokens, cấu trúc code, validation, accessibility và checklist FE QA. |
+| **Quy trình QA & Chuẩn hóa Jira** | [.md](file:///d:/TTCS_T926_K16C2_N3/docs/QA_PROCESS_AND_JIRA_STANDARDS.md) | Quy trình kiểm thử chất lượng, biểu mẫu Test Case 10 cột, Bug template và ma trận Severity/Priority. |
+| **Hướng dẫn kiểm thử Postman** | [.md](file:///d:/TTCS_T926_K16C2_N3/docs/related_documents.md) | 9 kịch bản test API Postman chi tiết từ Case thành công (201) đến Race Condition (409). |
+| **Biểu mẫu Test Case mẫu** | [.csv](file:///d:/TTCS_T926_K16C2_N3/docs/test_case_template.csv) / [.html](file:///d:/TTCS_T926_K16C2_N3/docs/test_case_template.html) | Bảng 10 Test Cases cốt lõi chuẩn UTF-8 có BOM mở trực tiếp bằng Excel hoặc Google Sheets. |
 
-# 2. Sửa .env ở thư mục gốc: đổi DB_HOST=127.0.0.1 (đảm bảo MySQL đang chạy local)
+---
 
-# 3. Import database từ thư mục gốc
-mysql -u root -p meeting_management < ../database/init_database.sql
+## 👥 Đội Ngũ Phát Triển (Team K16C2_N3)
 
-# 4. Chạy server (hot-reload)
-npm run dev
-```
+* **Học phần:** Thực tập Chuyên sâu T926 - K16C2 - Nhóm 3
+* **Đơn vị:** Khoa Công nghệ Thông tin - Trường Đại học Công nghệ Thông tin & Truyền thông (ICTU)
+* **Quy chuẩn Git:** Phân nhánh theo tính năng (`feature/*`, `qa/*`), commit theo chuẩn Conventional Commits (`feat:`, `fix:`, `docs:`) và bắt buộc review qua Pull Request trước khi merge vào `main`.
