@@ -3288,42 +3288,7 @@ body {
     break-inside: avoid !important;
   }
 
-  .placard-brand-row {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    text-align: left !important;
-    margin-bottom: 12px !important;
-  }
 
-  .placard-inst-name {
-    font-size: 11pt !important;
-    font-weight: 800 !important;
-    color: #1e293b !important;
-    letter-spacing: 0.5px !important;
-  }
-
-  .placard-system-title {
-    font-size: 8.5pt !important;
-    color: #64748b !important;
-    text-transform: uppercase !important;
-    font-weight: 600 !important;
-  }
-
-  .placard-brand-badge {
-    border: 1.5px solid #0f172a !important;
-    padding: 3px 8px !important;
-    border-radius: 6px !important;
-    font-size: 8.5pt !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.5px !important;
-  }
-
-  .placard-top-divider {
-    height: 2px !important;
-    background: #0f172a !important;
-    margin-bottom: 18px !important;
-  }
 
   .placard-door-label {
     font-size: 9pt !important;

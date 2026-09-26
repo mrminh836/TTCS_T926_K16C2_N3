@@ -2183,20 +2183,9 @@ function printRoomDoorPlacard(roomId) {
   printArea.innerHTML = `
     <div class="placard-sheet">
       <div class="placard-card">
-        <!-- Brand Header -->
-        <div class="placard-brand-row">
-          <div>
-            <div class="placard-inst-name">TRƯỜNG ĐẠI HỌC CNTT &amp; TRUYỀN THÔNG (ICTU)</div>
-            <div class="placard-system-title">HỆ THỐNG QUẢN LÝ PHÒNG HỌP THÔNG MINH</div>
-          </div>
-          <div class="placard-brand-badge">CHECK-IN QR</div>
-        </div>
-
-        <div class="placard-top-divider"></div>
-
         <!-- Room Main Info -->
         <div>
-          <div class="placard-door-label">BIỂN PHÒNG HỌP DOANH NGHIỆP</div>
+          <div class="placard-door-label">MÃ QR CHECK-IN CỬA PHÒNG</div>
           <h1 class="placard-room-title">${escapeHTML(room.name)}</h1>
 
           <div class="placard-meta-chips">
