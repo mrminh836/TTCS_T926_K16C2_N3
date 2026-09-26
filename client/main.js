@@ -1119,6 +1119,131 @@ function renderAdminRoomsPage() {
   renderAdminRoomsTable();
 }
 
+// =====================================================
+// COMPONENT BADGE / TAG HIỂN THỊ SỨC CHỨA & GAUGE (STITCH SPEC)
+// 4 Cấp độ: sm (<15), md (15-30), lg (31-50), xl (>50)
+// =====================================================
+
+function getCapacityScale(capacity) {
+  const cap = parseInt(capacity, 10) || 0;
+  if (cap < 15) {
+    return {
+      level: 'sm',
+      scaleName: 'Quy mô nhỏ',
+      tierLabel: 'Dưới 15 chỗ',
+      badgeClass: 'capacity-tag-sm',
+      meterClass: 'capacity-meter-bar-sm',
+      icon: 'bi-people',
+      optimalRange: '4 - 12 người',
+      areaRange: '15 - 25 m²',
+      percent: Math.min(100, Math.round((cap / 15) * 100)),
+      description: 'Phù hợp thảo luận nhóm nhanh, 1-on-1, phỏng vấn tuyển dụng'
+    };
+  } else if (cap <= 30) {
+    return {
+      level: 'md',
+      scaleName: 'Quy mô vừa',
+      tierLabel: '15 - 30 chỗ',
+      badgeClass: 'capacity-tag-md',
+      meterClass: 'capacity-meter-bar-md',
+      icon: 'bi-people-fill',
+      optimalRange: '12 - 25 người',
+      areaRange: '30 - 55 m²',
+      percent: Math.min(100, Math.round((cap / 30) * 100)),
+      description: 'Phù hợp họp phòng ban định kỳ, báo cáo sprint, thuyết trình dự án'
+    };
+  } else if (cap <= 50) {
+    return {
+      level: 'lg',
+      scaleName: 'Quy mô lớn',
+      tierLabel: '31 - 50 chỗ',
+      badgeClass: 'capacity-tag-lg',
+      meterClass: 'capacity-meter-bar-lg',
+      icon: 'bi-building',
+      optimalRange: '25 - 45 người',
+      areaRange: '60 - 95 m²',
+      percent: Math.min(100, Math.round((cap / 50) * 100)),
+      description: 'Phù hợp hội thảo chuyên đề, đào tạo nội bộ, họp mở rộng liên bộ phận'
+    };
+  } else {
+    return {
+      level: 'xl',
+      scaleName: 'Hội trường',
+      tierLabel: 'Trên 50 chỗ',
+      badgeClass: 'capacity-tag-xl',
+      meterClass: 'capacity-meter-bar-xl',
+      icon: 'bi-building-fill',
+      optimalRange: '50 - 150+ người',
+      areaRange: '100 - 250 m²',
+      percent: Math.min(100, Math.round((cap / 120) * 100)),
+      description: 'Phù hợp đại hội cổ đông, lễ ký kết, hội nghị khách hàng, sự kiện toàn công ty'
+    };
+  }
+}
+
+function renderCapacityBadge(capacity, options = {}) {
+  const cap = parseInt(capacity, 10) || 0;
+  const scale = getCapacityScale(cap);
+  const variant = options.variant || 'pill';
+
+  if (variant === 'table') {
+    const showMeter = options.showMeter !== false;
+    const showScaleText = options.showScaleText !== false;
+    const gaugePct = Math.min(100, Math.round((cap / 60) * 100));
+
+    return `
+      <div class="capacity-cell-wrapper" title="Sức chứa: ${cap} chỗ ngồi • ${scale.scaleName}">
+        <div class="capacity-tag ${scale.badgeClass} capacity-tag-pill">
+          <i class="bi ${scale.icon}"></i>
+          <span>${cap} chỗ ngồi</span>
+        </div>
+        ${showMeter ? `
+          <div class="capacity-meter" role="progressbar" aria-valuenow="${cap}" aria-valuemin="0" aria-valuemax="100">
+            <div class="capacity-meter-bar ${scale.meterClass}" style="width: ${gaugePct}%;"></div>
+          </div>
+        ` : ''}
+        ${showScaleText ? `
+          <div class="capacity-size-tag">
+            <i class="bi bi-tag-fill" style="font-size: 0.65rem; opacity: 0.7;"></i>
+            <span>${scale.scaleName}</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  if (variant === 'card') {
+    return `
+      <span class="capacity-tag ${scale.badgeClass} capacity-tag-lg-size">
+        <i class="bi ${scale.icon}"></i>
+        <span>${cap} chỗ ngồi</span>
+        <span class="opacity-75 ms-1 fw-normal">(${scale.scaleName})</span>
+      </span>
+    `;
+  }
+
+  return `
+    <span class="capacity-tag ${scale.badgeClass} capacity-tag-pill">
+      <i class="bi ${scale.icon}"></i>
+      <span>${cap} chỗ</span>
+    </span>
+  `;
+}
+
+function getEquipmentIcon(name) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('tv') || n.includes('màn hình') || n.includes('display')) return 'bi-tv';
+  if (n.includes('micro') || n.includes('mic')) return 'bi-mic';
+  if (n.includes('bảng') || n.includes('whiteboard') || n.includes('easel')) return 'bi-easel';
+  if (n.includes('camera') || n.includes('webcam') || n.includes('polycom')) return 'bi-camera-video';
+  if (n.includes('âm thanh') || n.includes('loa') || n.includes('audio') || n.includes('sound')) return 'bi-speaker';
+  if (n.includes('wifi') || n.includes('mạng')) return 'bi-wifi';
+  if (n.includes('máy chiếu') || n.includes('projector')) return 'bi-projector';
+  if (n.includes('điều hòa') || n.includes('lạnh')) return 'bi-snow';
+  if (n.includes('bút')) return 'bi-pen';
+  return 'bi-check2-circle';
+}
+
 function renderAdminRoomsTable() {
   const tbody = document.getElementById("admin-rooms-tbody");
   const countBadge = document.getElementById("room-table-count");
@@ -1236,16 +1361,7 @@ function renderAdminRoomsTable() {
         </td>
 
         <td>
-          <div class="capacity-cell-wrapper">
-            <div class="capacity-badge-pill">
-              <i class="bi bi-people-fill text-primary"></i>
-              <span>${room.capacity} chỗ</span>
-            </div>
-            <div class="capacity-meter" title="Sức chứa: ${room.capacity} chỗ">
-              <div class="capacity-meter-bar" style="width: ${capPct}%;"></div>
-            </div>
-            <span class="capacity-size-tag">${room.capacity < 15 ? 'Quy mô nhỏ' : (room.capacity <= 30 ? 'Quy mô vừa' : 'Quy mô lớn')}</span>
-          </div>
+          ${renderCapacityBadge(room.capacity, { variant: 'table', showMeter: true, showScaleText: true })}
         </td>
 
         <td>
@@ -1988,9 +2104,9 @@ async function saveRoom(event) {
 // 6D. MODAL MÃ QR & CHI TIẾT CHECK-IN PHÒNG HỌP (US 5.2)
 // =====================================================
 
-function generateRoomQRSVG(roomCode, roomName) {
+function generateRoomQRSVG(roomCode, roomName, size = 180) {
   return `
-    <svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="display:block; border-radius: 8px;">
+    <svg viewBox="0 0 200 200" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" style="display:block; margin: 0 auto; border-radius: 8px;">
       <!-- Nền trắng -->
       <rect width="200" height="200" fill="#ffffff" />
 
@@ -2051,101 +2167,398 @@ function generateRoomQRSVG(roomCode, roomName) {
   `;
 }
 
+// In thẻ dán cửa chuyên dụng (Chỉ in duy nhất biển phòng và mã QR Check-in)
+function printRoomDoorPlacard(roomId) {
+  const room = ROOMS.find(r => r.id === roomId) || ROOMS[0];
+  if (!room) return;
+
+  const roomCode = room.code || `RM-00${room.id}`;
+  const printArea = document.getElementById("print-room-placard-area");
+  if (!printArea) return;
+
+  const now = new Date();
+  const printDateStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} - ${now.toLocaleDateString('vi-VN')}`;
+
+  printArea.innerHTML = `
+    <div class="placard-sheet">
+      <div class="placard-card">
+        <!-- Room Main Info -->
+        <div>
+          <div class="placard-door-label">MÃ QR CHECK-IN CỬA PHÒNG</div>
+          <h1 class="placard-room-title">${escapeHTML(room.name)}</h1>
+        </div>
+
+        <!-- QR Code Canvas Center -->
+        <div class="placard-qr-container">
+          <div class="placard-qr-border">
+            ${generateRoomQRSVG(roomCode, room.name, 230)}
+          </div>
+          <div class="placard-qr-code-text">Mã định danh quét: <strong>${escapeHTML(room.qrCode || `QR-ROOM-00${room.id}`)}</strong></div>
+        </div>
+
+        <!-- Step Guide Check-in -->
+        <div class="placard-instructions">
+          <div class="placard-instruction-heading">
+            <i class="bi bi-phone"></i> HƯỚNG DẪN QUÉT MÃ CHECK-IN TỨC THÌ
+          </div>
+          <div class="placard-instruction-steps">
+            <div class="placard-step-item">
+              <span class="step-num">1</span>
+              <span>Dùng Camera điện thoại hoặc app ICTU Meeting quét mã QR tại cửa phòng</span>
+            </div>
+            <div class="placard-step-item">
+              <span class="step-num">2</span>
+              <span>Nhấn <strong>"Bắt đầu cuộc họp"</strong> trên màn hình để xác nhận Check-in</span>
+            </div>
+            <div class="placard-step-item">
+              <span class="step-num">3</span>
+              <span>Khi kết thúc sớm, quét lại mã để <strong>"Trả phòng trước giờ"</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="placard-warning-note">
+          ⚠️ <em>Lưu ý: Cuộc họp sẽ tự động bị hủy và nhường phòng cho nhóm khác nếu không Check-in sau 15 phút từ giờ bắt đầu.</em>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="placard-card-footer">
+          <div>
+            <strong>Ban Quản lý Tòa nhà:</strong> Hotline 0280.3846.123
+          </div>
+          <div>
+            <span>Thời điểm in: ${printDateStr}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Gọi lệnh in của trình duyệt
+  setTimeout(() => {
+    window.print();
+  }, 100);
+}
+
+// Biến toàn cục lưu trữ ID phòng đang xem chi tiết để các action buttons (Sửa, Đặt phòng) tương tác
+window.currentDetailRoomId = null;
+
 function openRoomQRModal(roomId) {
   const room = ROOMS.find(r => r.id === roomId);
   if (!room) return;
 
+  window.currentDetailRoomId = roomId;
+
   const content = document.getElementById("room-qr-content");
   if (!content) return;
+  content.scrollTop = 0;
+
+  const modalBadge = document.getElementById("room-detail-modal-badge");
+  const modalTitle = document.getElementById("room-qr-modal-title");
+  const modalSubtitle = document.getElementById("room-qr-modal-subtitle");
 
   const roomCode = room.code || `RM-00${room.id}`;
+  const scale = getCapacityScale(room.capacity);
   const qrSvg = generateRoomQRSVG(roomCode, room.name);
 
-  // Lấy các cuộc họp sắp diễn ra tại phòng này
+  // Cập nhật Header Modal
+  if (modalTitle) {
+    modalTitle.innerHTML = `<i class="bi bi-door-open-fill text-primary me-2"></i>Chi tiết Phòng &amp; Mã QR Check-in`;
+  }
+  if (modalSubtitle) {
+    modalSubtitle.textContent = `${escapeHTML(room.floor || 'Khu phòng ban')} • Mã: ${escapeHTML(roomCode)} • Sức chứa ${room.capacity} chỗ`;
+  }
+  if (modalBadge) {
+    modalBadge.textContent = scale.scaleName;
+  }
+
+  // 1. Phân loại icon và background theo type
+  let heroIconClass = "bi-building";
+  let heroBgClass = "bg-primary-subtle text-primary";
+  if (room.type === "Hội nghị") {
+    heroIconClass = "bi-building";
+    heroBgClass = "bg-primary-subtle text-primary";
+  } else if (room.type === "Nhóm / Tech") {
+    heroIconClass = "bi-laptop";
+    heroBgClass = "bg-info-subtle text-info";
+  } else if (room.type === "Hội trường lớn") {
+    heroIconClass = "bi-megaphone";
+    heroBgClass = "bg-warning-subtle text-warning";
+  } else if (room.type === "VIP / Phỏng vấn") {
+    heroIconClass = "bi-star-fill";
+    heroBgClass = "bg-danger-subtle text-danger";
+  } else if (room.type === "Đại sảnh / Board") {
+    heroIconClass = "bi-award-fill";
+    heroBgClass = "bg-purple-subtle text-purple";
+  }
+
+  // 2. Lấy danh sách cuộc họp tại phòng này
+  const todayStr = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
   const roomMeetings = meetings.filter(m => 
     (m.roomId === room.id || m.roomName === room.name) && 
     m.status !== "cancelled"
   );
 
+  // Kiểm tra phòng có đang bận cuộc họp nào trong khung giờ hiện tại không
+  let currentActiveMeeting = null;
+  roomMeetings.forEach(m => {
+    if (m.date === todayStr && m.startTime && m.endTime) {
+      const [sh, sm] = m.startTime.split(":").map(Number);
+      const [eh, em] = m.endTime.split(":").map(Number);
+      const startMin = (sh || 0) * 60 + (sm || 0);
+      const endMin = (eh || 0) * 60 + (em || 0);
+      if (currentMinutes >= startMin && currentMinutes <= endMin) {
+        currentActiveMeeting = m;
+      }
+    }
+  });
+
+  // Trạng thái live indicator
+  let liveStatusHTML = "";
+  if (room.status === "Maintenance") {
+    liveStatusHTML = `
+      <div class="room-status-indicator maintenance">
+        <span class="pulse-dot"></span>
+        <span>Đang bảo trì</span>
+      </div>
+    `;
+  } else if (room.status === "Inactive") {
+    liveStatusHTML = `
+      <div class="room-status-indicator busy">
+        <span class="pulse-dot"></span>
+        <span>Tạm ngừng</span>
+      </div>
+    `;
+  } else if (currentActiveMeeting) {
+    liveStatusHTML = `
+      <div class="room-status-indicator busy">
+        <span class="pulse-dot"></span>
+        <span>Đang có cuộc họp</span>
+      </div>
+    `;
+  } else {
+    liveStatusHTML = `
+      <div class="room-status-indicator ready">
+        <span class="pulse-dot"></span>
+        <span>Sẵn sàng hoạt động</span>
+      </div>
+    `;
+  }
+
   content.innerHTML = `
-    <!-- QR Visual Card -->
-    <div class="qr-preview-wrapper">
-      <div class="qr-code-svg-box">
-        ${qrSvg}
+    <!-- Top Hero Banner -->
+    <div class="room-detail-hero">
+      <div class="room-hero-icon-box ${heroBgClass}">
+        <i class="bi ${heroIconClass}"></i>
       </div>
-      <div class="qr-room-meta-title">${escapeHTML(room.name)}</div>
-      <div class="qr-room-meta-sub">
-        ${escapeHTML(room.floor || 'Khu phòng ban')} • Sức chứa: <strong>${room.capacity} chỗ ngồi</strong> • Mã: <code>${roomCode}</code>
-      </div>
-      <div class="qr-checkin-instruction">
-        <i class="bi bi-phone"></i>
-        <span>Nhân viên quét mã tại cửa phòng để Check-in xác nhận bắt đầu cuộc họp</span>
-      </div>
-    </div>
-
-    <!-- Specs Grid -->
-    <div class="row g-3 mb-4">
-      <div class="col-6">
-        <div class="p-3 bg-light rounded-3 border">
-          <div class="text-muted small mb-1">Trạng thái phòng</div>
-          <div class="fw-bold">
-            ${room.status === 'Active' ? '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Sẵn sàng hoạt động</span>' : (room.status === 'Maintenance' ? '<span class="text-warning"><i class="bi bi-tools me-1"></i>Đang bảo trì</span>' : '<span class="text-secondary">Tạm ngừng</span>')}
-          </div>
+      <div class="room-hero-info">
+        <div class="room-hero-title-row">
+          <h4 class="room-hero-name">${escapeHTML(room.name)}</h4>
+          <span class="room-hero-code">${escapeHTML(roomCode)}</span>
+          ${liveStatusHTML}
         </div>
-      </div>
-
-      <div class="col-6">
-        <div class="p-3 bg-light rounded-3 border">
-          <div class="text-muted small mb-1">Loại phòng</div>
-          <div class="fw-bold text-dark">${escapeHTML(room.type || 'Hội nghị tiêu chuẩn')}</div>
+        <div class="room-hero-sub">
+          <span><i class="bi bi-geo-alt"></i> ${escapeHTML(room.floor || 'Chưa định vị')}</span>
+          <span>•</span>
+          <span><i class="bi bi-tag"></i> ${escapeHTML(room.type || 'Phòng tiêu chuẩn')}</span>
         </div>
       </div>
     </div>
 
-    <!-- Trang thiết bị -->
+    <!-- BLOCK 1: THÔNG SỐ SỨC CHỨA & QUY MÔ (CAPACITY SPECS COMPONENT) -->
     <div class="mb-4">
-      <div class="fw-semibold text-slate-800 small mb-2">Trang thiết bị sẵn có trong phòng:</div>
-      <div class="d-flex flex-wrap gap-2">
-        ${(room.equipments || []).map(eq => `<span class="room-eq-pill py-1 px-2"><i class="bi bi-check2-circle text-primary"></i>${escapeHTML(eq)}</span>`).join('') || '<span class="text-muted small">Chưa trang bị</span>'}
+      <div class="room-section-title">
+        <i class="bi bi-people-fill"></i>
+        <span>Thông số sức chứa &amp; Quy mô phòng</span>
+      </div>
+
+      <!-- Specs 3 Metric Cards -->
+      <div class="room-specs-grid">
+        <div class="spec-metric-card">
+          <div class="spec-metric-label">
+            <i class="bi bi-person-check-fill text-primary"></i> Sức chứa tối đa
+          </div>
+          <div class="spec-metric-value text-primary">${room.capacity} chỗ ngồi</div>
+          <div class="spec-metric-sub">${scale.scaleName}</div>
+        </div>
+
+        <div class="spec-metric-card">
+          <div class="spec-metric-label">
+            <i class="bi bi-heart-pulse-fill text-success"></i> Khuyến nghị tối ưu
+          </div>
+          <div class="spec-metric-value text-success">${scale.optimalRange}</div>
+          <div class="spec-metric-sub">Không gian thoáng đãng</div>
+        </div>
+
+        <div class="spec-metric-card">
+          <div class="spec-metric-label">
+            <i class="bi bi-aspect-ratio-fill text-info"></i> Diện tích tiêu chuẩn
+          </div>
+          <div class="spec-metric-value text-slate-800">${scale.areaRange}</div>
+          <div class="spec-metric-sub">~2.0 m² / người</div>
+        </div>
+      </div>
+
+      <!-- Capacity Gauge Showcase -->
+      <div class="capacity-gauge-showcase">
+        <div class="capacity-gauge-header">
+          <div class="d-flex align-items-center gap-2">
+            <span class="small fw-semibold text-slate-700">Mức quy mô:</span>
+            ${renderCapacityBadge(room.capacity, { variant: 'card' })}
+          </div>
+          <span class="small text-muted">${scale.tierLabel}</span>
+        </div>
+        <div class="capacity-gauge-track" title="Tỉ lệ quy mô: ${scale.percent}%">
+          <div class="capacity-gauge-fill ${scale.meterClass}" style="width: ${Math.min(100, Math.max(14, Math.round((room.capacity / 70) * 100)))}%;"></div>
+        </div>
+        <div class="capacity-gauge-ticks">
+          <span>Nhỏ (&lt;15 chỗ)</span>
+          <span>Vừa (15-30 chỗ)</span>
+          <span>Lớn (31-50 chỗ)</span>
+          <span>Hội trường (&gt;50)</span>
+        </div>
+        <div class="mt-2 pt-2 border-top small text-muted d-flex align-items-center gap-2">
+          <i class="bi bi-lightbulb text-warning"></i>
+          <span><strong>Mục đích tối ưu:</strong> ${scale.description}</span>
+        </div>
       </div>
     </div>
 
-    <!-- Mô tả tiện ích -->
-    ${room.description ? `
-      <div class="mb-4">
-        <div class="fw-semibold text-slate-800 small mb-1">Mô tả tiện ích:</div>
-        <p class="text-muted small mb-0 p-2 bg-light rounded border">${escapeHTML(room.description)}</p>
-      </div>
-    ` : ''}
-
-    <!-- Lịch các cuộc họp tại phòng này -->
-    <div>
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="fw-semibold text-slate-800 small">Lịch họp đã đăng ký tại phòng:</span>
-        <span class="badge bg-secondary-subtle text-secondary">${roomMeetings.length} cuộc họp</span>
+    <!-- BLOCK 2: TRANG THIẾT BỊ & TIỆN NGHI KỸ THUẬT -->
+    <div class="mb-4">
+      <div class="room-section-title">
+        <i class="bi bi-cpu-fill"></i>
+        <span>Trang thiết bị &amp; Tiện nghi kỹ thuật</span>
       </div>
 
-      ${roomMeetings.length === 0 ? `
-        <div class="text-muted small p-3 bg-light rounded text-center border">
-          Hiện chưa có cuộc họp nào được đặt tại phòng này. Phòng sẵn sàng phục vụ.
+      ${(room.equipments && room.equipments.length > 0) ? `
+        <div class="room-amenities-grid">
+          ${room.equipments.map(eq => {
+            const icon = getEquipmentIcon(eq);
+            return `
+              <div class="room-amenity-card">
+                <i class="bi ${icon}"></i>
+                <span>${escapeHTML(eq)}</span>
+                <span class="amenity-status-dot" title="Tình trạng tốt / Sẵn sàng hoạt động"></span>
+              </div>
+            `;
+          }).join('')}
         </div>
       ` : `
-        <div class="list-group list-group-flush border rounded-3 overflow-hidden">
-          ${roomMeetings.slice(0, 4).map(m => `
-            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
-              <div>
-                <strong class="small d-block text-dark">${escapeHTML(m.title)}</strong>
-                <span class="text-muted small">${formatDate(m.date)} • ${m.startTime} - ${m.endTime} (${escapeHTML(m.host || 'Nguyễn Văn An')})</span>
-              </div>
-              <span class="${getStatusClass(m.status)}">${getStatusText(m.status)}</span>
-            </div>
-          `).join('')}
+        <div class="p-3 bg-light rounded-3 text-muted small text-center border mb-3">
+          Chưa có danh mục trang thiết bị riêng được thiết lập cho phòng này.
         </div>
       `}
+
+      ${room.description ? `
+        <div class="p-3 bg-light rounded-3 border">
+          <div class="fw-semibold text-slate-800 small mb-1">
+            <i class="bi bi-info-circle me-1 text-primary"></i>Ghi chú tiện ích &amp; Hướng dẫn phòng:
+          </div>
+          <p class="text-muted small mb-0">${escapeHTML(room.description)}</p>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- BLOCK 3: CHECK-IN QR CODE TỨC THÌ CỬA PHÒNG -->
+    <div class="mb-4">
+      <div class="room-section-title">
+        <i class="bi bi-qr-code-scan"></i>
+        <span>Mã QR Check-in cửa phòng (Door Placard)</span>
+      </div>
+
+      <div class="qr-placard-wrapper">
+        <div class="qr-code-svg-box">
+          ${qrSvg}
+        </div>
+        <div class="qr-room-meta-title">${escapeHTML(room.name)}</div>
+        <div class="qr-room-meta-sub">
+          ${escapeHTML(room.floor || 'Khu phòng ban')} • Sức chứa: <strong>${room.capacity} chỗ ngồi</strong> • Mã định danh: <code>${roomCode}</code>
+        </div>
+        <div class="qr-checkin-instruction">
+          <i class="bi bi-phone"></i>
+          <span>Nhân viên quét mã tại cửa phòng để Check-in xác nhận bắt đầu cuộc họp hoặc trả phòng sớm</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 4: DÒNG THỜI GIAN LỊCH HỌP (LIVE SCHEDULE TIMELINE) -->
+    <div>
+      <div class="room-section-title">
+        <i class="bi bi-clock-history"></i>
+        <span>Dòng thời gian lịch họp hôm nay &amp; Sắp tới</span>
+      </div>
+
+      <div class="room-timeline-container">
+        <div class="room-timeline-header">
+          <span>Lịch các cuộc họp đã đăng ký</span>
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle">${roomMeetings.length} cuộc họp</span>
+        </div>
+
+        ${roomMeetings.length === 0 ? `
+          <div class="room-timeline-empty">
+            <div class="room-timeline-empty-icon">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="room-timeline-empty-title">Phòng hiện đang sẵn sàng</div>
+            <div class="room-timeline-empty-sub">Hiện chưa có cuộc họp nào được đặt tại phòng này. Bạn có thể đặt phòng ngay bây giờ.</div>
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              onclick="bookMeetingForRoom(${room.id})">
+              <i class="bi bi-calendar-plus me-1"></i> Đặt lịch phòng này ngay
+            </button>
+          </div>
+        ` : `
+          <div class="room-timeline-list">
+            ${roomMeetings.slice(0, 5).map(m => {
+              const isToday = m.date === todayStr;
+              return `
+                <div class="room-timeline-item">
+                  <div class="room-timeline-dot ${isToday ? 'in-progress' : ''}"></div>
+                  <div class="room-timeline-body">
+                    <div style="min-width: 0;">
+                      <div class="room-timeline-title" title="${escapeHTML(m.title)}">${escapeHTML(m.title)}</div>
+                      <div class="room-timeline-meta">
+                        <span><i class="bi bi-calendar3"></i> ${formatDate(m.date)}</span>
+                        <span>•</span>
+                        <span><i class="bi bi-clock"></i> ${m.startTime} - ${m.endTime}</span>
+                        <span>•</span>
+                        <span><i class="bi bi-person"></i> ${escapeHTML(m.host || 'Nguyễn Văn An')}</span>
+                      </div>
+                    </div>
+                    <span class="${getStatusClass(m.status)} flex-shrink-0">${getStatusText(m.status)}</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `}
+      </div>
     </div>
   `;
 
   if (roomQrOverlay) roomQrOverlay.classList.remove("hidden");
+}
+
+// Alias định danh tương thích ngược
+const openRoomDetailModal = openRoomQRModal;
+
+function bookMeetingForRoom(roomId) {
+  closeRoomQRModal();
+  if (window.location.hash !== "#/meetings") {
+    window.location.hash = "#/meetings";
+  }
+  setTimeout(() => {
+    openAddModal();
+    const roomSelect = document.getElementById("meeting-room");
+    if (roomSelect && roomId) {
+      roomSelect.value = roomId.toString();
+    }
+  }, 120);
 }
 
 function closeRoomQRModal() {
@@ -3265,8 +3678,13 @@ function openDetailModal(id) {
           <span class="text-muted small d-block mb-0.5">
             <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP (Rooms)
           </span>
-          <div class="fw-semibold text-dark">${escapeHTML(roomName)}</div>
-          <div class="small text-muted">Sức chứa: <strong>${roomCapacity} người</strong> (RoomID: ${roomId})</div>
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
+            <div class="fw-semibold text-primary cursor-pointer" onclick="closeDetailModal(); openRoomQRModal(${roomId});" title="Nhấp để xem chi tiết phòng &amp; mã QR" style="cursor: pointer;">
+              ${escapeHTML(roomName)} <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
+            </div>
+            ${renderCapacityBadge(roomCapacity, { isPill: true })}
+          </div>
+          <div class="small text-muted mt-1">Định danh: <code>RM-00${roomId}</code></div>
         </div>
       </div>
 
@@ -3536,7 +3954,29 @@ if (btnCloseRoomQrBottom) {
 const btnPrintRoomQr = document.getElementById("btn-print-room-qr");
 if (btnPrintRoomQr) {
   btnPrintRoomQr.addEventListener("click", () => {
-    window.print();
+    const id = window.currentDetailRoomId || 1;
+    printRoomDoorPlacard(id);
+  });
+}
+
+const btnEditRoomDetail = document.getElementById("btn-edit-room-from-detail");
+if (btnEditRoomDetail) {
+  btnEditRoomDetail.addEventListener("click", () => {
+    if (window.currentDetailRoomId) {
+      const id = window.currentDetailRoomId;
+      closeRoomQRModal();
+      openEditRoomModal(id);
+    }
+  });
+}
+
+const btnBookRoomDetail = document.getElementById("btn-book-room-from-detail");
+if (btnBookRoomDetail) {
+  btnBookRoomDetail.addEventListener("click", () => {
+    if (window.currentDetailRoomId) {
+      const id = window.currentDetailRoomId;
+      bookMeetingForRoom(id);
+    }
   });
 }
 
