@@ -3288,7 +3288,38 @@ body {
     break-inside: avoid !important;
   }
 
+  .placard-brand-centered {
+    text-align: center !important;
+    margin-bottom: 10px !important;
+  }
 
+  .placard-inst-name {
+    font-size: 14pt !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    margin: 0 0 4px 0 !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+  }
+
+  .placard-system-title {
+    font-size: 9.5pt !important;
+    color: #475569 !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    margin: 0 !important;
+    text-align: center !important;
+  }
+
+  .placard-top-divider {
+    height: 2px !important;
+    background: #0f172a !important;
+    margin: 12px auto 16px auto !important;
+    width: 100% !important;
+  }
 
   .placard-door-label {
     font-size: 9pt !important;
