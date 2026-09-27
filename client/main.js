@@ -1045,9 +1045,11 @@ function getFilteredRooms() {
       if (!matchName && !matchCode && !matchFloor && !matchType) return false;
     }
 
-    // Lọc theo trạng thái
-    if (roomFilterState.status !== "all") {
-      if (room.status !== roomFilterState.status) return false;
+    // Lọc theo trạng thái (chuẩn hóa trim & case-insensitive)
+    if (roomFilterState.status && roomFilterState.status !== "all") {
+      const roomStatus = String(room.status || "").trim().toLowerCase();
+      const targetStatus = String(roomFilterState.status).trim().toLowerCase();
+      if (roomStatus !== targetStatus) return false;
     }
 
     // Lọc theo quy mô sức chứa
@@ -1072,8 +1074,12 @@ function getFilteredRooms() {
 
 function renderAdminRoomsPage() {
   const totalRooms = ROOMS.length;
-  const activeRooms = ROOMS.filter(r => r.status === "Active").length;
-  const maintenanceRooms = ROOMS.filter(r => r.status === "Maintenance").length;
+  const activeRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "active").length;
+  const maintenanceRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "maintenance").length;
+  const inactiveRooms = ROOMS.filter(r => {
+    const s = (r.status || "").trim().toLowerCase();
+    return s !== "active" && s !== "maintenance";
+  }).length;
   const totalCapacity = ROOMS.reduce((sum, r) => sum + (Number(r.capacity) || 0), 0);
 
   app.innerHTML = `
@@ -1232,34 +1238,38 @@ function renderAdminRoomsPage() {
             <div class="d-flex align-items-center gap-1 flex-wrap" role="tablist">
               <button
                 type="button"
+                id="tab-room-status-all"
                 class="room-status-tab-btn ${roomFilterState.status === 'all' ? 'active' : ''}"
                 data-status="all">
                 <span>Tất cả</span>
-                <span class="room-tab-count">${totalRooms}</span>
+                <span class="room-tab-count" id="room-tab-count-all">${totalRooms}</span>
               </button>
 
               <button
                 type="button"
+                id="tab-room-status-active"
                 class="room-status-tab-btn ${roomFilterState.status === 'Active' ? 'active' : ''}"
                 data-status="Active">
                 <span>Hoạt động</span>
-                <span class="room-tab-count">${activeRooms}</span>
+                <span class="room-tab-count" id="room-tab-count-active">${activeRooms}</span>
               </button>
 
               <button
                 type="button"
+                id="tab-room-status-maintenance"
                 class="room-status-tab-btn ${roomFilterState.status === 'Maintenance' ? 'active' : ''}"
                 data-status="Maintenance">
                 <span>Bảo trì</span>
-                <span class="room-tab-count">${maintenanceRooms}</span>
+                <span class="room-tab-count" id="room-tab-count-maintenance">${maintenanceRooms}</span>
               </button>
 
               <button
                 type="button"
+                id="tab-room-status-inactive"
                 class="room-status-tab-btn ${roomFilterState.status === 'Inactive' ? 'active' : ''}"
                 data-status="Inactive">
                 <span>Tạm ngừng</span>
-                <span class="room-tab-count">${totalRooms - activeRooms - maintenanceRooms}</span>
+                <span class="room-tab-count" id="room-tab-count-inactive">${inactiveRooms}</span>
               </button>
             </div>
           </div>
@@ -1466,6 +1476,9 @@ function renderAdminRoomsTable() {
 
   if (!tbody) return;
 
+  // Luôn đồng bộ số đếm trên các tab trạng thái bộ lọc
+  updateRoomStatusTabs();
+
   const filtered = getFilteredRooms();
   const total = ROOMS.length;
 
@@ -1640,10 +1653,30 @@ function renderAdminRoomsTable() {
   }).join("");
 }
 
+function updateRoomStatusTabs() {
+  const totalRooms = ROOMS.length;
+  const activeRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "active").length;
+  const maintenanceRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "maintenance").length;
+  const inactiveRooms = ROOMS.filter(r => {
+    const s = (r.status || "").trim().toLowerCase();
+    return s !== "active" && s !== "maintenance";
+  }).length;
+
+  const countAll = document.getElementById("room-tab-count-all") || document.querySelector('.room-status-tab-btn[data-status="all"] .room-tab-count');
+  const countActive = document.getElementById("room-tab-count-active") || document.querySelector('.room-status-tab-btn[data-status="Active"] .room-tab-count');
+  const countMaint = document.getElementById("room-tab-count-maintenance") || document.querySelector('.room-status-tab-btn[data-status="Maintenance"] .room-tab-count');
+  const countInactive = document.getElementById("room-tab-count-inactive") || document.querySelector('.room-status-tab-btn[data-status="Inactive"] .room-tab-count');
+
+  if (countAll) countAll.textContent = totalRooms;
+  if (countActive) countActive.textContent = activeRooms;
+  if (countMaint) countMaint.textContent = maintenanceRooms;
+  if (countInactive) countInactive.textContent = inactiveRooms;
+}
+
 function updateRoomKpiCards() {
   const totalRooms = ROOMS.length;
-  const activeRooms = ROOMS.filter(r => r.status === "Active").length;
-  const maintenanceRooms = ROOMS.filter(r => r.status === "Maintenance").length;
+  const activeRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "active").length;
+  const maintenanceRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "maintenance").length;
   const totalCapacity = ROOMS.reduce((sum, r) => sum + (Number(r.capacity) || 0), 0);
 
   const kpiTotal = document.getElementById("room-kpi-total");
@@ -1655,6 +1688,8 @@ function updateRoomKpiCards() {
   if (kpiActive) kpiActive.textContent = activeRooms;
   if (kpiMaint) kpiMaint.textContent = maintenanceRooms;
   if (kpiCap) kpiCap.textContent = totalCapacity;
+
+  updateRoomStatusTabs();
 }
 
 function setupAdminRoomEvents() {
@@ -3204,9 +3239,10 @@ async function saveRoom(event) {
       successView.classList.remove("hidden");
     }
 
-    // 5. Cập nhật Bảng, KPI và Form Đặt lịch cuộc họp
+    // 5. Cập nhật Bảng, KPI, Tabs và Form Đặt lịch cuộc họp
     renderAdminRoomsTable();
     updateRoomKpiCards();
+    updateRoomStatusTabs();
     syncMeetingRoomOptions();
 
   } catch (error) {
@@ -3790,9 +3826,11 @@ function executeDeleteRoom(roomId) {
     ROOMS.splice(idx, 1);
   }
 
+  persistRoomsToStorage();
   closeRoomDeleteModal();
-  renderAdminRoomsTable();
   updateRoomKpiCards();
+  updateRoomStatusTabs();
+  renderAdminRoomsTable();
   syncMeetingRoomOptions();
 }
 
@@ -3801,9 +3839,11 @@ function toggleRoomMaintenanceAndClose(roomId) {
   if (room) {
     room.status = "Maintenance";
   }
+  persistRoomsToStorage();
   closeRoomDeleteModal();
-  renderAdminRoomsTable();
   updateRoomKpiCards();
+  updateRoomStatusTabs();
+  renderAdminRoomsTable();
   syncMeetingRoomOptions();
 }
 
@@ -3811,14 +3851,17 @@ function toggleRoomStatus(roomId) {
   const room = ROOMS.find(r => r.id === roomId);
   if (!room) return;
 
-  if (room.status === "Active") {
+  const currentStatus = (room.status || "").trim().toLowerCase();
+  if (currentStatus === "active") {
     room.status = "Maintenance";
   } else {
     room.status = "Active";
   }
 
-  renderAdminRoomsTable();
+  persistRoomsToStorage();
   updateRoomKpiCards();
+  updateRoomStatusTabs();
+  renderAdminRoomsTable();
   syncMeetingRoomOptions();
 }
 
