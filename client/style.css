@@ -377,6 +377,79 @@ body {
 
 
 /* ==========================================
+   FORM VALIDATION (mới)
+========================================== */
+
+/* Viền đỏ cho input/select/textarea khi có lỗi */
+.modal .form-control.is-invalid,
+.modal .form-select.is-invalid {
+  border-color: #e0472f;
+
+  background-image: none;
+}
+
+.modal .form-control.is-invalid:focus,
+.modal .form-select.is-invalid:focus {
+  border-color: #e0472f;
+
+  box-shadow: 0 0 0 0.2rem rgba(224, 71, 47, 0.18);
+}
+
+/* Dòng thông báo lỗi dưới mỗi field */
+.invalid-feedback {
+  display: none;
+
+  color: #e0472f;
+
+  font-size: 0.78rem;
+
+  margin-top: 4px;
+}
+
+.invalid-feedback.show {
+  display: block;
+}
+
+/* Banner lỗi chung (vd: lỗi gọi API) ở đầu form */
+.form-alert {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  border-radius: 10px;
+
+  background: #ffe3e6;
+
+  color: #b8341f;
+
+  font-size: 0.85rem;
+
+  margin-bottom: 16px;
+}
+
+.form-alert.form-alert-success {
+  background: #e3fbe8;
+
+  color: #1f8a3d;
+}
+
+/* Nút Lưu khi đang gọi API */
+#btn-save-meeting[disabled] {
+  opacity: 0.75;
+
+  cursor: not-allowed;
+}
+
+#btn-save-spinner {
+  margin-right: 4px;
+}
+
+
+/* ==========================================
    DETAIL
 ========================================== */
 

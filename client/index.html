@@ -81,7 +81,10 @@
         </button>
       </div>
 
-      <form id="meeting-form">
+      <!-- Vùng hiển thị lỗi chung từ API -->
+      <div id="form-alert" class="form-alert hidden" role="alert"></div>
+
+      <form id="meeting-form" novalidate>
 
         <input
           type="hidden"
@@ -99,6 +102,7 @@
           placeholder="Nhập tiêu đề cuộc họp"
           required
         />
+        <div class="invalid-feedback" id="error-meeting-title"></div>
 
 
         <div class="row">
@@ -115,6 +119,7 @@
               class="form-control"
               required
             />
+            <div class="invalid-feedback" id="error-meeting-date"></div>
 
           </div>
 
@@ -130,6 +135,7 @@
               class="form-control"
               required
             />
+            <div class="invalid-feedback" id="error-meeting-time"></div>
 
           </div>
 
@@ -146,6 +152,7 @@
           class="form-control"
           placeholder="Phòng họp A hoặc link Google Meet"
         />
+        <div class="invalid-feedback" id="error-meeting-location"></div>
 
 
         <label for="meeting-participants">
@@ -158,6 +165,7 @@
           class="form-control"
           placeholder="Nguyễn A, Trần B, Lê C"
         />
+        <div class="invalid-feedback" id="error-meeting-participants"></div>
 
 
         <label for="meeting-status">
@@ -196,16 +204,25 @@
           class="form-control"
           rows="4"
           placeholder="Nội dung chính, mục tiêu cuộc họp..."></textarea>
+        <div class="invalid-feedback" id="error-meeting-notes"></div>
 
 
         <div class="modal-actions">
 
           <button
             type="submit"
+            id="btn-save-meeting"
             class="btn btn-primary">
 
-            <i class="bi bi-save"></i>
-            Lưu
+            <span
+              id="btn-save-spinner"
+              class="spinner-border spinner-border-sm hidden"
+              role="status"
+              aria-hidden="true">
+            </span>
+
+            <i id="btn-save-icon" class="bi bi-save"></i>
+            <span id="btn-save-text">Lưu</span>
 
           </button>
 

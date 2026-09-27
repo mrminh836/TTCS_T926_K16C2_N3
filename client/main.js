@@ -3,7 +3,19 @@
 // JavaScript thuần
 // Bootstrap 5 + Bootstrap Icons
 // Router Base + CRUD + Search + Filter
+// + Validate Form + Ghép API tạo/cập nhật cuộc họp
 // =====================================================
+
+
+// =====================================================
+// 0. CẤU HÌNH API
+// =====================================================
+
+// TODO: Thay bằng base URL API thật của bạn (vd: "https://api.ictu.edu.vn/v1")
+const API_BASE_URL = "https://api.example.com";
+
+// Đường dẫn resource cuộc họp
+const API_MEETINGS_ENDPOINT = `${API_BASE_URL}/meetings`;
 
 
 // =====================================================
@@ -366,6 +378,10 @@ function setupMeetingEvents() {
   // Form
   if (form) {
     form.addEventListener("submit", saveMeeting);
+
+    // Xóa lỗi validate ngay khi người dùng gõ lại / chọn lại
+    form.addEventListener("input", handleFieldLiveClear);
+    form.addEventListener("change", handleFieldLiveClear);
   }
 
 
@@ -699,6 +715,8 @@ function openAddModal() {
   title.textContent =
     "Thêm cuộc họp";
 
+  clearFormErrors();
+  hideFormAlert();
 
   modalOverlay.classList.remove("hidden");
 }
@@ -767,22 +785,375 @@ function openEditModal(id) {
     meeting.notes;
 
 
+  clearFormErrors();
+  hideFormAlert();
+
   modalOverlay.classList.remove("hidden");
 }
 
 
 // =====================================================
-// 12. LƯU
+// 12. VALIDATE FORM (CLIENT-SIDE)
 // =====================================================
 
-function saveMeeting(event) {
+// Danh sách field cần validate và selector tương ứng
+const FORM_FIELDS = [
+  "meeting-title",
+  "meeting-date",
+  "meeting-time",
+  "meeting-location",
+  "meeting-participants",
+  "meeting-notes"
+];
+
+
+// Kiểm tra dữ liệu form, trả về { valid, errors }
+// errors có dạng: { "meeting-title": "Thông báo lỗi..." }
+function validateMeetingForm(data) {
+
+  const errors = {};
+
+
+  // --- Tiêu đề: bắt buộc, tối thiểu 3 ký tự, tối đa 200 ---
+  if (!data.title) {
+    errors["meeting-title"] =
+      "Vui lòng nhập tiêu đề cuộc họp.";
+  } else if (data.title.length < 3) {
+    errors["meeting-title"] =
+      "Tiêu đề phải có ít nhất 3 ký tự.";
+  } else if (data.title.length > 200) {
+    errors["meeting-title"] =
+      "Tiêu đề không được vượt quá 200 ký tự.";
+  }
+
+
+  // --- Ngày: bắt buộc, đúng định dạng ---
+  if (!data.date) {
+    errors["meeting-date"] =
+      "Vui lòng chọn ngày họp.";
+  } else if (Number.isNaN(new Date(data.date).getTime())) {
+    errors["meeting-date"] =
+      "Ngày họp không hợp lệ.";
+  }
+
+
+  // --- Giờ: bắt buộc, đúng định dạng HH:MM ---
+  if (!data.time) {
+    errors["meeting-time"] =
+      "Vui lòng chọn giờ họp.";
+  } else if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(data.time)) {
+    errors["meeting-time"] =
+      "Giờ họp không hợp lệ.";
+  }
+
+
+  // --- Ngày + giờ không được nằm trong quá khứ khi tạo mới cuộc họp
+  //     đang ở trạng thái "Sắp diễn ra" ---
+  if (
+    !errors["meeting-date"] &&
+    !errors["meeting-time"] &&
+    data.status === "scheduled" &&
+    !data.isEditing
+  ) {
+
+    const meetingDateTime =
+      new Date(`${data.date}T${data.time}`);
+
+    const now = new Date();
+
+    if (meetingDateTime.getTime() < now.getTime()) {
+      errors["meeting-date"] =
+        "Cuộc họp \"Sắp diễn ra\" cần có thời gian trong tương lai.";
+    }
+  }
+
+
+  // --- Địa điểm: không bắt buộc, tối đa 200 ký tự ---
+  if (data.location && data.location.length > 200) {
+    errors["meeting-location"] =
+      "Địa điểm / Link không được vượt quá 200 ký tự.";
+  }
+
+
+  // --- Người tham gia: nếu có nhập thì mỗi tên tối đa 100 ký tự ---
+  if (data.participants.some(name => name.length > 100)) {
+    errors["meeting-participants"] =
+      "Mỗi tên người tham gia không được vượt quá 100 ký tự.";
+  }
+
+
+  // --- Ghi chú: không bắt buộc, tối đa 1000 ký tự ---
+  if (data.notes && data.notes.length > 1000) {
+    errors["meeting-notes"] =
+      "Ghi chú không được vượt quá 1000 ký tự.";
+  }
+
+
+  return {
+    valid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+
+// Hiển thị lỗi cho 1 field cụ thể
+function showFieldError(fieldId, message) {
+
+  const input =
+    document.getElementById(fieldId);
+
+  const errorBox =
+    document.getElementById(`error-${fieldId}`);
+
+
+  if (input) {
+    input.classList.add("is-invalid");
+  }
+
+  if (errorBox) {
+    errorBox.textContent = message;
+    errorBox.classList.add("show");
+  }
+}
+
+
+// Xóa lỗi của 1 field cụ thể
+function clearFieldError(fieldId) {
+
+  const input =
+    document.getElementById(fieldId);
+
+  const errorBox =
+    document.getElementById(`error-${fieldId}`);
+
+
+  if (input) {
+    input.classList.remove("is-invalid");
+  }
+
+  if (errorBox) {
+    errorBox.textContent = "";
+    errorBox.classList.remove("show");
+  }
+}
+
+
+// Hiển thị toàn bộ lỗi trả về từ validateMeetingForm
+function showFormErrors(errors) {
+
+  clearFormErrors();
+
+  Object.keys(errors).forEach(fieldId => {
+    showFieldError(fieldId, errors[fieldId]);
+  });
+
+  // Focus vào field lỗi đầu tiên để người dùng sửa nhanh hơn
+  const firstFieldId = Object.keys(errors)[0];
+
+  const firstInput =
+    firstFieldId &&
+    document.getElementById(firstFieldId);
+
+  if (firstInput) {
+    firstInput.focus();
+  }
+}
+
+
+// Xóa toàn bộ lỗi validate trên form
+function clearFormErrors() {
+
+  FORM_FIELDS.forEach(fieldId => {
+    clearFieldError(fieldId);
+  });
+}
+
+
+// Khi người dùng gõ / chọn lại field đang lỗi -> xóa lỗi field đó
+function handleFieldLiveClear(event) {
+
+  const fieldId = event.target.id;
+
+  if (FORM_FIELDS.includes(fieldId)) {
+    clearFieldError(fieldId);
+  }
+}
+
+
+// =====================================================
+// 13. THÔNG BÁO LỖI / THÀNH CÔNG CHUNG (form-alert)
+// =====================================================
+
+function showFormAlert(message, type = "error") {
+
+  const alertBox =
+    document.getElementById("form-alert");
+
+  if (!alertBox) {
+    return;
+  }
+
+  alertBox.textContent = message;
+
+  alertBox.classList.remove("hidden", "form-alert-success");
+
+  if (type === "success") {
+    alertBox.classList.add("form-alert-success");
+  }
+}
+
+
+function hideFormAlert() {
+
+  const alertBox =
+    document.getElementById("form-alert");
+
+  if (!alertBox) {
+    return;
+  }
+
+  alertBox.textContent = "";
+  alertBox.classList.add("hidden");
+}
+
+
+// Bật / tắt trạng thái loading cho nút Lưu khi đang gọi API
+function setSaveButtonLoading(isLoading) {
+
+  const button =
+    document.getElementById("btn-save-meeting");
+
+  const spinner =
+    document.getElementById("btn-save-spinner");
+
+  const icon =
+    document.getElementById("btn-save-icon");
+
+  const text =
+    document.getElementById("btn-save-text");
+
+  if (!button) {
+    return;
+  }
+
+  button.disabled = isLoading;
+
+  if (spinner) {
+    spinner.classList.toggle("hidden", !isLoading);
+  }
+
+  if (icon) {
+    icon.classList.toggle("hidden", isLoading);
+  }
+
+  if (text) {
+    text.textContent =
+      isLoading ? "Đang lưu..." : "Lưu";
+  }
+}
+
+
+// =====================================================
+// 14. GỌI API TẠO / CẬP NHẬT CUỘC HỌP
+// =====================================================
+
+// Đọc message lỗi trả về từ API một cách an toàn (không throw nếu body không phải JSON)
+async function readErrorMessage(response, fallbackMessage) {
+
+  try {
+
+    const errorBody = await response.json();
+
+    if (errorBody && errorBody.message) {
+      return errorBody.message;
+    }
+
+  } catch (err) {
+    // Body không phải JSON hợp lệ -> bỏ qua, dùng fallback
+  }
+
+  return fallbackMessage;
+}
+
+
+// POST /meetings -> tạo cuộc họp mới
+async function apiCreateMeeting(payload) {
+
+  const response = await fetch(API_MEETINGS_ENDPOINT, {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify(payload)
+  });
+
+
+  if (!response.ok) {
+
+    const message = await readErrorMessage(
+      response,
+      "Không thể tạo cuộc họp. Vui lòng thử lại."
+    );
+
+    throw new Error(message);
+  }
+
+
+  return response.json();
+}
+
+
+// PUT /meetings/:id -> cập nhật cuộc họp
+async function apiUpdateMeeting(id, payload) {
+
+  const response = await fetch(
+    `${API_MEETINGS_ENDPOINT}/${id}`,
+    {
+      method: "PUT",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify(payload)
+    }
+  );
+
+
+  if (!response.ok) {
+
+    const message = await readErrorMessage(
+      response,
+      "Không thể cập nhật cuộc họp. Vui lòng thử lại."
+    );
+
+    throw new Error(message);
+  }
+
+
+  return response.json();
+}
+
+
+// =====================================================
+// 15. LƯU (VALIDATE + GHÉP API)
+// =====================================================
+
+async function saveMeeting(event) {
 
   event.preventDefault();
 
+  hideFormAlert();
 
-  const id =
+
+  const idValue =
     document.getElementById("meeting-id")
       .value;
+
+  const isEditing = Boolean(idValue);
 
 
   const title =
@@ -826,71 +1197,106 @@ function saveMeeting(event) {
       .trim();
 
 
-  if (!title || !date || !time) {
+  const formData = {
+    title,
+    date,
+    time,
+    location,
+    participants,
+    status,
+    notes,
+    isEditing
+  };
 
-    alert(
-      "Vui lòng nhập đầy đủ Tiêu đề, Ngày và Giờ."
-    );
 
+  // ----- VALIDATE CLIENT-SIDE -----
+  const { valid, errors } =
+    validateMeetingForm(formData);
+
+  if (!valid) {
+    showFormErrors(errors);
     return;
   }
 
 
-  // SỬA
-  if (id) {
+  // Payload gửi lên API (không cần field nội bộ isEditing)
+  const payload = {
+    title,
+    date,
+    time,
+    location,
+    participants,
+    status,
+    notes
+  };
 
-    const index =
-      meetings.findIndex(
-        item => item.id === Number(id)
-      );
+
+  setSaveButtonLoading(true);
 
 
-    if (index !== -1) {
+  try {
 
-      meetings[index] = {
+    if (isEditing) {
 
-        id: Number(id),
+      // ----- CẬP NHẬT CUỘC HỌP -----
+      const id = Number(idValue);
 
-        title,
-        date,
-        time,
-        location,
-        participants,
-        status,
-        notes
+      const updated =
+        await apiUpdateMeeting(id, payload);
+
+      const index =
+        meetings.findIndex(
+          item => item.id === id
+        );
+
+      if (index !== -1) {
+
+        meetings[index] = {
+          id,
+          ...payload,
+          ...(updated || {})
+        };
+
+      }
+
+    } else {
+
+      // ----- TẠO CUỘC HỌP MỚI -----
+      const created =
+        await apiCreateMeeting(payload);
+
+      // Ưu tiên id do server trả về, nếu không có thì tự sinh tạm ở client
+      const newMeeting = {
+        id: (created && created.id) || getNextId(),
+        ...payload,
+        ...(created || {})
       };
 
+      meetings.push(newMeeting);
     }
 
+    closeMeetingModal();
+
+    renderMeetingTable();
+
+  } catch (error) {
+
+    console.error("Lỗi khi lưu cuộc họp:", error);
+
+    showFormAlert(
+      error.message ||
+      "Đã có lỗi xảy ra, vui lòng thử lại."
+    );
+
+  } finally {
+
+    setSaveButtonLoading(false);
   }
-
-  // THÊM
-  else {
-
-    meetings.push({
-
-      id: getNextId(),
-
-      title,
-      date,
-      time,
-      location,
-      participants,
-      status,
-      notes
-    });
-
-  }
-
-
-  closeMeetingModal();
-
-  renderMeetingTable();
 }
 
 
 // =====================================================
-// 13. ID MỚI
+// 16. ID MỚI (dự phòng khi API không trả về id)
 // =====================================================
 
 function getNextId() {
@@ -911,7 +1317,7 @@ function getNextId() {
 
 
 // =====================================================
-// 14. XÓA
+// 17. XÓA
 // =====================================================
 
 function deleteMeeting(id) {
@@ -949,7 +1355,7 @@ function deleteMeeting(id) {
 
 
 // =====================================================
-// 15. XEM CHI TIẾT
+// 18. XEM CHI TIẾT
 // =====================================================
 
 function openDetailModal(id) {
@@ -1033,7 +1439,7 @@ function openDetailModal(id) {
 
 
 // =====================================================
-// 16. ĐÓNG MODAL
+// 19. ĐÓNG MODAL
 // =====================================================
 
 function closeMeetingModal() {
@@ -1057,6 +1463,11 @@ function closeMeetingModal() {
   if (id) {
     id.value = "";
   }
+
+
+  clearFormErrors();
+  hideFormAlert();
+  setSaveButtonLoading(false);
 }
 
 
@@ -1067,7 +1478,7 @@ function closeDetailModal() {
 
 
 // =====================================================
-// 17. FORMAT DATE
+// 20. FORMAT DATE
 // =====================================================
 
 function formatDate(date) {
@@ -1091,7 +1502,7 @@ function formatDate(date) {
 
 
 // =====================================================
-// 18. STATUS
+// 21. STATUS
 // =====================================================
 
 function getStatusText(status) {
@@ -1123,7 +1534,7 @@ function getStatusClass(status) {
 
 
 // =====================================================
-// 19. CHỐNG HTML INJECTION
+// 22. CHỐNG HTML INJECTION
 // =====================================================
 
 function escapeHTML(value) {
@@ -1151,7 +1562,7 @@ function escapeHTML(value) {
 
 
 // =====================================================
-// 20. CLICK RA NGOÀI MODAL
+// 23. CLICK RA NGOÀI MODAL
 // =====================================================
 
 modalOverlay.addEventListener(
@@ -1179,7 +1590,7 @@ detailOverlay.addEventListener(
 
 
 // =====================================================
-// 21. PHÍM ESC
+// 24. PHÍM ESC
 // =====================================================
 
 document.addEventListener(
@@ -1209,7 +1620,7 @@ document.addEventListener(
 
 
 // =====================================================
-// 22. KHỞI ĐỘNG ROUTER
+// 25. KHỞI ĐỘNG ROUTER
 // =====================================================
 
 router();
