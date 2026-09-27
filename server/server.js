@@ -19,6 +19,9 @@ app.use('/api', meetingRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', healthRoutes);
 
+// Hỗ trợ trực tiếp các đường dẫn /rooms song song với /api/rooms
+app.use('/', roomRoutes);
+
 // Xử lý Route 404 (Không tìm thấy endpoint)
 app.use((req, res) => {
     res.status(404).json({

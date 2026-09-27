@@ -30,10 +30,10 @@ const getAllRooms = async (req, res, next) => {
     }
 };
 
-// 2. Lấy chi tiết phòng họp theo ID
+// 2. Lấy chi tiết phòng họp và sức chứa tối đa theo ID (GET /rooms/:id)
 const getRoomById = async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id, 10);
+        const id = req.roomId || parseInt(req.params.id, 10);
         if (isNaN(id) || id <= 0) {
             return res.status(400).json({
                 success: false,
@@ -51,7 +51,11 @@ const getRoomById = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            data: room
+            message: `Lấy thông tin chi tiết phòng "${room.name}" thành công.`,
+            data: {
+                ...room,
+                maxCapacity: room.maxCapacity !== undefined ? room.maxCapacity : room.capacity
+            }
         });
     } catch (error) {
         next(error);
