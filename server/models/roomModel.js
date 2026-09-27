@@ -130,7 +130,7 @@ const Room = {
         try {
             let sql = `
                 SELECT RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description, CreatedAt, UpdatedAt 
-                FROM rooms 
+                FROM Rooms 
                 WHERE 1=1
             `;
             const params = [];
@@ -203,7 +203,7 @@ const Room = {
         try {
             const [rows] = await db.execute(`
                 SELECT RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description, CreatedAt, UpdatedAt 
-                FROM rooms 
+                FROM Rooms 
                 WHERE RoomID = ?
             `, [parsedId]);
             if (rows.length === 0) return null;
@@ -214,8 +214,8 @@ const Room = {
             try {
                 const [countRows] = await db.execute(`
                     SELECT COUNT(*) as count 
-                    FROM bookings b
-                    JOIN meetings m ON b.MeetingID = m.MeetingID
+                    FROM Bookings b
+                    JOIN Meetings m ON b.MeetingID = m.MeetingID
                     WHERE b.RoomID = ? 
                       AND b.BookingStatus = 'Confirmed'
                       AND m.EndTime >= NOW()
@@ -255,7 +255,7 @@ const Room = {
         try {
             const sql = `
                 SELECT RoomID, RoomCode, RoomName, Capacity, Status 
-                FROM rooms 
+                FROM Rooms 
                 WHERE LOWER(RoomName) = LOWER(?)
                   AND (? IS NULL OR RoomID != ?)
                 LIMIT 1
@@ -285,7 +285,7 @@ const Room = {
         try {
             const sql = `
                 SELECT RoomID, RoomCode, RoomName, Capacity, Status 
-                FROM rooms 
+                FROM Rooms 
                 WHERE LOWER(RoomCode) = LOWER(?)
                   AND (? IS NULL OR RoomID != ?)
                 LIMIT 1
@@ -313,8 +313,8 @@ const Room = {
         try {
             const sql = `
                 SELECT COUNT(*) as count 
-                FROM bookings b
-                JOIN meetings m ON b.MeetingID = m.MeetingID
+                FROM Bookings b
+                JOIN Meetings m ON b.MeetingID = m.MeetingID
                 WHERE b.RoomID = ? 
                   AND b.BookingStatus = 'Confirmed'
                   AND m.EndTime >= NOW()
@@ -354,7 +354,7 @@ const Room = {
             // Tự động sinh RoomCode nếu chưa có
             let finalCode = code;
             if (!finalCode) {
-                const [countRows] = await db.execute(`SELECT MAX(RoomID) as maxId FROM rooms`);
+                const [countRows] = await db.execute(`SELECT MAX(RoomID) as maxId FROM Rooms`);
                 const nextId = (countRows[0] && countRows[0].maxId ? countRows[0].maxId : 0) + 1;
                 finalCode = `RM-${String(nextId).padStart(3, '0')}`;
             }
@@ -362,7 +362,7 @@ const Room = {
             const finalQrCode = qrCode || `QR-${finalCode}`;
 
             const sql = `
-                INSERT INTO rooms (RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description)
+                INSERT INTO Rooms (RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `;
             const [result] = await db.execute(sql, [
@@ -438,7 +438,7 @@ const Room = {
 
         try {
             const sql = `
-                UPDATE rooms 
+                UPDATE Rooms 
                 SET 
                     RoomName = ?, 
                     Capacity = ?, 

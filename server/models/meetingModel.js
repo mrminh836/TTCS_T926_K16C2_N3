@@ -7,8 +7,8 @@ const Meeting = {
     checkOverlap: async (roomId, startTime, endTime) => {
         const query = `
             SELECT m.MeetingID, m.Title, m.StartTime, m.EndTime
-            FROM meetings m
-            JOIN bookings b ON m.MeetingID = b.MeetingID
+            FROM Meetings m
+            JOIN Bookings b ON m.MeetingID = b.MeetingID
             WHERE b.RoomID = ? 
               AND b.BookingStatus = 'Confirmed'
               AND (m.StartTime < ?) AND (m.EndTime > ?)
@@ -37,11 +37,13 @@ const Meeting = {
         const connection = await db.getConnection();
 
         try {
+            // Đặt isolation level SERIALIZABLE để đảm bảo chống Race Condition
+            await connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
             await connection.beginTransaction();
 
             // 1. Kiểm tra sự tồn tại của Người tổ chức (Organizer)
-            const [organizers] = await connection.execute(
-                'SELECT UserID, FullName FROM users WHERE UserID = ?',
+            const [organizers] = await connection.query(
+                'SELECT UserID, FullName FROM Users WHERE UserID = ?',
                 [organizerId]
             );
             if (organizers.length === 0) {
@@ -51,8 +53,8 @@ const Meeting = {
             }
 
             // 2. Khóa dòng phòng họp (FOR UPDATE) để ngăn Race Condition và kiểm tra trạng thái phòng
-            const [rooms] = await connection.execute(
-                'SELECT RoomID, RoomName, Capacity, Status FROM rooms WHERE RoomID = ? FOR UPDATE',
+            const [rooms] = await connection.query(
+                'SELECT RoomID, RoomName, Capacity, Status FROM Rooms WHERE RoomID = ? FOR UPDATE',
                 [roomId]
             );
             if (rooms.length === 0) {
@@ -71,13 +73,14 @@ const Meeting = {
             // 3. Kiểm tra xung đột lịch (Overlap Check) ngay trong Transaction đã khóa phòng
             const overlapQuery = `
                 SELECT m.MeetingID, m.Title, m.StartTime, m.EndTime
-                FROM meetings m
-                JOIN bookings b ON m.MeetingID = b.MeetingID
+                FROM Meetings m
+                JOIN Bookings b ON m.MeetingID = b.MeetingID
                 WHERE b.RoomID = ? 
                   AND b.BookingStatus = 'Confirmed'
                   AND (m.StartTime < ?) AND (m.EndTime > ?)
+                FOR UPDATE
             `;
-            const [overlapRows] = await connection.execute(overlapQuery, [roomId, endTime, startTime]);
+            const [overlapRows] = await connection.query(overlapQuery, [roomId, endTime, startTime]);
             if (overlapRows.length > 0) {
                 const error = new Error(`Phòng họp "${room.RoomName}" đã có người đặt trong khung giờ này.`);
                 error.status = 409;
@@ -86,10 +89,10 @@ const Meeting = {
 
             // 4. Tạo bản ghi Cuộc họp (Meetings)
             const insertMeetingQuery = `
-                INSERT INTO meetings (Title, Description, StartTime, EndTime, OrganizerID, IsRecurring)
+                INSERT INTO Meetings (Title, Description, StartTime, EndTime, OrganizerID, IsRecurring)
                 VALUES (?, ?, ?, ?, ?, ?)
             `;
-            const [meetingResult] = await connection.execute(insertMeetingQuery, [
+            const [meetingResult] = await connection.query(insertMeetingQuery, [
                 title.trim(),
                 description ? description.trim() : null,
                 startTime,
@@ -101,18 +104,18 @@ const Meeting = {
 
             // 5. Tạo bản ghi Đặt phòng (Bookings)
             const insertBookingQuery = `
-                INSERT INTO bookings (MeetingID, RoomID, BookingStatus)
+                INSERT INTO Bookings (MeetingID, RoomID, BookingStatus)
                 VALUES (?, ?, 'Confirmed')
             `;
-            const [bookingResult] = await connection.execute(insertBookingQuery, [meetingId, roomId]);
+            const [bookingResult] = await connection.query(insertBookingQuery, [meetingId, roomId]);
             const bookingId = bookingResult.insertId;
 
             // 6. Thêm danh sách Người tham gia (meeting_participants) nếu có
             if (Array.isArray(participantIds) && participantIds.length > 0) {
                 for (const userId of participantIds) {
                     if (Number.isInteger(Number(userId))) {
-                        await connection.execute(
-                            'INSERT IGNORE INTO meeting_participants (MeetingID, UserID, ResponseStatus) VALUES (?, ?, ?)',
+                        await connection.query(
+                            'INSERT IGNORE INTO Meeting_Participants (MeetingID, UserID, ResponseStatus) VALUES (?, ?, ?)',
                             [meetingId, userId, 'Pending']
                         );
                     }
@@ -123,8 +126,8 @@ const Meeting = {
             if (Array.isArray(equipmentIds) && equipmentIds.length > 0) {
                 for (const eqId of equipmentIds) {
                     if (Number.isInteger(Number(eqId))) {
-                        await connection.execute(
-                            'INSERT IGNORE INTO booking_equipments (BookingID, EquipmentID) VALUES (?, ?)',
+                        await connection.query(
+                            'INSERT IGNORE INTO Booking_Equipments (BookingID, EquipmentID) VALUES (?, ?)',
                             [bookingId, eqId]
                         );
                     }
