@@ -32,6 +32,8 @@ function validateRoomInput(input) {
     }
 
     const {
+        roomCode,
+        code,
         roomName,
         name,
         capacity,
@@ -42,6 +44,16 @@ function validateRoomInput(input) {
         equipments,
         description
     } = input;
+
+    // 0. Kiểm tra Mã phòng họp (RoomCode) nếu người dùng cung cấp
+    const finalCode = (roomCode || code || '').trim();
+    if (finalCode) {
+        if (finalCode.length < 2 || finalCode.length > 50) {
+            errors.push('Mã phòng họp phải có độ dài từ 2 đến 50 ký tự.');
+        } else if (!/^[A-Za-z0-9_-]+$/.test(finalCode)) {
+            errors.push('Mã phòng họp chỉ được chứa chữ cái, số, dấu gạch nối (-) hoặc dấu gạch dưới (_).');
+        }
+    }
 
     // 1. Kiểm tra Tên phòng họp (RoomName)
     const finalName = (roomName || name || '').trim();
@@ -91,6 +103,7 @@ function validateRoomInput(input) {
         isValid: true,
         errors: [],
         data: {
+            code: finalCode || null,
             name: finalName,
             capacity: Number(capacity),
             floor: (floor || '').trim(),

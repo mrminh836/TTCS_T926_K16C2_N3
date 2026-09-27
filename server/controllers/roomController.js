@@ -1,82 +1,29 @@
 /**
  * Controller xử lý các yêu cầu liên quan đến Phòng họp (Room Controller)
- * Hỗ trợ các thao tác CRUD và kiểm tra ràng buộc toàn vẹn dữ liệu
+ * Hỗ trợ các thao tác CRUD và kiểm tra toàn vẹn ràng buộc CSDL (Luồng 1.3)
  */
 
 const { validateRoomInput, validateAvailableRoomsQuery } = require('../validators/roomValidator');
 const Room = require('../models/roomModel');
 
-// Mock data ban đầu khi chưa kết nối Database server trực tiếp
-let mockRooms = [
-    {
-        id: 1,
-        code: "RM-001",
-        name: "Phòng Tokyo (Tầng 4)",
-        capacity: 20,
-        type: "Hội nghị",
-        floor: "Tầng 4, Tòa A",
-        status: "Active",
-        qrCode: "QR-ROOM-001",
-        equipments: ["Máy chiếu Full HD", "Màn hình TV 75\"", "Micro & Loa họp"],
-        description: "Phòng hội thảo tiêu chuẩn cao, view thoáng, cách âm tốt, chuyên tổ chức họp ban giám đốc và đối tác."
-    },
-    {
-        id: 2,
-        code: "RM-002",
-        name: "Phòng Silicon (Tầng 2)",
-        capacity: 12,
-        type: "Nhóm / Tech",
-        floor: "Tầng 2, Tòa B",
-        status: "Active",
-        qrCode: "QR-ROOM-002",
-        equipments: ["Màn hình TV 75\"", "Bảng trắng viết", "Micro & Loa họp"],
-        description: "Thiết kế mở theo phong cách Silicon Valley, trang bị màn hình tương tác và bảng viết brainstorming."
-    },
-    {
-        id: 3,
-        code: "RM-003",
-        name: "Phòng Hội Nghị A",
-        capacity: 30,
-        type: "Hội trường lớn",
-        floor: "Tầng 1, Tòa Trung tâm",
-        status: "Active",
-        qrCode: "QR-ROOM-003",
-        equipments: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\"", "Bảng trắng viết"],
-        description: "Hội trường lớn phù hợp cho họp toàn công ty, hội thảo khách hàng, đào tạo nhân sự định kỳ."
-    },
-    {
-        id: 4,
-        code: "RM-004",
-        name: "Phòng Grand Board",
-        capacity: 50,
-        type: "Đại sảnh / Board",
-        floor: "Tầng 5, Tòa A",
-        status: "Maintenance",
-        qrCode: "QR-ROOM-004",
-        equipments: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\""],
-        description: "Đang nâng cấp hệ thống âm thanh vòm và điều hòa trung tâm."
-    },
-    {
-        id: 5,
-        code: "RM-005",
-        name: "Phòng VIP",
-        capacity: 10,
-        type: "VIP / Phỏng vấn",
-        floor: "Tầng 3, Tòa VIP",
-        status: "Active",
-        qrCode: "QR-ROOM-005",
-        equipments: ["Màn hình TV 75\"", "Micro & Loa họp"],
-        description: "Phòng tiếp đón đối tác cao cấp, phỏng vấn nhân sự cấp quản lý."
-    }
-];
-
-// 1. Lấy tất cả phòng họp
+// 1. Lấy tất cả phòng họp (Hỗ trợ lọc theo search, status, type, minCapacity)
 const getAllRooms = async (req, res, next) => {
     try {
+        const filters = {
+            search: req.query.search,
+            status: req.query.status,
+            type: req.query.type,
+            floor: req.query.floor,
+            minCapacity: req.query.minCapacity || req.query.capacity
+        };
+
+        const rooms = await Room.findAll(filters);
+
         return res.status(200).json({
             success: true,
-            total: mockRooms.length,
-            data: mockRooms
+            total: rooms.length,
+            filters,
+            data: rooms
         });
     } catch (error) {
         next(error);
@@ -87,8 +34,14 @@ const getAllRooms = async (req, res, next) => {
 const getRoomById = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const room = mockRooms.find(r => r.id === id);
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'
+            });
+        }
 
+        const room = await Room.findById(id);
         if (!room) {
             return res.status(404).json({
                 success: false,
@@ -105,7 +58,7 @@ const getRoomById = async (req, res, next) => {
     }
 };
 
-// 3. Thêm phòng họp mới
+// 3. Thêm phòng họp mới (POST /api/rooms)
 const createRoom = async (req, res, next) => {
     try {
         const validation = req.validatedRoomData 
@@ -122,30 +75,27 @@ const createRoom = async (req, res, next) => {
 
         const roomData = validation.data;
 
-        // Kiểm tra trùng lặp tên phòng
-        const duplicate = mockRooms.find(r => r.name.toLowerCase() === roomData.name.toLowerCase());
-        if (duplicate) {
+        // Kiểm tra trùng lặp Tên phòng
+        const duplicateName = await Room.findByName(roomData.name);
+        if (duplicateName) {
             return res.status(409).json({
                 success: false,
                 message: `Tên phòng họp "${roomData.name}" đã tồn tại trên hệ thống.`
             });
         }
 
-        const nextId = mockRooms.reduce((max, r) => Math.max(max, r.id), 0) + 1;
-        const newRoom = {
-            id: nextId,
-            code: `RM-00${nextId}`,
-            name: roomData.name,
-            capacity: roomData.capacity,
-            type: roomData.type,
-            floor: roomData.floor,
-            status: roomData.status,
-            qrCode: roomData.qrCode || `QR-ROOM-00${nextId}`,
-            equipments: roomData.equipments,
-            description: roomData.description
-        };
+        // Kiểm tra trùng lặp Mã phòng (nếu người dùng có nhập code)
+        if (roomData.code) {
+            const duplicateCode = await Room.findByCode(roomData.code);
+            if (duplicateCode) {
+                return res.status(409).json({
+                    success: false,
+                    message: `Mã phòng họp "${roomData.code}" đã được sử dụng.`
+                });
+            }
+        }
 
-        mockRooms.push(newRoom);
+        const newRoom = await Room.create(roomData);
 
         return res.status(201).json({
             success: true,
@@ -157,13 +107,19 @@ const createRoom = async (req, res, next) => {
     }
 };
 
-// 4. Cập nhật thông tin phòng họp
+// 4. Cập nhật thông tin phòng họp (PUT /api/rooms/:id)
 const updateRoom = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const room = mockRooms.find(r => r.id === id);
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'
+            });
+        }
 
-        if (!room) {
+        const existingRoom = await Room.findById(id);
+        if (!existingRoom) {
             return res.status(404).json({
                 success: false,
                 message: `Không tìm thấy phòng họp với ID: ${id}`
@@ -185,76 +141,110 @@ const updateRoom = async (req, res, next) => {
         const roomData = validation.data;
 
         // Kiểm tra trùng tên với phòng khác
-        const duplicate = mockRooms.find(r => r.name.toLowerCase() === roomData.name.toLowerCase() && r.id !== id);
-        if (duplicate) {
+        const duplicateName = await Room.findByName(roomData.name, id);
+        if (duplicateName) {
             return res.status(409).json({
                 success: false,
                 message: `Tên phòng họp "${roomData.name}" đã được sử dụng bởi phòng khác.`
             });
         }
 
-        room.name = roomData.name;
-        room.capacity = roomData.capacity;
-        room.type = roomData.type;
-        room.floor = roomData.floor;
-        room.status = roomData.status;
-        room.equipments = roomData.equipments;
-        room.description = roomData.description;
+        // Kiểm tra trùng mã với phòng khác (nếu có nhập code)
+        if (roomData.code) {
+            const duplicateCode = await Room.findByCode(roomData.code, id);
+            if (duplicateCode) {
+                return res.status(409).json({
+                    success: false,
+                    message: `Mã phòng họp "${roomData.code}" đã được sử dụng bởi phòng khác.`
+                });
+            }
+        }
+
+        const updatedRoom = await Room.update(id, roomData);
 
         return res.status(200).json({
             success: true,
             message: "Cập nhật thông tin phòng họp thành công.",
-            data: room
+            data: updatedRoom
         });
     } catch (error) {
         next(error);
     }
 };
 
-// 5. Xóa phòng họp (Safe Delete)
+// 5. Xóa phòng họp (DELETE /api/rooms/:id) - Tuân thủ ràng buộc Luồng 1.3
 const deleteRoom = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const index = mockRooms.findIndex(r => r.id === id);
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'
+            });
+        }
 
-        if (index === -1) {
+        const existingRoom = await Room.findById(id);
+        if (!existingRoom) {
             return res.status(404).json({
                 success: false,
                 message: `Không tìm thấy phòng họp với ID: ${id}`
             });
         }
 
-        const deleted = mockRooms.splice(index, 1)[0];
+        // Kiểm tra ràng buộc Luồng 1.3: Chặn xóa phòng nếu có cuộc họp Confirmed đang hoặc sắp diễn ra
+        const hasActiveMeetings = await Room.hasActiveMeetings(id);
+        if (hasActiveMeetings) {
+            return res.status(409).json({
+                success: false,
+                code: 'CANNOT_DELETE_ACTIVE_MEETINGS',
+                message: `Không thể xóa phòng họp "${existingRoom.name}" vì đang có cuộc họp đã lên lịch hoặc đang diễn ra. Vui lòng chuyển trạng thái phòng sang "Bảo trì" (Maintenance) thay vì xóa.`
+            });
+        }
+
+        await Room.delete(id);
 
         return res.status(200).json({
             success: true,
-            message: `Xóa phòng họp "${deleted.name}" thành công.`,
-            data: deleted
+            message: `Xóa phòng họp "${existingRoom.name}" thành công.`,
+            data: existingRoom
         });
     } catch (error) {
+        if (error.code === 'ACTIVE_MEETINGS_EXIST') {
+            return res.status(409).json({
+                success: false,
+                code: 'CANNOT_DELETE_ACTIVE_MEETINGS',
+                message: error.message
+            });
+        }
         next(error);
     }
 };
 
-// 6. Chuyển trạng thái nhanh (Hoạt động <-> Bảo trì)
+// 6. Chuyển trạng thái nhanh (PATCH /api/rooms/:id/status - Hoạt động <-> Bảo trì)
 const toggleRoomStatus = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const room = mockRooms.find(r => r.id === id);
+        if (isNaN(id) || id <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'
+            });
+        }
 
-        if (!room) {
+        const existingRoom = await Room.findById(id);
+        if (!existingRoom) {
             return res.status(404).json({
                 success: false,
                 message: `Không tìm thấy phòng họp với ID: ${id}`
             });
         }
 
-        room.status = room.status === 'Active' ? 'Maintenance' : 'Active';
+        const updatedRoom = await Room.toggleStatus(id);
 
         return res.status(200).json({
             success: true,
-            message: `Đã chuyển trạng thái phòng sang: ${room.status}`,
-            data: room
+            message: `Đã chuyển trạng thái phòng sang: ${updatedRoom.status}`,
+            data: updatedRoom
         });
     } catch (error) {
         next(error);

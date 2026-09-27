@@ -15,10 +15,17 @@ CREATE TABLE Users (
 );
 CREATE TABLE Rooms (
     RoomID INT AUTO_INCREMENT PRIMARY KEY,
-    RoomName VARCHAR(100) NOT NULL,
+    RoomCode VARCHAR(50) UNIQUE NOT NULL,
+    RoomName VARCHAR(100) UNIQUE NOT NULL,
     Capacity INT NOT NULL,
+    Type VARCHAR(50) DEFAULT 'Hội nghị',
+    Floor VARCHAR(100),
     Status VARCHAR(50) DEFAULT 'Active',
-    QRCode VARCHAR(255)
+    QRCode VARCHAR(255),
+    Description TEXT,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_rooms_status_capacity (Status, Capacity)
 );
 CREATE TABLE Meetings (
     MeetingID INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,3 +70,20 @@ CREATE TABLE Booking_Equipments (
     FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID),
     FOREIGN KEY (EquipmentID) REFERENCES Equipments(EquipmentID)
 );
+
+-- =====================================================
+-- DỮ LIỆU KHỞI TẠO MẪU (SEED DATA)
+-- =====================================================
+
+INSERT INTO Users (UserID, FullName, Email, PasswordHash, Role) VALUES
+    (1, 'Nguyễn Văn Quản Trị', 'admin@enterprise.vn', 'hash_admin_123', 'Admin'),
+    (2, 'Trần Thị Thư Ký', 'secretary@enterprise.vn', 'hash_sec_123', 'Secretary'),
+    (3, 'Lê Văn Trưởng Phòng', 'manager@enterprise.vn', 'hash_mgr_123', 'Manager'),
+    (4, 'Phạm Hoàng Nhân Viên', 'employee@enterprise.vn', 'hash_emp_123', 'Employee');
+
+INSERT INTO Rooms (RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description) VALUES
+    (1, 'RM-001', 'Phòng Tokyo (Tầng 4)', 20, 'Hội nghị', 'Tầng 4, Tòa A', 'Active', 'QR-ROOM-001', 'Phòng hội thảo tiêu chuẩn cao, view thoáng, cách âm tốt, chuyên tổ chức họp ban giám đốc và đối tác.'),
+    (2, 'RM-002', 'Phòng Silicon (Tầng 2)', 12, 'Nhóm / Tech', 'Tầng 2, Tòa B', 'Active', 'QR-ROOM-002', 'Thiết kế mở theo phong cách Silicon Valley, trang bị màn hình tương tác và bảng viết brainstorming.'),
+    (3, 'RM-003', 'Phòng Hội Nghị A', 30, 'Hội trường lớn', 'Tầng 1, Tòa Trung tâm', 'Active', 'QR-ROOM-003', 'Hội trường lớn phù hợp cho họp toàn công ty, hội thảo khách hàng, đào tạo nhân sự định kỳ.'),
+    (4, 'RM-004', 'Phòng Grand Board', 50, 'Đại sảnh / Board', 'Tầng 5, Tòa A', 'Maintenance', 'QR-ROOM-004', 'Đang nâng cấp hệ thống âm thanh vòm và điều hòa trung tâm.'),
+    (5, 'RM-005', 'Phòng VIP', 10, 'VIP / Phỏng vấn', 'Tầng 3, Tòa VIP', 'Active', 'QR-ROOM-005', 'Phòng tiếp đón đối tác cao cấp, phỏng vấn nhân sự cấp quản lý.');
