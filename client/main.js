@@ -403,6 +403,12 @@ function calcDuration() {
 
   durationText.innerText = `Thời lượng: ${formatted}`;
   durationBadge.classList.remove("hidden");
+
+  // Đồng bộ trạng thái active của các nút chọn nhanh thời lượng
+  document.querySelectorAll("[data-duration]").forEach(b => {
+    b.classList.toggle("active", Number(b.getAttribute("data-duration")) === diff);
+  });
+
   return true;
 }
 
@@ -686,6 +692,37 @@ function renderMeetingsPage() {
         </div>
       </div>
 
+      <!-- Real-Time Room Quick Availability Finder Widget -->
+      <div class="room-quick-finder-widget mb-4" id="room-quick-finder-section">
+        <div class="room-finder-header">
+          <div>
+            <div class="room-finder-title">
+              <i class="bi bi-broadcast text-primary"></i> Tra cứu phòng trống theo thời gian thực
+            </div>
+            <div class="stitch-hint mt-0.5">Kiểm tra ngay tình trạng phòng họp trong toàn bộ tòa nhà theo khung giờ</div>
+          </div>
+          <div class="room-finder-controls">
+            <div class="d-flex align-items-center gap-1">
+              <label for="finder-date" class="visually-hidden">Ngày tra cứu</label>
+              <input type="date" id="finder-date" class="form-control stitch-input stitch-input-sm" style="width: 140px; font-size: 0.78rem;" aria-label="Ngày tra cứu" />
+            </div>
+            <div class="d-flex align-items-center gap-1">
+              <label for="finder-start" class="visually-hidden">Giờ bắt đầu</label>
+              <input type="time" id="finder-start" class="form-control stitch-input stitch-input-sm" value="09:00" style="width: 95px; font-size: 0.78rem;" aria-label="Giờ bắt đầu tra cứu" />
+              <span class="text-muted small">➔</span>
+              <label for="finder-end" class="visually-hidden">Giờ kết thúc</label>
+              <input type="time" id="finder-end" class="form-control stitch-input stitch-input-sm" value="10:30" style="width: 95px; font-size: 0.78rem;" aria-label="Giờ kết thúc tra cứu" />
+            </div>
+            <button type="button" class="btn btn-sm btn-primary px-3" id="btn-finder-book-room" style="font-size: 0.78rem; font-weight: 600;" onclick="openAddModalWithSelection()">
+              <i class="bi bi-plus-lg me-1"></i> Đặt lịch ngay
+            </button>
+          </div>
+        </div>
+        <div id="finder-room-cards" class="realtime-room-grid">
+          <!-- Populated by renderFinderRoomCards() -->
+        </div>
+      </div>
+
       <!-- Toolbar & Multi-Filter Section -->
       <div class="filter-panel-card mb-4">
         <!-- Top row: Search + Status Tabs -->
@@ -801,6 +838,7 @@ function renderMeetingsPage() {
   // Gắn sự kiện
   setupMeetingEvents();
   renderMeetingTable();
+  initFinderRoomWidget();
   if (typeof MeetingAPI !== "undefined") {
     MeetingAPI.checkHealth();
   }
@@ -833,6 +871,137 @@ function updateDashboardStats() {
       else if (st === "cancelled") tab.innerText = `Đã hủy (${cancelledCount})`;
     });
   }
+
+  // Khởi tạo Widget Tra cứu phòng trống theo thời gian thực
+  initFinderRoomWidget();
+}
+
+// =====================================================
+// WIDGET TRA CỨU PHÒNG TRỐNG TRÊN TRANG CUỘC HỌP
+// =====================================================
+
+function initFinderRoomWidget() {
+  const dateInput = document.getElementById("finder-date");
+  const startInput = document.getElementById("finder-start");
+  const endInput = document.getElementById("finder-end");
+
+  if (dateInput) {
+    const today = new Date().toISOString().slice(0, 10);
+    dateInput.value = today;
+    dateInput.min = today;
+    dateInput.addEventListener("change", renderFinderRoomCards);
+  }
+
+  if (startInput) {
+    startInput.addEventListener("change", renderFinderRoomCards);
+  }
+
+  if (endInput) {
+    endInput.addEventListener("change", renderFinderRoomCards);
+  }
+
+  renderFinderRoomCards();
+}
+
+function renderFinderRoomCards() {
+  const container = document.getElementById("finder-room-cards");
+  if (!container) return;
+
+  const dateInput = document.getElementById("finder-date");
+  const startInput = document.getElementById("finder-start");
+  const endInput = document.getElementById("finder-end");
+
+  const today = new Date().toISOString().slice(0, 10);
+  const date = dateInput && dateInput.value ? dateInput.value : today;
+  const start = startInput && startInput.value ? startInput.value : "09:00";
+  const end = endInput && endInput.value ? endInput.value : "10:30";
+
+  const roomsStatus = calculateRoomAvailability(date, start, end, null);
+
+  container.innerHTML = roomsStatus.map(room => {
+    let cardStatusClass = "status-available";
+    let statusText = `<span><i class="bi bi-check-circle-fill me-1 text-success"></i> Sẵn sàng</span><span class="text-primary fw-semibold">Đặt ngay →</span>`;
+
+    if (room.isMaintenance) {
+      cardStatusClass = "status-maintenance";
+      statusText = `<span><i class="bi bi-tools me-1 text-warning"></i> Bảo trì</span><span class="text-muted">Không khả dụng</span>`;
+    } else if (room.isConflict) {
+      cardStatusClass = "status-busy";
+      const conf = room.conflictMeeting;
+      statusText = `<div class="room-conflict-badge"><i class="bi bi-x-circle-fill"></i> Bận: "${escapeHTML(conf ? conf.title : '')}" (${conf ? conf.time : ''})</div>`;
+    }
+
+    const eqChips = (room.equipments || []).slice(0, 2).map(eq => `<span class="room-eq-pill">${escapeHTML(eq)}</span>`).join("");
+    const isMaint = room.isMaintenance;
+    const clickAction = isMaint
+      ? `alert('Phòng &quot;${escapeHTML(room.name)}&quot; hiện đang trong quá trình bảo trì. Vui lòng chọn phòng khác.');`
+      : `openAddModalWithSelection(${room.id}, '${date}', '${start}', '${end}')`;
+
+    return `
+      <div
+        class="realtime-room-card ${cardStatusClass}"
+        style="${isMaint ? 'cursor: not-allowed;' : ''}"
+        onclick="${clickAction}"
+        role="button"
+        tabindex="0"
+        onkeydown="if(event.key==='Enter'||event.key===' '){${clickAction}event.preventDefault();}"
+      >
+        <div class="room-card-top">
+          <div>
+            <div class="room-card-name">${escapeHTML(room.name)}</div>
+            <div class="d-flex align-items-center gap-1 mt-0.5">
+              <span class="room-card-code">${escapeHTML(room.code || `RM-00${room.id}`)}</span>
+              <span class="text-muted" style="font-size: 0.7rem;">• ${room.capacity} chỗ</span>
+            </div>
+          </div>
+          <span class="room-card-meta-item small text-muted">
+            <i class="bi bi-geo-alt-fill text-slate-500"></i> ${escapeHTML(room.floor || 'Tòa nhà')}
+          </span>
+        </div>
+        <div class="room-card-equipments">
+          ${eqChips}
+        </div>
+        <div class="room-card-status-bar">
+          ${statusText}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function openAddModalWithSelection(roomId = null, date = null, start = null, end = null) {
+  openAddModal();
+  if (roomId) {
+    const roomSelect = document.getElementById("meeting-room");
+    if (roomSelect) {
+      roomSelect.value = String(roomId);
+      roomSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+  if (date) {
+    const dateInput = document.getElementById("meeting-date");
+    if (dateInput) {
+      dateInput.value = date;
+      dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+  if (start) {
+    const startInput = document.getElementById("meeting-start");
+    if (startInput) {
+      startInput.value = start;
+      startInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+  if (end) {
+    const endInput = document.getElementById("meeting-end");
+    if (endInput) {
+      endInput.value = end;
+      endInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+  const idInput = document.getElementById("meeting-id");
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
+  renderRealtimeRoomCards(editId);
 }
 
 // =====================================================
@@ -2188,6 +2357,9 @@ function setupMeetingFormValidationEvents() {
     const roomConflictAlert = document.getElementById("room-conflict-alert");
     const roomConflictText = document.getElementById("room-conflict-text");
 
+    // Tự động rà soát trạng thái phòng trống thời gian thực
+    renderRealtimeRoomCards(editId);
+
     if (roomId && date && start && end && start < end) {
       const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
       if (conflict && roomConflictAlert && roomConflictText) {
@@ -2205,6 +2377,24 @@ function setupMeetingFormValidationEvents() {
   if (dateInput) {
     dateInput.addEventListener("change", () => {
       dateInput.classList.remove("has-error", "is-invalid");
+
+      // Đồng bộ trạng thái active của các nút chọn nhanh ngày
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const tom = new Date(); tom.setDate(tom.getDate() + 1);
+      const tomStr = tom.toISOString().slice(0, 10);
+      const mon = new Date();
+      const monDiff = mon.getDay() === 0 ? 1 : (8 - mon.getDay());
+      mon.setDate(mon.getDate() + monDiff);
+      const monStr = mon.toISOString().slice(0, 10);
+
+      document.querySelectorAll("[data-date-preset]").forEach(b => {
+        const p = b.getAttribute("data-date-preset");
+        if (p === "today") b.classList.toggle("active", dateInput.value === todayStr);
+        else if (p === "tomorrow") b.classList.toggle("active", dateInput.value === tomStr);
+        else if (p === "next-monday") b.classList.toggle("active", dateInput.value === monStr);
+        else b.classList.remove("active");
+      });
+
       triggerLiveTimeAndConflict();
     });
   }
@@ -2250,6 +2440,375 @@ function setupMeetingFormValidationEvents() {
         descInput.classList.remove("has-error", "is-invalid");
         const descError = document.getElementById("desc-error");
         if (descError) descError.classList.add("hidden");
+      }
+    });
+  }
+
+  // Khởi tạo các bộ chọn nhanh DateTime & Bộ lọc Phòng
+  setupQuickDateTimePresets();
+}
+
+// =====================================================
+// 6B. ENGINE DANH SÁCH PHÒNG TRỐNG THEO THỜI GIAN THỰC
+// =====================================================
+
+let currentRoomCapFilter = "all";
+let currentOnlyAvailFilter = false;
+let isDropdownRoomView = false;
+
+function calculateRoomAvailability(date, startTime, endTime, editId = null) {
+  return ROOMS.map(room => {
+    if (room.status === "Maintenance") {
+      return {
+        ...room,
+        isAvailable: false,
+        isMaintenance: true,
+        isConflict: false,
+        conflictMeeting: null,
+        statusLabel: "Bảo trì"
+      };
+    }
+
+    if (!date || !startTime || !endTime) {
+      return {
+        ...room,
+        isAvailable: true,
+        isMaintenance: false,
+        isConflict: false,
+        conflictMeeting: null,
+        statusLabel: "Sẵn sàng"
+      };
+    }
+
+    const conflict = checkMeetingRoomConflict(room.id, date, startTime, endTime, editId);
+    if (conflict) {
+      return {
+        ...room,
+        isAvailable: false,
+        isMaintenance: false,
+        isConflict: true,
+        conflictMeeting: conflict,
+        statusLabel: "Trùng lịch"
+      };
+    }
+
+    return {
+      ...room,
+      isAvailable: true,
+      isMaintenance: false,
+      isConflict: false,
+      conflictMeeting: null,
+      statusLabel: "Sẵn sàng"
+    };
+  });
+}
+
+function renderRealtimeRoomCards(editId = null) {
+  const container = document.getElementById("realtime-room-grid");
+  if (!container) return;
+
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const roomSelect = document.getElementById("meeting-room");
+
+  const date = dateInput ? dateInput.value : "";
+  const startTime = startInput ? startInput.value : "";
+  const endTime = endInput ? endInput.value : "";
+  const selectedRoomId = Number(roomSelect ? roomSelect.value : 0);
+
+  // Cập nhật timeline trực quan
+  const timelineStart = document.getElementById("timeline-start-label");
+  const timelineEnd = document.getElementById("timeline-end-label");
+  if (timelineStart) timelineStart.textContent = startTime || "--:--";
+  if (timelineEnd) timelineEnd.textContent = endTime || "--:--";
+
+  const roomsStatus = calculateRoomAvailability(date, startTime, endTime, editId);
+
+  // Cập nhật số đếm thống kê trạng thái phòng
+  const availCount = roomsStatus.filter(r => r.isAvailable).length;
+  const busyCount = roomsStatus.filter(r => r.isConflict).length;
+  const maintCount = roomsStatus.filter(r => r.isMaintenance).length;
+
+  const elAvail = document.getElementById("realtime-avail-count");
+  const elBusy = document.getElementById("realtime-busy-count");
+  const elMaint = document.getElementById("realtime-maint-count");
+  if (elAvail) elAvail.textContent = String(availCount);
+  if (elBusy) elBusy.textContent = String(busyCount);
+  if (elMaint) elMaint.textContent = String(maintCount);
+
+  // Lọc theo Sức chứa & Chỉ phòng trống
+  let filtered = roomsStatus;
+  if (currentOnlyAvailFilter) {
+    filtered = filtered.filter(r => r.isAvailable);
+  }
+
+  if (currentRoomCapFilter === "small") {
+    filtered = filtered.filter(r => r.capacity < 15);
+  } else if (currentRoomCapFilter === "medium") {
+    filtered = filtered.filter(r => r.capacity >= 15 && r.capacity <= 30);
+  } else if (currentRoomCapFilter === "large") {
+    filtered = filtered.filter(r => r.capacity > 30);
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 py-4 text-center text-muted" style="grid-column: 1 / -1;">
+        <i class="bi bi-door-closed fs-3 d-block mb-1 text-slate-400"></i>
+        <div class="small fw-medium">Không tìm thấy phòng họp phù hợp với bộ lọc hiện tại.</div>
+        <button type="button" class="btn btn-sm btn-link text-primary p-0 mt-1" onclick="resetRoomFilters()">Đặt lại bộ lọc</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(room => {
+    const isSelected = room.id === selectedRoomId;
+    let cardStatusClass = "status-available";
+    let statusBadgeHtml = `
+      <div class="room-card-status-bar">
+        <span><i class="bi bi-check-circle-fill me-1 text-success"></i> Sẵn sàng đặt</span>
+        <span class="text-primary fw-semibold">${isSelected ? 'Đã chọn ✓' : 'Chọn phòng →'}</span>
+      </div>
+    `;
+
+    if (room.isMaintenance) {
+      cardStatusClass = "status-maintenance";
+      statusBadgeHtml = `
+        <div class="room-card-status-bar">
+          <span><i class="bi bi-tools me-1 text-warning"></i> Đang bảo trì</span>
+          <span class="text-muted">Không khả dụng</span>
+        </div>
+      `;
+    } else if (room.isConflict) {
+      cardStatusClass = "status-busy";
+      const conf = room.conflictMeeting;
+      statusBadgeHtml = `
+        <div class="room-card-status-bar">
+          <div class="room-conflict-badge">
+            <i class="bi bi-x-circle-fill"></i>
+            <strong>Trùng lịch:</strong> "${escapeHTML(conf ? conf.title : 'Đã có lịch')}"
+          </div>
+          <div class="text-danger small" style="font-size: 0.68rem;">
+            Khung giờ: ${conf ? conf.time : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    const eqChips = (room.equipments || []).slice(0, 3).map(eq => `<span class="room-eq-pill">${escapeHTML(eq)}</span>`).join("");
+
+    return `
+      <div
+        class="realtime-room-card ${cardStatusClass} ${isSelected ? 'is-selected' : ''}"
+        data-room-id="${room.id}"
+        role="radio"
+        aria-checked="${isSelected}"
+        tabindex="0"
+        onclick="selectRealtimeRoom(${room.id})"
+        onkeydown="if(event.key==='Enter'||event.key===' '){selectRealtimeRoom(${room.id});event.preventDefault();}"
+      >
+        <div class="room-card-top">
+          <div>
+            <div class="room-card-name">${escapeHTML(room.name)}</div>
+            <div class="d-flex align-items-center gap-1 mt-0.5">
+              <span class="room-card-code">${escapeHTML(room.code || `RM-00${room.id}`)}</span>
+              <span class="text-muted" style="font-size: 0.7rem;">• ${escapeHTML(room.type || 'Phòng họp')}</span>
+            </div>
+          </div>
+          <div class="room-select-indicator">
+            <i class="bi bi-check-lg"></i>
+          </div>
+        </div>
+
+        <div class="room-card-meta">
+          <span class="room-card-meta-item">
+            <i class="bi bi-people-fill text-primary"></i> ${room.capacity} chỗ
+          </span>
+          <span class="room-card-meta-item">
+            <i class="bi bi-geo-alt-fill text-slate-500"></i> ${escapeHTML(room.floor || 'Tầng 1')}
+          </span>
+        </div>
+
+        <div class="room-card-equipments">
+          ${eqChips}
+        </div>
+
+        ${statusBadgeHtml}
+      </div>
+    `;
+  }).join("");
+}
+
+function selectRealtimeRoom(roomId) {
+  const room = ROOMS.find(r => r.id === roomId);
+  if (!room) return;
+
+  const roomSelect = document.getElementById("meeting-room");
+  if (roomSelect) {
+    roomSelect.value = String(roomId);
+    roomSelect.classList.remove("has-error", "is-invalid");
+    roomSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  const roomError = document.getElementById("room-error");
+  if (roomError) roomError.classList.add("hidden");
+
+  const roomHint = document.getElementById("room-capacity-hint");
+  if (roomHint) {
+    roomHint.textContent = `Sức chứa: ${room.capacity} chỗ • ${room.floor}`;
+  }
+
+  const idInput = document.getElementById("meeting-id");
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const date = dateInput ? dateInput.value : "";
+  const start = startInput ? startInput.value : "";
+  const end = endInput ? endInput.value : "";
+  const roomConflictAlert = document.getElementById("room-conflict-alert");
+  const roomConflictText = document.getElementById("room-conflict-text");
+
+  if (room.status === "Maintenance") {
+    if (roomConflictAlert && roomConflictText) {
+      roomConflictText.innerHTML = `Phòng <strong>${escapeHTML(room.name)}</strong> hiện đang trong trạng thái <strong>Bảo trì</strong>. Vui lòng chọn phòng khác.`;
+      roomConflictAlert.classList.remove("hidden");
+    }
+  } else if (date && start && end) {
+    const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
+    if (conflict && roomConflictAlert && roomConflictText) {
+      roomConflictText.innerHTML = `Phòng <strong>${escapeHTML(room.name)}</strong> đã có lịch họp: <strong>"${escapeHTML(conflict.title)}"</strong> (${conflict.time}). Vui lòng chọn giờ hoặc phòng khác.`;
+      roomConflictAlert.classList.remove("hidden");
+    } else if (roomConflictAlert) {
+      roomConflictAlert.classList.add("hidden");
+    }
+  }
+
+  renderRealtimeRoomCards(editId);
+}
+
+function resetRoomFilters() {
+  currentRoomCapFilter = "all";
+  currentOnlyAvailFilter = false;
+  document.querySelectorAll("[data-cap-filter]").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-cap-filter") === "all");
+  });
+  const btnToggleOnlyAvail = document.getElementById("btn-toggle-only-avail");
+  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.remove("active");
+  const idInput = document.getElementById("meeting-id");
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
+  renderRealtimeRoomCards(editId);
+}
+
+function setupQuickDateTimePresets() {
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const idInput = document.getElementById("meeting-id");
+
+  // Đặt min date là ngày hôm nay
+  if (dateInput) {
+    const today = new Date().toISOString().slice(0, 10);
+    dateInput.min = today;
+  }
+
+  // 1. Nút chọn nhanh ngày
+  document.querySelectorAll("[data-date-preset]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-date-preset]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const preset = btn.getAttribute("data-date-preset");
+      const d = new Date();
+      if (preset === "today") {
+        // Hôm nay
+      } else if (preset === "tomorrow") {
+        d.setDate(d.getDate() + 1);
+      } else if (preset === "next-monday") {
+        const day = d.getDay();
+        const diff = (day === 0 ? 1 : 8 - day);
+        d.setDate(d.getDate() + diff);
+      }
+
+      const formatted = d.toISOString().slice(0, 10);
+      if (dateInput) {
+        dateInput.value = formatted;
+        dateInput.classList.remove("has-error", "is-invalid");
+        dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+  });
+
+  // 2. Nút chọn nhanh thời lượng
+  document.querySelectorAll("[data-duration]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-duration]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const durationMinutes = Number(btn.getAttribute("data-duration"));
+      let startVal = startInput ? startInput.value : "09:00";
+      if (!startVal) {
+        startVal = "09:00";
+        if (startInput) startInput.value = startVal;
+      }
+
+      const [h, m] = startVal.split(":").map(Number);
+      const totalMinutes = h * 60 + m + durationMinutes;
+      let formattedEnd;
+      if (totalMinutes >= 24 * 60) {
+        formattedEnd = "23:59";
+      } else {
+        const endH = Math.floor(totalMinutes / 60);
+        const endM = totalMinutes % 60;
+        formattedEnd = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+      }
+
+      if (endInput) {
+        endInput.value = formattedEnd;
+        endInput.classList.remove("has-error", "is-invalid");
+        endInput.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+  });
+
+  // 3. Nút lọc sức chứa phòng
+  document.querySelectorAll("[data-cap-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-cap-filter]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentRoomCapFilter = btn.getAttribute("data-cap-filter");
+      const editId = idInput && idInput.value ? Number(idInput.value) : null;
+      renderRealtimeRoomCards(editId);
+    });
+  });
+
+  // 4. Nút bật/tắt Chỉ phòng trống
+  const btnToggleOnlyAvail = document.getElementById("btn-toggle-only-avail");
+  if (btnToggleOnlyAvail) {
+    btnToggleOnlyAvail.addEventListener("click", () => {
+      currentOnlyAvailFilter = !currentOnlyAvailFilter;
+      btnToggleOnlyAvail.classList.toggle("active", currentOnlyAvailFilter);
+      const editId = idInput && idInput.value ? Number(idInput.value) : null;
+      renderRealtimeRoomCards(editId);
+    });
+  }
+
+  // 5. Nút chuyển đổi giao diện xem thẻ / dropdown
+  const btnToggleRoomView = document.getElementById("btn-toggle-room-view");
+  const roomGrid = document.getElementById("realtime-room-grid");
+  const roomSelectWrapper = document.getElementById("room-select-wrapper");
+  if (btnToggleRoomView && roomGrid && roomSelectWrapper) {
+    btnToggleRoomView.addEventListener("click", () => {
+      isDropdownRoomView = !isDropdownRoomView;
+      if (isDropdownRoomView) {
+        roomGrid.classList.add("hidden");
+        roomSelectWrapper.classList.remove("hidden");
+        btnToggleRoomView.innerHTML = '<i class="bi bi-grid-fill me-1"></i> Dạng thẻ';
+      } else {
+        roomGrid.classList.remove("hidden");
+        roomSelectWrapper.classList.add("hidden");
+        btnToggleRoomView.innerHTML = '<i class="bi bi-list-ul me-1"></i> Dropdown';
       }
     });
   }
@@ -3813,7 +4372,38 @@ function openAddModal() {
   const descCount = document.getElementById("desc-char-count");
   if (descCount) descCount.textContent = "0/2000 ký tự";
 
+  // Reset các bộ lọc phòng & view mode về mặc định
+  currentRoomCapFilter = "all";
+  currentOnlyAvailFilter = false;
+  document.querySelectorAll("[data-cap-filter]").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-cap-filter") === "all");
+  });
+  const btnToggleOnlyAvail = document.getElementById("btn-toggle-only-avail");
+  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.remove("active");
+
+  // Reset trạng thái nút chọn nhanh ngày (active: today)
+  document.querySelectorAll("[data-date-preset]").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-date-preset") === "today");
+  });
+
+  // Reset trạng thái nút chọn nhanh thời lượng (active: 90)
+  document.querySelectorAll("[data-duration]").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-duration") === "90");
+  });
+
+  // Reset view về Dạng thẻ nếu đang ở dropdown
+  const roomGrid = document.getElementById("realtime-room-grid");
+  const roomSelectWrapper = document.getElementById("room-select-wrapper");
+  const btnToggleRoomView = document.getElementById("btn-toggle-room-view");
+  if (roomGrid && roomSelectWrapper && btnToggleRoomView) {
+    isDropdownRoomView = false;
+    roomGrid.classList.remove("hidden");
+    roomSelectWrapper.classList.add("hidden");
+    btnToggleRoomView.innerHTML = '<i class="bi bi-list-ul"></i> Dropdown';
+  }
+
   calcDuration();
+  renderRealtimeRoomCards(null);
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
@@ -3926,6 +4516,7 @@ function openEditModal(id) {
   });
 
   calcDuration();
+  renderRealtimeRoomCards(meeting.id);
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
