@@ -1916,6 +1916,68 @@ const RoomAPI = {
     return { success: true, data: room, isFallback: true };
   },
 
+  async delete(id) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(`${ROOM_API_URL}/${id}`, {
+        method: "DELETE",
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      const json = await res.json();
+      if (res.ok) {
+        this.isBackendConnected = true;
+        this.updateStatusBadge();
+        const idx = ROOMS.findIndex(r => r.id === id);
+        if (idx !== -1) ROOMS.splice(idx, 1);
+        persistRoomsToStorage();
+        return { success: true, isFallback: false };
+      } else {
+        return { success: false, message: json.message, code: json.code, isFallback: false };
+      }
+    } catch {
+      this.isBackendConnected = false;
+      this.updateStatusBadge();
+    }
+    // Local Fallback
+    const idx = ROOMS.findIndex(r => r.id === id);
+    if (idx !== -1) ROOMS.splice(idx, 1);
+    persistRoomsToStorage();
+    return { success: true, isFallback: true };
+  },
+
+  async toggleStatus(id) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(`${ROOM_API_URL}/${id}/status`, {
+        method: "PATCH",
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        this.updateStatusBadge();
+        const updated = json.data || json;
+        const idx = ROOMS.findIndex(r => r.id === id);
+        if (idx !== -1) ROOMS[idx] = updated;
+        persistRoomsToStorage();
+        return { success: true, data: updated, isFallback: false };
+      }
+    } catch {
+      this.isBackendConnected = false;
+      this.updateStatusBadge();
+    }
+    const room = ROOMS.find(r => r.id === id);
+    if (room) {
+      room.status = room.status === "Active" ? "Maintenance" : "Active";
+      persistRoomsToStorage();
+    }
+    return { success: true, data: room, isFallback: true };
+  },
+
   async getAvailableRooms(params = {}) {
     const query = new URLSearchParams();
     if (params.date) query.set("date", params.date);
@@ -3857,13 +3919,13 @@ function closeRoomDeleteModal() {
   if (roomDeleteOverlay) roomDeleteOverlay.classList.add("hidden");
 }
 
-function executeDeleteRoom(roomId) {
-  const idx = ROOMS.findIndex(r => r.id === roomId);
-  if (idx !== -1) {
-    ROOMS.splice(idx, 1);
+async function executeDeleteRoom(roomId) {
+  const result = await RoomAPI.delete(roomId);
+  if (!result.success && result.message) {
+    alert(result.message);
+    return;
   }
 
-  persistRoomsToStorage();
   closeRoomDeleteModal();
   updateRoomKpiCards();
   updateRoomStatusTabs();
@@ -3871,12 +3933,8 @@ function executeDeleteRoom(roomId) {
   syncMeetingRoomOptions();
 }
 
-function toggleRoomMaintenanceAndClose(roomId) {
-  const room = ROOMS.find(r => r.id === roomId);
-  if (room) {
-    room.status = "Maintenance";
-  }
-  persistRoomsToStorage();
+async function toggleRoomMaintenanceAndClose(roomId) {
+  await RoomAPI.toggleStatus(roomId);
   closeRoomDeleteModal();
   updateRoomKpiCards();
   updateRoomStatusTabs();
@@ -3884,18 +3942,8 @@ function toggleRoomMaintenanceAndClose(roomId) {
   syncMeetingRoomOptions();
 }
 
-function toggleRoomStatus(roomId) {
-  const room = ROOMS.find(r => r.id === roomId);
-  if (!room) return;
-
-  const currentStatus = (room.status || "").trim().toLowerCase();
-  if (currentStatus === "active") {
-    room.status = "Maintenance";
-  } else {
-    room.status = "Active";
-  }
-
-  persistRoomsToStorage();
+async function toggleRoomStatus(roomId) {
+  await RoomAPI.toggleStatus(roomId);
   updateRoomKpiCards();
   updateRoomStatusTabs();
   renderAdminRoomsTable();
