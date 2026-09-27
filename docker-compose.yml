@@ -25,6 +25,8 @@ services:
       - ./server:/app
       # Giữ node_modules độc lập trong container
       - /app/node_modules
+      # Mount thư mục giao diện tĩnh client
+      - ./client:/client
     depends_on:
       mysql_db:
         condition: service_healthy
