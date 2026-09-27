@@ -3,7 +3,8 @@
  * Hỗ trợ các thao tác CRUD và kiểm tra ràng buộc toàn vẹn dữ liệu
  */
 
-const { validateRoomInput } = require('../validators/roomValidator');
+const { validateRoomInput, validateAvailableRoomsQuery } = require('../validators/roomValidator');
+const Room = require('../models/roomModel');
 
 // Mock data ban đầu khi chưa kết nối Database server trực tiếp
 let mockRooms = [
@@ -260,9 +261,42 @@ const toggleRoomStatus = async (req, res, next) => {
     }
 };
 
+// 7. Lọc danh sách phòng chưa có lịch đặt theo khoảng ngày/giờ (Available Rooms Query)
+const getAvailableRooms = async (req, res, next) => {
+    try {
+        const queryData = req.validatedAvailableQuery || validateAvailableRoomsQuery(req.query).data;
+
+        if (!queryData) {
+            const validation = validateAvailableRoomsQuery(req.query);
+            return res.status(400).json({
+                success: false,
+                message: validation.errors[0],
+                errors: validation.errors
+            });
+        }
+
+        const availableRooms = await Room.findAvailableRooms(queryData);
+
+        return res.status(200).json({
+            success: true,
+            total: availableRooms.length,
+            query: {
+                startTime: queryData.startTime,
+                endTime: queryData.endTime,
+                minCapacity: queryData.minCapacity,
+                excludeMeetingId: queryData.excludeMeetingId
+            },
+            data: availableRooms
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllRooms,
     getRoomById,
+    getAvailableRooms,
     createRoom,
     updateRoom,
     deleteRoom,

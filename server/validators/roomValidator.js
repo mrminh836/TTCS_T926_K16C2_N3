@@ -116,8 +116,173 @@ function validateRoomMiddleware(req, res, next) {
     next();
 }
 
+/**
+ * Định dạng đối tượng Date thành chuỗi chuẩn MySQL DATETIME (YYYY-MM-DD HH:mm:ss)
+ */
+function formatToMySQLDateTime(date) {
+    const pad = (n) => String(n).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const mi = pad(date.getMinutes());
+    const ss = pad(date.getSeconds());
+    return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+}
+
+/**
+ * Kiểm tra và chuẩn hóa chuỗi ngày giờ
+ */
+function parseDateTimeString(dateStr, timeStr) {
+    if (!dateStr && !timeStr) return null;
+
+    if (dateStr && timeStr) {
+        // Trường hợp truyền riêng date và time: date=2026-10-01, time=09:00
+        const cleanDate = dateStr.trim();
+        const cleanTime = timeStr.trim();
+        const fullStr = cleanTime.length === 5 ? `${cleanDate}T${cleanTime}:00` : `${cleanDate}T${cleanTime}`;
+        const d = new Date(fullStr);
+        if (!isNaN(d.getTime())) return d;
+        // Thử format khoảng trắng
+        const spaceStr = cleanTime.length === 5 ? `${cleanDate} ${cleanTime}:00` : `${cleanDate} ${cleanTime}`;
+        const d2 = new Date(spaceStr);
+        if (!isNaN(d2.getTime())) return d2;
+    }
+
+    if (dateStr && !timeStr) {
+        const d = new Date(dateStr.trim());
+        if (!isNaN(d.getTime())) return d;
+    }
+
+    return null;
+}
+
+/**
+ * Xác thực dữ liệu query tìm kiếm phòng trống theo khoảng thời gian
+ * Hỗ trợ các định dạng:
+ * 1. startTime & endTime (ISO / YYYY-MM-DD HH:mm:ss)
+ * 2. date & startTime & endTime (date=2026-10-01&startTime=09:00&endTime=10:30)
+ * 3. Tuỳ chọn minCapacity / capacity, excludeMeetingId
+ */
+function validateAvailableRoomsQuery(query) {
+    const errors = [];
+
+    if (!query || typeof query !== 'object') {
+        return {
+            isValid: false,
+            errors: ['Tham số truy vấn tìm phòng trống không hợp lệ.'],
+            data: null
+        };
+    }
+
+    const {
+        date,
+        startTime,
+        endTime,
+        start,
+        end,
+        minCapacity,
+        capacity,
+        excludeMeetingId
+    } = query;
+
+    const rawStart = startTime || start;
+    const rawEnd = endTime || end;
+
+    if (!rawStart || !rawEnd) {
+        errors.push('Vui lòng cung cấp đầy đủ thời gian bắt đầu (startTime) và thời gian kết thúc (endTime).');
+        return { isValid: false, errors, data: null };
+    }
+
+    // Parse StartTime và EndTime
+    const startDate = parseDateTimeString(date, rawStart) || parseDateTimeString(rawStart);
+    const endDate = parseDateTimeString(date, rawEnd) || parseDateTimeString(rawEnd);
+
+    if (!startDate || isNaN(startDate.getTime())) {
+        errors.push('Thời gian bắt đầu (startTime) không đúng định dạng ngày giờ hợp lệ.');
+    }
+
+    if (!endDate || isNaN(endDate.getTime())) {
+        errors.push('Thời gian kết thúc (endTime) không đúng định dạng ngày giờ hợp lệ.');
+    }
+
+    if (startDate && endDate && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        if (startDate.getTime() >= endDate.getTime()) {
+            errors.push('Thời gian kết thúc phải diễn ra sau thời gian bắt đầu.');
+        } else {
+            const durationMinutes = (endDate.getTime() - startDate.getTime()) / (60 * 1000);
+            if (durationMinutes < 5) {
+                errors.push('Khoảng thời gian kiểm tra phòng trống tối thiểu phải từ 5 phút trở lên.');
+            }
+        }
+    }
+
+    // Kiểm tra sức chứa tối thiểu (nếu có)
+    let parsedMinCapacity = null;
+    const rawCap = minCapacity || capacity;
+    if (rawCap !== undefined && rawCap !== null && rawCap !== '') {
+        if (!isPositiveInteger(rawCap)) {
+            errors.push('Sức chứa tối thiểu (minCapacity/capacity) phải là số nguyên dương.');
+        } else {
+            parsedMinCapacity = Number(rawCap);
+        }
+    }
+
+    // Kiểm tra excludeMeetingId (nếu có)
+    let parsedExcludeId = null;
+    if (excludeMeetingId !== undefined && excludeMeetingId !== null && excludeMeetingId !== '') {
+        if (!isPositiveInteger(excludeMeetingId)) {
+            errors.push('ID cuộc họp cần loại trừ (excludeMeetingId) phải là số nguyên dương.');
+        } else {
+            parsedExcludeId = Number(excludeMeetingId);
+        }
+    }
+
+    if (errors.length > 0) {
+        return {
+            isValid: false,
+            errors,
+            data: null
+        };
+    }
+
+    return {
+        isValid: true,
+        errors: [],
+        data: {
+            startTime: formatToMySQLDateTime(startDate),
+            endTime: formatToMySQLDateTime(endDate),
+            startDate,
+            endDate,
+            minCapacity: parsedMinCapacity,
+            excludeMeetingId: parsedExcludeId
+        }
+    };
+}
+
+/**
+ * Express Middleware xác thực query params tìm phòng trống
+ */
+function validateAvailableRoomsMiddleware(req, res, next) {
+    const result = validateAvailableRoomsQuery(req.query);
+    if (!result.isValid) {
+        return res.status(400).json({
+            success: false,
+            message: result.errors[0],
+            errors: result.errors
+        });
+    }
+    req.validatedAvailableQuery = result.data;
+    next();
+}
+
 module.exports = {
     ROOM_VALIDATION_CONFIG,
+    isPositiveInteger,
     validateRoomInput,
-    validateRoomMiddleware
+    validateRoomMiddleware,
+    validateAvailableRoomsQuery,
+    validateAvailableRoomsMiddleware,
+    formatToMySQLDateTime
 };
+
