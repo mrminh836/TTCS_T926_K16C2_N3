@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="620" rx="10" ry="10" fill="#f8fafc"/>
+  
+    <!-- Window Bar -->
+    <rect width="900" height="42" rx="10" ry="10" fill="#1e293b"/>
+    <rect y="32" width="900" height="10" fill="#1e293b"/>
+    <circle cx="20" cy="21" r="6" fill="#ef4444"/>
+    <circle cx="38" cy="21" r="6" fill="#f59e0b"/>
+    <circle cx="56" cy="21" r="6" fill="#10b981"/>
+    <text x="450.0" y="26" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="600" fill="#94a3b8">
+      Quản lý Cuộc họp - Thêm Cuộc họp Thành công (Happy Path)
+    </text>
+    
+
+  <!-- Modal Container -->
+  <g transform="translate(130, 70)" filter="url(#shadow)">
+    <rect width="640" height="490" rx="12" ry="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    
+    <!-- Modal Header -->
+    <rect width="640" height="55" rx="12" ry="12" fill="#f8fafc"/>
+    <rect y="45" width="640" height="10" fill="#f8fafc"/>
+    <text x="24" y="35" font-family="-apple-system, sans-serif" font-size="17" font-weight="700" fill="#0f172a">Thêm cuộc họp</text>
+    <circle cx="610" cy="28" r="14" fill="#f1f5f9"/>
+    <text x="610" y="33" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#64748b">×</text>
+
+    <!-- Success View Banner -->
+    <g transform="translate(24, 75)">
+      <rect width="592" height="380" rx="10" ry="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+      
+      <!-- Big Check Icon Circle -->
+      <circle cx="296" cy="60" r="32" fill="#22c55e"/>
+      <path d="M284 60 L292 68 L308 52" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Title & Desc -->
+      <text x="296" y="118" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#15803d">
+        Cuộc họp đã được ghi nhận thành công!
+      </text>
+      <text x="296" y="142" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#475569">
+        Lịch họp &quot;<tspan font-weight="bold" fill="#0f172a">Họp Sprint Planning K16</tspan>&quot; đã được lưu vào hệ thống.
+      </text>
+      <text x="296" y="162" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="600" fill="#16a34a">
+        ✓ Đã đồng bộ với CSDL máy chủ (Mã HTTP 201 Created)
+      </text>
+
+      <!-- Summary Card -->
+      <g transform="translate(46, 185)">
+        <rect width="500" height="120" rx="8" ry="8" fill="#ffffff" stroke="#dcfce7" stroke-width="1"/>
+        
+        <text x="20" y="30" font-family="sans-serif" font-size="12" fill="#64748b">Thời gian:</text>
+        <text x="120" y="30" font-family="sans-serif" font-size="13" font-weight="600" fill="#0f172a">09:00 - 10:30 (1 giờ 30 phút)</text>
+        <line x1="20" y1="42" x2="480" y2="42" stroke="#f1f5f9" stroke-width="1"/>
+
+        <text x="20" y="62" font-family="sans-serif" font-size="12" fill="#64748b">Ngày họp:</text>
+        <text x="120" y="62" font-family="sans-serif" font-size="13" font-weight="600" fill="#0f172a">28/09/2026 (Ngày mai)</text>
+        <line x1="20" y1="74" x2="480" y2="74" stroke="#f1f5f9" stroke-width="1"/>
+
+        <text x="20" y="94" font-family="sans-serif" font-size="12" fill="#64748b">Phòng họp:</text>
+        <text x="120" y="94" font-family="sans-serif" font-size="13" font-weight="600" fill="#0f172a">Phòng Tokyo (Tầng 4) — 20 chỗ</text>
+      </g>
+
+      <!-- Buttons -->
+      <g transform="translate(146, 325)">
+        <rect width="140" height="38" rx="6" ry="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+        <text x="70" y="24" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#475569">+ Tạo cuộc họp khác</text>
+
+        <rect x="155" width="140" height="38" rx="6" ry="6" fill="#2563eb"/>
+        <text x="225" y="24" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#ffffff">Xem danh sách</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Evidence Tag -->
+  <rect x="700" y="580" width="180" height="28" rx="4" ry="4" fill="#22c55e"/>
+  <text x="790" y="598" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">EVIDENCE: TC_MEET_REQ_001</text>
+</svg>

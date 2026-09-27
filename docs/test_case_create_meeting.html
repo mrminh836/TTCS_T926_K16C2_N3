@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bảng Test Cases Tạo Cuộc Họp - TTCS_T926_K16C2_N3</title>
+  <title>Bảng Test Cases Kèm Ảnh Minh Chứng - TTCS_T926_K16C2_N3</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
@@ -16,6 +16,8 @@
     .tc-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: bold; color: #2563eb; }
     .pre-text { white-space: pre-line; }
     .stat-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .evidence-card { transition: transform 0.2s; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+    .evidence-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
   </style>
 </head>
 <body class="p-3 p-md-4">
@@ -25,10 +27,11 @@
       <div>
         <div class="d-flex align-items-center gap-2 mb-1">
           <span class="badge bg-primary px-2 py-1">QA Specification</span>
+          <span class="badge bg-success px-2 py-1"><i class="bi bi-images me-1"></i>Có ảnh minh chứng</span>
           <span class="text-muted small">Sprint 1 • TTCS_T926_K16C2_N3</span>
         </div>
         <h2 class="fw-bold text-dark mb-1">
-          <i class="bi bi-shield-check text-success me-2"></i>Bộ Test Cases Luồng Tạo Cuộc Họp
+          <i class="bi bi-shield-check text-success me-2"></i>Bộ Test Cases Luồng Tạo Cuộc Họp Kèm Ảnh Minh Chứng
         </h2>
         <p class="text-muted mb-0">Kiểm tra trường bắt buộc, validate ngày giờ, độ dài, định dạng và phòng ngừa Race Condition</p>
       </div>
@@ -51,7 +54,7 @@
         <div class="stat-card">
           <div class="text-muted small fw-medium">Tổng số Test Cases</div>
           <div class="fs-3 fw-bold text-dark">41</div>
-          <div class="text-success small"><i class="bi bi-check2-all"></i> Bao phủ 100% nghiệp vụ</div>
+          <div class="text-success small"><i class="bi bi-check2-all"></i> Đầy đủ 11 cột chuẩn</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
@@ -70,9 +73,67 @@
       </div>
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="text-muted small fw-medium">Trạng thái Thực thi</div>
-          <div class="fs-3 fw-bold text-secondary">Ready for QA</div>
-          <div class="text-muted small">Actual & Status chờ điền</div>
+          <div class="text-muted small fw-medium">Ảnh Minh Chứng Sẵn Có</div>
+          <div class="fs-3 fw-bold text-success">7 Mẫu Ảnh UI</div>
+          <div class="text-muted small">100% vector SVG sắc nét</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsible Visual Evidence Showcase -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-card-image text-primary me-2"></i>Thư Viện Ảnh Minh Chứng Trực Quan (Evidence Showcase)</h5>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#galleryCollapse">
+          Đóng / Mở Gallery
+        </button>
+      </div>
+      <div class="collapse show" id="galleryCollapse">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/create_meeting/evidence_01_happy_path_success.svg" class="img-fluid rounded border mb-2" alt="Tạo cuộc họp thành công">
+                <div class="fw-semibold text-dark small">1. Tạo thành công & Banner ghi nhận</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_MEET_REQ_001, TC_MEET_TIME_001</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/create_meeting/evidence_02_empty_form_validation.svg" class="img-fluid rounded border mb-2" alt="Chặn bỏ trống trường bắt buộc">
+                <div class="fw-semibold text-danger small">2. Bỏ trống trường bắt buộc (Viền đỏ)</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_MEET_REQ_003 $ightarrow$ TC_MEET_REQ_017</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/create_meeting/evidence_03_time_order_violation.svg" class="img-fluid rounded border mb-2" alt="Giờ kết thúc trước bắt đầu">
+                <div class="fw-semibold text-danger small">3. Giờ kết thúc sớm hơn bắt đầu</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_MEET_TIME_006, TC_MEET_TIME_007</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/create_meeting/evidence_04_time_past_violation.svg" class="img-fluid rounded border mb-2" alt="Chặn đặt lịch quá khứ">
+                <div class="fw-semibold text-danger small">4. Chặn đặt lịch trong quá khứ</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_MEET_TIME_002, TC_MEET_TIME_003</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/create_meeting/evidence_05_room_conflict_alert.svg" class="img-fluid rounded border mb-2" alt="Trùng phòng họp">
+                <div class="fw-semibold text-danger small">5. Cảnh báo trùng lịch phòng họp</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_MEET_TIME_016 $ightarrow$ TC_MEET_TIME_020</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/create_meeting/evidence_07_api_backend_response.svg" class="img-fluid rounded border mb-2" alt="API Validation Response">
+                <div class="fw-semibold text-primary small">6. API Backend (400 Bad Request)</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_MEET_REQ_018, TC_MEET_TIME_014</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -107,16 +168,17 @@
         <table class="table table-hover table-bordered mb-0 align-middle" id="tcTable">
           <thead>
             <tr>
-              <th style="width: 110px;">Test Case ID</th>
-              <th style="width: 140px;">Nhóm / Feature</th>
-              <th style="width: 220px;">Tiêu đề kịch bản</th>
-              <th style="width: 200px;">Pre-conditions</th>
-              <th style="width: 250px;">Test Steps</th>
-              <th style="width: 200px;">Test Data</th>
-              <th style="width: 260px;">Expected Result</th>
-              <th style="width: 110px;" class="text-center">Actual Result</th>
-              <th style="width: 90px;" class="text-center">Status</th>
-              <th style="width: 130px;">Ghi chú / Bug ID</th>
+              <th style="width: 105px;">Test Case ID</th>
+              <th style="width: 130px;">Nhóm / Feature</th>
+              <th style="width: 200px;">Tiêu đề kịch bản</th>
+              <th style="width: 180px;">Pre-conditions</th>
+              <th style="width: 230px;">Test Steps</th>
+              <th style="width: 180px;">Test Data</th>
+              <th style="width: 240px;">Expected Result</th>
+              <th style="width: 100px;" class="text-center">Actual Result</th>
+              <th style="width: 80px;" class="text-center">Status</th>
+              <th style="width: 120px;">Ghi chú / Bug ID</th>
+              <th style="width: 110px;" class="text-center">Ảnh Minh Chứng</th>
             </tr>
           </thead>
           <tbody>
@@ -159,6 +221,11 @@ isRecurring: true</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm thử luồng tích cực (Happy Path) đầy đủ mọi trường.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_REQ_001: Tạo cuộc họp thành công khi nhập đầy đủ tất cả trường bắt buộc và trường tùy chọn')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -193,6 +260,11 @@ Participants: &#x27;&#x27; (Trống)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra hệ thống không ép buộc nhập các trường tùy chọn.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_REQ_002: Tạo cuộc họp thành công khi chỉ nhập các trường bắt buộc và bỏ trống tất cả trường tùy chọn')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -220,6 +292,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra validation trường bắt buộc Title phía UI.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_003: Chặn tạo cuộc họp khi bỏ trống trường Tiêu đề (meeting-title rỗng)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -245,6 +322,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Chống lỗi bypass validation bằng khoảng trắng.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_004: Chặn tạo cuộc họp khi Tiêu đề chỉ chứa toàn ký tự khoảng trắng (Whitespace only)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -268,6 +350,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Bảo toàn toàn vẹn dữ liệu cột VARCHAR(200) của CSDL.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_005: Chặn tạo cuộc họp khi Tiêu đề vượt quá độ dài tối đa cho phép (&gt; 200 ký tự)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -292,6 +379,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra bảo mật dữ liệu đầu vào (Input Sanitization).</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_006: Chặn tạo cuộc họp khi Tiêu đề chứa ký tự đặc biệt nguy hiểm (&lt;, &gt; / XSS Script)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -319,6 +411,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra trường bắt buộc Ngày họp.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_007: Chặn tạo cuộc họp khi bỏ trống trường Ngày họp (meeting-date rỗng)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -346,6 +443,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra trường bắt buộc Giờ bắt đầu.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_008: Chặn tạo cuộc họp khi bỏ trống trường Giờ bắt đầu (meeting-start rỗng)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -373,6 +475,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra trường bắt buộc Giờ kết thúc.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_009: Chặn tạo cuộc họp khi bỏ trống trường Giờ kết thúc (meeting-end rỗng)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -398,6 +505,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra thiếu toàn bộ cụm thời gian.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_010: Chặn tạo cuộc họp khi bỏ trống toàn bộ cụm Thời gian (Ngày, Giờ bắt đầu, Giờ kết thúc)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -422,6 +534,11 @@ RoomID: 0 / &#x27;&#x27;</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra tính bắt buộc của trường Phòng họp.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_011: Chặn tạo cuộc họp khi bỏ trống hoặc chọn phòng họp không hợp lệ (roomId = 0)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -448,6 +565,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra xử lý đồng thời nhiều trường bắt buộc bị thiếu.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_012: Chặn tạo cuộc họp khi bỏ trống nhiều trường bắt buộc cùng lúc (Tiêu đề, Ngày, Giờ)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -468,6 +590,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra submit rỗng hoàn toàn.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_013: Chặn tạo cuộc họp khi submit form hoàn toàn rỗng (Empty form submit)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -491,6 +618,11 @@ EndTime: &#x27;&#x27;</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra nhập thiếu cụm thời gian khi đã có tiêu đề.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_014: Chặn tạo cuộc họp khi chỉ nhập một phần thông tin (chỉ nhập Tiêu đề, bỏ trống ngày giờ)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -516,6 +648,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra độc lập validation của tiêu đề.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_015: Chặn tạo cuộc họp khi chỉ chọn Ngày giờ, bỏ trống Tiêu đề')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -535,6 +672,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra trải nghiệm người dùng (UX) khi form có lỗi.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_016: Kiểm tra tự động cuộn và Focus vào trường lỗi bắt buộc đầu tiên (First Error Field Focus)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -554,6 +696,11 @@ RoomID: 1</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra sự phản hồi mượt mà của UI khi sửa lỗi.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_02_empty_form_validation.svg', 'TC_MEET_REQ_017: Kiểm tra xóa trạng thái lỗi khi người dùng bắt đầu nhập lại dữ liệu hợp lệ (Error Clearance)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Trường bắt buộc">
@@ -584,6 +731,11 @@ Payload e: { title: &#x27;Test&#x27;, startTime, endTime, organizerId: 1 }</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra tính an toàn của API Backend khi bị request bỏ qua client validate.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_07_api_backend_response.svg', 'TC_MEET_REQ_018: API Backend trả về HTTP 400 Bad Request khi thiếu bất kỳ trường bắt buộc nào trong payload')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -612,6 +764,11 @@ Duration: 90 phút (1 giờ 30 phút)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra luồng chuẩn ngày giờ hợp lệ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_TIME_001: Tạo cuộc họp thành công với Ngày và Giờ hợp lệ trong tương lai')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -638,6 +795,11 @@ EndTime: 10:00</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra chặn ngày trong quá khứ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_04_time_past_violation.svg', 'TC_MEET_TIME_002: Chặn tạo cuộc họp khi Ngày họp ở thời điểm trong quá khứ (Past Date)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -664,6 +826,11 @@ EndTime: Giờ kết thúc sau Giờ bắt đầu</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra chặn giờ đã trôi qua trong cùng ngày hôm nay.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_04_time_past_violation.svg', 'TC_MEET_TIME_003: Chặn tạo cuộc họp khi Ngày là hôm nay nhưng Giờ bắt đầu đã trôi qua trong quá khứ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -690,6 +857,11 @@ EndTime: Giờ hiện tại + 2 giờ</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra tính năng đặt lịch trong cùng ngày khi giờ họp hợp lệ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_TIME_004: Cho phép tạo cuộc họp khi Ngày là hôm nay và Giờ bắt đầu ở tương lai gần (Same-day booking)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -709,6 +881,11 @@ EndTime: Giờ hiện tại + 2 giờ</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra cơ chế dung sai Tolerance 60s chống mạng lag.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_TIME_005: Kiểm tra dung sai thời gian mạng 1 phút chống lệch đồng hồ (Tolerance Window)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -733,6 +910,11 @@ EndTime: 14:00 (endTotal &lt; startTotal)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra logic kết thúc trước bắt đầu.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_03_time_order_violation.svg', 'TC_MEET_TIME_006: Chặn tạo cuộc họp khi Giờ bắt đầu sau Giờ kết thúc trong cùng một ngày (start &gt; end)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -757,6 +939,11 @@ EndTime: 10:00 (diffMinutes = 0)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Chặn cuộc họp có thời lượng bằng 0.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_03_time_order_violation.svg', 'TC_MEET_TIME_007: Chặn tạo cuộc họp khi Giờ bắt đầu trùng với Giờ kết thúc (start == end, thời lượng 0 phút)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -781,6 +968,11 @@ EndTime: 09:03 (diffMinutes = 3)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra quy tắc nghiệp vụ thời lượng tối thiểu 5 phút.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_06_min_duration_violation.svg', 'TC_MEET_TIME_008: Chặn tạo cuộc họp khi thời lượng nhỏ hơn giới hạn tối thiểu (&lt; 5 phút, ví dụ: 3 phút)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -806,6 +998,11 @@ EndTime: 09:05 (diffMinutes = 5)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra giá trị biên dưới hợp lệ (Min Boundary = 5m).</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_TIME_009: Giá trị biên dưới hợp lệ: Cho phép tạo cuộc họp có thời lượng chính xác 5 phút (Boundary Minimum)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -829,6 +1026,11 @@ EndTime: 09:04 (diffMinutes = 4)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra giá trị sát biên dưới (Min - 1m).</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_06_min_duration_violation.svg', 'TC_MEET_TIME_010: Giá trị biên dưới vi phạm: Chặn tạo cuộc họp có thời lượng 4 phút (Boundary Violation: 4 minutes)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -848,6 +1050,11 @@ EndTime: 2026-10-02 10:00:00 (Duration: 26 giờ = 1560 phút)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra giới hạn thời lượng tối đa 24 giờ chống chiếm dụng phòng.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_06_min_duration_violation.svg', 'TC_MEET_TIME_011: Chặn tạo cuộc họp khi thời lượng vượt quá giới hạn tối đa (&gt; 24 giờ cho 1 lần đặt)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -869,6 +1076,11 @@ EndTime: 2026-10-02 08:00:00 (Đúng tròn 1440 phút)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra giá trị biên trên hợp lệ (Max Boundary = 24h).</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_TIME_012: Giá trị biên trên hợp lệ: Cho phép tạo cuộc họp có thời lượng chính xác 24 giờ (Boundary Maximum)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -889,6 +1101,11 @@ endTime: &#x27;2026-10-14 10:00:00&#x27;</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra ngày bắt đầu sau ngày kết thúc qua API.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_07_api_backend_response.svg', 'TC_MEET_TIME_013: Chặn tạo cuộc họp khi Ngày bắt đầu sau Ngày kết thúc (startDate &gt; endDate trong Payload API)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -910,6 +1127,11 @@ endTime: &#x27;2026-10-01T10:00:00Z&#x27;</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Chống lỗi Crash Node.js do parse ngày giờ không hợp lệ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_07_api_backend_response.svg', 'TC_MEET_TIME_014: Chặn tạo cuộc họp khi định dạng chuỗi Ngày/Giờ không hợp lệ (Invalid Date format)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -937,6 +1159,11 @@ c. 09:00 -&gt; 10:45 (1 giờ 45 phút)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra tính năng Live Duration Calculator trên giao diện.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_TIME_015: Kiểm tra tính toán và hiển thị thời lượng động (Live Duration Badge) trên giao diện')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -960,6 +1187,11 @@ New Booking: 09:00 - 10:00 (Phòng Tokyo)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra chống trùng lặp tuyệt đối (100% overlap).</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_05_room_conflict_alert.svg', 'TC_MEET_TIME_016: Chặn đặt phòng khi khung giờ bị trùng lặp hoàn toàn với cuộc họp đã có (Exact Match Overlap)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -981,6 +1213,11 @@ New: 08:30 - 09:30 (Chồng lấn 09:00 - 09:30)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra chồng lấn thời gian phần đầu.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_05_room_conflict_alert.svg', 'TC_MEET_TIME_017: Chặn đặt phòng khi khung giờ bị chồng lấn một phần đầu (Start-overlap)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -1001,6 +1238,11 @@ New: 10:00 - 11:30 (Chồng lấn 10:00 - 10:30)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra chồng lấn thời gian phần đuôi.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_05_room_conflict_alert.svg', 'TC_MEET_TIME_018: Chặn đặt phòng khi khung giờ bị chồng lấn một phần cuối (End-overlap)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -1021,6 +1263,11 @@ New: 09:00 - 10:00 (Nằm trọn bên trong)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra trường hợp lịch mới nằm lọt trong lịch cũ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_05_room_conflict_alert.svg', 'TC_MEET_TIME_019: Chặn đặt phòng khi khung giờ mới nằm hoàn toàn bên trong cuộc họp khác (Inside-overlap)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -1041,6 +1288,11 @@ New: 09:00 - 11:00 (Bao trọn khung giờ lịch cũ)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra trường hợp lịch mới bao trùm lịch cũ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_05_room_conflict_alert.svg', 'TC_MEET_TIME_020: Chặn đặt phòng khi khung giờ mới bao trùm toàn bộ cuộc họp khác (Enclosing-overlap)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -1062,6 +1314,11 @@ New: 10:00 - 11:00 (Điểm kết thúc trùng điểm bắt đầu)</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra biên tiếp xúc thời gian (không tính là trùng lặp).</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_01_happy_path_success.svg', 'TC_MEET_TIME_021: Cho phép đặt phòng khi 2 cuộc họp nối tiếp sát nút nhau (Back-to-back booking - Hợp lệ)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -1084,6 +1341,11 @@ Time: 09:00 - 10:00 ngày mai</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra trạng thái phòng hợp lệ trước khi đặt.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_05_room_conflict_alert.svg', 'TC_MEET_TIME_022: Chặn đặt lịch vào phòng họp đang trong trạng thái Bảo trì (Maintenance) hoặc Tạm ngừng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
         <tr data-category="Ngày và giờ">
@@ -1105,6 +1367,11 @@ Time: 09:00 - 10:00 ngày mai</td>
           <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
           <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
           <td class="small text-muted">Kiểm tra tính an toàn dữ liệu và khả năng chịu tải đồng thời (Race Condition Protection).</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/create_meeting/evidence_05_room_conflict_alert.svg', 'TC_MEET_TIME_023: Kiểm tra cơ chế khóa phòng chống Race Condition khi 2 người dùng đặt trùng giờ đồng thời')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
         </tr>
         
           </tbody>
@@ -1112,17 +1379,48 @@ Time: 09:00 - 10:00 ngày mai</td>
       </div>
     </div>
 
+    <!-- Image Preview Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fs-6 fw-bold" id="imageModalLabel">Ảnh minh chứng kết quả kiểm thử</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center p-3 bg-light">
+            <img id="modalPreviewImg" src="" class="img-fluid rounded border shadow-sm" alt="Preview Evidence" style="max-height: 70vh;">
+          </div>
+          <div class="modal-footer">
+            <a id="btnDownloadEvidence" href="" download class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i> Tải ảnh về</a>
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <footer class="mt-4 text-center text-muted small pb-4">
-      Dự án: TTCS_T926_K16C2_N3 - Quản lý Lịch họp Doanh nghiệp • ICTU 2026. Biểu mẫu chuẩn tuân thủ quy trình QA.
+      Dự án: TTCS_T926_K16C2_N3 - Quản lý Lịch họp Doanh nghiệp • ICTU 2026. Biểu mẫu chuẩn tuân thủ quy trình QA có đính kèm ảnh minh chứng.
     </footer>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const searchInput = document.getElementById('searchInput');
     const filterCat = document.getElementById('filterCategory');
     const table = document.getElementById('tcTable');
     const rows = table.querySelectorAll('tbody tr');
     const showingCount = document.getElementById('showingCount');
+    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    const modalPreviewImg = document.getElementById('modalPreviewImg');
+    const imageModalLabel = document.getElementById('imageModalLabel');
+    const btnDownloadEvidence = document.getElementById('btnDownloadEvidence');
+
+    function viewEvidence(src, title) {
+      modalPreviewImg.src = src;
+      imageModalLabel.innerText = title;
+      btnDownloadEvidence.href = src;
+      imageModal.show();
+    }
 
     function applyFilter() {
       const query = searchInput.value.toLowerCase().trim();
