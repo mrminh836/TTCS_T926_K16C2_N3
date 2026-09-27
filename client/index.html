@@ -102,6 +102,9 @@
             <span class="stitch-badge">
               Form Modal
             </span>
+            <span id="meeting-api-status-badge" class="stitch-badge-api" title="Trạng thái kết nối API Backend">
+              <span class="api-dot-status"></span> <span id="meeting-api-status-text">Client Ready</span>
+            </span>
           </div>
           <p id="modal-subtitle" class="stitch-modal-subtitle">
             Tạo lịch họp và thiết lập thời gian cuộc họp
@@ -125,6 +128,7 @@
         <h4 class="stitch-success-title">Cuộc họp đã được ghi nhận thành công!</h4>
         <p class="stitch-success-desc">
           Lịch họp <span class="fw-semibold text-dark" id="success-title">"Họp Sprint Review nhóm K16C2"</span> đã được lưu vào hệ thống.
+          <span id="success-sync-status" class="d-block mt-1 small text-success fw-medium"></span>
         </p>
 
         <div class="stitch-summary-card">
@@ -252,7 +256,7 @@
             <label for="meeting-description" class="stitch-label">
               Mô tả
             </label>
-            <span class="stitch-hint">Không bắt buộc</span>
+            <span class="stitch-hint" id="desc-char-count">Tối đa 2000 ký tự</span>
           </div>
 
           <textarea
@@ -260,9 +264,11 @@
             name="meeting_description"
             class="form-control stitch-textarea"
             rows="4"
+            maxlength="2000"
             aria-label="Mô tả nội dung cuộc họp"
             placeholder="Nhập nội dung, mục tiêu hoặc chương trình cuộc họp..."></textarea>
           <small class="stitch-field-help">Cho phép nhập chi tiết agenda, mục tiêu hành động hoặc tài liệu đính kèm.</small>
+          <p id="desc-error" class="stitch-field-error hidden"></p>
           <!-- Giữ input id meeting-notes ẩn để hoàn toàn tương thích ngược -->
           <input type="hidden" id="meeting-notes" />
         </div>
@@ -334,10 +340,10 @@
           <!-- Ẩn input meeting-time cũ để đồng bộ tương thích ngược -->
           <input type="hidden" id="meeting-time" />
 
-          <!-- Time Error alert (khi end <= start) -->
+          <!-- Time Error alert (khi end <= start hoặc duration không hợp lệ) -->
           <div id="time-error-msg" class="stitch-time-error-box hidden">
             <i class="bi bi-exclamation-triangle-fill text-danger flex-shrink-0"></i>
-            <span>Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.</span>
+            <span id="time-error-text">Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.</span>
           </div>
         </div>
 
@@ -358,6 +364,11 @@
               <option value="4">Phòng Grand Board — Sức chứa: 50 người</option>
               <option value="5">Phòng VIP — Sức chứa: 10 người</option>
             </select>
+          </div>
+          <p id="room-error" class="stitch-field-error hidden"></p>
+          <div id="room-conflict-alert" class="stitch-time-error-box hidden mt-2">
+            <i class="bi bi-calendar-x-fill text-danger flex-shrink-0"></i>
+            <span id="room-conflict-text">Phòng họp đã có người đặt trong khung giờ này.</span>
           </div>
           <!-- Ẩn compatibility input -->
           <input type="hidden" id="meeting-location" />
