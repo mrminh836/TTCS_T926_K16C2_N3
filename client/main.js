@@ -928,7 +928,7 @@ function renderFinderRoomCards() {
     } else if (room.isConflict) {
       cardStatusClass = "status-busy";
       const conf = room.conflictMeeting;
-      statusText = `<div class="room-conflict-badge"><i class="bi bi-x-circle-fill"></i> Bận: "${escapeHTML(conf ? conf.title : '')}" (${conf ? conf.time : ''})</div>`;
+      statusText = `<span><i class="bi bi-dash-circle-fill me-1 text-danger"></i> Đang bận</span><span class="text-danger fw-semibold">${conf && conf.time ? conf.time : 'Không khả dụng'}</span>`;
     }
 
     const eqChips = (room.equipments || []).slice(0, 2).map(eq => `<span class="room-eq-pill">${escapeHTML(eq)}</span>`).join("");
@@ -2718,14 +2718,9 @@ function renderRealtimeRoomCards(editId = null) {
       cardStatusClass = "status-busy";
       const conf = room.conflictMeeting;
       statusBadgeHtml = `
-        <div class="room-card-status-bar">
-          <div class="room-conflict-badge">
-            <i class="bi bi-x-circle-fill"></i>
-            <strong>Trùng lịch:</strong> "${escapeHTML(conf ? conf.title : 'Đã có lịch')}"
-          </div>
-          <div class="text-danger small" style="font-size: 0.68rem;">
-            Khung giờ: ${conf ? conf.time : ''}
-          </div>
+        <div class="room-card-status-bar" title="${conf ? `Đã có lịch: ${escapeHTML(conf.title)} (${conf.time})` : 'Đã có lịch'}">
+          <span><i class="bi bi-dash-circle-fill me-1 text-danger"></i> Đang bận</span>
+          <span class="text-danger fw-semibold">${conf && conf.time ? conf.time : 'Không khả dụng'}</span>
         </div>
       `;
     }

@@ -3842,9 +3842,6 @@ body {
   background: #fef2f2;
   color: #991b1b;
   font-weight: 500;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
 }
 
 .status-maintenance .room-card-status-bar {
@@ -3895,3 +3892,22 @@ body {
   align-items: center;
   gap: 8px;
 }
+
+/* ========================================================
+   FIX: Ẩn icon chấm than đỏ trên input type="time" và "date" khi validate lỗi
+   Giúp ô nhập giờ/ngày luôn thoáng, gọn gàng, hiển thị duy nhất icon đồng hồ/lịch.
+   Cảnh báo lỗi vẫn đảm bảo nhận biết qua viền đỏ và thông báo chi tiết bên dưới.
+   ======================================================== */
+.form-control[type="time"].is-invalid,
+.form-control[type="date"].is-invalid,
+.form-control[type="datetime-local"].is-invalid,
+.stitch-input[type="time"].is-invalid,
+.stitch-input[type="date"].is-invalid,
+.stitch-input[type="datetime-local"].is-invalid,
+.was-validated .form-control[type="time"]:invalid,
+.was-validated .form-control[type="date"]:invalid,
+.was-validated .stitch-input[type="time"]:invalid,
+.was-validated .stitch-input[type="date"]:invalid {
+  background-image: none !important;
+  padding-right: 0.75rem !important;
+}
