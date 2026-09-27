@@ -289,13 +289,47 @@ function validateAvailableRoomsMiddleware(req, res, next) {
     next();
 }
 
+/**
+ * Express Middleware kiểm tra tính hợp lệ của ID phòng họp trên URL param (:id)
+ */
+function validateRoomIdMiddleware(req, res, next) {
+    const idParam = req.params.id;
+    if (idParam === undefined || idParam === null || String(idParam).trim() === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'
+        });
+    }
+
+    const trimmed = String(idParam).trim();
+    if (!/^\d+$/.test(trimmed)) {
+        return res.status(400).json({
+            success: false,
+            message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'
+        });
+    }
+
+    const num = Number(trimmed);
+    if (!Number.isInteger(num) || num <= 0) {
+        return res.status(400).json({
+            success: false,
+            message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'
+        });
+    }
+
+    req.roomId = num;
+    next();
+}
+
 module.exports = {
     ROOM_VALIDATION_CONFIG,
     isPositiveInteger,
     validateRoomInput,
     validateRoomMiddleware,
+    validateRoomIdMiddleware,
     validateAvailableRoomsQuery,
     validateAvailableRoomsMiddleware,
     formatToMySQLDateTime
 };
+
 

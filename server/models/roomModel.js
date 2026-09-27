@@ -83,18 +83,32 @@ let mockRoomsFallback = [
 // Mock danh sách cuộc họp đang hoạt động phục vụ kiểm tra Luồng 1.3 khi fallback
 let mockActiveBookingsFallback = [];
 
+// Bản đồ trang thiết bị mặc định theo phòng họp mẫu
+const defaultEquipmentsMap = {
+    1: ["Máy chiếu Full HD", "Màn hình TV 75\"", "Micro & Loa họp"],
+    2: ["Màn hình TV 75\"", "Bảng trắng viết", "Micro & Loa họp"],
+    3: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\"", "Bảng trắng viết"],
+    4: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\""],
+    5: ["Màn hình TV 75\"", "Micro & Loa họp"]
+};
+
 function formatRoomRow(row) {
     if (!row) return null;
+    const id = row.RoomID !== undefined ? row.RoomID : row.id;
+    const capacity = row.Capacity !== undefined ? Number(row.Capacity) : Number(row.capacity);
     return {
-        id: row.RoomID !== undefined ? row.RoomID : row.id,
-        code: row.RoomCode || row.code || `RM-${String(row.RoomID || row.id).padStart(3, '0')}`,
+        id,
+        code: row.RoomCode || row.code || `RM-${String(id).padStart(3, '0')}`,
         name: row.RoomName || row.name,
-        capacity: row.Capacity !== undefined ? Number(row.Capacity) : Number(row.capacity),
+        capacity,
+        maxCapacity: capacity, // Sức chứa tối đa của phòng họp
         type: row.Type || row.type || 'Hội nghị',
         floor: row.Floor || row.floor || '',
         status: row.Status || row.status || 'Active',
-        qrCode: row.QRCode || row.qrCode || `QR-ROOM-${String(row.RoomID || row.id).padStart(3, '0')}`,
-        equipments: row.equipments || [],
+        qrCode: row.QRCode || row.qrCode || `QR-ROOM-${String(id).padStart(3, '0')}`,
+        equipments: Array.isArray(row.equipments) && row.equipments.length > 0 
+            ? row.equipments 
+            : (defaultEquipmentsMap[id] || []),
         description: row.Description || row.description || '',
         createdAt: row.CreatedAt || row.createdAt || null,
         updatedAt: row.UpdatedAt || row.updatedAt || null
@@ -178,12 +192,14 @@ const Room = {
     },
 
     /**
-     * Lấy chi tiết phòng họp theo ID
+     * Lấy chi tiết phòng họp và sức chứa tối đa theo ID
      * @param {number} roomId
-     * @returns {Promise<Object|null>}
+     * @returns {Promise<Object|null>} Chi tiết phòng họp kèm sức chứa tối đa (maxCapacity)
      */
     findById: async (roomId) => {
         const parsedId = Number(roomId);
+        if (isNaN(parsedId) || parsedId <= 0) return null;
+
         try {
             const [rows] = await db.execute(`
                 SELECT RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description, CreatedAt, UpdatedAt 
@@ -191,10 +207,37 @@ const Room = {
                 WHERE RoomID = ?
             `, [parsedId]);
             if (rows.length === 0) return null;
-            return formatRoomRow(rows[0]);
+
+            const roomData = formatRoomRow(rows[0]);
+
+            // Thống kê số cuộc họp đã xác nhận sắp diễn ra hoặc đang diễn ra tại phòng này
+            try {
+                const [countRows] = await db.execute(`
+                    SELECT COUNT(*) as count 
+                    FROM bookings b
+                    JOIN meetings m ON b.MeetingID = m.MeetingID
+                    WHERE b.RoomID = ? 
+                      AND b.BookingStatus = 'Confirmed'
+                      AND m.EndTime >= NOW()
+                `, [parsedId]);
+                roomData.activeMeetingsCount = countRows && countRows[0] ? Number(countRows[0].count) : 0;
+            } catch {
+                roomData.activeMeetingsCount = 0;
+            }
+
+            return roomData;
         } catch {
             const found = mockRoomsFallback.find(r => r.id === parsedId);
-            return found ? formatRoomRow(found) : null;
+            if (!found) return null;
+
+            const roomData = formatRoomRow(found);
+            const now = Date.now();
+            roomData.activeMeetingsCount = mockActiveBookingsFallback.filter(b => 
+                b.roomId === parsedId && 
+                b.status === 'Confirmed' && 
+                new Date(b.endTime).getTime() >= now
+            ).length;
+            return roomData;
         }
     },
 
