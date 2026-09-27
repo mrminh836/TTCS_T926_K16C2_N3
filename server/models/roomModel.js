@@ -561,7 +561,7 @@ const Room = {
      * @returns {Promise<Array>} Danh sách phòng trống
      */
     findAvailableRooms: async ({ startTime, endTime, minCapacity = null, excludeMeetingId = null }) => {
-        const query = `
+        let sql = `
             SELECT 
                 r.RoomID,
                 r.RoomCode,
@@ -572,42 +572,41 @@ const Room = {
                 r.Status,
                 r.QRCode,
                 r.Description
-            FROM rooms r
+            FROM Rooms r
             WHERE r.Status = 'Active'
-              AND (? IS NULL OR r.Capacity >= ?)
+        `;
+        const params = [];
+
+        if (minCapacity !== null && minCapacity !== undefined && minCapacity !== '') {
+            sql += ` AND r.Capacity >= ?`;
+            params.push(Number(minCapacity));
+        }
+
+        sql += `
               AND NOT EXISTS (
                   SELECT 1
-                  FROM bookings b
-                  JOIN meetings m ON b.MeetingID = m.MeetingID
+                  FROM Bookings b
+                  JOIN Meetings m ON b.MeetingID = m.MeetingID
                   WHERE b.RoomID = r.RoomID
                     AND b.BookingStatus = 'Confirmed'
                     AND (m.StartTime < ?) AND (m.EndTime > ?)
-                    AND (? IS NULL OR m.MeetingID != ?)
+        `;
+        params.push(endTime, startTime);
+
+        if (excludeMeetingId) {
+            sql += ` AND m.MeetingID != ?`;
+            params.push(Number(excludeMeetingId));
+        }
+
+        sql += `
               )
             ORDER BY r.Capacity ASC, r.RoomName ASC
         `;
 
-        const params = [
-            minCapacity,
-            minCapacity,
-            endTime,
-            startTime,
-            excludeMeetingId,
-            excludeMeetingId
-        ];
-
         try {
-            const [rows] = await db.execute(query, params);
+            const [rows] = await db.query(sql, params);
             return rows.map(r => ({
-                id: r.RoomID,
-                code: r.RoomCode || `RM-${String(r.RoomID).padStart(3, '0')}`,
-                name: r.RoomName,
-                capacity: r.Capacity,
-                type: r.Type || 'Hội nghị',
-                floor: r.Floor || '',
-                status: r.Status,
-                qrCode: r.QRCode,
-                description: r.Description || '',
+                ...formatRoomRow(r),
                 isAvailable: true
             }));
         } catch (dbError) {
