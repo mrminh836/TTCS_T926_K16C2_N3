@@ -310,23 +310,29 @@ function exportToCSV() {
 // =====================================================
 
 function calcDuration() {
+  const dateInput = document.getElementById("meeting-date");
   const startInput = document.getElementById("meeting-start");
   const endInput = document.getElementById("meeting-end");
+  const idInput = document.getElementById("meeting-id");
+  const isEdit = idInput && idInput.value !== "";
   const durationBadge = document.getElementById("duration-badge");
   const durationText = document.getElementById("duration-text");
   const timeErrorMsg = document.getElementById("time-error-msg");
+  const timeErrorText = document.getElementById("time-error-text");
 
   if (!startInput || !endInput || !durationBadge || !durationText || !timeErrorMsg) {
     return true;
   }
 
+  const date = dateInput ? dateInput.value : "";
   const start = startInput.value;
   const end = endInput.value;
 
   if (!start || !end) {
     durationBadge.classList.add("hidden");
     timeErrorMsg.classList.add("hidden");
-    endInput.classList.remove("has-error");
+    endInput.classList.remove("has-error", "is-invalid");
+    startInput.classList.remove("has-error", "is-invalid");
     return true;
   }
 
@@ -339,32 +345,65 @@ function calcDuration() {
 
   if (diff <= 0) {
     // Trạng thái lỗi: endTime <= startTime
+    if (timeErrorText) timeErrorText.textContent = "Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.";
     timeErrorMsg.classList.remove("hidden");
     durationBadge.className = "stitch-duration-badge error";
     durationText.innerText = "Thời gian không hợp lệ";
-    endInput.classList.add("has-error");
+    endInput.classList.add("has-error", "is-invalid");
     durationBadge.classList.remove("hidden");
     return false;
-  } else {
-    timeErrorMsg.classList.add("hidden");
-    durationBadge.className = "stitch-duration-badge";
-    endInput.classList.remove("has-error");
-
-    const hours = Math.floor(diff / 60);
-    const minutes = diff % 60;
-    let formatted = "";
-    if (hours > 0 && minutes > 0) {
-      formatted = `${hours} giờ ${minutes} phút`;
-    } else if (hours > 0) {
-      formatted = `${hours} giờ`;
-    } else {
-      formatted = `${minutes} phút`;
-    }
-
-    durationText.innerText = `Thời lượng: ${formatted}`;
+  } else if (diff < 5) {
+    if (timeErrorText) timeErrorText.textContent = "Thời lượng cuộc họp tối thiểu phải từ 5 phút trở lên.";
+    timeErrorMsg.classList.remove("hidden");
+    durationBadge.className = "stitch-duration-badge error";
+    durationText.innerText = "Thời lượng quá ngắn (< 5p)";
+    endInput.classList.add("has-error", "is-invalid");
     durationBadge.classList.remove("hidden");
-    return true;
+    return false;
+  } else if (diff > 1440) {
+    if (timeErrorText) timeErrorText.textContent = "Thời lượng cuộc họp không được vượt quá 24 giờ trong một lần đặt.";
+    timeErrorMsg.classList.remove("hidden");
+    durationBadge.className = "stitch-duration-badge error";
+    durationText.innerText = "Thời lượng vượt quá 24h";
+    endInput.classList.add("has-error", "is-invalid");
+    durationBadge.classList.remove("hidden");
+    return false;
   }
+
+  // Chống đặt trong quá khứ nếu là tạo mới
+  if (!isEdit && date) {
+    const selectedStart = new Date(`${date}T${start}:00`);
+    if (selectedStart.getTime() < Date.now() - 60000) {
+      if (timeErrorText) timeErrorText.textContent = "Thời gian bắt đầu không thể diễn ra trong quá khứ.";
+      timeErrorMsg.classList.remove("hidden");
+      durationBadge.className = "stitch-duration-badge error";
+      durationText.innerText = "Thời gian trong quá khứ";
+      startInput.classList.add("has-error", "is-invalid");
+      durationBadge.classList.remove("hidden");
+      return false;
+    }
+  }
+
+  // Hợp lệ
+  timeErrorMsg.classList.add("hidden");
+  durationBadge.className = "stitch-duration-badge";
+  endInput.classList.remove("has-error", "is-invalid");
+  startInput.classList.remove("has-error", "is-invalid");
+
+  const hours = Math.floor(diff / 60);
+  const minutes = diff % 60;
+  let formatted = "";
+  if (hours > 0 && minutes > 0) {
+    formatted = `${hours} giờ ${minutes} phút`;
+  } else if (hours > 0) {
+    formatted = `${hours} giờ`;
+  } else {
+    formatted = `${minutes} phút`;
+  }
+
+  durationText.innerText = `Thời lượng: ${formatted}`;
+  durationBadge.classList.remove("hidden");
+  return true;
 }
 
 
@@ -562,6 +601,10 @@ function renderMeetingsPage() {
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">
+          <span id="meeting-page-api-badge" class="stitch-badge-api me-1 d-none d-sm-inline-flex" title="Trạng thái kết nối API Backend">
+            <span class="api-dot-status"></span> <span id="meeting-page-api-text">API Live</span>
+          </span>
+
           <button type="button" id="btn-export-excel" class="btn-stitch-export" title="Xuất danh sách ra file CSV">
             <i class="bi bi-file-earmark-arrow-down"></i>
             <span>Xuất báo cáo / Excel</span>
@@ -758,6 +801,9 @@ function renderMeetingsPage() {
   // Gắn sự kiện
   setupMeetingEvents();
   renderMeetingTable();
+  if (typeof MeetingAPI !== "undefined") {
+    MeetingAPI.checkHealth();
+  }
 }
 
 function updateDashboardStats() {
@@ -1686,6 +1732,526 @@ function loadPersistedRooms() {
     }
   } catch (e) {
     console.warn("Lỗi khi đọc phòng từ localStorage:", e);
+  }
+}
+
+// =====================================================
+// 6E. LƯU TRỮ VÀ ĐỒNG BỘ DỮ LIỆU CUỘC HỌP (MEETINGS STORAGE)
+// =====================================================
+
+function persistMeetingsToStorage() {
+  try {
+    localStorage.setItem("STITCH_MEETINGS_DATA", JSON.stringify(meetings));
+  } catch (e) {
+    console.warn("Lỗi khi lưu cuộc họp vào localStorage:", e);
+  }
+}
+
+function loadPersistedMeetings() {
+  try {
+    const saved = localStorage.getItem("STITCH_MEETINGS_DATA");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        meetings = parsed;
+      }
+    }
+  } catch (e) {
+    console.warn("Lỗi khi đọc cuộc họp từ localStorage:", e);
+  }
+}
+
+// =====================================================
+// 6F. MEETING API SERVICE (RESTful WITH GRACEFUL FALLBACK)
+// =====================================================
+
+const MEETING_API_URL = "http://localhost:3000/api/meetings";
+
+const MeetingAPI = {
+  isBackendConnected: false,
+
+  async checkHealth() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const res = await fetch("http://localhost:3000/api/health", { signal: controller.signal });
+      clearTimeout(timeoutId);
+      this.isBackendConnected = res.ok;
+    } catch {
+      this.isBackendConnected = false;
+    }
+    this.updateStatusBadges();
+    return this.isBackendConnected;
+  },
+
+  updateStatusBadges() {
+    const badges = [
+      { badge: document.getElementById("meeting-api-status-badge"), text: document.getElementById("meeting-api-status-text") },
+      { badge: document.getElementById("meeting-page-api-badge"), text: document.getElementById("meeting-page-api-text") }
+    ];
+
+    badges.forEach(({ badge, text }) => {
+      if (!badge || !text) return;
+      if (this.isBackendConnected) {
+        badge.classList.remove("offline");
+        badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật (Port 3000)";
+        text.textContent = "API Live (Port 3000)";
+      } else {
+        badge.classList.add("offline");
+        badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
+        text.textContent = "Client Fallback";
+      }
+    });
+  },
+
+  async create(payload) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(MEETING_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        this.isBackendConnected = true;
+        this.updateStatusBadges();
+        return {
+          success: false,
+          status: res.status,
+          message: json.message || "Không thể tạo cuộc họp trên máy chủ.",
+          errors: json.errors || [json.message],
+          isConflict: res.status === 409
+        };
+      }
+
+      this.isBackendConnected = true;
+      this.updateStatusBadges();
+      return {
+        success: true,
+        data: json.data || json,
+        message: json.message || "Tạo cuộc họp và đặt phòng thành công.",
+        isFallback: false
+      };
+    } catch (err) {
+      console.warn("Backend API offline hoặc timeout, chuyển sang Local Store Fallback:", err);
+      this.isBackendConnected = false;
+      this.updateStatusBadges();
+      return {
+        success: true,
+        isFallback: true,
+        data: null,
+        message: "Lưu tạm trên bộ nhớ cục bộ (Local Store Fallback)"
+      };
+    }
+  }
+};
+
+// =====================================================
+// 6G. MEETING FORM VALIDATION & CONFLICT CHECK (STITCH SPEC)
+// =====================================================
+
+function showMeetingFieldError(inputEl, errorEl, message) {
+  if (inputEl) {
+    inputEl.classList.add("has-error", "is-invalid");
+  }
+  if (errorEl) {
+    errorEl.innerHTML = `<i class="bi bi-exclamation-circle-fill me-1"></i> ${escapeHTML(message)}`;
+    errorEl.classList.remove("hidden");
+  }
+}
+
+function clearMeetingFormErrors() {
+  const globalError = document.getElementById("global-error");
+  if (globalError) globalError.classList.add("hidden");
+
+  const titleError = document.getElementById("title-error");
+  if (titleError) titleError.classList.add("hidden");
+
+  const titleErrorIcon = document.getElementById("title-error-icon");
+  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
+
+  const timeErrorMsg = document.getElementById("time-error-msg");
+  if (timeErrorMsg) timeErrorMsg.classList.add("hidden");
+
+  const roomError = document.getElementById("room-error");
+  if (roomError) roomError.classList.add("hidden");
+
+  const roomConflictAlert = document.getElementById("room-conflict-alert");
+  if (roomConflictAlert) roomConflictAlert.classList.add("hidden");
+
+  const descError = document.getElementById("desc-error");
+  if (descError) descError.classList.add("hidden");
+
+  [
+    "meeting-title",
+    "meeting-date",
+    "meeting-start",
+    "meeting-end",
+    "meeting-room",
+    "meeting-organizer",
+    "meeting-description"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("has-error", "is-invalid");
+  });
+}
+
+function checkMeetingRoomConflict(roomId, date, startTime, endTime, editId = null) {
+  if (!roomId || !date || !startTime || !endTime) return null;
+  return meetings.find(m => {
+    if (editId && m.id === editId) return false;
+    if (m.status === "cancelled") return false;
+    if (m.roomId !== roomId) return false;
+    if (m.date !== date) return false;
+    // Xung đột thời gian: (m.startTime < endTime) && (m.endTime > startTime)
+    return (m.startTime < endTime && m.endTime > startTime);
+  });
+}
+
+function validateMeetingForm(editId = null) {
+  const titleInput = document.getElementById("meeting-title");
+  const tagInput = document.getElementById("meeting-tag");
+  const descInput = document.getElementById("meeting-description") || document.getElementById("meeting-notes");
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const roomSelect = document.getElementById("meeting-room");
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const participantsInput = document.getElementById("meeting-participants");
+  const recurringInput = document.getElementById("meeting-recurring");
+
+  const titleError = document.getElementById("title-error");
+  const titleErrorIcon = document.getElementById("title-error-icon");
+  const timeErrorMsg = document.getElementById("time-error-msg");
+  const timeErrorText = document.getElementById("time-error-text");
+  const roomError = document.getElementById("room-error");
+  const roomConflictAlert = document.getElementById("room-conflict-alert");
+  const roomConflictText = document.getElementById("room-conflict-text");
+  const descError = document.getElementById("desc-error");
+  const globalError = document.getElementById("global-error");
+  const globalErrorTitle = document.getElementById("global-error-title");
+  const globalErrorDesc = document.getElementById("global-error-desc");
+
+  clearMeetingFormErrors();
+
+  let isValid = true;
+  let firstErrorField = null;
+
+  const title = titleInput ? titleInput.value.trim() : "";
+  const tag = tagInput ? tagInput.value.trim() : "";
+  const description = descInput ? descInput.value.trim() : "";
+  const date = dateInput ? dateInput.value : "";
+  const startTime = startInput ? startInput.value : "";
+  const endTime = endInput ? endInput.value : "";
+  const roomId = Number(roomSelect ? roomSelect.value : 0);
+  const organizerId = Number(organizerSelect ? organizerSelect.value : 0);
+  const isRecurring = recurringInput ? recurringInput.checked : false;
+
+  // 1. Kiểm tra Tiêu đề cuộc họp (Title)
+  if (!title) {
+    isValid = false;
+    showMeetingFieldError(titleInput, titleError, "Tiêu đề cuộc họp là bắt buộc và không được để trống.");
+    if (titleErrorIcon) titleErrorIcon.classList.remove("hidden");
+    if (!firstErrorField) firstErrorField = titleInput;
+  } else if (title.length < 1) {
+    isValid = false;
+    showMeetingFieldError(titleInput, titleError, "Tiêu đề cuộc họp phải có ít nhất 1 ký tự.");
+    if (titleErrorIcon) titleErrorIcon.classList.remove("hidden");
+    if (!firstErrorField) firstErrorField = titleInput;
+  } else if (title.length > 200) {
+    isValid = false;
+    showMeetingFieldError(titleInput, titleError, "Tiêu đề cuộc họp không được vượt quá 200 ký tự (chuẩn CSDL).");
+    if (titleErrorIcon) titleErrorIcon.classList.remove("hidden");
+    if (!firstErrorField) firstErrorField = titleInput;
+  } else if (/[<>]/.test(title)) {
+    isValid = false;
+    showMeetingFieldError(titleInput, titleError, "Tiêu đề không được chứa ký tự đặc biệt nguy hiểm (<, >).");
+    if (titleErrorIcon) titleErrorIcon.classList.remove("hidden");
+    if (!firstErrorField) firstErrorField = titleInput;
+  }
+
+  // 2. Kiểm tra Mô tả (Description)
+  if (description.length > 2000) {
+    isValid = false;
+    if (descError) {
+      descError.textContent = "Mô tả cuộc họp không được vượt quá 2000 ký tự.";
+      descError.classList.remove("hidden");
+    }
+    if (descInput) descInput.classList.add("has-error", "is-invalid");
+    if (!firstErrorField) firstErrorField = descInput;
+  }
+
+  // 3. Kiểm tra Thời gian (Date, Start Time, End Time)
+  if (!date || !startTime || !endTime) {
+    isValid = false;
+    if (timeErrorMsg) {
+      if (timeErrorText) timeErrorText.textContent = "Vui lòng chọn ngày họp, thời gian bắt đầu và kết thúc đầy đủ.";
+      timeErrorMsg.classList.remove("hidden");
+    }
+    if (!date && dateInput) { dateInput.classList.add("has-error", "is-invalid"); if (!firstErrorField) firstErrorField = dateInput; }
+    if (!startTime && startInput) { startInput.classList.add("has-error", "is-invalid"); if (!firstErrorField) firstErrorField = startInput; }
+    if (!endTime && endInput) { endInput.classList.add("has-error", "is-invalid"); if (!firstErrorField) firstErrorField = endInput; }
+  } else {
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+    const startTotal = startH * 60 + startM;
+    const endTotal = endH * 60 + endM;
+    const diffMinutes = endTotal - startTotal;
+
+    if (diffMinutes <= 0) {
+      isValid = false;
+      if (timeErrorMsg) {
+        if (timeErrorText) timeErrorText.textContent = "Thời gian kết thúc phải lớn hơn thời gian bắt đầu.";
+        timeErrorMsg.classList.remove("hidden");
+      }
+      if (endInput) endInput.classList.add("has-error", "is-invalid");
+      if (!firstErrorField) firstErrorField = endInput;
+    } else if (diffMinutes < 5) {
+      isValid = false;
+      if (timeErrorMsg) {
+        if (timeErrorText) timeErrorText.textContent = "Thời lượng cuộc họp tối thiểu phải từ 5 phút trở lên.";
+        timeErrorMsg.classList.remove("hidden");
+      }
+      if (endInput) endInput.classList.add("has-error", "is-invalid");
+      if (!firstErrorField) firstErrorField = endInput;
+    } else if (diffMinutes > 1440) {
+      isValid = false;
+      if (timeErrorMsg) {
+        if (timeErrorText) timeErrorText.textContent = "Thời lượng cuộc họp không được vượt quá 24 giờ trong 1 lần đặt.";
+        timeErrorMsg.classList.remove("hidden");
+      }
+      if (endInput) endInput.classList.add("has-error", "is-invalid");
+      if (!firstErrorField) firstErrorField = endInput;
+    } else {
+      const now = new Date();
+      const startDateTime = new Date(`${date}T${startTime}:00`);
+      if (!editId && startDateTime.getTime() < now.getTime() - 60000) {
+        isValid = false;
+        if (timeErrorMsg) {
+          if (timeErrorText) timeErrorText.textContent = "Thời gian bắt đầu không thể diễn ra trong quá khứ.";
+          timeErrorMsg.classList.remove("hidden");
+        }
+        if (startInput) startInput.classList.add("has-error", "is-invalid");
+        if (dateInput) dateInput.classList.add("has-error", "is-invalid");
+        if (!firstErrorField) firstErrorField = startInput;
+      }
+    }
+  }
+
+  // 4. Kiểm tra Phòng họp (Room)
+  const roomObj = ROOMS.find(r => r.id === roomId);
+  if (!roomId || !roomObj) {
+    isValid = false;
+    if (roomError) {
+      roomError.textContent = "Vui lòng chọn phòng họp hợp lệ.";
+      roomError.classList.remove("hidden");
+    }
+    if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+    if (!firstErrorField) firstErrorField = roomSelect;
+  } else if (roomObj.status !== "Active") {
+    isValid = false;
+    const statusLabel = roomObj.status === "Maintenance" ? "Bảo trì" : "Tạm ngừng";
+    if (roomError) {
+      roomError.textContent = `Phòng "${roomObj.name}" hiện không khả dụng (Trạng thái: ${statusLabel}). Vui lòng chọn phòng khác.`;
+      roomError.classList.remove("hidden");
+    }
+    if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+    if (!firstErrorField) firstErrorField = roomSelect;
+  }
+
+  // 5. Kiểm tra trùng lịch phòng phía Client (Conflict Pre-check)
+  if (isValid && roomObj && date && startTime && endTime) {
+    const conflictingMeeting = checkMeetingRoomConflict(roomId, date, startTime, endTime, editId);
+    if (conflictingMeeting) {
+      isValid = false;
+      if (roomConflictAlert && roomConflictText) {
+        roomConflictText.innerHTML = `Phòng <strong>${escapeHTML(roomObj.name)}</strong> đã có lịch họp: <strong>"${escapeHTML(conflictingMeeting.title)}"</strong> (${conflictingMeeting.time}). Vui lòng chọn giờ hoặc phòng khác.`;
+        roomConflictAlert.classList.remove("hidden");
+      }
+      if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+      if (!firstErrorField) firstErrorField = roomSelect;
+    }
+  }
+
+  // 6. Kiểm tra Người tổ chức (Organizer)
+  const organizerObj = USERS.find(u => u.id === organizerId);
+  if (!organizerId || !organizerObj) {
+    isValid = false;
+    if (organizerSelect) organizerSelect.classList.add("has-error", "is-invalid");
+  }
+
+  // Parse Người tham gia (Participants) & Thiết bị (Equipments)
+  const participants = participantsInput && participantsInput.value.trim()
+    ? participantsInput.value.split(",").map(p => p.trim()).filter(Boolean)
+    : [organizerObj?.name || "Nguyễn Văn An"];
+
+  const participantIds = participants.map(name => {
+    const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
+    return u ? u.id : null;
+  }).filter(Boolean);
+  if (!participantIds.includes(organizerId) && organizerId) {
+    participantIds.unshift(organizerId);
+  }
+
+  const equipmentCheckboxes = Array.from(document.querySelectorAll(".eq-checkbox:checked"));
+  const equipmentIds = equipmentCheckboxes.map(cb => Number(cb.value));
+  const equipmentNames = equipmentIds.map(eid => {
+    const eq = EQUIPMENTS.find(e => e.id === eid);
+    return eq ? eq.name : `Thiết bị #${eid}`;
+  });
+
+  // Hiển thị Global Error Banner & Trigger Shake nếu có lỗi
+  if (!isValid) {
+    if (globalError && globalErrorTitle && globalErrorDesc) {
+      globalErrorTitle.innerText = "Thông tin cuộc họp chưa hợp lệ";
+      globalErrorDesc.innerText = "Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi lưu.";
+      globalError.classList.remove("hidden");
+    }
+
+    const modalCard = document.querySelector(".meeting-modal-card");
+    if (modalCard) {
+      modalCard.classList.remove("stitch-shake");
+      void modalCard.offsetWidth;
+      modalCard.classList.add("stitch-shake");
+    }
+
+    if (firstErrorField) {
+      firstErrorField.focus();
+    }
+
+    return { isValid: false, data: null };
+  }
+
+  return {
+    isValid: true,
+    data: {
+      title,
+      tag,
+      description,
+      date,
+      startTime,
+      endTime,
+      timeDisplay: `${startTime} - ${endTime}`,
+      roomId,
+      roomObj,
+      organizerId,
+      organizerObj,
+      participants,
+      participantIds,
+      equipmentIds,
+      equipmentNames,
+      isRecurring,
+      startTimeISO: `${date}T${startTime}:00`,
+      endTimeISO: `${date}T${endTime}:00`
+    }
+  };
+}
+
+function setupMeetingFormValidationEvents() {
+  const titleInput = document.getElementById("meeting-title");
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const roomSelect = document.getElementById("meeting-room");
+  const descInput = document.getElementById("meeting-description");
+
+  if (titleInput) {
+    titleInput.addEventListener("input", () => {
+      if (titleInput.value.trim().length > 0) {
+        titleInput.classList.remove("has-error", "is-invalid");
+        const titleError = document.getElementById("title-error");
+        const titleErrorIcon = document.getElementById("title-error-icon");
+        if (titleError) titleError.classList.add("hidden");
+        if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
+        const globalError = document.getElementById("global-error");
+        if (globalError) globalError.classList.add("hidden");
+      }
+    });
+  }
+
+  const triggerLiveTimeAndConflict = () => {
+    calcDuration();
+    const idInput = document.getElementById("meeting-id");
+    const editId = idInput && idInput.value ? Number(idInput.value) : null;
+    const date = dateInput ? dateInput.value : "";
+    const start = startInput ? startInput.value : "";
+    const end = endInput ? endInput.value : "";
+    const roomId = Number(roomSelect ? roomSelect.value : 0);
+    const roomConflictAlert = document.getElementById("room-conflict-alert");
+    const roomConflictText = document.getElementById("room-conflict-text");
+
+    if (roomId && date && start && end && start < end) {
+      const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
+      if (conflict && roomConflictAlert && roomConflictText) {
+        const roomObj = ROOMS.find(r => r.id === roomId);
+        roomConflictText.innerHTML = `Phòng <strong>${escapeHTML(roomObj ? roomObj.name : '')}</strong> đã có lịch họp: <strong>"${escapeHTML(conflict.title)}"</strong> (${conflict.time}). Vui lòng chọn giờ hoặc phòng khác.`;
+        roomConflictAlert.classList.remove("hidden");
+      } else if (roomConflictAlert) {
+        roomConflictAlert.classList.add("hidden");
+      }
+    } else if (roomConflictAlert) {
+      roomConflictAlert.classList.add("hidden");
+    }
+  };
+
+  if (dateInput) {
+    dateInput.addEventListener("change", () => {
+      dateInput.classList.remove("has-error", "is-invalid");
+      triggerLiveTimeAndConflict();
+    });
+  }
+
+  if (startInput) {
+    startInput.addEventListener("change", triggerLiveTimeAndConflict);
+    startInput.addEventListener("input", triggerLiveTimeAndConflict);
+  }
+
+  if (endInput) {
+    endInput.addEventListener("change", triggerLiveTimeAndConflict);
+    endInput.addEventListener("input", triggerLiveTimeAndConflict);
+  }
+
+  if (roomSelect) {
+    roomSelect.addEventListener("change", () => {
+      roomSelect.classList.remove("has-error", "is-invalid");
+      const roomError = document.getElementById("room-error");
+      if (roomError) roomError.classList.add("hidden");
+      const roomId = Number(roomSelect.value);
+      const roomObj = ROOMS.find(r => r.id === roomId);
+      const roomHint = document.getElementById("room-capacity-hint");
+      if (roomHint && roomObj) {
+        roomHint.textContent = `Sức chứa: ${roomObj.capacity} chỗ • ${roomObj.floor}`;
+      }
+      triggerLiveTimeAndConflict();
+    });
+  }
+
+  if (descInput) {
+    descInput.addEventListener("input", () => {
+      const len = descInput.value.length;
+      const countEl = document.getElementById("desc-char-count");
+      if (countEl) {
+        countEl.textContent = `${len}/2000 ký tự`;
+        if (len > 2000) {
+          countEl.classList.add("text-danger");
+        } else {
+          countEl.classList.remove("text-danger");
+        }
+      }
+      if (len <= 2000) {
+        descInput.classList.remove("has-error", "is-invalid");
+        const descError = document.getElementById("desc-error");
+        if (descError) descError.classList.add("hidden");
+      }
+    });
   }
 }
 
@@ -2921,6 +3487,12 @@ function setupMeetingEvents() {
   if (meetingList) {
     meetingList.addEventListener("click", handleMeetingAction);
   }
+
+  // Khởi tạo sự kiện validation thời gian thực cho form cuộc họp
+  setupMeetingFormValidationEvents();
+  if (typeof MeetingAPI !== "undefined") {
+    MeetingAPI.updateStatusBadges();
+  }
 }
 
 // =====================================================
@@ -3177,23 +3749,20 @@ function handleMeetingAction(event) {
 // =====================================================
 
 function openAddModal() {
+  if (typeof MeetingAPI !== "undefined") {
+    MeetingAPI.checkHealth();
+  }
+
   const form = document.getElementById("meeting-form");
   const title = document.getElementById("modal-title");
   const subtitle = document.getElementById("modal-subtitle");
   const id = document.getElementById("meeting-id");
   const titleInput = document.getElementById("meeting-title");
-  const descInput = document.getElementById("meeting-description") || document.getElementById("meeting-notes");
   const dateInput = document.getElementById("meeting-date");
   const startInput = document.getElementById("meeting-start");
   const endInput = document.getElementById("meeting-end");
-  const locationInput = document.getElementById("meeting-location");
-  const participantsInput = document.getElementById("meeting-participants");
   const statusInput = document.getElementById("meeting-status");
   const successView = document.getElementById("success-view");
-  const globalError = document.getElementById("global-error");
-  const titleError = document.getElementById("title-error");
-  const titleErrorIcon = document.getElementById("title-error-icon");
-  const timeErrorMsg = document.getElementById("time-error-msg");
   const submitText = document.getElementById("submit-text");
 
   if (!form) return;
@@ -3210,12 +3779,7 @@ function openAddModal() {
   if (successView) successView.classList.add("hidden");
 
   // Xóa sạch trạng thái lỗi
-  if (globalError) globalError.classList.add("hidden");
-  if (titleError) titleError.classList.add("hidden");
-  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
-  if (timeErrorMsg) timeErrorMsg.classList.add("hidden");
-  if (titleInput) titleInput.classList.remove("has-error");
-  if (endInput) endInput.classList.remove("has-error");
+  clearMeetingFormErrors();
 
   // Khởi tạo giá trị mặc định chuẩn Enterprise
   const today = new Date().toISOString().split("T")[0];
@@ -3225,7 +3789,15 @@ function openAddModal() {
   if (statusInput) statusInput.value = "scheduled";
 
   const roomSelect = document.getElementById("meeting-room");
-  if (roomSelect) roomSelect.value = "1";
+  if (roomSelect) {
+    const firstActiveRoom = ROOMS.find(r => r.status === "Active") || ROOMS[0];
+    roomSelect.value = firstActiveRoom ? String(firstActiveRoom.id) : "1";
+    const roomHint = document.getElementById("room-capacity-hint");
+    if (roomHint && firstActiveRoom) {
+      roomHint.textContent = `Sức chứa: ${firstActiveRoom.capacity} chỗ • ${firstActiveRoom.floor}`;
+    }
+  }
+
   const organizerSelect = document.getElementById("meeting-organizer");
   if (organizerSelect) organizerSelect.value = "1";
 
@@ -3237,6 +3809,9 @@ function openAddModal() {
   const recurringInput = document.getElementById("meeting-recurring");
   if (recurringInput) recurringInput.checked = false;
   document.querySelectorAll(".eq-checkbox").forEach(cb => { cb.checked = false; });
+
+  const descCount = document.getElementById("desc-char-count");
+  if (descCount) descCount.textContent = "0/2000 ký tự";
 
   calcDuration();
 
@@ -3252,6 +3827,10 @@ function openAddModal() {
 // =====================================================
 
 function openEditModal(id) {
+  if (typeof MeetingAPI !== "undefined") {
+    MeetingAPI.checkHealth();
+  }
+
   const meeting = meetings.find(item => item.id === id);
 
   if (!meeting) {
@@ -3275,10 +3854,6 @@ function openEditModal(id) {
   const participantsInput = document.getElementById("meeting-participants");
   const statusInput = document.getElementById("meeting-status");
   const successView = document.getElementById("success-view");
-  const globalError = document.getElementById("global-error");
-  const titleError = document.getElementById("title-error");
-  const titleErrorIcon = document.getElementById("title-error-icon");
-  const timeErrorMsg = document.getElementById("time-error-msg");
   const submitText = document.getElementById("submit-text");
 
   if (title) title.textContent = "Chỉnh sửa cuộc họp";
@@ -3289,22 +3864,27 @@ function openEditModal(id) {
   if (successView) successView.classList.add("hidden");
 
   // Xóa lỗi
-  if (globalError) globalError.classList.add("hidden");
-  if (titleError) titleError.classList.add("hidden");
-  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
-  if (timeErrorMsg) timeErrorMsg.classList.add("hidden");
-  if (titleInput) titleInput.classList.remove("has-error");
-  if (endInput) endInput.classList.remove("has-error");
+  clearMeetingFormErrors();
 
   // Điền dữ liệu
   if (idInput) idInput.value = meeting.id;
   if (titleInput) titleInput.value = meeting.title || "";
-  if (descInput) descInput.value = meeting.notes || meeting.description || "";
-  if (notesInput) notesInput.value = meeting.notes || "";
+  const descValue = meeting.notes || meeting.description || "";
+  if (descInput) descInput.value = descValue;
+  if (notesInput) notesInput.value = descValue;
+  const descCount = document.getElementById("desc-char-count");
+  if (descCount) descCount.textContent = `${descValue.length}/2000 ký tự`;
   if (dateInput) dateInput.value = meeting.date || "";
 
   // Phòng họp & Người tổ chức chuẩn Database
-  if (roomSelect) roomSelect.value = meeting.roomId ? String(meeting.roomId) : "1";
+  if (roomSelect) {
+    roomSelect.value = meeting.roomId ? String(meeting.roomId) : "1";
+    const roomObj = ROOMS.find(r => r.id === (meeting.roomId || 1));
+    const roomHint = document.getElementById("room-capacity-hint");
+    if (roomHint && roomObj) {
+      roomHint.textContent = `Sức chứa: ${roomObj.capacity} chỗ • ${roomObj.floor}`;
+    }
+  }
   if (organizerSelect) organizerSelect.value = meeting.organizerId ? String(meeting.organizerId) : "1";
 
   // Nhãn cuộc họp (Tag)
@@ -3348,6 +3928,9 @@ function openEditModal(id) {
   calcDuration();
 
   modalOverlay.classList.remove("hidden");
+  if (titleInput) {
+    setTimeout(() => titleInput.focus(), 100);
+  }
 }
 
 
@@ -3355,24 +3938,40 @@ function openEditModal(id) {
 // 12. LƯU (VALIDATION & SUBMIT THEO STITCH SPEC)
 // =====================================================
 
-function saveMeeting(event) {
+async function saveMeeting(event) {
   event.preventDefault();
 
-  const id = document.getElementById("meeting-id").value;
-  const titleInput = document.getElementById("meeting-title");
-  const descInput = document.getElementById("meeting-description") || document.getElementById("meeting-notes");
-  const dateInput = document.getElementById("meeting-date");
-  const startInput = document.getElementById("meeting-start");
-  const endInput = document.getElementById("meeting-end");
-  const locationInput = document.getElementById("meeting-location");
-  const participantsInput = document.getElementById("meeting-participants");
-  const statusInput = document.getElementById("meeting-status");
+  const idInput = document.getElementById("meeting-id");
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
 
-  const titleError = document.getElementById("title-error");
-  const titleErrorIcon = document.getElementById("title-error-icon");
-  const globalError = document.getElementById("global-error");
-  const globalErrorTitle = document.getElementById("global-error-title");
-  const globalErrorDesc = document.getElementById("global-error-desc");
+  // 1. Chạy validation form phía client
+  const validation = validateMeetingForm(editId);
+  if (!validation.isValid) {
+    return;
+  }
+
+  const {
+    title,
+    tag,
+    description,
+    date,
+    startTime,
+    endTime,
+    timeDisplay,
+    roomId,
+    roomObj,
+    organizerId,
+    organizerObj,
+    participants,
+    participantIds,
+    equipmentIds,
+    equipmentNames,
+    isRecurring,
+    startTimeISO,
+    endTimeISO
+  } = validation.data;
+
+  // 2. Hiệu ứng Loading trên nút submit
   const btnSubmit = document.getElementById("btn-submit");
   const submitText = document.getElementById("submit-text");
   const submitSpinner = document.getElementById("submit-spinner");
@@ -3380,133 +3979,82 @@ function saveMeeting(event) {
   const successView = document.getElementById("success-view");
   const form = document.getElementById("meeting-form");
 
-  const roomSelect = document.getElementById("meeting-room");
-  const roomId = Number(roomSelect ? roomSelect.value : 1) || 1;
-  const roomObj = ROOMS.find(r => r.id === roomId) || ROOMS[0];
-
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const organizerId = Number(organizerSelect ? organizerSelect.value : 1) || 1;
-  const organizerObj = USERS.find(u => u.id === organizerId) || USERS[0];
-
-  const tagInput = document.getElementById("meeting-tag");
-  const tag = tagInput ? tagInput.value.trim() : "";
-
-  const title = titleInput ? titleInput.value.trim() : "";
-  const date = dateInput ? dateInput.value : "";
-  const startTime = startInput ? startInput.value : "";
-  const endTime = endInput ? endInput.value : "";
-  const location = roomObj.name;
-  const notes = descInput ? descInput.value.trim() : "";
-  const status = statusInput ? statusInput.value : "scheduled";
-
-  const participants = participantsInput
-    ? participantsInput.value
-        .split(",")
-        .map(item => item.trim())
-        .filter(item => item !== "")
-    : [organizerObj.name];
-
-  // Reset errors
-  if (titleError) titleError.classList.add("hidden");
-  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
-  if (titleInput) titleInput.classList.remove("has-error");
-  if (globalError) globalError.classList.add("hidden");
-
-  // 1. Validate Tiêu đề (Bắt buộc)
-  if (!title) {
-    if (titleError) titleError.classList.remove("hidden");
-    if (titleErrorIcon) titleErrorIcon.classList.remove("hidden");
-    if (titleInput) {
-      titleInput.classList.add("has-error");
-      titleInput.focus();
-    }
-    if (globalError && globalErrorTitle && globalErrorDesc) {
-      globalErrorTitle.innerText = "Trường bắt buộc chưa nhập";
-      globalErrorDesc.innerText = "Vui lòng nhập 'Tiêu đề cuộc họp' để hoàn tất biểu mẫu.";
-      globalError.classList.remove("hidden");
-    }
-    return;
-  }
-
-  // 2. Validate Thời gian (Bắt buộc & End > Start)
-  if (!date || !startTime || !endTime) {
-    if (globalError && globalErrorTitle && globalErrorDesc) {
-      globalErrorTitle.innerText = "Thông tin thời gian chưa đầy đủ";
-      globalErrorDesc.innerText = "Vui lòng chọn ngày họp, thời gian bắt đầu và thời gian kết thúc.";
-      globalError.classList.remove("hidden");
-    }
-    return;
-  }
-
-  const isDurationValid = calcDuration();
-  if (!isDurationValid) {
-    if (globalError && globalErrorTitle && globalErrorDesc) {
-      globalErrorTitle.innerText = "Thời gian không hợp lệ";
-      globalErrorDesc.innerText = `Thời gian kết thúc (${endTime}) không thể sớm hơn thời gian bắt đầu (${startTime}).`;
-      globalError.classList.remove("hidden");
-    }
-    return;
-  }
-
-  // 3. Trạng thái Loading giả lập mượt mà
   if (btnSubmit) btnSubmit.disabled = true;
   if (submitSpinner) submitSpinner.classList.remove("hidden");
   if (submitIcon) submitIcon.classList.add("hidden");
-  if (submitText) submitText.innerText = id ? "Đang cập nhật..." : "Đang tạo cuộc họp...";
+  if (submitText) submitText.innerText = editId ? "Đang cập nhật..." : "Đang tạo cuộc họp...";
 
-  const timeDisplay = `${startTime} - ${endTime}`;
+  try {
+    let finalMeetingId = editId;
+    let isFallback = true;
+    let syncMsg = "";
 
-  const recurringInput = document.getElementById("meeting-recurring");
-  const isRecurring = recurringInput ? recurringInput.checked : false;
+    if (!editId) {
+      // Chuẩn bị payload chuẩn theo API POST /api/meetings
+      const payload = {
+        title,
+        description: description || null,
+        startTime: startTimeISO,
+        endTime: endTimeISO,
+        organizerId,
+        roomId,
+        isRecurring: Boolean(isRecurring),
+        participantIds,
+        equipmentIds
+      };
 
-  const equipmentCheckboxes = Array.from(document.querySelectorAll(".eq-checkbox:checked"));
-  const equipmentIds = equipmentCheckboxes.map(cb => Number(cb.value));
-  const equipmentNames = equipmentIds.map(eid => {
-    const found = EQUIPMENTS.find(e => e.id === eid);
-    return found ? found.name : `Thiết bị #${eid}`;
-  });
+      const apiResult = await MeetingAPI.create(payload);
 
-  const participantIds = participants.map(name => {
-    const user = USERS.find(u => u.name.toLowerCase() === name.toLowerCase());
-    return user ? user.id : null;
-  }).filter(Boolean);
+      // Nếu API trả về lỗi nghiệp vụ từ backend (400, 404, 409...)
+      if (!apiResult.success) {
+        if (btnSubmit) btnSubmit.disabled = false;
+        if (submitSpinner) submitSpinner.classList.add("hidden");
+        if (submitIcon) submitIcon.classList.remove("hidden");
+        if (submitText) submitText.innerText = "Tạo cuộc họp";
 
-  setTimeout(() => {
-    // SỬA
-    if (id) {
-      const index = meetings.findIndex(item => item.id === Number(id));
-      if (index !== -1) {
-        meetings[index] = {
-          ...meetings[index],
-          id: Number(id),
-          title,
-          tag,
-          date,
-          startTime,
-          endTime,
-          time: timeDisplay,
-          roomId: roomObj.id,
-          roomName: roomObj.name,
-          capacity: roomObj.capacity,
-          organizerId: organizerObj.id,
-          host: organizerObj.name,
-          location: roomObj.name,
-          participants: participants.length > 0 ? participants : [organizerObj.name],
-          participantIds,
-          status,
-          notes,
-          isRecurring,
-          equipmentIds,
-          equipmentNames,
-          startTimeISO: `${date}T${startTime}:00`,
-          endTimeISO: `${date}T${endTime}:00`
-        };
+        const globalError = document.getElementById("global-error");
+        const globalErrorTitle = document.getElementById("global-error-title");
+        const globalErrorDesc = document.getElementById("global-error-desc");
+        if (globalError && globalErrorTitle && globalErrorDesc) {
+          globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch đặt phòng (409 Conflict)" : "Máy chủ từ chối yêu cầu";
+          globalErrorDesc.innerText = apiResult.message;
+          globalError.classList.remove("hidden");
+        }
+
+        const modalCard = document.querySelector(".meeting-modal-card");
+        if (modalCard) {
+          modalCard.classList.remove("stitch-shake");
+          void modalCard.offsetWidth;
+          modalCard.classList.add("stitch-shake");
+        }
+
+        if (apiResult.isConflict) {
+          const roomConflictAlert = document.getElementById("room-conflict-alert");
+          const roomConflictText = document.getElementById("room-conflict-text");
+          if (roomConflictAlert && roomConflictText) {
+            roomConflictText.innerHTML = `<strong>Máy chủ thông báo:</strong> ${escapeHTML(apiResult.message)}`;
+            roomConflictAlert.classList.remove("hidden");
+          }
+          const roomSelect = document.getElementById("meeting-room");
+          if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+        }
+        return;
       }
-    }
-    // THÊM MỚI
-    else {
-      meetings.unshift({
-        id: getNextId(),
+
+      isFallback = apiResult.isFallback;
+      if (!isFallback && apiResult.data?.meetingId) {
+        finalMeetingId = apiResult.data.meetingId;
+        syncMsg = `Đã đồng bộ trực tiếp vào CSDL MySQL (Mã cuộc họp: #${finalMeetingId})`;
+      } else {
+        finalMeetingId = getNextId();
+        syncMsg = "Đã lưu vào bộ nhớ cục bộ (Local Store Fallback - Tự động đồng bộ CSDL)";
+      }
+
+      const statusSelect = document.getElementById("meeting-status");
+      const status = statusSelect ? statusSelect.value : "scheduled";
+
+      const newMeeting = {
+        id: finalMeetingId,
         title,
         tag,
         date,
@@ -3522,26 +4070,63 @@ function saveMeeting(event) {
         participants: participants.length > 0 ? participants : [organizerObj.name],
         participantIds,
         status,
-        notes,
+        notes: description,
         isRecurring,
         equipmentIds,
         equipmentNames,
-        startTimeISO: `${date}T${startTime}:00`,
-        endTimeISO: `${date}T${endTime}:00`
-      });
+        startTimeISO,
+        endTimeISO
+      };
+
+      meetings.unshift(newMeeting);
+      persistMeetingsToStorage();
+    } else {
+      // Chỉnh sửa (Edit)
+      const index = meetings.findIndex(item => item.id === editId);
+      if (index !== -1) {
+        const statusSelect = document.getElementById("meeting-status");
+        const status = statusSelect ? statusSelect.value : "scheduled";
+        meetings[index] = {
+          ...meetings[index],
+          id: editId,
+          title,
+          tag,
+          date,
+          startTime,
+          endTime,
+          time: timeDisplay,
+          roomId: roomObj.id,
+          roomName: roomObj.name,
+          capacity: roomObj.capacity,
+          organizerId: organizerObj.id,
+          host: organizerObj.name,
+          location: roomObj.name,
+          participants: participants.length > 0 ? participants : [organizerObj.name],
+          participantIds,
+          status,
+          notes: description,
+          isRecurring,
+          equipmentIds,
+          equipmentNames,
+          startTimeISO,
+          endTimeISO
+        };
+        persistMeetingsToStorage();
+        syncMsg = "Đã cập nhật thông tin cuộc họp thành công";
+      }
     }
 
-    // Khôi phục nút submit
+    // Tắt loading
     if (btnSubmit) btnSubmit.disabled = false;
     if (submitSpinner) submitSpinner.classList.add("hidden");
     if (submitIcon) submitIcon.classList.remove("hidden");
-    if (submitText) submitText.innerText = id ? "Cập nhật cuộc họp" : "Tạo cuộc họp";
+    if (submitText) submitText.innerText = editId ? "Cập nhật cuộc họp" : "Tạo cuộc họp";
 
-    // Cập nhật bảng và thống kê
+    // Cập nhật bảng và dashboard
     renderMeetingTable();
     updateDashboardStats();
 
-    // Hiển thị Success View
+    // Hiển thị Success View Banner
     if (form) form.classList.add("hidden");
     if (successView) {
       successView.classList.remove("hidden");
@@ -3550,6 +4135,7 @@ function saveMeeting(event) {
       const successDate = document.getElementById("success-date-display");
       const successRoom = document.getElementById("success-room-display");
       const successStatus = document.getElementById("success-status-display");
+      const successSyncStatus = document.getElementById("success-sync-status");
 
       if (successTitle) successTitle.innerText = `"${title}"`;
       if (successTime) {
@@ -3559,9 +4145,28 @@ function saveMeeting(event) {
       }
       if (successDate) successDate.innerText = formatDate(date);
       if (successRoom) successRoom.innerText = `${roomObj.name} (${roomObj.capacity} chỗ)`;
-      if (successStatus) successStatus.innerText = getStatusText(status);
+      const statusSelect = document.getElementById("meeting-status");
+      if (successStatus) successStatus.innerText = getStatusText(statusSelect ? statusSelect.value : "scheduled");
+      if (successSyncStatus) {
+        successSyncStatus.innerHTML = `<i class="bi bi-shield-check me-1"></i> ${syncMsg}`;
+      }
     }
-  }, 350);
+  } catch (error) {
+    console.error("Lỗi khi lưu cuộc họp:", error);
+    if (btnSubmit) btnSubmit.disabled = false;
+    if (submitSpinner) submitSpinner.classList.add("hidden");
+    if (submitIcon) submitIcon.classList.remove("hidden");
+    if (submitText) submitText.innerText = editId ? "Cập nhật cuộc họp" : "Tạo cuộc họp";
+
+    const globalError = document.getElementById("global-error");
+    const globalErrorTitle = document.getElementById("global-error-title");
+    const globalErrorDesc = document.getElementById("global-error-desc");
+    if (globalError && globalErrorTitle && globalErrorDesc) {
+      globalErrorTitle.innerText = "Lỗi xử lý";
+      globalErrorDesc.innerText = "Có lỗi xảy ra trong quá trình lưu cuộc họp. Vui lòng thử lại.";
+      globalError.classList.remove("hidden");
+    }
+  }
 }
 
 
@@ -3619,7 +4224,7 @@ function deleteMeeting(id) {
       item => item.id !== id
     );
 
-
+  persistMeetingsToStorage();
   renderMeetingTable();
   updateDashboardStats();
 }
@@ -3768,15 +4373,10 @@ function openDetailModal(id) {
 
 function closeMeetingModal() {
   modalOverlay.classList.add("hidden");
+  clearMeetingFormErrors();
 
   const form = document.getElementById("meeting-form");
   const successView = document.getElementById("success-view");
-  const globalError = document.getElementById("global-error");
-  const titleError = document.getElementById("title-error");
-  const titleErrorIcon = document.getElementById("title-error-icon");
-  const timeErrorMsg = document.getElementById("time-error-msg");
-  const titleInput = document.getElementById("meeting-title");
-  const endInput = document.getElementById("meeting-end");
   const id = document.getElementById("meeting-id");
 
   if (form) {
@@ -3789,12 +4389,6 @@ function closeMeetingModal() {
   if (id) {
     id.value = "";
   }
-  if (globalError) globalError.classList.add("hidden");
-  if (titleError) titleError.classList.add("hidden");
-  if (titleErrorIcon) titleErrorIcon.classList.add("hidden");
-  if (timeErrorMsg) timeErrorMsg.classList.add("hidden");
-  if (titleInput) titleInput.classList.remove("has-error");
-  if (endInput) endInput.classList.remove("has-error");
 
   const recurringInput = document.getElementById("meeting-recurring");
   if (recurringInput) recurringInput.checked = false;
@@ -4065,7 +4659,10 @@ document.addEventListener(
 // =====================================================
 
 loadPersistedRooms();
+loadPersistedMeetings();
 setupRoomFormValidationEvents();
+setupMeetingFormValidationEvents();
 RoomAPI.checkHealth();
+MeetingAPI.checkHealth();
 syncMeetingRoomOptions();
 router();
