@@ -273,7 +273,7 @@
           <input type="hidden" id="meeting-notes" />
         </div>
 
-        <!-- BUSINESS 3: Khu vực Thời gian cuộc họp (Time Section Card) -->
+        <!-- BUSINESS 3: Khu vực Thời gian cuộc họp (Smart Time Section Card) -->
         <div class="stitch-time-card" id="group-time-section">
           <div class="stitch-time-card-header">
             <div class="d-flex align-items-center gap-2">
@@ -281,7 +281,7 @@
                 <i class="bi bi-clock"></i>
               </span>
               <span class="stitch-label m-0">
-                Thời gian <span class="text-danger">*</span>
+                Thời gian cuộc họp <span class="text-danger">*</span>
               </span>
             </div>
 
@@ -289,6 +289,22 @@
             <div id="duration-badge" class="stitch-duration-badge">
               <span class="stitch-pulse-dot"></span>
               <span id="duration-text">Thời lượng: 1 giờ 30 phút</span>
+            </div>
+          </div>
+
+          <!-- Quick Date Presets -->
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <span class="stitch-hint"><i class="bi bi-calendar-event me-1"></i>Chọn nhanh ngày:</span>
+            <div class="stitch-time-presets" id="quick-date-presets">
+              <button type="button" class="btn-time-chip active" data-date-preset="today" id="btn-date-today">
+                <i class="bi bi-calendar-check"></i> Hôm nay
+              </button>
+              <button type="button" class="btn-time-chip" data-date-preset="tomorrow" id="btn-date-tomorrow">
+                <i class="bi bi-sun"></i> Ngày mai
+              </button>
+              <button type="button" class="btn-time-chip" data-date-preset="next-monday" id="btn-date-monday">
+                <i class="bi bi-calendar-week"></i> Thứ Hai tới
+              </button>
             </div>
           </div>
 
@@ -337,6 +353,32 @@
             </div>
           </div>
 
+          <!-- Quick Duration Presets -->
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-1">
+            <span class="stitch-hint"><i class="bi bi-hourglass-split me-1"></i>Chọn nhanh thời lượng:</span>
+            <div class="stitch-time-presets" id="quick-duration-presets">
+              <button type="button" class="btn-time-chip" data-duration="15">15p</button>
+              <button type="button" class="btn-time-chip" data-duration="30">30p</button>
+              <button type="button" class="btn-time-chip" data-duration="45">45p</button>
+              <button type="button" class="btn-time-chip" data-duration="60">1 giờ</button>
+              <button type="button" class="btn-time-chip active" data-duration="90">1h 30p</button>
+              <button type="button" class="btn-time-chip" data-duration="120">2 giờ</button>
+            </div>
+          </div>
+
+          <!-- Interactive Visual Timeline Strip -->
+          <div class="stitch-timeline-strip" id="visual-timeline-strip">
+            <div class="stitch-timeline-time">
+              <i class="bi bi-play-circle-fill text-primary"></i>
+              <span id="timeline-start-label">09:00</span>
+            </div>
+            <div class="stitch-timeline-connector"></div>
+            <div class="stitch-timeline-time">
+              <span id="timeline-end-label">10:30</span>
+              <i class="bi bi-stop-circle-fill text-success"></i>
+            </div>
+          </div>
+
           <!-- Ẩn input meeting-time cũ để đồng bộ tương thích ngược -->
           <input type="hidden" id="meeting-time" />
 
@@ -347,30 +389,90 @@
           </div>
         </div>
 
-        <!-- BUSINESS 4: Chọn Phòng họp (Rooms & Bookings - Chuẩn Database Schema) -->
+        <!-- BUSINESS 4: Chọn Phòng họp & Danh sách phòng trống theo thời gian thực (Real-time Room Availability Explorer) -->
         <div class="stitch-form-group" id="group-room">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <label for="meeting-room" class="stitch-label">
-              <i class="bi bi-door-open text-primary me-1"></i> Phòng họp <span class="text-danger">*</span>
-            </label>
-            <span class="stitch-hint" id="room-capacity-hint">Chọn phòng đặt lịch</span>
+          <div class="realtime-room-explorer">
+            <div class="realtime-room-header">
+              <div>
+                <label for="meeting-room" class="stitch-label m-0">
+                  <i class="bi bi-door-open-fill text-primary me-1"></i> Phòng họp & Trạng thái thực tế <span class="text-danger">*</span>
+                </label>
+                <div class="stitch-hint mt-0.5" id="realtime-room-hint">
+                  Hệ thống tự động rà soát lịch trống theo ngày & giờ đã chọn
+                </div>
+              </div>
+
+              <!-- Thống kê phòng thời gian thực -->
+              <div class="room-stats-pills">
+                <span class="badge-avail-pill">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <strong id="realtime-avail-count">0</strong> trống
+                </span>
+                <span class="badge-busy-pill">
+                  <i class="bi bi-slash-circle-fill"></i>
+                  <strong id="realtime-busy-count">0</strong> bận
+                </span>
+                <span class="badge-maint-pill">
+                  <i class="bi bi-tools"></i>
+                  <strong id="realtime-maint-count">0</strong> bảo trì
+                </span>
+              </div>
+            </div>
+
+            <!-- Bộ lọc phòng nhanh -->
+            <div class="room-filter-bar">
+              <div class="d-flex align-items-center gap-1">
+                <span class="stitch-hint me-1"><i class="bi bi-funnel"></i> Sức chứa:</span>
+                <div class="room-filter-chips" id="room-cap-filter-chips">
+                  <button type="button" class="btn-room-filter active" data-cap-filter="all">Tất cả</button>
+                  <button type="button" class="btn-room-filter" data-cap-filter="small">&lt; 15 chỗ</button>
+                  <button type="button" class="btn-room-filter" data-cap-filter="medium">15 - 30 chỗ</button>
+                  <button type="button" class="btn-room-filter" data-cap-filter="large">&gt; 30 chỗ</button>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn-room-filter" id="btn-toggle-only-avail">
+                  <i class="bi bi-shield-check text-success me-1"></i> Chỉ phòng trống
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" id="btn-toggle-room-view" style="font-size: 0.72rem; height: 26px;">
+                  <i class="bi bi-list-ul"></i> Dropdown
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid Thẻ Phòng Trống Theo Thời Gian Thực -->
+            <div id="realtime-room-grid" class="realtime-room-grid" role="radiogroup" aria-label="Danh sách phòng họp trống theo thời gian thực">
+              <!-- Dynamically populated by main.js -->
+            </div>
+
+            <!-- Dropdown Select (Ẩn mặc định, đồng bộ 2 chiều để tương thích form và API) -->
+            <div id="room-select-wrapper" class="hidden mt-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="stitch-sublabel">Chọn từ danh sách xổ xuống:</span>
+                <span class="stitch-hint" id="room-capacity-hint">Chọn phòng đặt lịch</span>
+              </div>
+              <div class="stitch-input-relative">
+                <select id="meeting-room" name="roomId" class="form-select stitch-input" aria-label="Phòng họp" required>
+                  <option value="1">Phòng Tokyo (Tầng 4) — Sức chứa: 20 người</option>
+                  <option value="2">Phòng Silicon (Tầng 2) — Sức chứa: 12 người</option>
+                  <option value="3">Phòng Hội Nghị A — Sức chứa: 30 người</option>
+                  <option value="4">Phòng Grand Board — Sức chứa: 50 người</option>
+                  <option value="5">Phòng VIP — Sức chứa: 10 người</option>
+                </select>
+              </div>
+            </div>
+
+            <p id="room-error" class="stitch-field-error hidden m-0"></p>
+
+            <!-- Cảnh báo xung đột phòng nếu chọn phải phòng bận -->
+            <div id="room-conflict-alert" class="stitch-time-error-box hidden mt-1">
+              <i class="bi bi-calendar-x-fill text-danger flex-shrink-0"></i>
+              <span id="room-conflict-text">Phòng họp đã có người đặt trong khung giờ này.</span>
+            </div>
           </div>
 
-          <div class="stitch-input-relative">
-            <select id="meeting-room" name="roomId" class="form-select stitch-input" aria-label="Phòng họp" required>
-              <option value="1">Phòng Tokyo (Tầng 4) — Sức chứa: 20 người</option>
-              <option value="2">Phòng Silicon (Tầng 2) — Sức chứa: 12 người</option>
-              <option value="3">Phòng Hội Nghị A — Sức chứa: 30 người</option>
-              <option value="4">Phòng Grand Board — Sức chứa: 50 người</option>
-              <option value="5">Phòng VIP — Sức chứa: 10 người</option>
-            </select>
-          </div>
-          <p id="room-error" class="stitch-field-error hidden"></p>
-          <div id="room-conflict-alert" class="stitch-time-error-box hidden mt-2">
-            <i class="bi bi-calendar-x-fill text-danger flex-shrink-0"></i>
-            <span id="room-conflict-text">Phòng họp đã có người đặt trong khung giờ này.</span>
-          </div>
-          <!-- Ẩn compatibility input -->
+          <!-- Ẩn compatibility inputs -->
           <input type="hidden" id="meeting-location" />
           <input type="hidden" id="meeting-organizer-id" value="1" />
         </div>
