@@ -1914,6 +1914,43 @@ const RoomAPI = {
       persistRoomsToStorage();
     }
     return { success: true, data: room, isFallback: true };
+  },
+
+  async getAvailableRooms(params = {}) {
+    const query = new URLSearchParams();
+    if (params.date) query.set("date", params.date);
+    if (params.startTime) query.set("startTime", params.startTime);
+    if (params.endTime) query.set("endTime", params.endTime);
+    if (params.start) query.set("start", params.start);
+    if (params.end) query.set("end", params.end);
+    if (params.minCapacity) query.set("minCapacity", params.minCapacity);
+    if (params.capacity) query.set("capacity", params.capacity);
+    if (params.excludeMeetingId) query.set("excludeMeetingId", params.excludeMeetingId);
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch(`${ROOM_API_URL}/available?${query.toString()}`, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        this.updateStatusBadge();
+        return { success: true, data: json.data || [], total: json.total || 0, isFallback: false };
+      }
+    } catch {
+      this.isBackendConnected = false;
+      this.updateStatusBadge();
+    }
+
+    // Local Fallback nếu backend chưa chạy
+    if (typeof calculateRoomAvailability === "function") {
+      const allStatus = calculateRoomAvailability(params.date, params.startTime || params.start, params.endTime || params.end, params.excludeMeetingId);
+      const avail = allStatus.filter(r => r.isAvailable);
+      return { success: true, data: avail, total: avail.length, isFallback: true };
+    }
+    const availRooms = ROOMS.filter(r => r.status === "Active");
+    return { success: true, data: availRooms, total: availRooms.length, isFallback: true };
   }
 };
 

@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const roomController = require('../controllers/roomController');
-const { validateRoomMiddleware } = require('../validators/roomValidator');
+const { validateRoomMiddleware, validateAvailableRoomsMiddleware } = require('../validators/roomValidator');
 
 // API Routes cho Quản lý Phòng họp (Enterprise Room Management APIs)
 router.get('/rooms', roomController.getAllRooms);
+router.get('/rooms/available', validateAvailableRoomsMiddleware, roomController.getAvailableRooms);
 router.get('/rooms/:id', roomController.getRoomById);
 router.post('/rooms', validateRoomMiddleware, roomController.createRoom);
 router.put('/rooms/:id', validateRoomMiddleware, roomController.updateRoom);
