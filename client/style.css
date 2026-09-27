@@ -3842,9 +3842,6 @@ body {
   background: #fef2f2;
   color: #991b1b;
   font-weight: 500;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
 }
 
 .status-maintenance .room-card-status-bar {
