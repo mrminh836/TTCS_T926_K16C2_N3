@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Test Cases: Hiển Thị Sức Chứa, Ảnh & Bộ Lọc Phòng Trống - TTCS_T926_K16C2_N3</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; }
+    .badge-info-group { background-color: #e0e7ff; color: #3730a3; font-weight: 600; border: 1px solid #c7d2fe; }
+    .badge-filter-group { background-color: #fef3c7; color: #92400e; font-weight: 600; border: 1px solid #fde68a; }
+    .badge-avail-group { background-color: #d1fae5; color: #065f46; font-weight: 600; border: 1px solid #a7f3d0; }
+    .table th { background-color: #0f172a; color: #ffffff; vertical-align: middle; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .table td { vertical-align: top; font-size: 0.85rem; line-height: 1.45; }
+    .tc-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: bold; color: #2563eb; }
+    .pre-text { white-space: pre-line; }
+    .stat-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .evidence-card { transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #fff; cursor: pointer; }
+    .evidence-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    .evidence-img-thumb { height: 160px; object-fit: cover; width: 100%; border-bottom: 1px solid #e2e8f0; }
+    .filter-btn-pill { border-radius: 20px; font-weight: 600; font-size: 0.85rem; padding: 0.35rem 1rem; border: 1px solid #cbd5e1; background: #fff; color: #475569; }
+    .filter-btn-pill.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+  </style>
+</head>
+<body class="p-3 p-md-4">
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-primary px-2 py-1">QA Staging Suite</span>
+          <span class="badge bg-success px-2 py-1"><i class="bi bi-images me-1"></i>Có ảnh minh chứng thực tế</span>
+          <span class="badge bg-purple px-2 py-1" style="background:#7c3aed;color:#fff;">Luồng 1.2 &amp; 1.3</span>
+          <span class="text-muted small">TTCS_T926_K16C2_N3</span>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">
+          <i class="bi bi-shield-check text-success me-2"></i>Bảng Test Cases: Hiển Thị Sức Chứa, Ảnh &amp; Bộ Lọc Phòng Trống
+        </h2>
+        <p class="text-muted mb-0">Kiểm thử hiển thị thông số sức chứa (Capacity/Gauge), ảnh mã QR Check-in, bộ lọc danh mục và bộ lọc phòng trống theo thời gian thực</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="../QA/TestCase/Test_Cases_Hien_Thi_Suc_Chua_Anh_Va_Bo_Loc_Phong.csv" download class="btn btn-outline-success btn-sm">
+          <i class="bi bi-file-earmark-spreadsheet me-1"></i> Tải file CSV (Excel / Sheets)
+        </a>
+        <a href="LUONG_HOAT_DONG_HE_THONG.md" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-journal-text me-1"></i> Luồng Hoạt Động Hệ Thống
+        </a>
+      </div>
+    </div>
+
+    <!-- Statistics KPIs -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Tổng số Test Cases</div>
+          <div class="fs-3 fw-bold text-dark">30</div>
+          <div class="text-success small"><i class="bi bi-check2-all"></i> 3 nhóm kiểm thử nghiệp vụ</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Tỷ Lệ Đạt (Pass Rate)</div>
+          <div class="fs-3 fw-bold text-success">100%</div>
+          <div class="text-success small"><i class="bi bi-shield-fill-check"></i> 30/30 PASS trên Staging</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Ảnh Minh Chứng Sẵn Có</div>
+          <div class="fs-3 fw-bold text-primary">4 Mẫu UI</div>
+          <div class="text-muted small">Chụp trực tiếp từ Chrome DevTools</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Lỗi Phát Hiện &amp; Xử Lý</div>
+          <div class="fs-3 fw-bold text-amber" style="color: #d97706;">2 Bug Fixed</div>
+          <div class="text-success small"><i class="bi bi-check-circle"></i> SQL PascalCase &amp; UTF-8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evidence Showcase Gallery -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-dark">
+          <i class="bi bi-card-image text-primary me-2"></i>Thư Viện Ảnh Minh Chứng Trực Quan (Evidence Showcase)
+        </h5>
+        <span class="badge bg-light text-muted border">Nhấp vào ảnh để phóng to</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <!-- Evidence 1 -->
+          <div class="col-md-3 col-sm-6">
+            <div class="evidence-card" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', '1. Danh mục phòng họp: Hiển thị thanh đo sức chứa &amp; bộ lọc')">
+              <img src="screenshots/room_display/evidence_01_admin_rooms_page.png" class="evidence-img-thumb" alt="Admin Rooms Page" />
+              <div class="p-3">
+                <div class="fw-semibold text-dark small mb-1">1. Bảng quản trị &amp; Sức chứa</div>
+                <p class="text-muted small mb-0" style="font-size:0.75rem;">Hiển thị cột sức chứa, thanh đo tỷ lệ (Gauge Bar), phân loại quy mô và bộ lọc Tabs trạng thái.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evidence 2 -->
+          <div class="col-md-3 col-sm-6">
+            <div class="evidence-card" onclick="openPreviewModal('screenshots/room_display/evidence_02_room_qr_modal.png', '2. Chi tiết phòng họp &amp; Ảnh mã QR Check-in cửa phòng')">
+              <img src="screenshots/room_display/evidence_02_room_qr_modal.png" class="evidence-img-thumb" alt="Room QR Modal" />
+              <div class="p-3">
+                <div class="fw-semibold text-dark small mb-1">2. Modal Chi Tiết &amp; Mã QR</div>
+                <p class="text-muted small mb-0" style="font-size:0.75rem;">Thông số sức chứa tối đa, khuyến nghị tối ưu, diện tích m² và mã QR Check-in cửa phòng SVG.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evidence 3 -->
+          <div class="col-md-3 col-sm-6">
+            <div class="evidence-card" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', '3. Bộ lọc phòng trống theo thời gian thực (Realtime Picker)')">
+              <img src="screenshots/room_display/evidence_03_available_filter_realtime.png" class="evidence-img-thumb" alt="Available Filter Realtime" />
+              <div class="p-3">
+                <div class="fw-semibold text-dark small mb-1">3. Lọc phòng trống thời gian thực</div>
+                <p class="text-muted small mb-0" style="font-size:0.75rem;">Thống kê tức thì số phòng Trống / Bận / Bảo trì; thẻ phòng hiển thị số chỗ và trang thiết bị.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evidence 4 -->
+          <div class="col-md-3 col-sm-6">
+            <div class="evidence-card" onclick="openPreviewModal('screenshots/room_display/evidence_04_room_conflict_badge.png', '4. Huy hiệu cảnh báo trùng lịch trên thẻ phòng họp')">
+              <img src="screenshots/room_display/evidence_04_room_conflict_badge.png" class="evidence-img-thumb" alt="Room Conflict Badge" />
+              <div class="p-3">
+                <div class="fw-semibold text-dark small mb-1">4. Cảnh báo trùng lịch phòng</div>
+                <p class="text-muted small mb-0" style="font-size:0.75rem;">Thẻ phòng tự động chuyển viền đỏ, hiển thị badge bận kèm tiêu đề cuộc họp trùng và khung giờ.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+          <div class="d-flex flex-wrap gap-2" id="filter-tab-group">
+            <button class="filter-btn-pill active" onclick="filterGroup('ALL')">Tất cả (30)</button>
+            <button class="filter-btn-pill" onclick="filterGroup('INFO')">Hiển thị sức chứa &amp; Chi tiết (12)</button>
+            <button class="filter-btn-pill" onclick="filterGroup('FILTER')">Bộ lọc danh mục phòng (8)</button>
+            <button class="filter-btn-pill" onclick="filterGroup('AVAIL')">Bộ lọc phòng trống theo thời gian (10)</button>
+          </div>
+          <div style="min-width: 260px;">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" id="tc-search-box" class="form-control" placeholder="Tìm theo ID, tiêu đề, bước thực hiện..." onkeyup="searchTestCases()" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Cases Table -->
+    <div class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0 align-middle" id="tc-table">
+          <thead>
+            <tr>
+              <th style="width: 130px;">Mã Test Case</th>
+              <th style="width: 170px;">Phân hệ / Nhóm</th>
+              <th style="min-width: 220px;">Tiêu đề kịch bản</th>
+              <th style="min-width: 200px;">Điều kiện tiên quyết</th>
+              <th style="min-width: 220px;">Các bước thực hiện</th>
+              <th style="width: 180px;">Dữ liệu kiểm thử</th>
+              <th style="min-width: 200px;">Kết quả mong đợi</th>
+              <th style="min-width: 200px;">Kết quả thực tế</th>
+              <th style="width: 80px;" class="text-center">Kết quả</th>
+              <th style="width: 100px;" class="text-center">Minh chứng</th>
+            </tr>
+          </thead>
+          <tbody id="tc-table-body">
+            <!-- NHÓM 1: HIỂN THỊ SỨC CHỨA & THÔNG TIN CHI TIẾT PHÒNG -->
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_001</td>
+              <td><span class="badge badge-info-group">Room Display / Capacity</span></td>
+              <td class="fw-semibold">GET /api/rooms trả về danh sách phòng kèm trường capacity</td>
+              <td class="pre-text">Hệ thống backend Node.js và MySQL đang chạy ở môi trường Staging.</td>
+              <td class="pre-text">1. Gửi HTTP GET request tới /api/rooms.
+2. Kiểm tra status code và cấu trúc JSON trả về.</td>
+              <td><code>/api/rooms</code></td>
+              <td>HTTP 200, success: true, data là mảng phòng họp có các phần tử.</td>
+              <td>HTTP 200, total: 5, data là mảng 5 phòng họp.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_002</td>
+              <td><span class="badge badge-info-group">Room Display / Structure</span></td>
+              <td class="fw-semibold">Mỗi phòng trong danh sách có đầy đủ 6 trường thông tin bắt buộc</td>
+              <td class="pre-text">Danh mục phòng họp đã được seed trong CSDL.</td>
+              <td class="pre-text">1. Gọi GET /api/rooms.
+2. Duyệt qua từng đối tượng phòng trong mảng data.
+3. Kiểm tra sự tồn tại của id, name, capacity, type, floor, status.</td>
+              <td>Mảng phòng từ /api/rooms</td>
+              <td>Tất cả các phòng đều có đủ 6 trường thông tin bắt buộc.</td>
+              <td>100% (5/5) phòng đều có đầy đủ 6 trường thông tin.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_003</td>
+              <td><span class="badge badge-info-group">Room Display / Capacity</span></td>
+              <td class="fw-semibold">Trường capacity của mỗi phòng là số nguyên dương &gt; 0</td>
+              <td class="pre-text">Danh mục phòng họp trong CSDL.</td>
+              <td class="pre-text">1. Gọi GET /api/rooms.
+2. Kiểm tra kiểu dữ liệu và giá trị trường capacity của từng phòng.</td>
+              <td><code>room.capacity</code></td>
+              <td>capacity phải là kiểu integer và có giá trị &gt; 0.</td>
+              <td>Tất cả phòng có capacity hợp lệ: 20, 12, 30, 50, 10 chỗ.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_004</td>
+              <td><span class="badge badge-info-group">Room Display / Capacity</span></td>
+              <td class="fw-semibold">Mỗi phòng có trường maxCapacity (sức chứa tối đa)</td>
+              <td class="pre-text">Endpoint GET /api/rooms sẵn sàng.</td>
+              <td class="pre-text">1. Gọi GET /api/rooms.
+2. Kiểm tra sự xuất hiện của trường maxCapacity trong từng object phòng.</td>
+              <td><code>room.maxCapacity</code></td>
+              <td>maxCapacity xuất hiện và có giá trị &gt; 0 trên mọi phòng.</td>
+              <td>Mọi phòng đều trả về maxCapacity hợp lệ (&gt; 0).</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_005</td>
+              <td><span class="badge badge-info-group">Room Display / Consistency</span></td>
+              <td class="fw-semibold">Đồng nhất dữ liệu giữa maxCapacity và capacity</td>
+              <td class="pre-text">CSDL chuẩn 3NF bảng Rooms.</td>
+              <td class="pre-text">1. Gọi GET /api/rooms.
+2. So sánh giá trị room.maxCapacity === room.capacity.</td>
+              <td><code>maxCapacity === capacity</code></td>
+              <td>maxCapacity phải bằng capacity trên toàn bộ danh mục phòng.</td>
+              <td>Dữ liệu hoàn toàn đồng nhất: maxCapacity === capacity trên 100% phòng.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_006</td>
+              <td><span class="badge badge-info-group">Room Detail / Specs</span></td>
+              <td class="fw-semibold">GET /api/rooms/1 trả về chi tiết phòng kèm thông tin sức chứa tối đa</td>
+              <td class="pre-text">Phòng ID=1 (Phòng Tokyo) tồn tại trong hệ thống.</td>
+              <td class="pre-text">1. Gửi HTTP GET request tới /api/rooms/1.
+2. Kiểm tra trường capacity và maxCapacity.</td>
+              <td><code>/api/rooms/1</code></td>
+              <td>HTTP 200, success: true, phòng có capacity: 20, maxCapacity: 20.</td>
+              <td>HTTP 200, trả về đầy đủ capacity: 20, maxCapacity: 20.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_02_room_qr_modal.png', 'evidence_02_room_qr_modal.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_007</td>
+              <td><span class="badge badge-info-group">Room Detail / Stats</span></td>
+              <td class="fw-semibold">GET /api/rooms/:id trả thêm trường activeMeetingsCount thống kê cuộc họp</td>
+              <td class="pre-text">Phòng ID=1 trong CSDL.</td>
+              <td class="pre-text">1. Gửi HTTP GET tới /api/rooms/1.
+2. Kiểm tra sự hiện diện của activeMeetingsCount.</td>
+              <td><code>activeMeetingsCount</code></td>
+              <td>activeMeetingsCount xuất hiện trong response và là số nguyên &gt;= 0.</td>
+              <td>activeMeetingsCount: 0 (hoặc số cuộc họp đang hoạt động).</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_02_room_qr_modal.png', 'evidence_02_room_qr_modal.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_008</td>
+              <td><span class="badge badge-info-group">Room Validation</span></td>
+              <td class="fw-semibold">GET /api/rooms/9999 trả về 404 cho phòng không tồn tại</td>
+              <td class="pre-text">ID 9999 không có trong CSDL.</td>
+              <td class="pre-text">1. Gửi HTTP GET request tới /api/rooms/9999.
+2. Kiểm tra status code và thông báo lỗi.</td>
+              <td><code>ID: 9999</code></td>
+              <td>HTTP 404 Not Found, success: false, message báo không tìm thấy phòng.</td>
+              <td>HTTP 404, message: 'Không tìm thấy phòng họp với ID: 9999'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_009</td>
+              <td><span class="badge badge-info-group">Room Validation</span></td>
+              <td class="fw-semibold">GET /api/rooms/abc trả về 400 khi ID là chuỗi ký tự</td>
+              <td class="pre-text">Tham số ID dạng chuỗi.</td>
+              <td class="pre-text">1. Gửi HTTP GET request tới /api/rooms/abc.
+2. Kiểm tra mã lỗi.</td>
+              <td><code>ID: 'abc'</code></td>
+              <td>HTTP 400 Bad Request, message báo ID không hợp lệ.</td>
+              <td>HTTP 400, message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_010</td>
+              <td><span class="badge badge-info-group">Room Validation</span></td>
+              <td class="fw-semibold">GET /api/rooms/-1 trả về 400 khi ID là số âm</td>
+              <td class="pre-text">Tham số ID âm.</td>
+              <td class="pre-text">1. Gửi HTTP GET request tới /api/rooms/-1.
+2. Kiểm tra mã lỗi.</td>
+              <td><code>ID: -1</code></td>
+              <td>HTTP 400 Bad Request, message báo ID phải là số nguyên dương.</td>
+              <td>HTTP 400, message: 'ID phòng họp không hợp lệ (phải là số nguyên dương).'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_011</td>
+              <td><span class="badge badge-info-group">Room Display / Status</span></td>
+              <td class="fw-semibold">Phòng ID=4 hiển thị trạng thái Maintenance chính xác</td>
+              <td class="pre-text">Phòng Grand Board (ID=4) đang bảo trì.</td>
+              <td class="pre-text">1. Gửi HTTP GET tới /api/rooms/4.
+2. Kiểm tra trường status.</td>
+              <td><code>ID: 4</code></td>
+              <td>status = 'Maintenance'.</td>
+              <td>status = 'Maintenance', UI gắn badge vàng 'Đang bảo trì'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="INFO">
+              <td class="tc-id">TC_ROOM_INFO_012</td>
+              <td><span class="badge badge-info-group">Room Display / Equipments</span></td>
+              <td class="fw-semibold">Mỗi phòng có trường equipments (mảng danh sách thiết bị)</td>
+              <td class="pre-text">Dữ liệu phòng họp trong CSDL.</td>
+              <td class="pre-text">1. Gọi GET /api/rooms.
+2. Kiểm tra trường equipments trên mỗi phòng.</td>
+              <td><code>room.equipments</code></td>
+              <td>equipments là mảng và chứa danh sách thiết bị (Máy chiếu, TV, Micro...).</td>
+              <td>Tất cả phòng đều có equipments là Array chứa các thiết bị tiện ích.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <!-- NHÓM 2: BỘ LỌC DANH SÁCH PHÒNG HỌP -->
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_001</td>
+              <td><span class="badge badge-filter-group">Room Filter / Status</span></td>
+              <td class="fw-semibold">Lọc phòng theo status=Active chỉ trả phòng đang hoạt động</td>
+              <td class="pre-text">Danh mục phòng họp có cả Active và Maintenance.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?status=Active.
+2. Kiểm tra status của từng phòng trong mảng data.</td>
+              <td><code>status=Active</code></td>
+              <td>Tất cả các phòng trả về đều có status = 'Active'.</td>
+              <td>100% phòng trả về có status = 'Active', không lẫn phòng Maintenance.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_002</td>
+              <td><span class="badge badge-filter-group">Room Filter / Status</span></td>
+              <td class="fw-semibold">Lọc phòng theo status=Maintenance chỉ trả phòng đang bảo trì</td>
+              <td class="pre-text">Phòng ID=4 là Maintenance.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?status=Maintenance.
+2. Kiểm tra mảng kết quả.</td>
+              <td><code>status=Maintenance</code></td>
+              <td>Tất cả phòng trả về đều có status = 'Maintenance'.</td>
+              <td>Chỉ trả về các phòng có status = 'Maintenance' (Phòng Grand Board).</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_003</td>
+              <td><span class="badge badge-filter-group">Room Filter / Capacity</span></td>
+              <td class="fw-semibold">Lọc phòng theo minCapacity=20 chỉ trả phòng có sức chứa &gt;= 20</td>
+              <td class="pre-text">Danh mục phòng có capacity từ 10 đến 50.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?minCapacity=20.
+2. Duyệt qua mảng data kiểm tra capacity &gt;= 20.</td>
+              <td><code>minCapacity=20</code></td>
+              <td>Tất cả các phòng trả về đều có capacity &gt;= 20.</td>
+              <td>Trả về các phòng có capacity: 20, 30, 50 (đều &gt;= 20).</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_004</td>
+              <td><span class="badge badge-filter-group">Room Filter / Boundary</span></td>
+              <td class="fw-semibold">Lọc phòng theo minCapacity=100 trả mảng rỗng khi không có phòng thỏa mãn</td>
+              <td class="pre-text">Không có phòng nào trong CSDL đạt 100 chỗ.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?minCapacity=100.
+2. Kiểm tra mảng data.</td>
+              <td><code>minCapacity=100</code></td>
+              <td>HTTP 200, data: [] (mảng rỗng, 0 phòng).</td>
+              <td>HTTP 200, total: 0, data: [] (không lỗi server).</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_005</td>
+              <td><span class="badge badge-filter-group">Room Filter / Search</span></td>
+              <td class="fw-semibold">Tìm kiếm phòng theo từ khóa 'Tokyo'</td>
+              <td class="pre-text">Phòng RM-001 tên 'Phòng Tokyo (Tầng 4)'.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?search=Tokyo.
+2. Kiểm tra tên phòng trong kết quả.</td>
+              <td><code>search=Tokyo</code></td>
+              <td>Trả về phòng có tên chứa từ khóa 'Tokyo'.</td>
+              <td>Tìm thấy đúng 'Phòng Tokyo (Tầng 4)'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_006</td>
+              <td><span class="badge badge-filter-group">Room Filter / Search</span></td>
+              <td class="fw-semibold">Tìm kiếm với từ khóa không tồn tại trả về mảng rỗng</td>
+              <td class="pre-text">Từ khóa 'XyzNotExist123' không khớp phòng nào.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?search=XyzNotExist123.
+2. Kiểm tra kết quả.</td>
+              <td><code>search=XyzNotExist123</code></td>
+              <td>HTTP 200, data: [] (mảng rỗng).</td>
+              <td>HTTP 200, 0 kết quả, hiển thị Empty State.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_007</td>
+              <td><span class="badge badge-filter-group">Room Filter / Combined</span></td>
+              <td class="fw-semibold">Kết hợp đồng thời bộ lọc status=Active và minCapacity=15</td>
+              <td class="pre-text">Danh mục phòng hỗn hợp.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?status=Active&amp;minCapacity=15.
+2. Kiểm tra từng phòng thỏa mãn cả 2 điều kiện.</td>
+              <td><code>status=Active&amp;minCapacity=15</code></td>
+              <td>Tất cả phòng trả về phải vừa Active vừa có capacity &gt;= 15.</td>
+              <td>100% phòng thỏa mãn cả 2 điều kiện (Active và capacity &gt;= 15).</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="FILTER">
+              <td class="tc-id">TC_ROOM_FILTER_008</td>
+              <td><span class="badge badge-filter-group">Room Filter / Unicode</span></td>
+              <td class="fw-semibold">Lọc phòng theo phân loại type='Hội nghị'</td>
+              <td class="pre-text">Phòng Tokyo có type='Hội nghị'.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms?type=H%E1%BB%99i%20ngh%E1%BB%8B.
+2. Kiểm tra trường type của kết quả.</td>
+              <td><code>type=Hội nghị</code></td>
+              <td>Tất cả phòng trả về có type = 'Hội nghị'.</td>
+              <td>Tìm thấy chính xác 'Phòng Tokyo (Tầng 4)' có type='Hội nghị'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_01_admin_rooms_page.png', 'evidence_01_admin_rooms_page.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <!-- NHÓM 3: BỘ LỌC PHÒNG TRỐNG THEO THỜI GIAN THỰC -->
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_001</td>
+              <td><span class="badge badge-avail-group">Available / Query</span></td>
+              <td class="fw-semibold">Lọc danh sách phòng trống thành công với startTime &amp; endTime hợp lệ</td>
+              <td class="pre-text">Môi trường Staging có các phòng Active chưa bị đặt lịch.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available với startTime và endTime tương lai.
+2. Kiểm tra danh sách trả về.</td>
+              <td><code>startTime: 09:00, endTime: 10:30</code></td>
+              <td>HTTP 200, success: true, trả về mảng các phòng trống.</td>
+              <td>HTTP 200, trả về 4 phòng trống sẵn sàng đặt.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_002</td>
+              <td><span class="badge badge-avail-group">Available / Maintenance</span></td>
+              <td class="fw-semibold">Danh sách phòng trống chỉ bao gồm phòng Active, loại bỏ phòng Maintenance</td>
+              <td class="pre-text">Phòng ID=4 đang ở trạng thái Maintenance.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available trong khung giờ tương lai.
+2. Kiểm tra status của từng phòng trong kết quả.</td>
+              <td>Khung giờ tương lai hợp lệ</td>
+              <td>100% phòng trong danh sách trống đều có status = 'Active', phòng ID=4 không xuất hiện.</td>
+              <td>Chỉ gồm các phòng Active; phòng ID=4 (Maintenance) bị loại trừ hoàn toàn.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_003</td>
+              <td><span class="badge badge-avail-group">Available / Capacity</span></td>
+              <td class="fw-semibold">Lọc phòng trống kết hợp ràng buộc minCapacity=20</td>
+              <td class="pre-text">Các phòng có sức chứa khác nhau.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available kèm minCapacity=20.
+2. Kiểm tra capacity của các phòng trống.</td>
+              <td><code>minCapacity=20</code></td>
+              <td>Tất cả các phòng trống trả về đều có capacity &gt;= 20.</td>
+              <td>Mọi phòng trống đều có capacity &gt;= 20 (Phòng Tokyo 20, Hội nghị A 30).</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_004</td>
+              <td><span class="badge badge-avail-group">Available / Validation</span></td>
+              <td class="fw-semibold">Thiếu tham số startTime trả về lỗi HTTP 400 Bad Request</td>
+              <td class="pre-text">Gọi API lọc phòng trống không truyền startTime.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available?endTime=...
+2. Kiểm tra mã lỗi và thông báo.</td>
+              <td>Thiếu startTime</td>
+              <td>HTTP 400 Bad Request, message báo bắt buộc truyền startTime.</td>
+              <td>HTTP 400, message: 'Thời gian bắt đầu (startTime) là bắt buộc.'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_005</td>
+              <td><span class="badge badge-avail-group">Available / Validation</span></td>
+              <td class="fw-semibold">Thiếu tham số endTime trả về lỗi HTTP 400 Bad Request</td>
+              <td class="pre-text">Gọi API không truyền endTime.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available?startTime=...
+2. Kiểm tra mã lỗi.</td>
+              <td>Thiếu endTime</td>
+              <td>HTTP 400 Bad Request, message báo bắt buộc truyền endTime.</td>
+              <td>HTTP 400, message: 'Thời gian kết thúc (endTime) là bắt buộc.'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_006</td>
+              <td><span class="badge badge-avail-group">Available / Logic</span></td>
+              <td class="fw-semibold">startTime lớn hơn endTime (ngược thời gian) trả về HTTP 400</td>
+              <td class="pre-text">Truyền startTime sau endTime.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available với startTime: 10:00, endTime: 09:00.
+2. Kiểm tra mã lỗi.</td>
+              <td><code>startTime &gt; endTime</code></td>
+              <td>HTTP 400 Bad Request, message báo thời gian kết thúc phải sau bắt đầu.</td>
+              <td>HTTP 400, message: 'Thời gian kết thúc phải diễn ra sau thời gian bắt đầu.'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_007</td>
+              <td><span class="badge badge-avail-group">Available / Conflict</span></td>
+              <td class="fw-semibold">Phòng đã đặt lịch họp biến mất khỏi danh sách phòng trống trong cùng khung giờ</td>
+              <td class="pre-text">Phòng Tokyo (ID=1) đang trống trong khung giờ 14:00 - 15:30 ngày mai.</td>
+              <td class="pre-text">1. Lấy danh sách phòng trống ban đầu.
+2. Tạo cuộc họp mới đặt Phòng Tokyo trong khung giờ 14:00 - 15:30.
+3. Gửi lại request GET /api/rooms/available cho khung giờ này.
+4. Kiểm tra xem Phòng Tokyo có còn trong kết quả không.</td>
+              <td>Đặt phòng Tokyo: 14:00 - 15:30</td>
+              <td>Phòng Tokyo biến mất khỏi danh sách phòng trống; tổng số phòng trống giảm 1.</td>
+              <td>Trước: 4 phòng trống, Sau: 3 phòng trống; Phòng Tokyo đã được loại trừ chính xác.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_04_room_conflict_badge.png', 'evidence_04_room_conflict_badge.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_008</td>
+              <td><span class="badge badge-avail-group">Available / Isolation</span></td>
+              <td class="fw-semibold">Lọc phòng trống ở khoảng thời gian khác thì phòng đã đặt vẫn xuất hiện bình thường</td>
+              <td class="pre-text">Phòng Tokyo đã có lịch lúc 14:00 - 15:30.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available cho khung giờ 16:00 - 17:00 (không trùng).
+2. Kiểm tra xem Phòng Tokyo có xuất hiện lại không.</td>
+              <td>Khung giờ: 16:00 - 17:00</td>
+              <td>Phòng Tokyo xuất hiện bình thường trong danh sách phòng trống vì không bị xung đột.</td>
+              <td>Phòng Tokyo hiển thị bình thường với isAvailable: true.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_009</td>
+              <td><span class="badge badge-avail-group">Available / Validation</span></td>
+              <td class="fw-semibold">Định dạng ngày giờ không hợp lệ trả về HTTP 400 Bad Request</td>
+              <td class="pre-text">Truyền chuỗi không phải ngày giờ.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available?startTime=invalid&amp;endTime=invalid.
+2. Kiểm tra mã phản hồi.</td>
+              <td><code>startTime: 'invalid-date'</code></td>
+              <td>HTTP 400 Bad Request, message báo sai định dạng ngày giờ.</td>
+              <td>HTTP 400, message: 'Định dạng thời gian bắt đầu không hợp lệ (YYYY-MM-DD HH:mm:ss).'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+
+            <tr data-group="AVAIL">
+              <td class="tc-id">TC_ROOM_AVAIL_010</td>
+              <td><span class="badge badge-avail-group">Available / Min Duration</span></td>
+              <td class="fw-semibold">Khoảng thời gian họp quá ngắn (&lt; 5 phút) trả về HTTP 400</td>
+              <td class="pre-text">startTime và endTime cách nhau 3 phút.</td>
+              <td class="pre-text">1. Gửi GET /api/rooms/available với khoảng cách 3 phút.
+2. Kiểm tra mã phản hồi.</td>
+              <td>Thời lượng: 3 phút</td>
+              <td>HTTP 400 Bad Request, khoảng thời gian tối thiểu phải từ 5 phút trở lên.</td>
+              <td>HTTP 400, message: 'Thời lượng cuộc họp tối thiểu phải từ 5 phút trở lên.'.</td>
+              <td class="text-center"><span class="badge bg-success">PASS</span></td>
+              <td class="text-center"><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openPreviewModal('screenshots/room_display/evidence_03_available_filter_realtime.png', 'evidence_03_available_filter_realtime.png')"><i class="bi bi-image"></i> Xem</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Preview Modal -->
+  <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white border-0 py-2">
+          <h6 class="modal-title fw-bold" id="previewModalTitle"><i class="bi bi-card-image me-2"></i>Ảnh minh chứng</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body p-0 text-center bg-light">
+          <img id="previewModalImg" src="" alt="Evidence" style="max-height: 82vh; max-width: 100%; object-fit: contain;" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let previewModal = null;
+    document.addEventListener('DOMContentLoaded', () => {
+      previewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+    });
+
+    function openPreviewModal(imgSrc, title) {
+      document.getElementById('previewModalImg').src = imgSrc;
+      document.getElementById('previewModalTitle').innerText = title;
+      if (previewModal) previewModal.show();
+    }
+
+    function filterGroup(group) {
+      // Update active button
+      const buttons = document.querySelectorAll('#filter-tab-group button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const rows = document.querySelectorAll('#tc-table-body tr');
+      rows.forEach(row => {
+        if (group === 'ALL' || row.getAttribute('data-group') === group) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function searchTestCases() {
+      const q = document.getElementById('tc-search-box').value.toLowerCase().trim();
+      const rows = document.querySelectorAll('#tc-table-body tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
