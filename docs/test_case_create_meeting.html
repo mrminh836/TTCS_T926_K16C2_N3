@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Test Cases Tạo Cuộc Họp - TTCS_T926_K16C2_N3</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .badge-req { background-color: #e0e7ff; color: #3730a3; font-weight: 600; border: 1px solid #c7d2fe; }
+    .badge-time { background-color: #fef3c7; color: #92400e; font-weight: 600; border: 1px solid #fde68a; }
+    .badge-untested { background-color: #f1f5f9; color: #64748b; font-weight: 600; border: 1px solid #cbd5e1; }
+    .table th { background-color: #0f172a; color: #ffffff; vertical-align: middle; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .table td { vertical-align: top; font-size: 0.85rem; line-height: 1.45; }
+    .tc-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: bold; color: #2563eb; }
+    .pre-text { white-space: pre-line; }
+    .stat-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  </style>
+</head>
+<body class="p-3 p-md-4">
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-primary px-2 py-1">QA Specification</span>
+          <span class="text-muted small">Sprint 1 • TTCS_T926_K16C2_N3</span>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">
+          <i class="bi bi-shield-check text-success me-2"></i>Bộ Test Cases Luồng Tạo Cuộc Họp
+        </h2>
+        <p class="text-muted mb-0">Kiểm tra trường bắt buộc, validate ngày giờ, độ dài, định dạng và phòng ngừa Race Condition</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="test_case_create_meeting.csv" download class="btn btn-outline-success btn-sm">
+          <i class="bi bi-file-earmark-spreadsheet me-1"></i> Tải file CSV (Excel / Sheets)
+        </a>
+        <a href="QA_TEST_CASES_CREATE_MEETING.md" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-markdown me-1"></i> Xem Tài Liệu Markdown
+        </a>
+        <a href="QA_PROCESS_AND_JIRA_STANDARDS.md" class="btn btn-primary btn-sm">
+          <i class="bi bi-book me-1"></i> Quy Trình QA & Jira
+        </a>
+      </div>
+    </div>
+
+    <!-- Statistics KPIs -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Tổng số Test Cases</div>
+          <div class="fs-3 fw-bold text-dark">41</div>
+          <div class="text-success small"><i class="bi bi-check2-all"></i> Bao phủ 100% nghiệp vụ</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Nhóm Trường Bắt Buộc</div>
+          <div class="fs-3 fw-bold text-indigo" style="color: #4f46e5;">18</div>
+          <div class="text-muted small">Empty, trim, length, format</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Nhóm Ngày & Giờ</div>
+          <div class="fs-3 fw-bold text-amber" style="color: #d97706;">23</div>
+          <div class="text-muted small">Quá khứ, thứ tự, 5m-24h, conflict</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Trạng thái Thực thi</div>
+          <div class="fs-3 fw-bold text-secondary">Ready for QA</div>
+          <div class="text-muted small">Actual & Status chờ điền</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body py-3">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-4">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo mã TC, tiêu đề, bước thực hiện...">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select id="filterCategory" class="form-select form-select-sm">
+              <option value="ALL">-- Tất cả các nhóm kiểm thử (41 TCs) --</option>
+              <option value="Trường bắt buộc">Nhóm 1: Kiểm tra trường bắt buộc (18 TCs)</option>
+              <option value="Ngày và giờ">Nhóm 2: Kiểm tra ngày và giờ (23 TCs)</option>
+            </select>
+          </div>
+          <div class="col-md-4 text-md-end text-muted small" id="showingCount">
+            Hiển thị <strong>41</strong> / <strong>41</strong> test cases
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Test Cases Table -->
+    <div class="card shadow-sm border-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0 align-middle" id="tcTable">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Test Case ID</th>
+              <th style="width: 140px;">Nhóm / Feature</th>
+              <th style="width: 220px;">Tiêu đề kịch bản</th>
+              <th style="width: 200px;">Pre-conditions</th>
+              <th style="width: 250px;">Test Steps</th>
+              <th style="width: 200px;">Test Data</th>
+              <th style="width: 260px;">Expected Result</th>
+              <th style="width: 110px;" class="text-center">Actual Result</th>
+              <th style="width: 90px;" class="text-center">Status</th>
+              <th style="width: 130px;">Ghi chú / Bug ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_001</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Tạo cuộc họp thành công khi nhập đầy đủ tất cả trường bắt buộc và trường tùy chọn</td>
+          <td class="pre-text small text-muted">1. Người dùng đang ở màn hình Quản lý cuộc họp (/client/index.html).
+2. Phòng họp &#x27;Phòng Tokyo (Tầng 4)&#x27; đang hoạt động (Active) và trống lịch ngày mai 09:00 - 10:30.
+3. Đã có sẵn danh sách người dùng trong hệ thống.</td>
+          <td class="pre-text small">1. Bấm nút &#x27;+ Thêm cuộc họp&#x27; để mở modal.
+2. Nhập Tiêu đề: &#x27;Họp Sprint Planning K16&#x27;.
+3. Chọn Nhãn (Tag): &#x27;Sprint 24&#x27;.
+4. Nhập Mô tả: &#x27;Lập kế hoạch phân công công việc cho Sprint 24&#x27;.
+5. Chọn Ngày họp: Ngày mai.
+6. Chọn Giờ bắt đầu: &#x27;09:00&#x27;, Giờ kết thúc: &#x27;10:30&#x27;.
+7. Chọn Phòng họp: &#x27;Phòng Tokyo (Tầng 4)&#x27;.
+8. Mở Thiết lập bổ sung: Chọn Người tổ chức &#x27;Nguyễn Văn An&#x27;, nhập Người tham gia &#x27;Trần Văn A, Lê Văn B&#x27;, chọn Trạng thái &#x27;Sắp diễn ra&#x27;, tích chọn &#x27;Lặp định kỳ&#x27;.
+9. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp Sprint Planning K16&#x27;
+Tag: &#x27;Sprint 24&#x27;
+Description: &#x27;Lập kế hoạch phân công công việc cho Sprint 24&#x27;
+Date: Ngày mai
+StartTime: 09:00
+EndTime: 10:30
+RoomID: 1 (Phòng Tokyo)
+OrganizerID: 1 (Nguyễn Văn An)
+Participants: &#x27;Trần Văn A, Lê Văn B&#x27;
+Status: &#x27;scheduled&#x27;
+isRecurring: true</td>
+          <td class="pre-text small text-primary fw-medium">1. Form vượt qua toàn bộ bước kiểm tra tính hợp lệ.
+2. Hệ thống gọi API POST /api/meetings thành công (HTTP 201 Created).
+3. Hiển thị Banner &#x27;Cuộc họp đã được ghi nhận thành công!&#x27; với đầy đủ tóm tắt thông tin.
+4. Bảng danh sách cuộc họp được cập nhật bản ghi mới, thẻ thống kê KPI tăng tương ứng.
+5. Dữ liệu được lưu an toàn vào DB (hoặc localStorage dự phòng khi offline).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm thử luồng tích cực (Happy Path) đầy đủ mọi trường.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_002</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Tạo cuộc họp thành công khi chỉ nhập các trường bắt buộc và bỏ trống tất cả trường tùy chọn</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.
+2. Phòng họp &#x27;Phòng Silicon (Tầng 2)&#x27; đang Active và trống lịch.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp đồng bộ kỹ thuật&#x27;.
+2. Để trống ô Nhãn (Tag) và Mô tả.
+3. Chọn Ngày họp: Ngày mai.
+4. Chọn Giờ bắt đầu: &#x27;14:00&#x27;, Giờ kết thúc: &#x27;15:00&#x27;.
+5. Chọn Phòng họp: &#x27;Phòng Silicon (Tầng 2)&#x27;.
+6. Để mặc định Người tổ chức (ID: 1), để trống Người tham gia, không tích Lặp định kỳ.
+7. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp đồng bộ kỹ thuật&#x27;
+Tag: &#x27;&#x27; (Trống)
+Description: &#x27;&#x27; (Trống)
+Date: Ngày mai
+StartTime: 14:00
+EndTime: 15:00
+RoomID: 2
+OrganizerID: 1
+Participants: &#x27;&#x27; (Trống)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống chấp nhận dữ liệu chỉ gồm trường bắt buộc.
+2. Tạo cuộc họp thành công (HTTP 201 Created).
+3. Các trường tùy chọn (Mô tả, Tag, Người tham gia) nhận giá trị rỗng/null mà không gây lỗi hệ thống.
+4. Hiển thị banner thành công và cập nhật bảng danh sách.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra hệ thống không ép buộc nhập các trường tùy chọn.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_003</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi bỏ trống trường Tiêu đề (meeting-title rỗng)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Để trống hoàn toàn ô &#x27;Tiêu đề cuộc họp&#x27;.
+2. Điền đầy đủ Ngày mai, Giờ bắt đầu &#x27;09:00&#x27;, Giờ kết thúc &#x27;10:00&#x27;.
+3. Chọn Phòng họp: &#x27;Phòng Tokyo&#x27;.
+4. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;&#x27; (Rỗng)
+Date: Ngày mai
+StartTime: 09:00
+EndTime: 10:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống chặn submit phía Client.
+2. Ô &#x27;Tiêu đề cuộc họp&#x27; hiển thị viền đỏ (class has-error, is-invalid) kèm icon chấm than đỏ.
+3. Dòng thông báo lỗi hiển thị ngay dưới ô nhập: &#x27;Tiêu đề cuộc họp là bắt buộc và không được để trống.&#x27;.
+4. Hiển thị hộp thông báo lỗi chung phía trên form (&#x27;Thông tin chưa hợp lệ&#x27;).
+5. Con trỏ chuột tự động focus vào ô Tiêu đề cuộc họp.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra validation trường bắt buộc Title phía UI.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_004</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Tiêu đề chỉ chứa toàn ký tự khoảng trắng (Whitespace only)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập vào ô Tiêu đề: &#x27;     &#x27; (5 dấu cách).
+2. Điền đầy đủ Ngày mai, Giờ bắt đầu &#x27;09:00&#x27;, Giờ kết thúc &#x27;10:00&#x27;.
+3. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;     &#x27; (Chỉ chứa khoảng trắng)
+Date: Ngày mai
+StartTime: 09:00
+EndTime: 10:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống thực hiện hàm trim() dữ liệu và phát hiện tiêu đề rỗng.
+2. Ngăn chặn submit form.
+3. Ô Tiêu đề bị viền đỏ, hiển thị lỗi: &#x27;Tiêu đề cuộc họp là bắt buộc và không được để trống.&#x27;.
+4. Không gửi request lên máy chủ, form rung nhẹ cảnh báo lỗi.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chống lỗi bypass validation bằng khoảng trắng.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_005</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Tiêu đề vượt quá độ dài tối đa cho phép (&gt; 200 ký tự)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập hoặc dán chuỗi 201 ký tự vào ô Tiêu đề cuộc họp (Ví dụ: &#x27;Họp khẩn...&#x27; lặp lại dài 201 ký tự).
+2. Điền đầy đủ Ngày, Giờ và Phòng hợp lệ.
+3. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: Chuỗi ký tự có độ dài 201 ký tự (&#x27;A&#x27; x 201)
+Date: Ngày mai
+StartTime: 09:00
+EndTime: 10:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Phía Client: Thuộc tính maxlength=&#x27;200&#x27; ngăn người dùng gõ ký tự thứ 201, hoặc JS validate báo lỗi: &#x27;Tiêu đề cuộc họp không được vượt quá 200 ký tự (chuẩn CSDL).&#x27;.
+2. Phía Server: Middleware validateMeetingInput trả về HTTP 400 Bad Request nếu request bị giả mạo gửi qua curl/Postman.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Bảo toàn toàn vẹn dữ liệu cột VARCHAR(200) của CSDL.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_006</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Tiêu đề chứa ký tự đặc biệt nguy hiểm (&lt;, &gt; / XSS Script)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;&#x27;.
+2. Nhập Ngày, Giờ và Phòng hợp lệ.
+3. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;&#x27;
+Date: Ngày mai
+StartTime: 09:00
+EndTime: 10:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Client phát hiện ký tự đặc biệt nguy hiểm (&lt;, &gt;).
+2. Chặn submit form, báo lỗi đỏ: &#x27;Tiêu đề không được chứa ký tự đặc biệt nguy hiểm (&lt;, &gt;).&#x27;.
+3. Tránh hoàn toàn nguy cơ Cross-Site Scripting (XSS).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra bảo mật dữ liệu đầu vào (Input Sanitization).</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_007</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi bỏ trống trường Ngày họp (meeting-date rỗng)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề hợp lệ: &#x27;Họp rà soát tiến độ&#x27;.
+2. Để trống ô &#x27;Ngày họp&#x27;.
+3. Nhập Giờ bắt đầu &#x27;09:00&#x27;, Giờ kết thúc &#x27;10:00&#x27;.
+4. Chọn Phòng hợp lệ.
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp rà soát tiến độ&#x27;
+Date: &#x27;&#x27; (Rỗng)
+StartTime: 09:00
+EndTime: 10:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Form ngăn chặn submit.
+2. Ô &#x27;Ngày họp&#x27; được viền đỏ (class has-error, is-invalid).
+3. Hiển thị box thông báo lỗi thời gian: &#x27;Vui lòng chọn ngày họp, thời gian bắt đầu và kết thúc đầy đủ.&#x27;.
+4. Con trỏ tự động focus vào ô Ngày họp.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra trường bắt buộc Ngày họp.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_008</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi bỏ trống trường Giờ bắt đầu (meeting-start rỗng)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề hợp lệ.
+2. Chọn Ngày họp: Ngày mai.
+3. Để trống ô &#x27;Thời gian bắt đầu&#x27;.
+4. Nhập Giờ kết thúc &#x27;10:00&#x27;.
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp giao ban&#x27;
+Date: Ngày mai
+StartTime: &#x27;&#x27; (Rỗng)
+EndTime: 10:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Form ngăn chặn submit.
+2. Ô Giờ bắt đầu được thêm viền đỏ cảnh báo.
+3. Hộp thông báo lỗi thời gian hiển thị: &#x27;Vui lòng chọn ngày họp, thời gian bắt đầu và kết thúc đầy đủ.&#x27;.
+4. Badge thời lượng không hiển thị thời lượng hợp lệ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra trường bắt buộc Giờ bắt đầu.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_009</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi bỏ trống trường Giờ kết thúc (meeting-end rỗng)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề hợp lệ.
+2. Chọn Ngày họp: Ngày mai.
+3. Nhập Giờ bắt đầu &#x27;09:00&#x27;.
+4. Để trống ô &#x27;Thời gian kết thúc&#x27;.
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp giao ban&#x27;
+Date: Ngày mai
+StartTime: 09:00
+EndTime: &#x27;&#x27; (Rỗng)
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Form ngăn chặn submit.
+2. Ô Giờ kết thúc hiển thị viền đỏ cảnh báo.
+3. Thông báo lỗi: &#x27;Vui lòng chọn ngày họp, thời gian bắt đầu và kết thúc đầy đủ.&#x27;.
+4. Focus vào ô Giờ kết thúc.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra trường bắt buộc Giờ kết thúc.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_010</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi bỏ trống toàn bộ cụm Thời gian (Ngày, Giờ bắt đầu, Giờ kết thúc)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp thảo luận&#x27;.
+2. Để trống cả 3 ô Ngày họp, Giờ bắt đầu và Giờ kết thúc.
+3. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp thảo luận&#x27;
+Date: &#x27;&#x27;
+StartTime: &#x27;&#x27;
+EndTime: &#x27;&#x27;
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Form chặn submit.
+2. Cả 3 ô Ngày, Giờ bắt đầu, Giờ kết thúc đều bị đánh dấu viền đỏ (is-invalid).
+3. Hiển thị thông báo lỗi thời gian màu đỏ trong thẻ thời gian.
+4. Focus vào ô trống đầu tiên (Ngày họp).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra thiếu toàn bộ cụm thời gian.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_011</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi bỏ trống hoặc chọn phòng họp không hợp lệ (roomId = 0)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề, Ngày, Giờ hợp lệ.
+2. Đặt giá trị trường Phòng họp về rỗng hoặc 0 (Ví dụ qua inspect/select).
+3. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp dự án&#x27;
+Date: Ngày mai
+StartTime: 09:00
+EndTime: 10:00
+RoomID: 0 / &#x27;&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Form chặn submit.
+2. Thẻ chọn Phòng họp hiển thị viền đỏ và thông báo: &#x27;Vui lòng chọn phòng họp hợp lệ.&#x27;.
+3. Server từ chối với HTTP 400 Bad Request: &#x27;Mã phòng họp (roomId) phải là số nguyên dương hợp lệ.&#x27;.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra tính bắt buộc của trường Phòng họp.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_012</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi bỏ trống nhiều trường bắt buộc cùng lúc (Tiêu đề, Ngày, Giờ)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Để trống Tiêu đề.
+2. Để trống Ngày họp và Giờ bắt đầu.
+3. Chỉ nhập Giờ kết thúc: &#x27;11:00&#x27;.
+4. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;&#x27; (Rỗng)
+Date: &#x27;&#x27; (Rỗng)
+StartTime: &#x27;&#x27; (Rỗng)
+EndTime: 11:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Form chặn submit và kích hoạt hiệu ứng rung (shake animation).
+2. Alert lỗi chung &#x27;Thông tin chưa hợp lệ&#x27; hiển thị phía trên.
+3. Cả ô Tiêu đề, Ngày họp, Giờ bắt đầu đều chuyển sang viền đỏ và có thông báo lỗi riêng tương ứng.
+4. Con trỏ tự động nhảy về focus vào ô Tiêu đề (trường lỗi đầu tiên).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra xử lý đồng thời nhiều trường bắt buộc bị thiếu.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_013</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi submit form hoàn toàn rỗng (Empty form submit)</td>
+          <td class="pre-text small text-muted">1. Bấm &#x27;+ Thêm cuộc họp&#x27; để mở form mới.</td>
+          <td class="pre-text small">1. Không nhập bất kỳ ký tự nào vào form.
+2. Bấm trực tiếp vào nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Form hoàn toàn rỗng, chưa nhập dữ liệu.</td>
+          <td class="pre-text small text-primary fw-medium">1. Form hoàn toàn không gửi đi request nào lên server.
+2. Hiển thị hộp cảnh báo đỏ toàn cục: &#x27;Thông tin chưa hợp lệ - Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi tiếp tục.&#x27;.
+3. Toàn bộ các trường bắt buộc (Tiêu đề, Ngày, Giờ bắt đầu, Giờ kết thúc) đều hiện trạng thái lỗi.
+4. Focus ngay vào ô Tiêu đề cuộc họp.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra submit rỗng hoàn toàn.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_014</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi chỉ nhập một phần thông tin (chỉ nhập Tiêu đề, bỏ trống ngày giờ)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp đột xuất&#x27;.
+2. Không chọn Ngày, Giờ bắt đầu, Giờ kết thúc.
+3. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;Họp đột xuất&#x27;
+Date: &#x27;&#x27;
+StartTime: &#x27;&#x27;
+EndTime: &#x27;&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Ô Tiêu đề hiển thị hợp lệ (không viền đỏ, không có icon lỗi).
+2. Nhóm thời gian hiển thị viền đỏ và cảnh báo: &#x27;Vui lòng chọn ngày họp, thời gian bắt đầu và kết thúc đầy đủ.&#x27;.
+3. Form không submit, focus vào ô Ngày họp.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra nhập thiếu cụm thời gian khi đã có tiêu đề.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_015</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi chỉ chọn Ngày giờ, bỏ trống Tiêu đề</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Để trống ô Tiêu đề.
+2. Chọn Ngày họp: Ngày mai.
+3. Chọn Giờ: 08:00 - 09:00.
+4. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Title: &#x27;&#x27; (Rỗng)
+Date: Ngày mai
+StartTime: 08:00
+EndTime: 09:00
+RoomID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Cụm thời gian hiển thị thời lượng hợp lệ (&#x27;Thời lượng: 1 giờ 0 phút&#x27;).
+2. Ô Tiêu đề bị viền đỏ, hiển thị icon cảnh báo và thông báo &#x27;Tiêu đề cuộc họp là bắt buộc và không được để trống.&#x27;.
+3. Form không submit, focus vào ô Tiêu đề.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra độc lập validation của tiêu đề.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_016</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra tự động cuộn và Focus vào trường lỗi bắt buộc đầu tiên (First Error Field Focus)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Mở form, để trống toàn bộ thông tin.
+2. Cuộn màn hình xuống dưới cùng.
+3. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Form rỗng.</td>
+          <td class="pre-text small text-primary fw-medium">1. Trình duyệt tự động focus và cuộn màn hình lên trường lỗi đầu tiên là &#x27;Tiêu đề cuộc họp&#x27; (firstErrorField).
+2. Giúp người dùng ngay lập tức nhìn thấy vị trí cần bổ sung dữ liệu.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra trải nghiệm người dùng (UX) khi form có lỗi.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_017</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / Mandatory Fields</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra xóa trạng thái lỗi khi người dùng bắt đầu nhập lại dữ liệu hợp lệ (Error Clearance)</td>
+          <td class="pre-text small text-muted">1. Form vừa submit lỗi do để trống Tiêu đề (ô Tiêu đề đang viền đỏ và hiện text lỗi).</td>
+          <td class="pre-text small">1. Người dùng click vào ô Tiêu đề và gõ ký tự bất kỳ (Ví dụ: chữ &#x27;H&#x27;).
+2. Quan sát giao diện ô Tiêu đề.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Gõ ký tự: &#x27;H&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Viền đỏ is-invalid biến mất ngay lập tức.
+2. Icon cảnh báo đỏ và dòng text thông báo lỗi bên dưới ẩn đi.
+3. Trả lại trạng thái bình thường (Normal state) cho ô nhập liệu.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra sự phản hồi mượt mà của UI khi sửa lỗi.</td>
+        </tr>
+        
+        <tr data-category="Trường bắt buộc">
+          <td class="tc-id text-nowrap">TC_MEET_REQ_018</td>
+          <td>
+            <span class="badge badge-req mb-1">Trường bắt buộc</span><br>
+            <span class="text-secondary small">Meeting / API Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">API Backend trả về HTTP 400 Bad Request khi thiếu bất kỳ trường bắt buộc nào trong payload</td>
+          <td class="pre-text small text-muted">1. Máy chủ Backend Node.js đang chạy tại cổng 3000.
+2. Endpoint POST /api/meetings sẵn sàng tiếp nhận request.</td>
+          <td class="pre-text small">1. Sử dụng công cụ (Postman/Curl) gửi lần lượt 4 request POST /api/meetings với body JSON thiếu từng trường:
+   a. Thiếu trường &#x27;title&#x27;
+   b. Thiếu trường &#x27;startTime&#x27;
+   c. Thiếu trường &#x27;endTime&#x27;
+   d. Thiếu trường &#x27;organizerId&#x27;
+   e. Thiếu trường &#x27;roomId&#x27;.
+2. Quan sát HTTP status code và JSON trả về.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Payload a: { startTime, endTime, organizerId: 1, roomId: 1 }
+Payload b: { title: &#x27;Test&#x27;, endTime, organizerId: 1, roomId: 1 }
+Payload c: { title: &#x27;Test&#x27;, startTime, organizerId: 1, roomId: 1 }
+Payload d: { title: &#x27;Test&#x27;, startTime, endTime, roomId: 1 }
+Payload e: { title: &#x27;Test&#x27;, startTime, endTime, organizerId: 1 }</td>
+          <td class="pre-text small text-primary fw-medium">1. Cả 5 trường hợp máy chủ đều trả về mã trạng thái HTTP 400 Bad Request.
+2. Thuộc tính &#x27;success&#x27;: false.
+3. Thuộc tính &#x27;message&#x27; chỉ rõ cụ thể trường bắt buộc còn thiếu.
+4. Máy chủ không bị crash hoặc văng lỗi Unhandled Promise Rejection (500).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra tính an toàn của API Backend khi bị request bỏ qua client validate.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_001</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Tạo cuộc họp thành công với Ngày và Giờ hợp lệ trong tương lai</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.
+2. Phòng họp ID=1 đang Active và chưa có ai đặt vào ngày mai từ 09:00 đến 10:30.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp Tổng kết Quý 3&#x27;.
+2. Chọn Ngày họp: Ngày mai.
+3. Chọn Giờ bắt đầu: &#x27;09:00&#x27;.
+4. Chọn Giờ kết thúc: &#x27;10:30&#x27;.
+5. Chọn Phòng: &#x27;Phòng Tokyo&#x27;.
+6. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Date: Ngày mai
+StartTime: 09:00
+EndTime: 10:30
+Duration: 90 phút (1 giờ 30 phút)</td>
+          <td class="pre-text small text-primary fw-medium">1. Dynamic Duration Badge hiển thị: &#x27;Thời lượng: 1 giờ 30 phút&#x27;.
+2. Không có bất kỳ cảnh báo lỗi thời gian nào.
+3. Cuộc họp được tạo thành công, HTTP 201 Created.
+4. Banner hiển thị đúng thông tin: 09:00 - 10:30 (1 giờ 30 phút).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra luồng chuẩn ngày giờ hợp lệ.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_002</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Ngày họp ở thời điểm trong quá khứ (Past Date)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.
+2. Ngày hiện tại của hệ thống là hôm nay.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp bù tuần trước&#x27;.
+2. Chọn Ngày họp: Ngày hôm qua (hoặc một ngày trong quá khứ).
+3. Chọn Giờ bắt đầu: &#x27;09:00&#x27;, Giờ kết thúc: &#x27;10:00&#x27;.
+4. Chọn Phòng họp hợp lệ.
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Date: Ngày hôm qua (Ví dụ: 2026-09-26 khi hôm nay là 2026-09-27)
+StartTime: 09:00
+EndTime: 10:00</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện thời điểm bắt đầu nhỏ hơn thời điểm hiện tại.
+2. Chặn submit form.
+3. Hộp thông báo lỗi thời gian hiển thị: &#x27;Thời gian bắt đầu không thể diễn ra trong quá khứ.&#x27;.
+4. Cả ô Ngày họp và Giờ bắt đầu đều hiển thị viền đỏ cảnh báo (is-invalid).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra chặn ngày trong quá khứ.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_003</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Ngày là hôm nay nhưng Giờ bắt đầu đã trôi qua trong quá khứ</td>
+          <td class="pre-text small text-muted">1. Giả sử thời gian hiện tại là 15:30 chiều hôm nay.
+2. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp khẩn sáng nay&#x27;.
+2. Chọn Ngày họp: Hôm nay.
+3. Chọn Giờ bắt đầu: &#x27;09:00&#x27; (đã trôi qua so với 15:30).
+4. Chọn Giờ kết thúc: &#x27;10:00&#x27;.
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Date: Hôm nay
+StartTime: Giờ đã trôi qua (Trước giờ hiện tại &gt; 1 phút)
+EndTime: Giờ kết thúc sau Giờ bắt đầu</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống so sánh startDateTime với thời điểm hiện tại và phát hiện đã quá hạn.
+2. Chặn submit form.
+3. Hiển thị thông báo lỗi màu đỏ: &#x27;Thời gian bắt đầu không thể diễn ra trong quá khứ.&#x27;.
+4. Viền đỏ ô Giờ bắt đầu.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra chặn giờ đã trôi qua trong cùng ngày hôm nay.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_004</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Cho phép tạo cuộc họp khi Ngày là hôm nay và Giờ bắt đầu ở tương lai gần (Same-day booking)</td>
+          <td class="pre-text small text-muted">1. Giả sử thời gian hiện tại là 10:00 sáng hôm nay.
+2. Phòng họp ID=1 đang trống từ 11:00 đến 12:00 hôm nay.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp nhanh trưa nay&#x27;.
+2. Chọn Ngày họp: Hôm nay.
+3. Chọn Giờ bắt đầu: &#x27;11:00&#x27; (sau thời điểm hiện tại 1 giờ).
+4. Chọn Giờ kết thúc: &#x27;12:00&#x27;.
+5. Chọn Phòng: &#x27;Phòng Tokyo&#x27;.
+6. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Date: Hôm nay
+StartTime: Giờ hiện tại + 1 giờ
+EndTime: Giờ hiện tại + 2 giờ</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống xác nhận thời gian bắt đầu nằm ở tương lai.
+2. Form submit thành công không có lỗi.
+3. Cuộc họp được lưu vào hệ thống, hiển thị banner xác nhận.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra tính năng đặt lịch trong cùng ngày khi giờ họp hợp lệ.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_005</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra dung sai thời gian mạng 1 phút chống lệch đồng hồ (Tolerance Window)</td>
+          <td class="pre-text small text-muted">1. Đặt lịch họp sát với mốc hiện tại (chênh lệch dưới 60 giây do độ trễ gửi mạng hoặc bấm nút chậm vài giây).</td>
+          <td class="pre-text small">1. Chọn Ngày: Hôm nay.
+2. Chọn Giờ bắt đầu bằng đúng phút hiện tại (hoặc vừa nhảy sang phút mới dưới 60s).
+3. Bấm &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">startDateTime: Thời điểm hiện tại trừ đi 30 giây (trong khoảng dung sai 60.000ms).</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống áp dụng TIME_PAST_TOLERANCE_MS (60 giây), không chặn oan request của người dùng.
+2. Cho phép submit thành công nếu thời gian chênh lệch dưới 1 phút.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra cơ chế dung sai Tolerance 60s chống mạng lag.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_006</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Giờ bắt đầu sau Giờ kết thúc trong cùng một ngày (start &gt; end)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề hợp lệ.
+2. Chọn Ngày: Ngày mai.
+3. Chọn Giờ bắt đầu: &#x27;15:00&#x27;.
+4. Chọn Giờ kết thúc: &#x27;14:00&#x27; (sớm hơn giờ bắt đầu 1 tiếng).
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">StartTime: 15:00
+EndTime: 14:00 (endTotal &lt; startTotal)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống tính toán diffMinutes = -60 phút (nhỏ hơn hoặc bằng 0).
+2. Form ngăn chặn submit.
+3. Hộp thông báo lỗi thời gian hiển thị: &#x27;Thời gian kết thúc phải lớn hơn thời gian bắt đầu.&#x27;.
+4. Ô Giờ kết thúc hiển thị viền đỏ (is-invalid).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra logic kết thúc trước bắt đầu.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_007</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Giờ bắt đầu trùng với Giờ kết thúc (start == end, thời lượng 0 phút)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề hợp lệ.
+2. Chọn Ngày: Ngày mai.
+3. Chọn Giờ bắt đầu: &#x27;10:00&#x27;.
+4. Chọn Giờ kết thúc: &#x27;10:00&#x27;.
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">StartTime: 10:00
+EndTime: 10:00 (diffMinutes = 0)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống tính toán diffMinutes = 0.
+2. Ngăn chặn submit form.
+3. Thông báo lỗi: &#x27;Thời gian kết thúc phải lớn hơn thời gian bắt đầu.&#x27;.
+4. Ô Giờ kết thúc viền đỏ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn cuộc họp có thời lượng bằng 0.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_008</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi thời lượng nhỏ hơn giới hạn tối thiểu (&lt; 5 phút, ví dụ: 3 phút)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề hợp lệ.
+2. Chọn Ngày: Ngày mai.
+3. Chọn Giờ bắt đầu: &#x27;09:00&#x27;.
+4. Chọn Giờ kết thúc: &#x27;09:03&#x27; (thời lượng chỉ 3 phút).
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">StartTime: 09:00
+EndTime: 09:03 (diffMinutes = 3)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện diffMinutes &lt; 5.
+2. Form chặn submit.
+3. Hiển thị thông báo lỗi màu đỏ: &#x27;Thời lượng cuộc họp tối thiểu phải từ 5 phút trở lên.&#x27;.
+4. Ô Giờ kết thúc viền đỏ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra quy tắc nghiệp vụ thời lượng tối thiểu 5 phút.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_009</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Giá trị biên dưới hợp lệ: Cho phép tạo cuộc họp có thời lượng chính xác 5 phút (Boundary Minimum)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.
+2. Phòng họp đang trống.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Standup nhanh 5 phút&#x27;.
+2. Chọn Ngày: Ngày mai.
+3. Chọn Giờ bắt đầu: &#x27;09:00&#x27;.
+4. Chọn Giờ kết thúc: &#x27;09:05&#x27; (đúng 5 phút).
+5. Chọn Phòng họp hợp lệ.
+6. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">StartTime: 09:00
+EndTime: 09:05 (diffMinutes = 5)</td>
+          <td class="pre-text small text-primary fw-medium">1. Dynamic Duration Badge hiển thị: &#x27;Thời lượng: 5 phút&#x27;.
+2. Không có thông báo lỗi thời lượng.
+3. Hệ thống cho phép tạo cuộc họp thành công (HTTP 201 Created).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra giá trị biên dưới hợp lệ (Min Boundary = 5m).</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_010</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Giá trị biên dưới vi phạm: Chặn tạo cuộc họp có thời lượng 4 phút (Boundary Violation: 4 minutes)</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề hợp lệ.
+2. Chọn Ngày: Ngày mai.
+3. Chọn Giờ bắt đầu: &#x27;09:00&#x27;.
+4. Chọn Giờ kết thúc: &#x27;09:04&#x27; (4 phút).
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">StartTime: 09:00
+EndTime: 09:04 (diffMinutes = 4)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống từ chối submit.
+2. Hiển thị thông báo lỗi: &#x27;Thời lượng cuộc họp tối thiểu phải từ 5 phút trở lên.&#x27;.
+3. Ô Giờ kết thúc viền đỏ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra giá trị sát biên dưới (Min - 1m).</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_011</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi thời lượng vượt quá giới hạn tối đa (&gt; 24 giờ cho 1 lần đặt)</td>
+          <td class="pre-text small text-muted">1. Modal hoặc API tiếp nhận request đặt phòng.</td>
+          <td class="pre-text small">1. Gửi request tạo cuộc họp kéo dài hơn 24 giờ (Ví dụ: từ 08:00 ngày 01/10/2026 đến 10:00 ngày 02/10/2026 - 26 giờ).
+2. Bấm &#x27;Lưu&#x27; hoặc gửi API POST /api/meetings.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">StartTime: 2026-10-01 08:00:00
+EndTime: 2026-10-02 10:00:00 (Duration: 26 giờ = 1560 phút)</td>
+          <td class="pre-text small text-primary fw-medium">1. Client: Báo lỗi &#x27;Thời lượng cuộc họp không được vượt quá 24 giờ trong 1 lần đặt.&#x27;.
+2. Server: Middleware trả về HTTP 400 Bad Request kèm message &#x27;Thời lượng cuộc họp không được vượt quá 24 giờ trong một lần đặt.&#x27;.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra giới hạn thời lượng tối đa 24 giờ chống chiếm dụng phòng.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_012</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Giá trị biên trên hợp lệ: Cho phép tạo cuộc họp có thời lượng chính xác 24 giờ (Boundary Maximum)</td>
+          <td class="pre-text small text-muted">1. Gửi request qua API với thời lượng tròn 24 giờ.
+2. Phòng họp trống toàn bộ khung giờ 24h.</td>
+          <td class="pre-text small">1. Gửi POST /api/meetings với StartTime: &#x27;2026-10-01 08:00:00&#x27;, EndTime: &#x27;2026-10-02 08:00:00&#x27;.
+2. Kiểm tra kết quả phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">StartTime: 2026-10-01 08:00:00
+EndTime: 2026-10-02 08:00:00 (Đúng tròn 1440 phút)</td>
+          <td class="pre-text small text-primary fw-medium">1. Máy chủ xác nhận thời lượng đúng bằng 24 giờ.
+2. Vượt qua bước kiểm tra thời lượng.
+3. Tạo cuộc họp thành công (HTTP 201 Created).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra giá trị biên trên hợp lệ (Max Boundary = 24h).</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_013</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi Ngày bắt đầu sau Ngày kết thúc (startDate &gt; endDate trong Payload API)</td>
+          <td class="pre-text small text-muted">1. API Backend đang chạy.</td>
+          <td class="pre-text small">1. Gửi request POST /api/meetings qua Postman với startTime ngày 15/10/2026, endTime ngày 14/10/2026.
+2. Quan sát phản hồi API.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">startTime: &#x27;2026-10-15 09:00:00&#x27;
+endTime: &#x27;2026-10-14 10:00:00&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Máy chủ phát hiện end &lt;= start.
+2. Trả về mã lỗi HTTP 400 Bad Request.
+3. Message: &#x27;Thời gian kết thúc phải diễn ra sau thời gian bắt đầu.&#x27;.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra ngày bắt đầu sau ngày kết thúc qua API.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_014</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Date &amp; Time Validation</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn tạo cuộc họp khi định dạng chuỗi Ngày/Giờ không hợp lệ (Invalid Date format)</td>
+          <td class="pre-text small text-muted">1. Kiểm tra qua API hoặc khi người dùng cố tình nhập chuỗi sai định dạng.</td>
+          <td class="pre-text small">1. Gửi request với startTime: &#x27;invalid-date-string&#x27; hoặc &#x27;2026-02-31T25:00:00Z&#x27;.
+2. Quan sát phản hồi từ hệ thống.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">startTime: &#x27;invalid-date-string&#x27;
+endTime: &#x27;2026-10-01T10:00:00Z&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Hàm parseValidDate phát hiện isNaN(date.getTime()).
+2. Hệ thống từ chối dữ liệu, trả về HTTP 400 Bad Request.
+3. Message: &#x27;Định dạng ngày giờ không hợp lệ (hỗ trợ chuẩn ISO 8601 hoặc YYYY-MM-DD HH:mm:ss).&#x27;.
+4. Không làm sập ứng dụng với lỗi Invalid Date.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chống lỗi Crash Node.js do parse ngày giờ không hợp lệ.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_015</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / UI Duration Calculator</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra tính toán và hiển thị thời lượng động (Live Duration Badge) trên giao diện</td>
+          <td class="pre-text small text-muted">1. Modal &#x27;Thêm cuộc họp&#x27; đang mở.</td>
+          <td class="pre-text small">1. Chọn Ngày: Ngày mai.
+2. Chọn Giờ bắt đầu: &#x27;09:00&#x27;.
+3. Lần lượt đổi Giờ kết thúc:
+   a. Chọn &#x27;09:30&#x27; -&gt; Quan sát badge.
+   b. Chọn &#x27;11:00&#x27; -&gt; Quan sát badge.
+   c. Chọn &#x27;10:45&#x27; -&gt; Quan sát badge.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">a. 09:00 -&gt; 09:30 (30 phút)
+b. 09:00 -&gt; 11:00 (2 giờ 0 phút)
+c. 09:00 -&gt; 10:45 (1 giờ 45 phút)</td>
+          <td class="pre-text small text-primary fw-medium">1. Badge thời lượng (#duration-badge) cập nhật ngay lập tức theo thời gian thực (real-time):
+   a. Hiển thị: &#x27;Thời lượng: 30 phút&#x27;.
+   b. Hiển thị: &#x27;Thời lượng: 2 giờ 0 phút&#x27;.
+   c. Hiển thị: &#x27;Thời lượng: 1 giờ 45 phút&#x27;.
+2. Giao diện trực quan, rõ ràng cho người dùng.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra tính năng Live Duration Calculator trên giao diện.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_016</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Time Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đặt phòng khi khung giờ bị trùng lặp hoàn toàn với cuộc họp đã có (Exact Match Overlap)</td>
+          <td class="pre-text small text-muted">1. Phòng &#x27;Phòng Tokyo&#x27; (ID=1) đã có lịch họp từ 09:00 đến 10:00 ngày mai (Tiêu đề: &#x27;Họp Team A&#x27;).</td>
+          <td class="pre-text small">1. Bấm &#x27;+ Thêm cuộc họp&#x27;.
+2. Nhập Tiêu đề: &#x27;Họp Team B&#x27;.
+3. Chọn Ngày mai, Giờ bắt đầu &#x27;09:00&#x27;, Giờ kết thúc &#x27;10:00&#x27;.
+4. Chọn Phòng: &#x27;Phòng Tokyo&#x27; (ID=1).
+5. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Existing Meeting: 09:00 - 10:00 (Phòng Tokyo)
+New Booking: 09:00 - 10:00 (Phòng Tokyo)</td>
+          <td class="pre-text small text-primary fw-medium">1. Phía Client: Hàm checkMeetingRoomConflict phát hiện trùng lặp, hiển thị box đỏ cảnh báo: &#x27;Phòng Tokyo đã có lịch họp: &quot;Họp Team A&quot; (09:00 - 10:00). Vui lòng chọn giờ hoặc phòng khác.&#x27;.
+2. Phía Server: Nếu request gửi lên, Transaction khóa phòng kiểm tra Overlap và trả về HTTP 409 Conflict: &#x27;Phòng họp &quot;Phòng Tokyo&quot; đã có người đặt trong khung giờ này.&#x27;.
+3. Cuộc họp không được tạo đè.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra chống trùng lặp tuyệt đối (100% overlap).</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_017</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Time Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đặt phòng khi khung giờ bị chồng lấn một phần đầu (Start-overlap)</td>
+          <td class="pre-text small text-muted">1. Phòng ID=1 đã có lịch từ 09:00 đến 10:30 ngày mai.</td>
+          <td class="pre-text small">1. Nhập thông tin đặt phòng ID=1 từ 08:30 đến 09:30 (giao nhau 30 phút từ 09:00 đến 09:30).
+2. Bấm &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Existing: 09:00 - 10:30
+New: 08:30 - 09:30 (Chồng lấn 09:00 - 09:30)</td>
+          <td class="pre-text small text-primary fw-medium">1. Thuật toán kiểm tra (StartTime &lt; EndExist &amp;&amp; EndTime &gt; StartExist) trả về True.
+2. Hệ thống từ chối đặt phòng.
+3. Báo lỗi xung đột lịch phòng (HTTP 409 Conflict hoặc Client Alert).
+4. Form không lưu cuộc họp bị trùng.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra chồng lấn thời gian phần đầu.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_018</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Time Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đặt phòng khi khung giờ bị chồng lấn một phần cuối (End-overlap)</td>
+          <td class="pre-text small text-muted">1. Phòng ID=1 đã có lịch từ 09:00 đến 10:30 ngày mai.</td>
+          <td class="pre-text small">1. Nhập thông tin đặt phòng ID=1 từ 10:00 đến 11:30 (giao nhau 30 phút từ 10:00 đến 10:30).
+2. Bấm &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Existing: 09:00 - 10:30
+New: 10:00 - 11:30 (Chồng lấn 10:00 - 10:30)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện xung đột lịch.
+2. Chặn submit và hiển thị cảnh báo phòng đã có người đặt.
+3. Giữ nguyên dữ liệu trên form để người dùng đổi phòng hoặc đổi giờ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra chồng lấn thời gian phần đuôi.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_019</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Time Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đặt phòng khi khung giờ mới nằm hoàn toàn bên trong cuộc họp khác (Inside-overlap)</td>
+          <td class="pre-text small text-muted">1. Phòng ID=1 đã có lịch từ 08:00 đến 12:00 ngày mai.</td>
+          <td class="pre-text small">1. Nhập thông tin đặt phòng ID=1 từ 09:00 đến 10:00 (nằm lọt thỏm trong 08:00 - 12:00).
+2. Bấm &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Existing: 08:00 - 12:00
+New: 09:00 - 10:00 (Nằm trọn bên trong)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện xung đột hoàn toàn.
+2. Từ chối lưu cuộc họp, trả về HTTP 409 Conflict.
+3. Thông báo rõ tên cuộc họp đang chiếm phòng.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra trường hợp lịch mới nằm lọt trong lịch cũ.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_020</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Time Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đặt phòng khi khung giờ mới bao trùm toàn bộ cuộc họp khác (Enclosing-overlap)</td>
+          <td class="pre-text small text-muted">1. Phòng ID=1 đã có lịch từ 09:30 đến 10:30 ngày mai.</td>
+          <td class="pre-text small">1. Nhập thông tin đặt phòng ID=1 từ 09:00 đến 11:00 (bao trùm toàn bộ khung 09:30 - 10:30).
+2. Bấm &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Existing: 09:30 - 10:30
+New: 09:00 - 11:00 (Bao trọn khung giờ lịch cũ)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện lịch cũ bị bao phủ bên trong khung giờ mới.
+2. Chặn đặt lịch và báo lỗi xung đột phòng.
+3. Không cho phép ghi đè.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra trường hợp lịch mới bao trùm lịch cũ.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_021</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Time Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Cho phép đặt phòng khi 2 cuộc họp nối tiếp sát nút nhau (Back-to-back booking - Hợp lệ)</td>
+          <td class="pre-text small text-muted">1. Phòng ID=1 đã có lịch từ 09:00 đến 10:00 ngày mai.</td>
+          <td class="pre-text small">1. Đặt tiếp phòng ID=1 với khung giờ: Giờ bắt đầu &#x27;10:00&#x27;, Giờ kết thúc &#x27;11:00&#x27; (StartTime mới = EndTime cũ).
+2. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Existing: 09:00 - 10:00
+New: 10:00 - 11:00 (Điểm kết thúc trùng điểm bắt đầu)</td>
+          <td class="pre-text small text-primary fw-medium">1. Công thức (StartTime &lt; EndExist &amp;&amp; EndTime &gt; StartExist) trả về False vì (10:00 &lt; 10:00) là False.
+2. Hệ thống xác nhận KHÔNG bị xung đột.
+3. Cho phép đặt phòng thành công (HTTP 201 Created).
+4. Hai cuộc họp hiển thị kế tiếp nhau trên lịch họp.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra biên tiếp xúc thời gian (không tính là trùng lặp).</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_022</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Room Status</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đặt lịch vào phòng họp đang trong trạng thái Bảo trì (Maintenance) hoặc Tạm ngừng</td>
+          <td class="pre-text small text-muted">1. Phòng họp ID=2 có Status = &#x27;Maintenance&#x27; (Đang bảo trì).</td>
+          <td class="pre-text small">1. Mở modal &#x27;Thêm cuộc họp&#x27;.
+2. Nhập tiêu đề, ngày mai từ 09:00 đến 10:00.
+3. Chọn Phòng họp ID=2 (Phòng đang bảo trì).
+4. Bấm nút &#x27;Lưu cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">RoomID: 2 (Status = &#x27;Maintenance&#x27;)
+Time: 09:00 - 10:00 ngày mai</td>
+          <td class="pre-text small text-primary fw-medium">1. Phía Client: Hiển thị cảnh báo lỗi phòng: &#x27;Phòng hiện không khả dụng (Trạng thái: Bảo trì). Vui lòng chọn phòng khác.&#x27;.
+2. Phía Server: Trả về HTTP 400 Bad Request: &#x27;Phòng họp hiện không khả dụng (Trạng thái: Maintenance).&#x27;.
+3. Chặn lưu cuộc họp vào phòng không sẵn sàng.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra trạng thái phòng hợp lệ trước khi đặt.</td>
+        </tr>
+        
+        <tr data-category="Ngày và giờ">
+          <td class="tc-id text-nowrap">TC_MEET_TIME_023</td>
+          <td>
+            <span class="badge badge-time mb-1">Ngày và giờ</span><br>
+            <span class="text-secondary small">Meeting / Concurrency</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra cơ chế khóa phòng chống Race Condition khi 2 người dùng đặt trùng giờ đồng thời</td>
+          <td class="pre-text small text-muted">1. Hai người dùng A và B cùng mở form đặt phòng ID=1.
+2. Cả hai cùng chọn ngày mai từ 09:00 đến 10:00.</td>
+          <td class="pre-text small">1. User A và User B cùng bấm nút &#x27;Lưu cuộc họp&#x27; gần như cùng một tích tắc (miligiây).
+2. Quan sát phản hồi của 2 request trên Server.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Cùng RoomID: 1, cùng StartTime: 09:00, cùng EndTime: 10:00.</td>
+          <td class="pre-text small text-primary fw-medium">1. Database Transaction kích hoạt câu lệnh SELECT ... FOR UPDATE khóa bản ghi phòng họp.
+2. Request đến trước (User A) được tạo thành công (HTTP 201 Created).
+3. Request đến sau (User B) khi giải phóng khóa sẽ quét thấy lịch của User A và bị từ chối với HTTP 409 Conflict: &#x27;Phòng họp đã có người đặt trong khung giờ này.&#x27;.
+4. Không bao giờ xảy ra tình trạng 2 cuộc họp cùng tồn tại trong 1 phòng tại 1 khung giờ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge badge-untested px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra tính an toàn dữ liệu và khả năng chịu tải đồng thời (Race Condition Protection).</td>
+        </tr>
+        
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="mt-4 text-center text-muted small pb-4">
+      Dự án: TTCS_T926_K16C2_N3 - Quản lý Lịch họp Doanh nghiệp • ICTU 2026. Biểu mẫu chuẩn tuân thủ quy trình QA.
+    </footer>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const filterCat = document.getElementById('filterCategory');
+    const table = document.getElementById('tcTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const showingCount = document.getElementById('showingCount');
+
+    function applyFilter() {
+      const query = searchInput.value.toLowerCase().trim();
+      const cat = filterCat.value;
+      let visible = 0;
+
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        const rCat = r.getAttribute('data-category');
+        const matchSearch = !query || text.includes(query);
+        const matchCat = cat === 'ALL' || rCat === cat;
+
+        if (matchSearch && matchCat) {
+          r.style.display = '';
+          visible++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+
+      showingCount.innerHTML = `Hiển thị <strong>${visible}</strong> / <strong>41</strong> test cases`;
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    filterCat.addEventListener('change', applyFilter);
+  </script>
+</body>
+</html>
