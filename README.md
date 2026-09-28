@@ -274,6 +274,7 @@ npm run dev
 | **Hướng dẫn kiểm thử Postman** | [.md](file:///d:/TTCS_T926_K16C2_N3/docs/related_documents.md) | 9 kịch bản test API Postman chi tiết từ Case thành công (201) đến Race Condition (409). |
 | **Biểu mẫu Test Case mẫu** | [.csv](file:///d:/TTCS_T926_K16C2_N3/docs/test_case_template.csv) / [.html](file:///d:/TTCS_T926_K16C2_N3/docs/test_case_template.html) | Bảng 10 Test Cases cốt lõi chuẩn UTF-8 có BOM mở trực tiếp bằng Excel hoặc Google Sheets. |
 | **Bộ Test Cases Tạo cuộc họp** | [.md](docs/QA_TEST_CASES_CREATE_MEETING.md) / [.csv](docs/test_case_create_meeting.csv) / [.xlsx](QA/TestCase/Test_Cases_Tao_Cuoc_Hop_Validation.xlsx) / [.html](docs/test_case_create_meeting.html) | Bộ 41 Test Cases chi tiết cho luồng Tạo cuộc họp: kiểm tra trường bắt buộc, validate ngày giờ, độ dài, định dạng và phòng ngừa Race Condition. |
+| **Runbook QA Staging & log bug** | [Runbook](docs/QA_STAGING_CREATE_MEETING_AND_BUG_LOG.md) / [Execution log CSV](docs/QA_STAGING_EXECUTION_LOG.csv) / [Bug log CSV](docs/QA_BUG_LOG_TEMPLATE.csv) | Trình tự smoke/regression trên Staging, kiểm tra API/persistence, cảnh báo cấu hình frontend đang gọi `localhost`, ghi nhận kết quả và theo dõi bug/retest. |
 
 ---
 
