@@ -5,7 +5,7 @@
 
 ## 📑 MỤC LỤC
 1. [Mục Tiêu & Phạm Vi Áp Dụng](#1-mục-tiêu--phạm-vi-áp-dụng)
-2. [Biểu Mẫu Viết Test Case Chuẩn (Test Case Template)](#2-biểu-mẫu-viết-test-case-chuẩn-test-case-template)
+2. [Biểu Mẫu Viết Test Case Chuẩn (Test Case Template)](#2-biểu-mẫu-viết-test-case-chuẩn-test-c ase-template)
    - [2.1. Cấu trúc 10 cột chuẩn](#21-cấu-trúc-10-cột-chuẩn)
    - [2.2. Bảng Test Cases mẫu thực tế dự án](#22-bảng-test-cases-mẫu-thực-tế-dự-án)
    - [2.3. Hướng dẫn nhập vào Google Sheets / Excel](#23-hướng-dẫn-nhập-vào-google-sheets--excel)
@@ -220,7 +220,7 @@ h3. 6. Bằng chứng đính kèm (Attachments & Logs)
 - **Component**: `Backend`, `Database`
 - **Severity**: 🔴 `Critical`
 - **Priority**: `High`
-- **Mô tả (Description)**:
+- **Mô tả (Description)**:   
   > **1. Môi trường kiểm thử:**
   > - Node.js v20.x, MySQL 8.0, Postman v10.2
   > - URL: `POST http://localhost:3000/api/meetings`
