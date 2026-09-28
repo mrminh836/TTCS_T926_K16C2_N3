@@ -12,7 +12,9 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.resolve(__dirname, '../client')));
+const clientPath = path.resolve(__dirname, '../client');
+app.use(express.static(clientPath));
+app.use('/client', express.static(clientPath));
 
 // Routes
 app.use('/api', meetingRoutes);

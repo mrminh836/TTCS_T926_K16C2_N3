@@ -8,24 +8,24 @@
 
 ## 📑 MỤC LỤC TỔNG QUAN
 
-1. [Bản Đồ Lộ Trình Phát Triển 5 Sprints (Sprint Roadmap)](#1-bản-đồ-lộ-trình-phát-triển-5-sprints-sprint-roadmap)
-2. [SPRINT 1: Nền Tảng Đặt Lịch & Quản Lý Phòng Họp (Core Booking & Rooms)](#2-sprint-1-nền-tảng-đặt-lịch--quản-lý-phòng-họp-core-booking--rooms)
+1. [Bản Đồ Lộ Trình 4 Tuần Phát Triển (4 Sprints — 1 Tháng Học Phần TTCS)](#1-bản-đồ-lộ-trình-4-tuần-phát-triển-4-sprints--1-tháng-học-phần-ttcs)
+2. [TUẦN 1 — SPRINT 1: Nền Tảng Đặt Lịch & Quản Lý Phòng Họp (Core Booking & Rooms)](#2-tuần-1--sprint-1-nền-tảng-đặt-lịch--quản-lý-phòng-họp-core-booking--rooms)
    - Luồng 1.1: Tạo cuộc họp & Khóa phòng chống đặt trùng Race Condition
    - Luồng 1.2: Tra cứu & Lọc danh sách phòng họp trống theo thời gian thực
    - Luồng 1.3: Quản trị danh mục phòng họp phía Admin (CRUD Rooms)
-3. [SPRINT 2: Quản Lý Vòng Đời, Lặp Định Kỳ & Điều Phối Thiết Bị (Lifecycle & Resources)](#3-sprint-2-quản-lý-vòng-đời-lặp-định-kỳ--điều-phối-thiết-bị-lifecycle--resources)
+3. [TUẦN 2 — SPRINT 2: Vòng Đời Cuộc Họp, Lặp Định Kỳ & Điều Phối Thiết Bị (Lifecycle & Resources)](#3-tuần-2--sprint-2-vòng-đời-cuộc-họp-lặp-định-kỳ--điều-phối-thiết-bị-lifecycle--resources)
    - Luồng 2.1: Chỉnh sửa & Hủy cuộc họp (Giải phóng phòng họp tức thời)
    - Luồng 2.2: Đặt lịch họp định kỳ (IsRecurring - Tuần / Tháng) & Thuật toán sinh chuỗi lịch
    - Luồng 2.3: Điều phối, kiểm tra trạng thái & Đặt kèm thiết bị phòng họp
-4. [SPRINT 3: Người Dùng, Phân Quyền RBAC & Lời Mời Họp (Users, RBAC & Invites)](#4-sprint-3-người-dùng-phân-quyền-rbac--lời-mời-họp-users-rbac--invites)
-   - Luồng 3.1: Xác thực & Phân quyền người dùng (Admin, Organizer, Attendee)
+4. [TUẦN 3 — SPRINT 3: Người Dùng, Xác Thực Đăng Nhập & Phân Quyền RBAC (Users, Auth & RBAC)](#4-tuần-3--sprint-3-người-dùng-xác-thực-đăng-nhập--phân-quyền-rbac-users-auth--rbac)
+   - Luồng 3.1: Xác thực đăng nhập / đăng ký & Phân quyền người dùng (Admin, Organizer, Attendee)
    - Luồng 3.2: Mời người tham dự & Phản hồi trạng thái tham gia (Accept/Decline)
    - Luồng 3.3: Chính sách giới hạn quyền đặt phòng theo phòng ban / cấp bậc
-5. [SPRINT 4: Đồng Bộ Lịch Cá Nhân, Thông Báo & Phân Tích Báo Cáo (Sync & Analytics)](#5-sprint-4-đồng-bộ-lịch-cá-nhân-thông-báo--phân-tích-báo-cáo-sync--analytics)
-   - Luồng 4.1: Đồng bộ 2 chiều với Google Calendar & Microsoft Outlook
+5. [TUẦN 4 — SPRINT 4: Đồng Bộ Lịch Cá Nhân, Báo Cáo Thống Kê & Đóng Gói Nghiệm Thu (Sync, Analytics & Sign-off)](#5-tuần-4--sprint-4-đồng-bộ-lịch-cá-nhân-báo-cáo-thống-kê--đóng-gói-nghiệm-thu-sync-analytics--sign-off)
+   - Luồng 4.1: Đồng bộ 2 chiều với Google Calendar & Microsoft Outlook (.ics)
    - Luồng 4.2: Hệ thống gửi thông báo nhắc hẹn tự động (Email / Web Push)
    - Luồng 4.3: Báo cáo hiệu suất, tần suất sử dụng phòng & Thống kê tỷ lệ hủy
-6. [SPRINT 5: Tính Năng Nâng Cao, AI Gợi Ý & Check-in QR (Smart AI & Integrations)](#6-sprint-5-tính-năng-nâng-cao-ai-gợi-ý--check-in-qr-smart-ai--integrations)
+6. [ĐỊNH HƯỚNG MỞ RỘNG TƯƠNG LAI (FUTURE ROADMAP — HẬU 4 TUẦN HỌC PHẦN)](#6-định-hướng-mở-rộng-tương-lai-future-roadmap--hậu-4-tuần-học-phần)
    - Luồng 5.1: Thuật toán gợi ý khung giờ họp rảnh chung (Smart Scheduler)
    - Luồng 5.2: Check-in / Check-out phòng họp bằng mã QR Code (Auto-release sau 15p)
    - Luồng 5.3: Trợ lý ảo Chatbot NLP hỗ trợ đặt phòng tức thì
@@ -34,40 +34,46 @@
 
 ---
 
-## 1. Bản Đồ Lộ Trình Phát Triển 5 Sprints (Sprint Roadmap)
+## 1. Bản Đồ Lộ Trình 4 Tuần Phát Triển (4 Sprints — 1 Tháng Học Phần TTCS)
 
-Dựa trên toàn bộ 28 User Stories trong file Product Backlog, hệ thống được phân rã thành **5 Sprints** có tính kế thừa và độc lập cao:
+Dựa trên toàn bộ 28 User Stories trong file Product Backlog chuẩn (`Product_Backlog_Meeting_Management_ictu.xlsx`), phạm vi học phần Thực tập Chuyên sâu (1 tháng / 4 tuần) được phân bổ tối ưu thành **4 Sprints (mỗi tuần 1 Sprint)**. Các tính năng AI và tích hợp mở rộng được đưa vào phần Định hướng tương lai (Future Roadmap):
 
 ```mermaid
 gantt
-    title LỘ TRÌNH 5 SPRINTS PHÁT TRIỂN HỆ THỐNG ĐẶT LỊCH HỌP
+    title LỘ TRÌNH 4 TUẦN (4 SPRINTS) PHÁT TRIỂN HỆ THỐNG ĐẶT LỊCH HỌP (1 THÁNG TTCS)
     dateFormat  YYYY-MM-DD
-    section Sprint 1
-    Setup & Kiến trúc CSDL 7 bảng            :done, s1_1, 2026-09-21, 2026-09-23
-    Đặt phòng & Chống trùng Race Condition  :done, s1_2, 2026-09-23, 2026-09-26
-    Xem phòng trống & Admin CRUD Phòng       :active, s1_3, 2026-09-25, 2026-09-28
-    section Sprint 2
-    Sửa / Hủy cuộc họp & Giải phóng phòng    :s2_1, 2026-09-29, 2026-10-03
-    Cuộc họp lặp định kỳ (IsRecurring)      :s2_2, 2026-10-02, 2026-10-06
-    Điều phối & Quản lý thiết bị hội nghị    :s2_3, 2026-10-05, 2026-10-09
-    section Sprint 3
-    Quản lý User & Phân quyền RBAC           :s3_1, 2026-10-10, 2026-10-14
-    Mời người tham dự & Phản hồi lời mời    :s3_2, 2026-10-13, 2026-10-17
-    Giới hạn quyền đặt phòng theo chính sách :s3_3, 2026-10-16, 2026-10-20
-    section Sprint 4
-    Đồng bộ Google Calendar & Outlook        :s4_1, 2026-10-21, 2026-10-26
-    Thông báo nhắc hẹn tự động trước 15p     :s4_2, 2026-10-25, 2026-10-29
-    Báo cáo tần suất & Phân tích hủy phòng   :s4_3, 2026-10-28, 2026-11-02
-    section Sprint 5
-    Smart Scheduler (Gợi ý giờ rảnh chung)   :s5_1, 2026-11-03, 2026-11-07
-    Check-in / Check-out QR Code tại phòng   :s5_2, 2026-11-06, 2026-11-10
-    Chatbot NLP trợ lý ảo đặt lịch nhanh     :s5_3, 2026-11-09, 2026-11-14
-    Tích hợp Webhook đồng bộ HRM / ERP       :s5_4, 2026-11-13, 2026-11-17
+    section Tuần 1: Sprint 1 (Core Booking & Rooms)
+    Setup & Kiến trúc CSDL 7 bảng            :done, s1_1, 2026-09-21, 2026-09-24
+    Đặt phòng & Chống trùng Race Condition  :done, s1_2, 2026-09-24, 2026-09-27
+    Xem phòng trống & Admin CRUD Phòng       :done, s1_3, 2026-09-26, 2026-09-28
+    section Tuần 2: Sprint 2 (Lifecycle & Resources)
+    Sửa / Hủy cuộc họp & Giải phóng phòng    :active, s2_1, 2026-09-29, 2026-10-02
+    Cuộc họp lặp định kỳ (IsRecurring)      :s2_2, 2026-10-01, 2026-10-04
+    Điều phối & Quản lý thiết bị hội nghị    :s2_3, 2026-10-03, 2026-10-05
+    section Tuần 3: Sprint 3 (Users, Auth & Invites)
+    Xác thực Đăng nhập / Đăng ký (JWT)       :s3_1, 2026-10-06, 2026-10-09
+    Phân quyền RBAC & Giới hạn quyền đặt     :s3_2, 2026-10-08, 2026-10-11
+    Mời người tham dự & Phản hồi lời mời    :s3_3, 2026-10-10, 2026-10-13
+    section Tuần 4: Sprint 4 (Sync, Analytics & Sign-off)
+    Đồng bộ Google Calendar & Thông báo nhắc :s4_1, 2026-10-14, 2026-10-17
+    Báo cáo tần suất, Tỷ lệ hủy & Xuất Excel :s4_2, 2026-10-16, 2026-10-19
+    Kiểm thử E2E, Đóng gói & Nghiệm thu      :s4_3, 2026-10-19, 2026-10-21
 ```
+
+### Bảng Ánh Xạ 28 User Stories Backlog Vào Lộ Trình 4 Tuần:
+
+| Tuần / Sprint | Mục tiêu Sprint | Các User Story phụ trách (Chuẩn Backlog) | Trọng tâm bàn giao |
+| :---: | :--- | :--- | :--- |
+| **Tuần 1 — Sprint 1**<br>(21/09 – 28/09) | **Core Booking & Rooms** | • **US 1.0:** Tạo lịch họp mới<br>• **US 7.0:** Xem danh sách phòng trống<br>• **US 8.0:** Đặt phòng theo khung giờ cụ thể<br>• **US 9.0:** Xem chi tiết thông tin phòng họp<br>• **US 10.0:** Tự động khóa phòng khi đặt thành công (Khóa dòng MySQL chống Race Condition)<br>• **US 11.0:** Thêm, sửa, xóa phòng họp (Admin CRUD Rooms) |  **Đã xong 100%**<br>(22/22 Tasks, 31 SP, 71 Test Cases PASS) |
+| **Tuần 2 — Sprint 2**<br>(29/09 – 05/10) | **Lifecycle & Resources** | • **US 2.0:** Chỉnh sửa hoặc hủy lịch họp (Tự động giải phóng phòng)<br>• **US 3.0:** Đặt lịch họp định kỳ (Tuần / Tháng)<br>• **US 6.0:** Xem lại lịch sử các cuộc họp đã tham gia<br>• **US 12.0:** Đặt kèm thiết bị khi đặt phòng<br>• **US 13.0:** Xem trạng thái thiết bị real-time<br>• **US 14.0:** Quản lý danh mục thiết bị (Admin CRUD Equipments) | 🚀 **Tuần hiện tại**<br>Quản lý vòng đời cuộc họp & thiết bị |
+| **Tuần 3 — Sprint 3**<br>(06/10 – 13/10) | **Users, Auth & RBAC** | • **US 18.0:** Tạo tài khoản người dùng mới (Quản trị viên)<br>• **US 19.0:** Xem danh sách tất cả người dùng<br>• **US 20.0:** Phân quyền người dùng (Admin, Organizer, Attendee) & Đăng nhập JWT<br>• **US 21.0:** Giới hạn quyền đặt phòng theo chính sách<br>• **US 4.0:** Mời người tham dự vào cuộc họp & phản hồi lời mời | ⏳ **Tuần 3**<br>Đăng nhập, phân quyền & lời mời họp |
+| **Tuần 4 — Sprint 4**<br>(14/10 – 21/10) | **Sync, Analytics & Sign-off** | • **US 15.0:** Đồng bộ lịch cá nhân (.ics, Google Calendar / Outlook)<br>• **US 16.0:** Nhận thông báo nhắc nhở trước khi họp<br>• **US 22.0:** Báo cáo sử dụng phòng họp theo thời gian<br>• **US 23.0:** Thống kê số lượng cuộc họp bị hủy<br>• **US 24.0:** Xuất báo cáo ra file Excel / CSV UTF-8 / PDF<br>• Kiểm thử E2E, rà soát Definition of Done & Báo cáo tổng kết | 🏁 **Nghiệm thu môn học**<br>Báo cáo KPI, xuất file & bảo vệ |
+| **Mở rộng (Future Scope)** | **Smart AI & Integrations** | • **US 5.0:** Gợi ý thời gian họp thông minh (Smart Scheduler)<br>• **US 17.0:** Ứng dụng di động (Mobile App)<br>• **US 25.0:** Đặt phòng qua Chatbot trợ lý ảo NLP<br>• **US 26.0:** Gợi ý phòng họp tự động theo quy mô người tham dự<br>• **US 27.0:** Check-in / Check-out phòng bằng mã QR Code (Auto-release sau 15p)<br>• **US 28.0:** Tích hợp Webhook kết nối hệ thống nhân sự HRM / ERP | 🔮 Định hướng phát triển tương lai sau học phần |
+
 
 ---
 
-## 2. SPRINT 1: Nền Tảng Đặt Lịch & Quản Lý Phòng Họp (Core Booking & Rooms)
+## 2. TUẦN 1 — SPRINT 1: Nền Tảng Đặt Lịch & Quản Lý Phòng Họp (Core Booking & Rooms)
 > **Mục tiêu:** Xây dựng khung ứng dụng, CSDL 7 bảng, luồng đặt phòng cơ bản với cơ chế khóa dòng chống trùng lịch và chức năng quản lý danh mục phòng họp.
 
 ### 2.1. Luồng 1.1: Tạo cuộc họp & Khóa phòng chống đặt trùng Race Condition
@@ -143,7 +149,7 @@ WHERE r.Status = 'Active'
 
 ---
 
-## 3. SPRINT 2: Quản Lý Vòng Đời, Lặp Định Kỳ & Điều Phối Thiết Bị (Lifecycle & Resources)
+## 3. TUẦN 2 — SPRINT 2: Vòng Đời Cuộc Họp, Lặp Định Kỳ & Điều Phối Thiết Bị (Lifecycle & Resources)
 > **Mục tiêu:** Cho phép chỉnh sửa/hủy lịch họp, tự động sinh chuỗi lịch họp lặp định kỳ, quản lý danh mục và điều phối thiết bị kèm theo.
 
 ### 3.1. Luồng 2.1: Chỉnh sửa & Hủy cuộc họp (Giải phóng phòng họp)
@@ -209,8 +215,8 @@ graph TD
 
 ---
 
-## 4. SPRINT 3: Người Dùng, Phân Quyền RBAC & Lời Mời Họp (Users, RBAC & Invites)
-> **Mục tiêu:** Quản lý tài khoản người dùng, phân quyền theo vai trò (Role-Based Access Control), gửi lời mời họp và theo dõi phản hồi tham dự.
+## 4. TUẦN 3 — SPRINT 3: Người Dùng, Xác Thực Đăng Nhập & Phân Quyền RBAC (Users, Auth & RBAC)
+> **Mục tiêu:** Quản lý tài khoản người dùng, xác thực đăng nhập JWT, phân quyền theo vai trò (Role-Based Access Control), gửi lời mời họp và theo dõi phản hồi tham dự.
 
 ### 4.1. Luồng 3.1: Xác thực & Phân quyền người dùng (RBAC)
 - **User Story:** `US 18.0` (Tạo user), `US 19.0` (Danh sách user), `US 20.0` (Phân quyền Admin / Organizer / Attendee).
@@ -254,8 +260,8 @@ sequenceDiagram
 
 ---
 
-## 5. SPRINT 4: Đồng Bộ Lịch Cá Nhân, Thông Báo & Phân Tích Báo Cáo (Sync & Analytics)
-> **Mục tiêu:** Đồng bộ hai chiều với Google Calendar / Outlook, gửi thông báo nhắc hẹn trước giờ họp và cung cấp Dashboard báo cáo đo lường lãng phí tài nguyên.
+## 5. TUẦN 4 — SPRINT 4: Đồng Bộ Lịch Cá Nhân, Báo Cáo Thống Kê & Đóng Gói Nghiệm Thu (Sync, Analytics & Sign-off)
+> **Mục tiêu:** Đồng bộ lịch làm việc cá nhân với Google Calendar / Outlook (.ics), thông báo tự động, Dashboard báo cáo KPI và hoàn thiện nghiệm thu môn học.
 
 ### 5.1. Luồng 4.1: Đồng bộ 2 chiều với Google Calendar & Microsoft Outlook
 - **User Story:** `US 15.0` (Đồng bộ Google Calendar / Outlook), `US 17.0` (Xem lịch trên ứng dụng di động).
@@ -289,8 +295,8 @@ graph LR
 
 ---
 
-## 6. SPRINT 5: Tính Năng Nâng Cao, AI Gợi Ý & Check-in QR (Smart AI & Integrations)
-> **Mục tiêu:** Ứng dụng AI và IoT để hiện đại hóa hệ sinh thái đặt phòng: Smart Scheduler gợi ý giờ rảnh, Check-in QR tại cửa phòng, Chatbot NLP và tích hợp HRM/ERP.
+## 6. ĐỊNH HƯỚNG MỞ RỘNG TƯƠNG LAI (FUTURE ROADMAP — HẬU 4 TUẦN HỌC PHẦN)
+> **Mục tiêu mở rộng:** Ứng dụng AI và IoT để hiện đại hóa hệ sinh thái đặt phòng: Smart Scheduler gợi ý giờ rảnh, Check-in QR tại cửa phòng, Chatbot NLP, ứng dụng Mobile và tích hợp HRM/ERP.
 
 ### 6.1. Luồng 5.1: Thuật toán gợi ý khung giờ họp rảnh chung (Smart Scheduler)
 - **User Story:** `US 5.0` (Xem gợi ý thời gian họp khi mọi người đều rảnh).

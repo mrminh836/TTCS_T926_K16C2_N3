@@ -305,9 +305,9 @@ Hãy:
 3. Viết helper tạo file .ics chuẩn iCalendar để tải và đồng bộ vào Google Calendar.
 ```
 
-### 10.4. Mẫu Prompt phát triển SPRINT 5 (Smart Scheduler, Check-in QR & Chatbot)
+### 10.4. Mẫu Prompt phát triển HẠNG MỤC MỞ RỘNG (Future Scope — Smart Scheduler, Check-in QR & Chatbot)
 ```text
-Tôi đang làm Sprint 5 - Tính năng nâng cao AI & QR Check-in (US 5.0 & US 27.0).
+Tôi đang làm Hạng mục mở rộng (Future Scope) - Tính năng nâng cao AI & QR Check-in (US 5.0 & US 27.0).
 Đọc kỹ file docs/LUONG_HOAT_DONG_HE_THONG.md (Mục 6.1 và 6.2).
 Hãy:
 1. Viết thuật toán Smart Scheduler tìm top 3 khung giờ rảnh chung của nhóm 5 người.

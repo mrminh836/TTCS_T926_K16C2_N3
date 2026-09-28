@@ -268,7 +268,7 @@ npm run dev
 
 | Tài liệu | Định dạng | Nội dung chính |
 | :--- | :---: | :--- |
-| **Đặc tả luồng hoạt động hệ thống** | [.docx](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.docx) / [.md](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.md) | Toàn bộ 5 luồng hoạt động chi tiết, thuật toán Overlap, cơ chế khóa dòng và ma trận ánh xạ FE-BE-DB. |
+| **Đặc tả luồng hoạt động hệ thống** | [.docx](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.docx) / [.md](file:///d:/TTCS_T926_K16C2_N3/docs/LUONG_HOAT_DONG_HE_THONG.md) | Toàn bộ lộ trình 4 tuần (4 Sprints) chuẩn 28 User Stories Backlog, thuật toán Overlap, cơ chế khóa dòng và ma trận ánh xạ FE-BE-DB. |
 | **Cẩm nang phát triển Frontend** | [.md](file:///d:/TTCS_T926_K16C2_N3/.agents/skills/fe-development-guide/SKILL.md) | Bộ quy chuẩn UI/UX, Design tokens, cấu trúc code, validation, accessibility và checklist FE QA. |
 | **Quy trình QA & Chuẩn hóa Jira** | [.md](file:///d:/TTCS_T926_K16C2_N3/docs/QA_PROCESS_AND_JIRA_STANDARDS.md) | Quy trình kiểm thử chất lượng, biểu mẫu Test Case 10 cột, Bug template và ma trận Severity/Priority. |
 | **Hướng dẫn kiểm thử Postman** | [.md](file:///d:/TTCS_T926_K16C2_N3/docs/related_documents.md) | 9 kịch bản test API Postman chi tiết từ Case thành công (201) đến Race Condition (409). |

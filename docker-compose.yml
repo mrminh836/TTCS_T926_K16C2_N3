@@ -23,6 +23,7 @@ services:
     volumes:
       # Mount mã nguồn để hot-reload khi dev (không cần rebuild image)
       - ./server:/app
+      - ./client:/client
       # Giữ node_modules độc lập trong container
       - /app/node_modules
     depends_on:
