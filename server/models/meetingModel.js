@@ -2,6 +2,113 @@ const db = require('../config/database');
 
 const Meeting = {
     /**
+     * Lấy danh sách cuộc họp với bộ lọc và phân trang
+     * @param {Object} filters - Các tham số lọc
+     * @param {string} [filters.date] - Lọc theo ngày cụ thể (YYYY-MM-DD)
+     * @param {string} [filters.startDate] - Lọc từ ngày (YYYY-MM-DD)
+     * @param {string} [filters.endDate] - Lọc đến ngày (YYYY-MM-DD)
+     * @param {string} [filters.status] - Lọc theo trạng thái booking (Confirmed, Cancelled, Completed)
+     * @param {number} [filters.page=1] - Trang hiện tại
+     * @param {number} [filters.limit=10] - Số bản ghi mỗi trang
+     * @returns {Object} { meetings, pagination }
+     */
+    getAll: async (filters = {}) => {
+        const {
+            date,
+            startDate,
+            endDate,
+            status,
+            page = 1,
+            limit = 10
+        } = filters;
+
+        // ── Xây dựng câu truy vấn cơ bản với JOIN đầy đủ ──
+        let baseQuery = `
+            FROM Meetings m
+            LEFT JOIN Users u ON m.OrganizerID = u.UserID
+            LEFT JOIN Bookings b ON m.MeetingID = b.MeetingID
+            LEFT JOIN Rooms r ON b.RoomID = r.RoomID
+        `;
+
+        const conditions = [];
+        const params = [];
+
+        // ── Lọc theo ngày cụ thể (date=2026-10-01) ──
+        if (date) {
+            conditions.push('DATE(m.StartTime) = ?');
+            params.push(date);
+        }
+
+        // ── Lọc theo khoảng ngày (startDate & endDate) ──
+        if (startDate) {
+            conditions.push('DATE(m.StartTime) >= ?');
+            params.push(startDate);
+        }
+        if (endDate) {
+            conditions.push('DATE(m.StartTime) <= ?');
+            params.push(endDate);
+        }
+
+        // ── Lọc theo trạng thái booking ──
+        if (status) {
+            conditions.push('b.BookingStatus = ?');
+            params.push(status);
+        }
+
+        // ── Ghép điều kiện WHERE ──
+        if (conditions.length > 0) {
+            baseQuery += ' WHERE ' + conditions.join(' AND ');
+        }
+
+        // ── Đếm tổng số bản ghi (cho phân trang) ──
+        const countQuery = `SELECT COUNT(DISTINCT m.MeetingID) AS total ${baseQuery}`;
+        const [countRows] = await db.execute(countQuery, params);
+        const total = countRows[0].total;
+
+        // ── Tính toán phân trang ──
+        const offset = (page - 1) * limit;
+        const totalPages = Math.ceil(total / limit);
+
+        // ── Truy vấn dữ liệu chính với đầy đủ thông tin ──
+        const dataQuery = `
+            SELECT 
+                m.MeetingID     AS meetingId,
+                m.Title         AS title,
+                m.Description   AS description,
+                m.StartTime     AS startTime,
+                m.EndTime       AS endTime,
+                m.IsRecurring   AS isRecurring,
+                m.CreatedAt     AS createdAt,
+                m.OrganizerID   AS organizerId,
+                u.FullName      AS organizerName,
+                u.Email         AS organizerEmail,
+                b.BookingID     AS bookingId,
+                b.BookingStatus AS bookingStatus,
+                r.RoomID        AS roomId,
+                r.RoomName      AS roomName,
+                r.Capacity      AS roomCapacity
+            ${baseQuery}
+            ORDER BY m.StartTime DESC
+            LIMIT ? OFFSET ?
+        `;
+
+        const dataParams = [...params, String(limit), String(offset)];
+        const [rows] = await db.execute(dataQuery, dataParams);
+
+        return {
+            meetings: rows,
+            pagination: {
+                currentPage: page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+        };
+    },
+
+    /**
      * Tra cứu xem phòng có bị trùng lịch hay không (dùng cho API kiểm tra phòng trống độc lập)
      */
     checkOverlap: async (roomId, startTime, endTime) => {
