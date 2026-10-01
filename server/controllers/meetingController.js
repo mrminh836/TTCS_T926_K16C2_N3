@@ -41,4 +41,49 @@ const createMeeting = async (req, res, next) => {
     }
 };
 
-module.exports = { createMeeting };
+const updateMeeting = async (req, res) => {
+    try {
+        // PARSE ID SANG SỐ VÀ VALIDATE
+        const meetingId = parseInt(req.params.id, 10);
+        if (isNaN(meetingId)) {
+            return res.status(400).json({ message: "ID cuộc họp không hợp lệ. Vui lòng nhập số." });
+        }
+
+        const { title, description, startTime, endTime, organizerId, roomId, isRecurring } = req.body;
+
+        // 1. Validate dữ liệu
+        if (!title || !startTime || !endTime || !organizerId || !roomId) {
+            return res.status(400).json({ message: "Vui lòng nhập đủ các trường bắt buộc." });
+        }
+
+        if (new Date(startTime) >= new Date(endTime)) {
+            return res.status(400).json({ message: "Thời gian kết thúc phải sau thời gian bắt đầu." });
+        }
+
+        // 2. Chặn trùng giờ (loại trừ chính nó)
+        const isOverlap = await Meeting.checkOverlapUpdate(roomId, startTime, endTime, meetingId);
+        if (isOverlap) {
+            return res.status(409).json({ message: "Cập nhật thất bại! Phòng này đã có cuộc họp khác trong khung giờ bạn chọn." });
+        }
+
+        // 3. Thực thi cập nhật
+        await Meeting.update(meetingId, { title, description, startTime, endTime, organizerId, roomId, isRecurring });
+
+        return res.status(200).json({
+            message: "Cập nhật cuộc họp thành công",
+            data: { meetingId, title, roomId, startTime, endTime }
+        });
+
+    } catch (error) {
+        // BẮT LỖI 404 NẾU CUỘC HỌP KHÔNG TỒN TẠI
+        if (error.status === 404) {
+            return res.status(404).json({ message: error.message });
+        }
+
+        console.error("Lỗi cập nhật cuộc họp:", error);
+        return res.status(500).json({ message: "Lỗi server nội bộ." });
+    }
+};
+
+module.exports = { createMeeting, updateMeeting };
+
