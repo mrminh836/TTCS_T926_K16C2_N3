@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Test Cases Chỉnh Sửa Cuộc Họp - TTCS_T926_K16C2_N3</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .table th { background-color: #0f172a; color: #ffffff; vertical-align: middle; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .table td { vertical-align: top; font-size: 0.85rem; line-height: 1.45; }
+    .tc-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: bold; color: #2563eb; }
+    .pre-text { white-space: pre-line; }
+    .stat-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .evidence-card { transition: transform 0.2s; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+    .evidence-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+  </style>
+</head>
+<body class="p-3 p-md-4">
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-primary px-2 py-1">QA Specification • US 2.0</span>
+          <span class="badge bg-success px-2 py-1"><i class="bi bi-images me-1"></i>Có ảnh minh chứng</span>
+          <span class="text-muted small">Sprint 2 • TTCS_T926_K16C2_N3</span>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">
+          <i class="bi bi-pencil-square text-primary me-2"></i>Bộ Test Cases Luồng Chỉnh Sửa Cuộc Họp
+        </h2>
+        <p class="text-muted mb-0">Kiểm thử đổi giờ, đổi phòng, kiểm tra trùng lặp thông minh loại trừ chính nó (Self-Exclusion) &amp; API PUT</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="test_case_edit_meeting.csv" download class="btn btn-outline-success btn-sm">
+          <i class="bi bi-file-earmark-spreadsheet me-1"></i> Tải file CSV (Excel / Sheets)
+        </a>
+        <a href="QA_TEST_CASES_EDIT_MEETING.md" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-markdown me-1"></i> Xem Tài Liệu Markdown
+        </a>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Tổng số Test Cases</div>
+          <div class="fs-3 fw-bold text-dark">40</div>
+          <div class="text-success small"><i class="bi bi-check2-all"></i> Đầy đủ 5 nhóm kịch bản</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Trùng Lặp &amp; Self-Exclusion</div>
+          <div class="fs-3 fw-bold text-danger">8 TCs</div>
+          <div class="text-muted small">Loại trừ chính nó &amp; 409 Conflict</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Đổi Ngày &amp; Giờ / Đổi Phòng</div>
+          <div class="fs-3 fw-bold text-warning" style="color: #d97706;">14 TCs</div>
+          <div class="text-muted small">Thời lượng, quá khứ, đổi Bookings</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">API PUT Backend</div>
+          <div class="fs-3 fw-bold text-primary">6 TCs</div>
+          <div class="text-muted small">200 OK, 400 Bad Request, 404, 409</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery Showcase -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-card-image text-primary me-2"></i>Thư Viện Ảnh Minh Chứng Luồng Chỉnh Sửa (Evidence Showcase)</h5>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#galleryCollapse">
+          Đóng / Mở Gallery
+        </button>
+      </div>
+      <div class="collapse show" id="galleryCollapse">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg" class="img-fluid rounded border mb-2" alt="Prefill dữ liệu cũ">
+                <div class="fw-semibold text-dark small">1. Prefill dữ liệu cũ &amp; Đổi tiêu đề</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_EDIT_GEN_001 $ightarrow$ TC_EDIT_GEN_012</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/edit_meeting/evidence_edit_04_self_overlap_exclusion.svg" class="img-fluid rounded border mb-2" alt="Self-Exclusion không báo trùng chính nó">
+                <div class="fw-semibold text-success small">2. Loại trừ chính nó (Self-Exclusion)</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_EDIT_OVL_001 (m.MeetingID != 1 &rarr; 200 OK)</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/edit_meeting/evidence_edit_05_overlap_conflict_error.svg" class="img-fluid rounded border mb-2" alt="Báo lỗi trùng phòng khác">
+                <div class="fw-semibold text-danger small">3. Xung đột lịch phòng khác (409 Conflict)</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_EDIT_OVL_002 $ightarrow$ TC_EDIT_OVL_008</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/edit_meeting/evidence_edit_02_change_time_success.svg" class="img-fluid rounded border mb-2" alt="Đổi giờ thành công">
+                <div class="fw-semibold text-primary small">4. Đổi giờ hợp lệ &amp; Tính thời lượng mới</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_EDIT_TIME_001, TC_EDIT_TIME_002</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/edit_meeting/evidence_edit_03_change_room_success.svg" class="img-fluid rounded border mb-2" alt="Đổi phòng thành công">
+                <div class="fw-semibold text-primary small">5. Đổi phòng họp (Cập nhật Bookings)</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_EDIT_ROOM_001 $ightarrow$ TC_EDIT_ROOM_004</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/edit_meeting/evidence_edit_07_api_put_response.svg" class="img-fluid rounded border mb-2" alt="API PUT Response">
+                <div class="fw-semibold text-dark small">6. API PUT /api/meetings/:id (200 OK)</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_EDIT_API_001 $ightarrow$ TC_EDIT_API_006</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body py-3">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-4">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo mã TC, tiêu đề, bước thực hiện...">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select id="filterCategory" class="form-select form-select-sm">
+              <option value="ALL">-- Tất cả nhóm kịch bản (40 TCs) --</option>
+              <option value="Thông tin chung">Nhóm 1: Prefill &amp; Thông tin chung (12 TCs)</option>
+              <option value="Đổi ngày &amp; giờ">Nhóm 2: Đổi ngày và giờ (10 TCs)</option>
+              <option value="Đổi phòng họp">Nhóm 3: Đổi phòng họp (4 TCs)</option>
+              <option value="Kiểm tra trùng lặp">Nhóm 4: Kiểm tra trùng lặp &amp; Loại trừ chính nó (8 TCs)</option>
+              <option value="API Backend">Nhóm 5: API PUT Backend (6 TCs)</option>
+            </select>
+          </div>
+          <div class="col-md-4 text-md-end text-muted small" id="showingCount">
+            Hiển thị <strong>40</strong> / <strong>40</strong> test cases
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Table -->
+    <div class="card shadow-sm border-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0 align-middle" id="tcTable">
+          <thead>
+            <tr>
+              <th style="width: 105px;">Test Case ID</th>
+              <th style="width: 130px;">Nhóm / Feature</th>
+              <th style="width: 200px;">Tiêu đề kịch bản</th>
+              <th style="width: 180px;">Pre-conditions</th>
+              <th style="width: 230px;">Test Steps</th>
+              <th style="width: 180px;">Test Data</th>
+              <th style="width: 240px;">Expected Result</th>
+              <th style="width: 100px;" class="text-center">Actual Result</th>
+              <th style="width: 80px;" class="text-center">Status</th>
+              <th style="width: 120px;">Ghi chú / Bug ID</th>
+              <th style="width: 110px;" class="text-center">Ảnh Minh Chứng</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_001</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Mở modal Chỉnh sửa cuộc họp và kiểm tra prefill chính xác 100% dữ liệu cũ</td>
+          <td class="pre-text small text-muted">1. Đang ở màn hình Quản lý cuộc họp (/client/index.html).
+2. Đã có cuộc họp ID=1 (&#x27;Họp nhóm phát triển Frontend&#x27;, ngày mai 09:00 - 10:30, Phòng Tokyo, Organizer: Nguyễn Văn An).</td>
+          <td class="pre-text small">1. Tại bảng danh sách cuộc họp, tìm dòng cuộc họp ID=1.
+2. Bấm nút Chỉnh sửa (icon chiếc bút chì).
+3. Quan sát tiêu đề modal và các ô nhập liệu.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Expected Fields: Title, Date, StartTime, EndTime, RoomID, OrganizerID, Participants, Tag, Description</td>
+          <td class="pre-text small text-primary fw-medium">1. Modal mở lên mượt mà với tiêu đề &#x27;Chỉnh sửa cuộc họp&#x27;.
+2. Trường ẩn meeting-id có giá trị là &#x27;1&#x27;.
+3. Toàn bộ các ô nhập liệu được đổ đầy đủ dữ liệu hiện tại của cuộc họp ID=1, không bị thiếu sót bất kỳ trường nào.
+4. Con trỏ tự động focus vào ô Tiêu đề.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra prefill form đầy đủ khi mở modal sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_001: Mở modal Chỉnh sửa cuộc họp và kiểm tra prefill chính xác 100% dữ liệu cũ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_002</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chỉnh sửa Tiêu đề cuộc họp hợp lệ (giữ nguyên ngày giờ và phòng)</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Thay đổi nội dung ô Tiêu đề thành: &#x27;Họp Sprint Review K16 (Cập nhật)&#x27;.
+2. Giữ nguyên tất cả các trường Ngày, Giờ và Phòng họp.
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Title: &#x27;Họp Sprint Review K16 (Cập nhật)&#x27;
+Other fields: Unchanged</td>
+          <td class="pre-text small text-primary fw-medium">1. Form vượt qua validation.
+2. Gọi API PUT /api/meetings/1 thành công (HTTP 200 OK).
+3. Hiển thị thông báo Toast xanh: &#x27;Cập nhật cuộc họp thành công&#x27;.
+4. Modal đóng lại, dòng ID=1 trên bảng hiển thị tiêu đề mới.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra sửa tiêu đề đơn thuần.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_002: Chỉnh sửa Tiêu đề cuộc họp hợp lệ (giữ nguyên ngày giờ và phòng)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_003</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chỉnh sửa Mô tả và Nhãn cuộc họp (Tag) hợp lệ</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Chọn Nhãn mới: &#x27;Quan trọng&#x27; (hoặc click nút tag chip).
+2. Nhập nội dung Mô tả mới: &#x27;Thảo luận các đầu việc ưu tiên cao của tuần&#x27;.
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Tag: &#x27;Quan trọng&#x27;
+New Description: &#x27;Thảo luận các đầu việc ưu tiên cao của tuần&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Cập nhật thành công (HTTP 200 OK).
+2. Bảng danh sách cập nhật nhãn màu đỏ (tag-danger) &#x27;Quan trọng&#x27;.
+3. Xem chi tiết cuộc họp hiển thị đúng nội dung mô tả mới.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra sửa trường tùy chọn tag &amp; description.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_003: Chỉnh sửa Mô tả và Nhãn cuộc họp (Tag) hợp lệ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_004</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chỉnh sửa Người tổ chức (organizerId) sang thành viên khác</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1 (Organizer hiện tại là ID=1: Nguyễn Văn An).</td>
+          <td class="pre-text small">1. Mở phần Thiết lập bổ sung.
+2. Đổi Người tổ chức sang: &#x27;Trần Thu Hà (ID: 2 - Manager)&#x27;.
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New organizerId: 2</td>
+          <td class="pre-text small text-primary fw-medium">1. Máy chủ cập nhật trường OrganizerID = 2 trong bảng Meetings.
+2. Phản hồi HTTP 200 OK, toast xanh thông báo thành công.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra chuyển giao người tổ chức.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_004: Chỉnh sửa Người tổ chức (organizerId) sang thành viên khác')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_005</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chỉnh sửa danh sách Người tham gia cuộc họp</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Thêm thành viên vào ô Người tham gia: &#x27;Phạm Văn C, Đỗ Quang D&#x27;.
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Participants: &#x27;Nguyễn Minh Lượng, Trần Văn A, Lê Văn B, Phạm Văn C, Đỗ Quang D&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống cập nhật danh sách người tham gia.
+2. Bảng cuộc họp hiển thị danh sách mới tại cột Người tham gia.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra cập nhật danh sách người dự.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_005: Chỉnh sửa danh sách Người tham gia cuộc họp')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_006</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi xóa sạch trường Tiêu đề (bỏ trống tiêu đề khi sửa)</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Xóa toàn bộ nội dung trong ô Tiêu đề (để ô trống hoàn toàn).
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Title: &#x27;&#x27; (Rỗng)</td>
+          <td class="pre-text small text-primary fw-medium">1. Client chặn submit, form rung nhẹ cảnh báo.
+2. Ô Tiêu đề bị viền đỏ (is-invalid) kèm icon chấm than đỏ.
+3. Dòng lỗi hiển thị: &#x27;Tiêu đề cuộc họp là bắt buộc và không được để trống.&#x27;.
+4. Không gửi request lên server.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Validate bắt buộc tiêu đề khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_006: Chặn lưu khi xóa sạch trường Tiêu đề (bỏ trống tiêu đề khi sửa)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_007</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi Tiêu đề chỉ chứa toàn ký tự khoảng trắng khi chỉnh sửa</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Nhập vào ô Tiêu đề: &#x27;     &#x27; (toàn khoảng trắng).
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Title: &#x27;     &#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Hàm trim() phát hiện chuỗi rỗng sau khi cắt khoảng trắng.
+2. Form chặn submit, hiển thị viền đỏ và thông báo lỗi tiêu đề bắt buộc.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chống bypass trim rỗng khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_007: Chặn lưu khi Tiêu đề chỉ chứa toàn ký tự khoảng trắng khi chỉnh sửa')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_008</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi Tiêu đề vượt quá độ dài tối đa cho phép (&gt; 200 ký tự) khi chỉnh sửa</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Dán chuỗi 205 ký tự vào ô Tiêu đề.
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Title: Chuỗi 205 ký tự</td>
+          <td class="pre-text small text-primary fw-medium">1. Thuộc tính maxlength=&#x27;200&#x27; ngăn nhập quá 200 ký tự hoặc JS validate chặn với thông báo: &#x27;Tiêu đề cuộc họp không được vượt quá 200 ký tự (chuẩn CSDL).&#x27;.
+2. Bảo toàn toàn vẹn dữ liệu DB.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra giới hạn ký tự tối đa cột Title.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_008: Chặn lưu khi Tiêu đề vượt quá độ dài tối đa cho phép (&gt; 200 ký tự) khi chỉnh sửa')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_009</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi Mô tả vượt quá độ dài tối đa cho phép (&gt; 2000 ký tự) khi chỉnh sửa</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Dán văn bản dài 2050 ký tự vào ô Mô tả.
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Description: Chuỗi 2050 ký tự</td>
+          <td class="pre-text small text-primary fw-medium">1. Form chặn submit.
+2. Hiển thị thông báo lỗi màu đỏ: &#x27;Mô tả cuộc họp không được vượt quá 2000 ký tự.&#x27;.
+3. Ô Mô tả bị viền đỏ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra giới hạn ký tự tối đa cột Description.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_009: Chặn lưu khi Mô tả vượt quá độ dài tối đa cho phép (&gt; 2000 ký tự) khi chỉnh sửa')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_010</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi Tiêu đề chứa ký tự đặc biệt nguy hiểm (&lt;, &gt; / XSS)</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Nhập Tiêu đề: &#x27;Họp &lt;script&gt;alert(1)&lt;/script&gt;&#x27;.
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Title: &#x27;Họp &lt;script&gt;alert(1)&lt;/script&gt;&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Client phát hiện ký tự đặc biệt nguy hiểm.
+2. Báo lỗi: &#x27;Tiêu đề không được chứa ký tự đặc biệt nguy hiểm (&lt;, &gt;).&#x27;.
+3. Không lưu dữ liệu độc hại vào DB.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Bảo mật phòng chống XSS khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_010: Chặn lưu khi Tiêu đề chứa ký tự đặc biệt nguy hiểm (&lt;, &gt; / XSS)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_011</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Đóng modal chỉnh sửa (bấm nút Hủy, nút X hoặc click ngoài overlay) - Giữ nguyên dữ liệu cũ</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.
+2. Đã gõ thử tiêu đề mới nhưng chưa bấm Lưu.</td>
+          <td class="pre-text small">1. Thao tác 1: Bấm nút &#x27;Hủy&#x27;.
+2. Thao tác 2: Mở lại và bấm nút &#x27;X&#x27; góc trên bên phải.
+3. Thao tác 3: Mở lại và click vào vùng tối bên ngoài modal.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Chưa lưu dữ liệu thay đổi</td>
+          <td class="pre-text small text-primary fw-medium">1. Modal đóng lại mượt mà.
+2. Bản ghi cuộc họp ID=1 trên bảng giữ nguyên 100% dữ liệu gốc ban đầu.
+3. Không bị cập nhật dữ liệu dở dang.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra thao tác hủy chỉnh sửa an toàn.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_011: Đóng modal chỉnh sửa (bấm nút Hủy, nút X hoặc click ngoài overlay) - Giữ nguyên dữ liệu cũ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Thông tin chung">
+          <td class="tc-id text-nowrap">TC_EDIT_GEN_012</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Thông tin chung</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Reset form sạch sẽ khi chuyển từ chỉnh sửa sang tạo mới cuộc họp</td>
+          <td class="pre-text small text-muted">1. Vừa mở modal chỉnh sửa cuộc họp ID=1 và đóng lại.</td>
+          <td class="pre-text small">1. Bấm nút &#x27;+ Thêm cuộc họp&#x27; ở đầu trang.
+2. Quan sát tiêu đề modal và các ô nhập liệu.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Action: Mở form thêm mới sau khi đóng form sửa</td>
+          <td class="pre-text small text-primary fw-medium">1. Tiêu đề modal chuyển thành &#x27;Thêm cuộc họp&#x27;.
+2. Trường hidden meeting-id được reset về rỗng (&#x27;&#x27;).
+3. Toàn bộ các ô Tiêu đề, Mô tả, Tag... được làm sạch hoàn toàn, không bị dính dữ liệu cũ của cuộc họp ID=1.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra state management tránh rò rỉ dữ liệu giữa edit và add.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_01_prefill_and_change_title.svg', 'TC_EDIT_GEN_012: Reset form sạch sẽ khi chuyển từ chỉnh sửa sang tạo mới cuộc họp')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_001</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Đổi giờ bắt đầu và kết thúc sang khung giờ mới hợp lệ trong cùng ngày (phòng trống)</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đang có giờ: 09:00 - 10:30 ngày 2026-10-10 tại Phòng Tokyo.
+2. Khung giờ 14:00 - 16:00 cùng ngày tại Phòng Tokyo đang hoàn toàn trống.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi Giờ bắt đầu thành: &#x27;14:00&#x27;.
+3. Đổi Giờ kết thúc thành: &#x27;16:00&#x27;.
+4. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New StartTime: 14:00
+New EndTime: 16:00
+New Duration: 2 giờ 0 phút</td>
+          <td class="pre-text small text-primary fw-medium">1. Duration Badge cập nhật trực tiếp: &#x27;Thời lượng: 2 giờ 0 phút&#x27;.
+2. Cập nhật thành công (HTTP 200 OK).
+3. Cột Ngày giờ trên bảng danh sách đổi thành: &#x27;2026-10-10 (14:00 - 16:00)&#x27;.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra đổi giờ họp hợp lệ trong ngày.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_02_change_time_success.svg', 'TC_EDIT_TIME_001: Đổi giờ bắt đầu và kết thúc sang khung giờ mới hợp lệ trong cùng ngày (phòng trống)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_002</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Đổi Ngày họp sang một ngày khác trong tương lai (phòng trống)</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đang diễn ra ngày 2026-10-10.
+2. Ngày 2026-10-15 khung 09:00 - 10:30 phòng Tokyo đang trống.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi Ngày họp thành: &#x27;2026-10-15&#x27;.
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Date: 2026-10-15
+StartTime: 09:00
+EndTime: 10:30</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống cập nhật ngày mới vào CSDL.
+2. Bảng danh sách hiển thị ngày họp mới là 15/10/2026.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra đổi ngày họp sang tương lai.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_02_change_time_success.svg', 'TC_EDIT_TIME_002: Đổi Ngày họp sang một ngày khác trong tương lai (phòng trống)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_003</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi đổi thời gian khiến giờ kết thúc sớm hơn giờ bắt đầu (start &gt; end)</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Chọn Giờ bắt đầu: &#x27;16:00&#x27;.
+2. Chọn Giờ kết thúc: &#x27;15:00&#x27; (sớm hơn bắt đầu 1 tiếng).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+StartTime: 16:00
+EndTime: 15:00 (diffMinutes = -60)</td>
+          <td class="pre-text small text-primary fw-medium">1. Form chặn submit.
+2. Duration Badge hiển thị cảnh báo không hợp lệ.
+3. Hộp cảnh báo lỗi thời gian (#time-error-msg) hiển thị chữ đỏ: &#x27;Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.&#x27;.
+4. Ô Giờ kết thúc viền đỏ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Validate thứ tự thời gian khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_06_invalid_time_error.svg', 'TC_EDIT_TIME_003: Chặn lưu khi đổi thời gian khiến giờ kết thúc sớm hơn giờ bắt đầu (start &gt; end)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_004</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi đổi thời gian khiến giờ bắt đầu trùng giờ kết thúc (start == end, thời lượng 0 phút)</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Chọn Giờ bắt đầu: &#x27;10:00&#x27;.
+2. Chọn Giờ kết thúc: &#x27;10:00&#x27;.
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+StartTime: 10:00
+EndTime: 10:00 (diffMinutes = 0)</td>
+          <td class="pre-text small text-primary fw-medium">1. Form chặn submit.
+2. Báo lỗi: &#x27;Thời gian kết thúc phải lớn hơn thời gian bắt đầu.&#x27;.
+3. Không gửi request lên server.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn thời lượng 0 phút khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_06_invalid_time_error.svg', 'TC_EDIT_TIME_004: Chặn lưu khi đổi thời gian khiến giờ bắt đầu trùng giờ kết thúc (start == end, thời lượng 0 phút)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_005</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi đổi Ngày họp sang thời điểm trong quá khứ</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Đổi Ngày họp thành: &#x27;2026-09-20&#x27; (ngày đã trôi qua trong quá khứ).
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Date: 2026-09-20 (Quá khứ)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện thời điểm bắt đầu nhỏ hơn thời điểm hiện tại.
+2. Chặn submit form.
+3. Hiển thị box thông báo lỗi: &#x27;Thời gian bắt đầu không thể diễn ra trong quá khứ.&#x27;.
+4. Ô Ngày họp bị viền đỏ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn lùi lịch về quá khứ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_06_invalid_time_error.svg', 'TC_EDIT_TIME_005: Chặn lưu khi đổi Ngày họp sang thời điểm trong quá khứ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_006</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi chọn Ngày là hôm nay nhưng đổi Giờ bắt đầu đã trôi qua trong quá khứ</td>
+          <td class="pre-text small text-muted">1. Giả sử thời gian hiện tại là 15:00 chiều hôm nay.
+2. Đang mở modal Chỉnh sửa cuộc họp.</td>
+          <td class="pre-text small">1. Chọn Ngày: Hôm nay.
+2. Đổi Giờ bắt đầu thành &#x27;09:00&#x27; (giờ sáng đã trôi qua).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Date: Hôm nay
+StartTime: 09:00 (&lt; current time 15:00)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống so sánh startDateTime với thời điểm hiện tại và phát hiện đã quá hạn.
+2. Báo lỗi: &#x27;Thời gian bắt đầu không thể diễn ra trong quá khứ.&#x27;.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn giờ đã trôi qua trong cùng ngày khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_06_invalid_time_error.svg', 'TC_EDIT_TIME_006: Chặn lưu khi chọn Ngày là hôm nay nhưng đổi Giờ bắt đầu đã trôi qua trong quá khứ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_007</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi đổi thời lượng cuộc họp nhỏ hơn 5 phút (ví dụ: 3 phút)</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Đổi Giờ bắt đầu: &#x27;09:00&#x27;.
+2. Đổi Giờ kết thúc: &#x27;09:03&#x27; (thời lượng 3 phút).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+StartTime: 09:00
+EndTime: 09:03 (diffMinutes = 3)</td>
+          <td class="pre-text small text-primary fw-medium">1. Form chặn submit.
+2. Hiển thị thông báo lỗi màu đỏ: &#x27;Thời lượng cuộc họp tối thiểu phải từ 5 phút trở lên.&#x27;.
+3. Ô Giờ kết thúc viền đỏ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Validate thời lượng tối thiểu 5m khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_06_invalid_time_error.svg', 'TC_EDIT_TIME_007: Chặn lưu khi đổi thời lượng cuộc họp nhỏ hơn 5 phút (ví dụ: 3 phút)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_008</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Giá trị biên dưới hợp lệ: Cho phép đổi thời lượng cuộc họp đúng chính xác 5 phút (Min Boundary)</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Đổi Giờ bắt đầu: &#x27;09:00&#x27;.
+2. Đổi Giờ kết thúc: &#x27;09:05&#x27; (đúng 5 phút).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+StartTime: 09:00
+EndTime: 09:05 (diffMinutes = 5)</td>
+          <td class="pre-text small text-primary fw-medium">1. Live Duration Badge hiển thị: &#x27;Thời lượng: 5 phút&#x27;.
+2. Không có cảnh báo lỗi thời lượng.
+3. Cập nhật thành công (HTTP 200 OK).</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra giá trị biên dưới hợp lệ 5 phút khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_02_change_time_success.svg', 'TC_EDIT_TIME_008: Giá trị biên dưới hợp lệ: Cho phép đổi thời lượng cuộc họp đúng chính xác 5 phút (Min Boundary)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_009</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn lưu khi đổi thời lượng cuộc họp vượt quá giới hạn tối đa (&gt; 24 giờ)</td>
+          <td class="pre-text small text-muted">1. Gửi request cập nhật hoặc thao tác trên form.</td>
+          <td class="pre-text small">1. Đổi thời gian kéo dài hơn 24 giờ (Ví dụ: Start 08:00 ngày 10/10 đến End 10:00 ngày 11/10 - 26 giờ).
+2. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Duration: 26 giờ (&gt; 24 giờ)</td>
+          <td class="pre-text small text-primary fw-medium">1. Form hoặc API chặn submit.
+2. Báo lỗi: &#x27;Thời lượng cuộc họp không được vượt quá 24 giờ trong một lần đặt.&#x27;.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Validate giới hạn thời lượng tối đa 24h khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_06_invalid_time_error.svg', 'TC_EDIT_TIME_009: Chặn lưu khi đổi thời lượng cuộc họp vượt quá giới hạn tối đa (&gt; 24 giờ)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi ngày &amp; giờ">
+          <td class="tc-id text-nowrap">TC_EDIT_TIME_010</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Đổi ngày &amp; giờ</span><br>
+            <span class="text-secondary small">Meeting / Edit Time</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra cập nhật Dynamic Duration Badge khi chỉnh sửa thay đổi giờ bắt đầu và kết thúc</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Đổi Giờ kết thúc sang &#x27;09:45&#x27; -&gt; Quan sát badge.
+2. Đổi tiếp sang &#x27;11:00&#x27; -&gt; Quan sát badge.
+3. Đổi tiếp sang &#x27;12:30&#x27; -&gt; Quan sát badge.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Start: 09:00
+End lần lượt: 09:45 (45p), 11:00 (2h0p), 12:30 (3h30p)</td>
+          <td class="pre-text small text-primary fw-medium">1. Dynamic Duration Badge cập nhật ngay lập tức theo thời gian thực (real-time):
+   - &#x27;Thời lượng: 45 phút&#x27;
+   - &#x27;Thời lượng: 2 giờ 0 phút&#x27;
+   - &#x27;Thời lượng: 3 giờ 30 phút&#x27;.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra tính phản hồi của live calculator trên modal sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_02_change_time_success.svg', 'TC_EDIT_TIME_010: Kiểm tra cập nhật Dynamic Duration Badge khi chỉnh sửa thay đổi giờ bắt đầu và kết thúc')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi phòng họp">
+          <td class="tc-id text-nowrap">TC_EDIT_ROOM_001</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đổi phòng họp</span><br>
+            <span class="text-secondary small">Meeting / Edit Room</span>
+          </td>
+          <td class="fw-semibold text-dark">Đổi phòng họp sang phòng khác (phòng mới trống trong cùng khung giờ) - Cập nhật bảng Bookings</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đang đặt tại Phòng Tokyo (ID=1) lúc 09:00 - 10:30 ngày mai.
+2. Phòng Silicon (ID=2) đang Active và hoàn toàn trống trong khung 09:00 - 10:30.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Tại ô Phòng họp, chọn: &#x27;Phòng Silicon (Tầng 2) — Sức chứa: 12 người&#x27;.
+3. Giữ nguyên khung giờ 09:00 - 10:30.
+4. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Old RoomID: 1 (Tokyo)
+New RoomID: 2 (Silicon)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống cập nhật bảng Bookings: SET RoomID = 2 WHERE MeetingID = 1.
+2. Trả về HTTP 200 OK.
+3. Toast xanh báo thành công.
+4. Cột Địa điểm/Phòng trên bảng danh sách chuyển sang hiển thị &#x27;Phòng Silicon (Tầng 2)&#x27;.
+5. Phòng Tokyo cũ được giải phóng hoàn toàn trong khung giờ này.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra đổi phòng họp và giải phóng phòng cũ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_03_change_room_success.svg', 'TC_EDIT_ROOM_001: Đổi phòng họp sang phòng khác (phòng mới trống trong cùng khung giờ) - Cập nhật bảng Bookings')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi phòng họp">
+          <td class="tc-id text-nowrap">TC_EDIT_ROOM_002</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đổi phòng họp</span><br>
+            <span class="text-secondary small">Meeting / Edit Room</span>
+          </td>
+          <td class="fw-semibold text-dark">Đổi đồng thời cả Phòng họp và Giờ họp sang thông tin mới hợp lệ</td>
+          <td class="pre-text small text-muted">1. Đang mở modal Chỉnh sửa cuộc họp ID=1.
+2. Phòng Hội Nghị A (ID=3) đang trống vào buổi chiều 14:00 - 16:00.</td>
+          <td class="pre-text small">1. Đổi Phòng họp sang: &#x27;Phòng Hội Nghị A (ID: 3)&#x27;.
+2. Đổi Giờ bắt đầu: &#x27;14:00&#x27;, Giờ kết thúc: &#x27;16:00&#x27;.
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New RoomID: 3
+New Time: 14:00 - 16:00</td>
+          <td class="pre-text small text-primary fw-medium">1. Cập nhật thành công cả 2 bảng Meetings và Bookings.
+2. Trả về HTTP 200 OK.
+3. Giao diện cập nhật đúng cả phòng mới và giờ mới.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra đổi đồng thời cả phòng và thời gian.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_03_change_room_success.svg', 'TC_EDIT_ROOM_002: Đổi đồng thời cả Phòng họp và Giờ họp sang thông tin mới hợp lệ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi phòng họp">
+          <td class="tc-id text-nowrap">TC_EDIT_ROOM_003</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đổi phòng họp</span><br>
+            <span class="text-secondary small">Meeting / Edit Room</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đổi sang phòng họp đang trong trạng thái Bảo trì (Maintenance) hoặc Tạm ngừng</td>
+          <td class="pre-text small text-muted">1. Phòng VIP (ID=5) đang có trạng thái &#x27;Maintenance&#x27; trong CSDL.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Chọn chuyển sang Phòng VIP (ID: 5).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New RoomID: 5 (Status = Maintenance)</td>
+          <td class="pre-text small text-primary fw-medium">1. Phía Client hoặc Server chặn cập nhật.
+2. Báo lỗi: &#x27;Phòng VIP hiện không khả dụng (Trạng thái: Bảo trì). Vui lòng chọn phòng khác.&#x27;.
+3. Cuộc họp không bị chuyển vào phòng đang bảo trì.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn đổi vào phòng không khả dụng.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_03_change_room_success.svg', 'TC_EDIT_ROOM_003: Chặn đổi sang phòng họp đang trong trạng thái Bảo trì (Maintenance) hoặc Tạm ngừng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đổi phòng họp">
+          <td class="tc-id text-nowrap">TC_EDIT_ROOM_004</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đổi phòng họp</span><br>
+            <span class="text-secondary small">Meeting / Edit Room</span>
+          </td>
+          <td class="fw-semibold text-dark">Đổi sang phòng có sức chứa lớn hơn cho cuộc họp phát sinh đông người</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ban đầu ở phòng nhỏ 12 chỗ (Silicon), số lượng người tham gia tăng lên 35 người.
+2. Phòng Grand Board (ID=4, sức chứa 50 chỗ) đang trống.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi sang Phòng Grand Board (50 chỗ).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New RoomID: 4 (Grand Board - 50 chỗ)</td>
+          <td class="pre-text small text-primary fw-medium">1. Cập nhật thành công (HTTP 200 OK).
+2. Cuộc họp được gán thành công vào phòng có sức chứa lớn hơn.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra chuyển phòng theo quy mô sức chứa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_03_change_room_success.svg', 'TC_EDIT_ROOM_004: Đổi sang phòng có sức chứa lớn hơn cho cuộc họp phát sinh đông người')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_001</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Self-Exclusion</span>
+          </td>
+          <td class="fw-semibold text-dark">LOẠI TRỪ CHÍNH NÓ (Self-Exclusion): Giữ nguyên giờ &amp; phòng khi sửa -&gt; KHÔNG ĐƯỢC báo trùng lặp với chính nó</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đang chiếm phòng Tokyo lúc 09:00 - 10:30 ngày 2026-10-10.
+2. Mở modal chỉnh sửa ID=1.</td>
+          <td class="pre-text small">1. Chỉ sửa nội dung ô Tiêu đề thành: &#x27;Họp Sprint Review (Cập nhật ghi chú)&#x27;.
+2. Giữ nguyên 100% Ngày (2026-10-10), Giờ (09:00 - 10:30) và Phòng (Tokyo).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+RoomID: 1 (Tokyo - Giữ nguyên)
+Time: 09:00 - 10:30 (Giữ nguyên)</td>
+          <td class="pre-text small text-primary fw-medium">1. Client: Hàm checkMeetingRoomConflict(..., editId=1) nhận diện đúng ID hiện tại và BỎ QUA không báo trùng.
+2. Server: Câu lệnh SQL kiểm tra Overlap có điều kiện &#x27;m.MeetingID != 1&#x27; -&gt; Trả về isOverlap = false.
+3. Máy chủ KHÔNG trả về lỗi 409 Conflict.
+4. Cập nhật thành công, trả về HTTP 200 OK và hiển thị toast xanh.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Ca kiểm thử cốt lõi nhất của luồng sửa: Ngăn chặn tự báo trùng với chính mình.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_04_self_overlap_exclusion.svg', 'TC_EDIT_OVL_001: LOẠI TRỪ CHÍNH NÓ (Self-Exclusion): Giữ nguyên giờ &amp; phòng khi sửa -&gt; KHÔNG ĐƯỢC báo trùng lặp với chính nó')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_002</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đổi giờ khi khung giờ mới bị trùng lặp hoàn toàn (100% overlap) với cuộc họp KHÁC trong cùng phòng</td>
+          <td class="pre-text small text-muted">1. Trong Phòng Tokyo (ID=1) đã có cuộc họp ID=2 lúc 14:00 - 15:30 ngày mai.
+2. Đang sửa cuộc họp ID=1 (đang ở khung giờ 09:00 - 10:30).</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa cuộc họp ID=1.
+2. Đổi giờ họp ID=1 thành: 14:00 - 15:30 (trùng 100% với cuộc họp ID=2).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Time: 14:00 - 15:30 (Trùng với Meeting ID=2 trong phòng Tokyo)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện xung đột lịch phòng với cuộc họp ID=2.
+2. Phía Client: Hiển thị box đỏ cảnh báo phòng đã có người đặt.
+3. Phía Server: checkOverlapUpdate phát hiện trùng, trả về mã HTTP 409 Conflict: &#x27;Cập nhật thất bại! Phòng này đã có cuộc họp khác trong khung giờ bạn chọn.&#x27;.
+4. Không cho phép ghi đè.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn trùng lặp hoàn toàn với cuộc họp khác.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_05_overlap_conflict_error.svg', 'TC_EDIT_OVL_002: Chặn đổi giờ khi khung giờ mới bị trùng lặp hoàn toàn (100% overlap) với cuộc họp KHÁC trong cùng phòng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_003</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đổi giờ khi khung giờ mới chồng lấn một phần đầu (Start-overlap) với cuộc họp KHÁC</td>
+          <td class="pre-text small text-muted">1. Phòng Tokyo đã có cuộc họp ID=2 từ 14:00 đến 15:30.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi giờ ID=1 thành: 13:30 - 14:30 (chồng lấn 30 phút từ 14:00 đến 14:30).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Time: 13:30 - 14:30 (Giao nhau phần đầu với 14:00 - 15:30)</td>
+          <td class="pre-text small text-primary fw-medium">1. Thuật toán Overlap (StartTime &lt; EndExist &amp;&amp; EndTime &gt; StartExist &amp;&amp; MeetingID != 1) trả về True.
+2. Hệ thống từ chối cập nhật, trả về HTTP 409 Conflict.
+3. Form giữ nguyên dữ liệu để người dùng đổi lại giờ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn chồng lấn phần đầu với cuộc họp khác.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_05_overlap_conflict_error.svg', 'TC_EDIT_OVL_003: Chặn đổi giờ khi khung giờ mới chồng lấn một phần đầu (Start-overlap) với cuộc họp KHÁC')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_004</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đổi giờ khi khung giờ mới chồng lấn một phần cuối (End-overlap) với cuộc họp KHÁC</td>
+          <td class="pre-text small text-muted">1. Phòng Tokyo đã có cuộc họp ID=2 từ 14:00 đến 15:30.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi giờ ID=1 thành: 15:00 - 16:30 (chồng lấn 30 phút từ 15:00 đến 15:30).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Time: 15:00 - 16:30 (Giao nhau phần cuối)</td>
+          <td class="pre-text small text-primary fw-medium">1. Phát hiện trùng lặp.
+2. Từ chối cập nhật với mã lỗi HTTP 409 Conflict.
+3. Cuộc họp ID=1 giữ nguyên lịch cũ.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn chồng lấn phần cuối với cuộc họp khác.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_05_overlap_conflict_error.svg', 'TC_EDIT_OVL_004: Chặn đổi giờ khi khung giờ mới chồng lấn một phần cuối (End-overlap) với cuộc họp KHÁC')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_005</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đổi giờ khi khung giờ mới nằm lọt thỏm hoàn toàn bên trong cuộc họp KHÁC</td>
+          <td class="pre-text small text-muted">1. Phòng Tokyo đã có cuộc họp ID=2 từ 13:00 đến 17:00.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi giờ ID=1 thành: 14:00 - 15:00 (nằm trọn bên trong 13:00 - 17:00).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Time: 14:00 - 15:00 (Inside 13:00 - 17:00)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện xung đột.
+2. Trả về HTTP 409 Conflict, chặn lưu.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn lịch mới nằm lọt trong lịch khác.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_05_overlap_conflict_error.svg', 'TC_EDIT_OVL_005: Chặn đổi giờ khi khung giờ mới nằm lọt thỏm hoàn toàn bên trong cuộc họp KHÁC')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_006</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đổi giờ khi khung giờ mới bao trùm toàn bộ cuộc họp KHÁC</td>
+          <td class="pre-text small text-muted">1. Phòng Tokyo đã có cuộc họp ID=2 từ 14:00 đến 15:00.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi giờ ID=1 thành: 13:30 - 15:30 (bao trọn khung 14:00 - 15:00).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Time: 13:30 - 15:30 (Enclosing 14:00 - 15:00)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống phát hiện cuộc họp ID=2 bị bao trùm.
+2. Từ chối cập nhật với mã lỗi HTTP 409 Conflict.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn lịch mới bao trùm lịch khác.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_05_overlap_conflict_error.svg', 'TC_EDIT_OVL_006: Chặn đổi giờ khi khung giờ mới bao trùm toàn bộ cuộc họp KHÁC')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_007</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Cho phép đổi giờ nối tiếp sát nút (Back-to-back: new StartTime == existing EndTime) - Hợp lệ</td>
+          <td class="pre-text small text-muted">1. Phòng Tokyo đã có cuộc họp ID=2 từ 14:00 đến 15:30.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi giờ ID=1 thành: 15:30 - 17:00 (bắt đầu đúng tích tắc cuộc họp ID=2 kết thúc).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New Time: 15:30 - 17:00 (Điểm bắt đầu trùng điểm kết thúc của ID=2)</td>
+          <td class="pre-text small text-primary fw-medium">1. Phép so sánh (15:30 &lt; 15:30) trả về False -&gt; Không có xung đột.
+2. Hệ thống chấp nhận cập nhật thành công (HTTP 200 OK).
+3. Hai cuộc họp nối tiếp nhau trên lịch họp.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra biên tiếp xúc thời gian khi sửa.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_02_change_time_success.svg', 'TC_EDIT_OVL_007: Cho phép đổi giờ nối tiếp sát nút (Back-to-back: new StartTime == existing EndTime) - Hợp lệ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Kiểm tra trùng lặp">
+          <td class="tc-id text-nowrap">TC_EDIT_OVL_008</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Kiểm tra trùng lặp</span><br>
+            <span class="text-secondary small">Meeting / Overlap Conflict</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đổi sang phòng khác khi phòng mới bị trùng lịch họp ở khung giờ đó</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 lúc 09:00 - 10:30.
+2. Phòng Silicon (ID=2) ĐÃ CÓ cuộc họp ID=3 lúc 09:00 - 10:30.</td>
+          <td class="pre-text small">1. Mở modal chỉnh sửa ID=1.
+2. Đổi phòng họp sang: Phòng Silicon (ID=2).
+3. Bấm nút &#x27;Lưu thay đổi&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+New RoomID: 2 (Đã có ID=3 đặt trùng giờ)</td>
+          <td class="pre-text small text-primary fw-medium">1. Thuật toán checkOverlapUpdate kiểm tra tại RoomID=2 phát hiện cuộc họp ID=3 bị trùng.
+2. Trả về mã lỗi HTTP 409 Conflict: &#x27;Cập nhật thất bại! Phòng này đã có cuộc họp khác trong khung giờ bạn chọn.&#x27;.
+3. Chặn lưu.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Chặn đổi phòng khi phòng đích bị trùng lịch.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_05_overlap_conflict_error.svg', 'TC_EDIT_OVL_008: Chặn đổi sang phòng khác khi phòng mới bị trùng lịch họp ở khung giờ đó')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend">
+          <td class="tc-id text-nowrap">TC_EDIT_API_001</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend</span><br>
+            <span class="text-secondary small">Meeting / API PUT</span>
+          </td>
+          <td class="fw-semibold text-dark">API PUT /api/meetings/:id cập nhật thành công và trả về HTTP 200 OK kèm payload chuẩn</td>
+          <td class="pre-text small text-muted">1. Máy chủ Backend đang chạy tại http://localhost:3000.
+2. Đã có cuộc họp ID=1 trong CSDL.</td>
+          <td class="pre-text small">1. Mở Postman/cURL gửi request:
+   PUT http://localhost:3000/api/meetings/1
+   Headers: Content-Type: application/json
+   Body JSON đầy đủ thông tin hợp lệ.
+2. Quan sát status code và JSON trả về.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">PUT /api/meetings/1
+{
+  &quot;title&quot;: &quot;Họp Sprint Review K16 (API Update)&quot;,
+  &quot;startTime&quot;: &quot;2026-10-10 14:00:00&quot;,
+  &quot;endTime&quot;: &quot;2026-10-10 15:30:00&quot;,
+  &quot;organizerId&quot;: 1,
+  &quot;roomId&quot;: 2,
+  &quot;isRecurring&quot;: false
+}</td>
+          <td class="pre-text small text-primary fw-medium">1. Mã phản hồi HTTP 200 OK.
+2. JSON body trả về dạng:
+   {
+     &quot;message&quot;: &quot;Cập nhật cuộc họp thành công&quot;,
+     &quot;data&quot;: { &quot;meetingId&quot;: 1, &quot;title&quot;: &quot;...&quot;, &quot;roomId&quot;: 2, ... }
+   }
+3. CSDL được cập nhật đúng bản ghi.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm thử API Happy Path.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_07_api_put_response.svg', 'TC_EDIT_API_001: API PUT /api/meetings/:id cập nhật thành công và trả về HTTP 200 OK kèm payload chuẩn')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend">
+          <td class="tc-id text-nowrap">TC_EDIT_API_002</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend</span><br>
+            <span class="text-secondary small">Meeting / API PUT</span>
+          </td>
+          <td class="fw-semibold text-dark">API PUT /api/meetings/:id trả về HTTP 404 Not Found khi ID cuộc họp không tồn tại</td>
+          <td class="pre-text small text-muted">1. Trong bảng Meetings không có cuộc họp nào có ID = 99999.</td>
+          <td class="pre-text small">1. Gửi request PUT http://localhost:3000/api/meetings/99999 với payload hợp lệ.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">PUT /api/meetings/99999</td>
+          <td class="pre-text small text-primary fw-medium">1. Máy chủ bắt được error.status = 404 trong Model update.
+2. Trả về HTTP 404 Not Found.
+3. JSON: { &quot;message&quot;: &quot;Cuộc họp với ID 99999 không tồn tại.&quot; }.
+4. Server không bị văng lỗi 500.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra xử lý lỗi 404 cuộc họp không tồn tại.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_07_api_put_response.svg', 'TC_EDIT_API_002: API PUT /api/meetings/:id trả về HTTP 404 Not Found khi ID cuộc họp không tồn tại')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend">
+          <td class="tc-id text-nowrap">TC_EDIT_API_003</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend</span><br>
+            <span class="text-secondary small">Meeting / API PUT</span>
+          </td>
+          <td class="fw-semibold text-dark">API PUT /api/meetings/:id trả về HTTP 400 Bad Request khi tham số ID không phải là số hợp lệ</td>
+          <td class="pre-text small text-muted">1. Backend đang chạy.</td>
+          <td class="pre-text small">1. Gửi request: PUT http://localhost:3000/api/meetings/abc.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">PUT /api/meetings/abc</td>
+          <td class="pre-text small text-primary fw-medium">1. Hàm parseInt(req.params.id, 10) phát hiện isNaN.
+2. Trả về HTTP 400 Bad Request.
+3. JSON: { &quot;message&quot;: &quot;ID cuộc họp không hợp lệ. Vui lòng nhập số.&quot; }.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra validate param ID là số.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_07_api_put_response.svg', 'TC_EDIT_API_003: API PUT /api/meetings/:id trả về HTTP 400 Bad Request khi tham số ID không phải là số hợp lệ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend">
+          <td class="tc-id text-nowrap">TC_EDIT_API_004</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend</span><br>
+            <span class="text-secondary small">Meeting / API PUT</span>
+          </td>
+          <td class="fw-semibold text-dark">API PUT /api/meetings/:id trả về HTTP 400 Bad Request khi thiếu các trường bắt buộc</td>
+          <td class="pre-text small text-muted">1. Backend đang chạy.</td>
+          <td class="pre-text small">1. Gửi request PUT /api/meetings/1 nhưng body JSON thiếu trường &#x27;title&#x27; hoặc &#x27;startTime&#x27; hoặc &#x27;roomId&#x27;.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Body: { &quot;description&quot;: &quot;Chỉ gửi mô tả&quot; }</td>
+          <td class="pre-text small text-primary fw-medium">1. Controller kiểm tra if (!title || !startTime || !endTime || !organizerId || !roomId).
+2. Trả về HTTP 400 Bad Request.
+3. JSON: { &quot;message&quot;: &quot;Vui lòng nhập đủ các trường bắt buộc.&quot; }.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra validate thiếu trường phía API.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_07_api_put_response.svg', 'TC_EDIT_API_004: API PUT /api/meetings/:id trả về HTTP 400 Bad Request khi thiếu các trường bắt buộc')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend">
+          <td class="tc-id text-nowrap">TC_EDIT_API_005</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend</span><br>
+            <span class="text-secondary small">Meeting / API PUT</span>
+          </td>
+          <td class="fw-semibold text-dark">API PUT /api/meetings/:id trả về HTTP 400 Bad Request khi startTime &gt;= endTime</td>
+          <td class="pre-text small text-muted">1. Backend đang chạy.</td>
+          <td class="pre-text small">1. Gửi PUT /api/meetings/1 với startTime: &#x27;2026-10-10 15:00:00&#x27;, endTime: &#x27;2026-10-10 14:00:00&#x27;.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">startTime &gt;= endTime</td>
+          <td class="pre-text small text-primary fw-medium">1. Controller kiểm tra if (new Date(startTime) &gt;= new Date(endTime)).
+2. Trả về HTTP 400 Bad Request.
+3. JSON: { &quot;message&quot;: &quot;Thời gian kết thúc phải sau thời gian bắt đầu.&quot; }.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra validate thứ tự thời gian phía API.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_07_api_put_response.svg', 'TC_EDIT_API_005: API PUT /api/meetings/:id trả về HTTP 400 Bad Request khi startTime &gt;= endTime')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend">
+          <td class="tc-id text-nowrap">TC_EDIT_API_006</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend</span><br>
+            <span class="text-secondary small">Meeting / API PUT</span>
+          </td>
+          <td class="fw-semibold text-dark">API PUT /api/meetings/:id trả về HTTP 409 Conflict khi bị trùng lịch phòng khác</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=2 đang đặt phòng ID=1 từ 14:00 đến 15:30.</td>
+          <td class="pre-text small">1. Gửi PUT /api/meetings/1 cập nhật vào phòng ID=1 khung 14:00 đến 15:30.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">PUT /api/meetings/1 (Trùng với Meeting ID=2)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hàm checkOverlapUpdate trả về true.
+2. Trả về HTTP 409 Conflict.
+3. JSON: { &quot;message&quot;: &quot;Cập nhật thất bại! Phòng này đã có cuộc họp khác trong khung giờ bạn chọn.&quot; }.</td>
+          <td class="text-center text-muted fst-italic"><em>(Chờ test)</em></td>
+          <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Untested</span></td>
+          <td class="small text-muted">Kiểm tra xử lý lỗi trùng phòng qua API.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/edit_meeting/evidence_edit_07_api_put_response.svg', 'TC_EDIT_API_006: API PUT /api/meetings/:id trả về HTTP 409 Conflict khi bị trùng lịch phòng khác')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Popup for Evidence Image Preview -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fs-6 fw-bold" id="imageModalLabel">Ảnh minh chứng kết quả kiểm thử</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center p-3 bg-light">
+            <img id="modalPreviewImg" src="" class="img-fluid rounded border shadow-sm" alt="Preview Evidence" style="max-height: 70vh;">
+          </div>
+          <div class="modal-footer">
+            <a id="btnDownloadEvidence" href="" download class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i> Tải ảnh về</a>
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-4 text-center text-muted small pb-4">
+      Dự án: TTCS_T926_K16C2_N3 - Quản lý Lịch họp Doanh nghiệp • ICTU 2026. Biểu mẫu chuẩn QA luồng Chỉnh sửa cuộc họp.
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const filterCat = document.getElementById('filterCategory');
+    const table = document.getElementById('tcTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const showingCount = document.getElementById('showingCount');
+    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    const modalPreviewImg = document.getElementById('modalPreviewImg');
+    const imageModalLabel = document.getElementById('imageModalLabel');
+    const btnDownloadEvidence = document.getElementById('btnDownloadEvidence');
+
+    function viewEvidence(src, title) {
+      modalPreviewImg.src = src;
+      imageModalLabel.innerText = title;
+      btnDownloadEvidence.href = src;
+      imageModal.show();
+    }
+
+    function applyFilter() {
+      const query = searchInput.value.toLowerCase().trim();
+      const cat = filterCat.value;
+      let visible = 0;
+
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        const rCat = r.getAttribute('data-category');
+        const matchSearch = !query || text.includes(query);
+        const matchCat = cat === 'ALL' || rCat === cat;
+
+        if (matchSearch && matchCat) {
+          r.style.display = '';
+          visible++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+
+      showingCount.innerHTML = `Hiển thị <strong>${visible}</strong> / <strong>40</strong> test cases`;
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    filterCat.addEventListener('change', applyFilter);
+  </script>
+</body>
+</html>
