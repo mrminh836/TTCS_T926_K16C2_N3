@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620">
+  <defs>
+    <filter id="sh_c5" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="900" height="620" rx="10" ry="10" fill="#f8fafc"/>
+  
+    <!-- Window Bar -->
+    <rect width="900" height="42" rx="10" ry="10" fill="#1e293b"/>
+    <rect y="32" width="900" height="10" fill="#1e293b"/>
+    <circle cx="20" cy="21" r="6" fill="#ef4444"/>
+    <circle cx="38" cy="21" r="6" fill="#f59e0b"/>
+    <circle cx="56" cy="21" r="6" fill="#10b981"/>
+    <text x="450.0" y="26" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="600" fill="#94a3b8">
+      Modal Chi Tiết Cuộc Họp Đã Hủy - Hiển thị lý do hủy &amp; Thời gian hủy
+    </text>
+    
+
+  <g transform="translate(160, 65)" filter="url(#sh_c5)">
+    <rect width="580" height="510" rx="12" ry="12" fill="#ffffff" stroke="#e2e8f0"/>
+    
+    <!-- Header -->
+    <rect width="580" height="54" rx="12" ry="12" fill="#fef2f2"/>
+    <text x="24" y="34" font-family="sans-serif" font-size="16" font-weight="700" fill="#991b1b">Chi tiết cuộc họp (Đã hủy)</text>
+    <circle cx="550" cy="27" r="12" fill="#ffffff" stroke="#fecaca"/>
+    <text x="550" y="31" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#991b1b">×</text>
+
+    <!-- Cancelled notice banner -->
+    <g transform="translate(24, 70)">
+      <rect width="532" height="70" rx="8" ry="8" fill="#fef2f2" stroke="#fca5a5"/>
+      <circle cx="28" cy="25" r="12" fill="#ef4444"/>
+      <path d="M22 25l4 4 8-8" stroke="#ffffff" stroke-width="2" fill="none"/>
+      <text x="48" y="24" font-family="sans-serif" font-size="13" font-weight="700" fill="#991b1b">CUỘC HỌP NÀY ĐÃ BỊ HỦY</text>
+      <text x="48" y="44" font-family="sans-serif" font-size="12" fill="#7f1d1d">Lý do hủy: "Dời lịch do sếp đi công tác đột xuất"</text>
+      <text x="48" y="60" font-family="sans-serif" font-size="11" fill="#b91c1c">Thời gian hủy: 2026-10-05 08:30:15 • Thực hiện bởi: Nguyễn Văn An</text>
+    </g>
+
+    <!-- Details list -->
+    <g transform="translate(24, 160)">
+      <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="600" fill="#64748b">TIÊU ĐỀ CUỘC HỌP:</text>
+      <text x="0" y="38" font-family="sans-serif" font-size="16" font-weight="700" fill="#0f172a" text-decoration="line-through">Họp Sprint Review K16</text>
+
+      <line x1="0" y1="55" x2="532" y2="55" stroke="#f1f5f9"/>
+
+      <text x="0" y="78" font-family="sans-serif" font-size="12" font-weight="600" fill="#64748b">PHÒNG HỌP BAN ĐẦU:</text>
+      <text x="0" y="100" font-family="sans-serif" font-size="14" font-weight="600" fill="#334155">Phòng Tokyo (Tầng 4) <tspan fill="#16a34a" font-size="12" font-weight="bold">(Đã giải phóng phòng)</tspan></text>
+
+      <line x1="0" y1="115" x2="532" y2="115" stroke="#f1f5f9"/>
+
+      <text x="0" y="138" font-family="sans-serif" font-size="12" font-weight="600" fill="#64748b">THỜI GIAN ĐÃ ĐẶT:</text>
+      <text x="0" y="160" font-family="sans-serif" font-size="14" fill="#334155">09:00 - 10:30 (Thứ Bảy, 10/10/2026) - 1 giờ 30 phút</text>
+
+      <line x1="0" y1="175" x2="532" y2="175" stroke="#f1f5f9"/>
+
+      <text x="0" y="198" font-family="sans-serif" font-size="12" font-weight="600" fill="#64748b">NGƯỜI TỔ CHỨC &amp; THAM GIA:</text>
+      <text x="0" y="220" font-family="sans-serif" font-size="13" fill="#334155">Tổ chức: Nguyễn Văn An • 5 thành viên được mời</text>
+    </g>
+
+    <!-- Close button -->
+    <g transform="translate(24, 440)">
+      <rect width="532" height="42" rx="6" ry="6" fill="#f1f5f9" stroke="#cbd5e1"/>
+      <text x="266" y="26" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#475569">Đóng xem chi tiết</text>
+    </g>
+  </g>
+</svg>

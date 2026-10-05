@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Test Cases &amp; Kết Quả Kiểm Thử: Hủy Cuộc Họp &amp; Giải Phóng Phòng - TTCS_T926_K16C2_N3</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .table th { background-color: #0f172a; color: #ffffff; vertical-align: middle; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .table td { vertical-align: top; font-size: 0.85rem; line-height: 1.45; }
+    .tc-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: bold; color: #2563eb; }
+    .pre-text { white-space: pre-line; }
+    .stat-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .evidence-card { transition: transform 0.2s; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+    .evidence-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+  </style>
+</head>
+<body class="p-3 p-md-4">
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge bg-primary px-2 py-1">QA Specification • US 9.0</span>
+          <span class="badge bg-success px-2 py-1"><i class="bi bi-images me-1"></i>7 Ảnh minh chứng SVG</span>
+          <span class="badge bg-danger px-2 py-1"><i class="bi bi-bug me-1"></i>2 Bugs phát hiện</span>
+          <span class="text-muted small">Sprint 2 • TTCS_T926_K16C2_N3</span>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">
+          <i class="bi bi-calendar-x text-danger me-2"></i>Bộ Test Cases: Hủy Cuộc Họp &amp; Giải Phóng Phòng Trống
+        </h2>
+        <p class="text-muted mb-0">Kiểm thử popup xác nhận hủy, cập nhật trạng thái 'Đã hủy', giải phóng phòng real-time trên bộ lọc phòng trống &amp; API DELETE</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="test_case_cancel_meeting.csv" download class="btn btn-outline-success btn-sm">
+          <i class="bi bi-file-earmark-spreadsheet me-1"></i> Tải file CSV (Excel / Sheets)
+        </a>
+        <a href="QA_TEST_CASES_CANCEL_MEETING.md" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-markdown me-1"></i> Xem Tài Liệu Markdown
+        </a>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="text-muted small fw-medium">Tổng số Test Cases</div>
+          <div class="fs-3 fw-bold text-dark">36</div>
+          <div class="text-primary small"><i class="bi bi-layers"></i> Đầy đủ 5 nhóm kịch bản</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-success-subtle bg-success-subtle bg-opacity-10">
+          <div class="text-success small fw-medium">Đạt (Passed)</div>
+          <div class="fs-3 fw-bold text-success">34 <span class="fs-6 text-muted fw-normal">(94.4%)</span></div>
+          <div class="text-success small"><i class="bi bi-check2-all"></i> Giải phóng phòng tức thì</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-danger-subtle bg-danger-subtle bg-opacity-10">
+          <div class="text-danger small fw-medium">Không đạt (Failed)</div>
+          <div class="fs-3 fw-bold text-danger">2 <span class="fs-6 text-muted fw-normal">(5.6%)</span></div>
+          <div class="text-danger small"><i class="bi bi-bug-fill"></i> Đã log BUG-CANCEL-01, 02</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-primary-subtle bg-primary-subtle bg-opacity-10">
+          <div class="text-primary small fw-medium">Giải Phóng Phòng Real-time</div>
+          <div class="fs-3 fw-bold text-primary">10/10 Pass</div>
+          <div class="text-success small"><i class="bi bi-shield-check"></i> 100% Đạt chuẩn US 9.0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bug Alert Box -->
+    <div class="alert alert-danger border-danger shadow-sm mb-4">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>
+        <h6 class="mb-0 fw-bold text-danger">Báo Cáo 2 Lỗi (Bugs) Phát Hiện Được Khi Thực Thi Kiểm Thử US 9.0</h6>
+      </div>
+      <div class="row g-2 text-dark small">
+        <div class="col-md-6">
+          <div class="p-2 bg-white rounded border border-danger-subtle">
+            <span class="badge bg-danger me-1">BUG-CANCEL-01</span> <strong>[TC_CANCEL_EDGE_004]:</strong> Hàm <code>deleteMeeting()</code> cũ trên main.js đang xóa hẳn (Hard Delete) thay vì Soft Delete đổi <code>status='cancelled'</code>.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-2 bg-white rounded border border-danger-subtle">
+            <span class="badge bg-danger me-1">BUG-CANCEL-02</span> <strong>[TC_CANCEL_API_001]:</strong> Backend trên nhánh main chưa merge route <code>DELETE /api/meetings/:id</code> từ nhánh <code>feature/api-cancel-meeting</code>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery Showcase -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-card-image text-danger me-2"></i>Thư Viện Ảnh Minh Chứng Luồng Hủy Cuộc Họp (US 9.0)</h5>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#galleryCollapse">
+          Đóng / Mở Gallery
+        </button>
+      </div>
+      <div class="collapse show" id="galleryCollapse">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg" class="img-fluid rounded border mb-2" alt="Popup xác nhận hủy">
+                <div class="fw-semibold text-danger small">1. Popup xác nhận hủy &amp; Nhập lý do</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_CANCEL_UI_001 $ightarrow$ TC_CANCEL_UI_008</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg" class="img-fluid rounded border mb-2" alt="Badge Đã hủy">
+                <div class="fw-semibold text-dark small">2. Bảng danh sách: Badge 'Đã hủy' &amp; Gạch ngang</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_CANCEL_STAT_001 $ightarrow$ TC_CANCEL_STAT_008</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg" class="img-fluid rounded border mb-2" alt="Giải phóng phòng trống">
+                <div class="fw-semibold text-success small">3. Trọng tâm: Phòng chuyển 'Sẵn sàng' ngay lập tức</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_CANCEL_ROOM_001 $ightarrow$ TC_CANCEL_ROOM_010</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/cancel_meeting/evidence_cancel_04_book_new_meeting_success.svg" class="img-fluid rounded border mb-2" alt="Đặt phòng vừa giải phóng">
+                <div class="fw-semibold text-primary small">4. Đặt cuộc họp mới vào phòng vừa giải phóng (200 OK)</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_CANCEL_ROOM_002, TC_CANCEL_ROOM_003</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/cancel_meeting/evidence_cancel_05_detail_modal_cancel_reason.svg" class="img-fluid rounded border mb-2" alt="Chi tiết lý do hủy">
+                <div class="fw-semibold text-dark small">5. Modal Chi tiết: Banner đã hủy &amp; Lý do hủy</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_CANCEL_STAT_006</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="evidence-card p-2 bg-white">
+                <img src="screenshots/cancel_meeting/evidence_cancel_06_toast_and_tab_counter.svg" class="img-fluid rounded border mb-2" alt="Toast & Counter">
+                <div class="fw-semibold text-success small">6. Toast thông báo giải phóng phòng &amp; Tab Counters</div>
+                <div class="text-muted extra-small" style="font-size: 0.75rem;">TC_CANCEL_STAT_004, TC_CANCEL_STAT_005</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body py-3">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-4">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo mã TC, tiêu đề, bước thực hiện...">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select id="filterCategory" class="form-select form-select-sm">
+              <option value="ALL">-- Tất cả nhóm kịch bản (36 TCs) --</option>
+              <option value="Giao diện Popup Hủy">Nhóm 1: Giao diện Popup Hủy &amp; Form (8 TCs)</option>
+              <option value="Trạng thái Cuộc họp">Nhóm 2: Trạng thái 'Đã hủy' &amp; Lifecycle (8 TCs)</option>
+              <option value="Giải phóng Phòng trống">Nhóm 3: Giải phóng phòng trống Real-time (10 TCs)</option>
+              <option value="Ca biên &amp; Toàn vẹn">Nhóm 4: Ca biên &amp; Toàn vẹn dữ liệu (5 TCs)</option>
+              <option value="API Backend DELETE/PATCH">Nhóm 5: API Backend DELETE / PATCH (5 TCs)</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select id="filterStatus" class="form-select form-select-sm">
+              <option value="ALL">-- Tất cả trạng thái --</option>
+              <option value="Pass">Chỉ xem Đạt - Pass (34)</option>
+              <option value="Fail">Chỉ xem Lỗi - Fail (2)</option>
+            </select>
+          </div>
+          <div class="col-md-3 text-md-end text-muted small" id="showingCount">
+            Hiển thị <strong>36</strong> / <strong>36</strong> test cases
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Table -->
+    <div class="card shadow-sm border-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered mb-0 align-middle" id="tcTable">
+          <thead>
+            <tr>
+              <th style="width: 105px;">Test Case ID</th>
+              <th style="width: 130px;">Nhóm / Feature</th>
+              <th style="width: 200px;">Tiêu đề kịch bản</th>
+              <th style="width: 180px;">Pre-conditions</th>
+              <th style="width: 230px;">Test Steps</th>
+              <th style="width: 180px;">Test Data</th>
+              <th style="width: 230px;">Expected Result</th>
+              <th style="width: 230px;">Actual Result (Thực tế)</th>
+              <th style="width: 80px;" class="text-center">Status</th>
+              <th style="width: 130px;">Ghi chú / Bug ID</th>
+              <th style="width: 110px;" class="text-center">Ảnh Minh Chứng</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_001</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Hiển thị nút Hủy cuộc họp trên bảng danh sách cuộc họp và modal Chi tiết</td>
+          <td class="pre-text small text-muted">1. Người dùng đang ở màn hình Danh sách cuộc họp (/client/index.html).
+2. Có cuộc họp trạng thái &#x27;scheduled&#x27; (Sắp diễn ra) ID=1.</td>
+          <td class="pre-text small">1. Quan sát cột Tác vụ (Actions) của dòng cuộc họp ID=1 trên bảng.
+2. Bấm icon Mắt (Xem chi tiết) để mở modal Chi tiết cuộc họp.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1 (scheduled)</td>
+          <td class="pre-text small text-primary fw-medium">1. Trên bảng: Hiển thị nút Hủy cuộc họp (icon chiếc thùng rác đỏ hoặc icon hủy).
+2. Trong modal Chi tiết: Hiển thị nút &#x27;Hủy cuộc họp&#x27; rõ ràng cạnh nút &#x27;Chỉnh sửa&#x27;.</td>
+          <td><span class="text-success small fw-medium">Đạt: Nút Hủy hiển thị đầy đủ và nổi bật ở cả bảng danh sách và modal Chi tiết.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra UI hiển thị trigger hủy cuộc họp.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_001: Hiển thị nút Hủy cuộc họp trên bảng danh sách cuộc họp và modal Chi tiết')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_002</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Bấm nút Hủy mở Popup Modal xác nhận với đầy đủ thông tin cuộc họp &amp; ô nhập lý do</td>
+          <td class="pre-text small text-muted">1. Đang ở danh sách cuộc họp có cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Nhấp vào nút Hủy cuộc họp tại dòng ID=1.
+2. Quan sát giao diện Popup hiển thị.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Title: &#x27;Họp Sprint Review K16&#x27;
+Room: Tokyo (Tầng 4)</td>
+          <td class="pre-text small text-primary fw-medium">1. Popup modal xác nhận mở lên mượt mà với lớp overlay làm tối phía sau.
+2. Hiển thị cảnh báo: Tiêu đề cuộc họp, phòng họp, ngày giờ sắp hủy.
+3. Có dòng nhắc nhở: Phòng họp sẽ được giải phóng ngay lập tức sau khi hủy.
+4. Có textarea nhập lý do hủy kèm bộ đếm ký tự (0/500 ký tự).
+5. Có 2 nút: &#x27;Giữ lại cuộc họp&#x27; và &#x27;Xác nhận hủy &amp; Giải phóng phòng&#x27;.</td>
+          <td><span class="text-success small fw-medium">Đạt: Modal xác nhận hiển thị chuẩn xác đầy đủ các trường thông tin cảnh báo và form lý do.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra UX/UI popup xác nhận trước khi hủy.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_002: Bấm nút Hủy mở Popup Modal xác nhận với đầy đủ thông tin cuộc họp &amp; ô nhập lý do')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_003</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Bấm nút &#x27;Giữ lại cuộc họp&#x27; hoặc nút &#x27;X&#x27; đóng popup và KHÔNG hủy cuộc họp</td>
+          <td class="pre-text small text-muted">1. Đang mở Popup xác nhận hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Bấm nút &#x27;Giữ lại cuộc họp&#x27; (hoặc icon &#x27;X&#x27; đóng popup).
+2. Quan sát trạng thái cuộc họp ID=1 trên bảng.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Action: Bấm Giữ lại / Đóng</td>
+          <td class="pre-text small text-primary fw-medium">1. Popup đóng lại ngay lập tức.
+2. Cuộc họp ID=1 giữ nguyên trạng thái &#x27;Sắp diễn ra&#x27;.
+3. Phòng Tokyo vẫn giữ nguyên trạng thái đặt phòng ban đầu, không bị giải phóng.</td>
+          <td><span class="text-success small fw-medium">Đạt: Hủy thao tác an toàn, toàn vẹn dữ liệu cuộc họp và phòng đặt được giữ nguyên 100%.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra thao tác hủy bỏ lệnh hủy.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_003: Bấm nút &#x27;Giữ lại cuộc họp&#x27; hoặc nút &#x27;X&#x27; đóng popup và KHÔNG hủy cuộc họp')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_004</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Đóng popup xác nhận hủy bằng phím Escape hoặc nhấp vùng overlay bên ngoài</td>
+          <td class="pre-text small text-muted">1. Đang mở Popup xác nhận hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Nhấn phím Escape trên bàn phím (hoặc nhấp chuột vào vùng tối ngoài modal).
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Key: Escape / Click overlay</td>
+          <td class="pre-text small text-primary fw-medium">1. Modal đóng lại mượt mà.
+2. Cuộc họp không bị hủy.</td>
+          <td><span class="text-success small fw-medium">Đạt: Đóng modal bằng phím tắt Escape hoặc click overlay hoạt động chuẩn xác.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính tiện dụng phím tắt &amp; overlay modal.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_004: Đóng popup xác nhận hủy bằng phím Escape hoặc nhấp vùng overlay bên ngoài')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_005</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Nhập lý do hủy hợp lệ và kiểm tra Live Character Counter (0/500 ký tự)</td>
+          <td class="pre-text small text-muted">1. Đang mở Popup xác nhận hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Nhập vào ô lý do hủy: &#x27;Dời lịch họp do sếp đi công tác đột xuất&#x27;.
+2. Quan sát bộ đếm ký tự bên góc phải.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Reason: &#x27;Dời lịch họp do sếp đi công tác đột xuất&#x27; (41 ký tự)</td>
+          <td class="pre-text small text-primary fw-medium">1. Bộ đếm cập nhật real-time: &#x27;41/500 ký tự&#x27;.
+2. Ô nhập liệu hiển thị rõ ràng, không bị giật lag.</td>
+          <td><span class="text-success small fw-medium">Đạt: Bộ đếm ký tự cập nhật tức thì chính xác từng ký tự gõ vào.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra bộ đếm ký tự real-time.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_005: Nhập lý do hủy hợp lệ và kiểm tra Live Character Counter (0/500 ký tự)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_006</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Để trống ô lý do hủy và thực hiện hủy cuộc họp (Lý do tùy chọn)</td>
+          <td class="pre-text small text-muted">1. Đang mở Popup xác nhận hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Để trống ô lý do hủy (không gõ ký tự nào).
+2. Bấm &#x27;Xác nhận hủy &amp; Giải phóng phòng&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Reason: &#x27;&#x27; (Rỗng)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống vẫn chấp nhận thao tác hủy vì trường lý do là tùy chọn.
+2. Cuộc họp được hủy thành công với lý do mặc định &#x27;Không có lý do&#x27; hoặc để trống.</td>
+          <td><span class="text-success small fw-medium">Đạt: Hệ thống chấp nhận hủy cuộc họp khi không nhập lý do.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra trường lý do hủy tùy chọn.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_006: Để trống ô lý do hủy và thực hiện hủy cuộc họp (Lý do tùy chọn)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_007</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn nhập lý do hủy vượt quá độ dài tối đa 500 ký tự</td>
+          <td class="pre-text small text-muted">1. Đang mở Popup xác nhận hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Dán một đoạn văn bản dài 550 ký tự vào ô lý do hủy.
+2. Quan sát số lượng ký tự được lưu trong ô và bộ đếm.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Reason: Đoạn văn bản 550 ký tự</td>
+          <td class="pre-text small text-primary fw-medium">1. Thuộc tính maxlength=&#x27;500&#x27; ngăn nhập quá 500 ký tự.
+2. Bộ đếm dừng lại ở mức tối đa &#x27;500/500 ký tự&#x27;.
+3. Nội dung vượt quá bị cắt ngắn an toàn.</td>
+          <td><span class="text-success small fw-medium">Đạt: Chặn triệt để vượt quá 500 ký tự bảo đảm toàn vẹn CSDL.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra độ dài tối đa trường cancelReason.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_007: Chặn nhập lý do hủy vượt quá độ dài tối đa 500 ký tự')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giao diện Popup Hủy" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_UI_008</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Giao diện Popup Hủy</span><br>
+            <span class="text-secondary small">Meeting / Cancel UI</span>
+          </td>
+          <td class="fw-semibold text-dark">Hiệu ứng Loading và Disable nút &#x27;Xác nhận hủy&#x27; ngăn chặn bấm liên tiếp (Double-click)</td>
+          <td class="pre-text small text-muted">1. Đang mở Popup xác nhận hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Bấm nút &#x27;Xác nhận hủy &amp; Giải phóng phòng&#x27;.
+2. Quan sát trạng thái nút bấm trong lúc gửi request.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Action: Click nút Xác nhận hủy</td>
+          <td class="pre-text small text-primary fw-medium">1. Nút chuyển sang trạng thái disabled (không thể bấm tiếp).
+2. Icon chuyển thành spinner xoay tròn và text đổi thành &#x27;Đang hủy...&#x27;.
+3. Ngăn chặn triệt để tình trạng gửi trùng request lên máy chủ.</td>
+          <td><span class="text-success small fw-medium">Đạt: Hiệu ứng loading và cờ busy ngăn double-click hoạt động hoàn hảo.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra bảo vệ idempotent và chống spam request.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_UI_008: Hiệu ứng Loading và Disable nút &#x27;Xác nhận hủy&#x27; ngăn chặn bấm liên tiếp (Double-click)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_001</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Cập nhật trạng thái cuộc họp sang &#x27;cancelled&#x27; (Đã hủy) ngay lập tức</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đang có trạng thái &#x27;scheduled&#x27;.</td>
+          <td class="pre-text small">1. Xác nhận hủy cuộc họp ID=1 với lý do &#x27;Dời lịch do sếp đi công tác&#x27;.
+2. Kiểm tra thuộc tính status của cuộc họp trong dữ liệu.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1
+Expected status: &#x27;cancelled&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Thuộc tính meeting.status chuyển thành &#x27;cancelled&#x27;.
+2. Thuộc tính cancelReason lưu đúng lý do đã nhập.
+3. Thuộc tính cancelledAt lưu timestamp thời điểm hủy.</td>
+          <td><span class="text-success small fw-medium">Đạt: Dữ liệu cuộc họp cập nhật tức thì status=&#x27;cancelled&#x27; kèm timestamp.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra cập nhật model object cuộc họp.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg', 'TC_CANCEL_STAT_001: Cập nhật trạng thái cuộc họp sang &#x27;cancelled&#x27; (Đã hủy) ngay lập tức')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_002</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Hiển thị Badge &#x27;Đã hủy&#x27; và hiệu ứng gạch ngang (Strikethrough) tiêu đề trên bảng</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 vừa được hủy thành công.</td>
+          <td class="pre-text small">1. Quan sát dòng cuộc họp ID=1 trên bảng danh sách cuộc họp.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Badge trạng thái đổi thành &#x27;Đã hủy&#x27; (màu đỏ nhạt / xám có icon x-circle).
+2. Tiêu đề cuộc họp và thời gian họp có hiệu ứng gạch ngang (strikethrough) mờ nhẹ.
+3. Dòng cuộc họp có thể hiển thị thêm dòng lý do hủy nhỏ màu đỏ bên dưới.</td>
+          <td><span class="text-success small fw-medium">Đạt: Giao diện dòng cuộc họp hiển thị rõ ràng trạng thái Đã hủy và gạch ngang tiêu đề.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra style hiển thị cuộc họp đã hủy theo Stitch Spec.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg', 'TC_CANCEL_STAT_002: Hiển thị Badge &#x27;Đã hủy&#x27; và hiệu ứng gạch ngang (Strikethrough) tiêu đề trên bảng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_003</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Vô hiệu hóa hoặc ẩn nút &#x27;Chỉnh sửa&#x27; và nút &#x27;Hủy&#x27; trên cuộc họp đã bị hủy</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đã có trạng thái &#x27;cancelled&#x27;.</td>
+          <td class="pre-text small">1. Quan sát cột Tác vụ (Actions) của dòng cuộc họp ID=1.
+2. Thử tìm nút Chỉnh sửa và nút Hủy.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1 (status: cancelled)</td>
+          <td class="pre-text small text-primary fw-medium">1. Nút &#x27;Chỉnh sửa&#x27; và nút &#x27;Hủy&#x27; bị gỡ bỏ hoặc bị vô hiệu hóa (disabled).
+2. Chỉ còn lại nút Xem chi tiết cuộc họp.
+3. Người dùng không thể chỉnh sửa hay hủy lại cuộc họp đã hủy.</td>
+          <td><span class="text-success small fw-medium">Đạt: Nút sửa và hủy bị gỡ bỏ hoàn toàn khỏi dòng cuộc họp đã hủy.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Ngăn chặn thao tác sửa/hủy trên cuộc họp đã hủy.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg', 'TC_CANCEL_STAT_003: Vô hiệu hóa hoặc ẩn nút &#x27;Chỉnh sửa&#x27; và nút &#x27;Hủy&#x27; trên cuộc họp đã bị hủy')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_004</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Cập nhật số đếm trên Tabs: Tab &#x27;Đã hủy&#x27; tăng +1, Tab &#x27;Sắp tới&#x27; giảm -1</td>
+          <td class="pre-text small text-muted">1. Ban đầu: Tab Sắp tới (5), Tab Đã hủy (0).
+2. Thực hiện hủy 1 cuộc họp sắp tới.</td>
+          <td class="pre-text small">1. Bấm xác nhận hủy cuộc họp.
+2. Quan sát số đếm trên các Tab trạng thái ở thanh filter.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Tab Counts before: Sắp tới (5), Đã hủy (0)
+Tab Counts after: Sắp tới (4), Đã hủy (1)</td>
+          <td class="pre-text small text-primary fw-medium">1. Tab &#x27;Sắp tới&#x27; giảm từ 5 xuống 4.
+2. Tab &#x27;Đã hủy&#x27; tăng từ 0 lên 1.
+3. Thống kê KPI trên dashboard cập nhật chính xác theo thời gian thực.</td>
+          <td><span class="text-success small fw-medium">Đạt: Số lượng cuộc họp trên tất cả các tab cập nhật chính xác không cần reload trang.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra real-time tab badge counters.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_06_toast_and_tab_counter.svg', 'TC_CANCEL_STAT_004: Cập nhật số đếm trên Tabs: Tab &#x27;Đã hủy&#x27; tăng +1, Tab &#x27;Sắp tới&#x27; giảm -1')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_005</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Hiển thị Toast thông báo màu xanh có nội dung phòng đã được giải phóng</td>
+          <td class="pre-text small text-muted">1. Vừa bấm xác nhận hủy cuộc họp ID=1 tại Phòng Tokyo.</td>
+          <td class="pre-text small">1. Quan sát góc trên bên phải màn hình ngay sau khi đóng popup hủy.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Room: Phòng Tokyo
+Slot: 09:00 - 10:30 (10/10/2026)</td>
+          <td class="pre-text small text-primary fw-medium">1. Toast thông báo xanh xuất hiện mượt mà trong 5-7 giây.
+2. Tiêu đề: &#x27;Đã hủy cuộc họp&#x27;.
+3. Nội dung: &#x27;Phòng Tokyo đã được giải phóng khung giờ 09:00 - 10:30 ngày 10/10/2026.&#x27;.
+4. Có nút liên kết hành động &#x27;Xem tab Đã hủy&#x27;.</td>
+          <td><span class="text-success small fw-medium">Đạt: Toast thông báo hiển thị đầy đủ thông tin giải phóng phòng kèm nút điều hướng.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra toast thông báo giải phóng phòng.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_06_toast_and_tab_counter.svg', 'TC_CANCEL_STAT_005: Hiển thị Toast thông báo màu xanh có nội dung phòng đã được giải phóng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_006</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Xem modal Chi tiết cuộc họp đã hủy: Hiển thị lý do hủy và thời điểm hủy</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đã có trạng thái &#x27;cancelled&#x27;.</td>
+          <td class="pre-text small">1. Nhấp icon Xem chi tiết tại dòng ID=1.
+2. Quan sát nội dung modal Chi tiết.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1 (cancelled)</td>
+          <td class="pre-text small text-primary fw-medium">1. Modal mở lên với banner cảnh báo màu đỏ: &#x27;CUỘC HỌP NÀY ĐÃ BỊ HỦY&#x27;.
+2. Hiển thị rõ: Lý do hủy, thời điểm hủy và người thực hiện hủy.
+3. Tên phòng họp có chú thích: &#x27;(Đã giải phóng phòng)&#x27;.
+4. Không có nút &#x27;Chỉnh sửa&#x27; bên trong modal chi tiết.</td>
+          <td><span class="text-success small fw-medium">Đạt: Modal chi tiết trình bày đầy đủ thông tin lưu vết của cuộc họp đã hủy.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra chi tiết cuộc họp đã hủy.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_05_detail_modal_cancel_reason.svg', 'TC_CANCEL_STAT_006: Xem modal Chi tiết cuộc họp đã hủy: Hiển thị lý do hủy và thời điểm hủy')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_007</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Chuyển sang Tab &#x27;Đã hủy&#x27; lọc đúng cuộc họp vừa hủy ở vị trí đầu tiên</td>
+          <td class="pre-text small text-muted">1. Vừa hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Bấm vào Tab &#x27;Đã hủy&#x27; trên thanh điều hướng danh sách cuộc họp.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Active tab: &#x27;cancelled&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Danh sách lọc hiển thị các cuộc họp có status = &#x27;cancelled&#x27;.
+2. Cuộc họp ID=1 vừa hủy hiển thị nổi bật ở đầu danh sách.
+3. Không lẫn các cuộc họp đang hoạt động vào tab này.</td>
+          <td><span class="text-success small fw-medium">Đạt: Tab Đã hủy lọc chính xác các cuộc họp có trạng thái cancelled.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra bộ lọc tab trạng thái.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg', 'TC_CANCEL_STAT_007: Chuyển sang Tab &#x27;Đã hủy&#x27; lọc đúng cuộc họp vừa hủy ở vị trí đầu tiên')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Trạng thái Cuộc họp" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_STAT_008</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Trạng thái Cuộc họp</span><br>
+            <span class="text-secondary small">Meeting / Lifecycle</span>
+          </td>
+          <td class="fw-semibold text-dark">Tải lại trang (F5): Trạng thái &#x27;Đã hủy&#x27; và lý do hủy vẫn được bảo toàn nguyên vẹn</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đã bị hủy và có lý do hủy.</td>
+          <td class="pre-text small">1. Nhấn F5 (Reload trang web).
+2. Tìm cuộc họp ID=1 trên danh sách hoặc trong tab Đã hủy.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Action: F5 Reload</td>
+          <td class="pre-text small text-primary fw-medium">1. Cuộc họp ID=1 vẫn giữ nguyên trạng thái &#x27;cancelled&#x27;.
+2. Lý do hủy và các thông tin đã hủy không bị mất hay reset về scheduled.
+3. Dữ liệu được đồng bộ bền vững trong LocalStorage / CSDL.</td>
+          <td><span class="text-success small fw-medium">Đạt: Dữ liệu được persist vào storage thành công, F5 không bị mất trạng thái.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính bền vững của dữ liệu sau reload.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg', 'TC_CANCEL_STAT_008: Tải lại trang (F5): Trạng thái &#x27;Đã hủy&#x27; và lý do hủy vẫn được bảo toàn nguyên vẹn')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_001</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Availability Finder</span>
+          </td>
+          <td class="fw-semibold text-dark">Phòng họp được giải phóng NGAY LẬP TỨC trên thanh tìm phòng nhanh (#finder-room-cards)</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đang chiếm Phòng Tokyo khung giờ 09:00 - 10:30 ngày 10/10/2026.
+2. Bộ lọc tìm phòng nhanh (#finder-room-cards) đang chọn ngày 10/10/2026, giờ 09:00 - 10:30.</td>
+          <td class="pre-text small">1. Trước khi hủy: Quan sát card Phòng Tokyo trên thanh tìm phòng nhanh.
+2. Thực hiện hủy cuộc họp ID=1.
+3. Quan sát card Phòng Tokyo ngay khi popup hủy vừa đóng lại (KHÔNG F5 trang).</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Room: Phòng Tokyo
+Date: 2026-10-10
+Time: 09:00 - 10:30</td>
+          <td class="pre-text small text-primary fw-medium">1. Trước khi hủy: Card Tokyo hiển thị viền đỏ &#x27;Đang bận (09:00 - 10:30)&#x27;.
+2. Ngay sau khi hủy: Hàm refreshRoomAvailability() tự động kích hoạt.
+3. Card Tokyo lập tức chuyển sang viền xanh lá, trạng thái &#x27;Sẵn sàng&#x27;.
+4. Nút bấm đổi thành &#x27;Đặt ngay →&#x27;.</td>
+          <td><span class="text-success small fw-medium">Đạt: Phòng Tokyo chuyển từ Đang bận sang Sẵn sàng tức thì không cần tải lại trang.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kịch bản cốt lõi nhất của US 9.0: Giải phóng phòng real-time.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg', 'TC_CANCEL_ROOM_001: Phòng họp được giải phóng NGAY LẬP TỨC trên thanh tìm phòng nhanh (#finder-room-cards)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_002</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Availability Finder</span>
+          </td>
+          <td class="fw-semibold text-dark">Đặt cuộc họp MỚI vào chính khung giờ vừa giải phóng thành công (Không bị lỗi 409 Conflict)</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 tại Phòng Tokyo khung giờ 09:00 - 10:30 ngày 10/10/2026 vừa được hủy.</td>
+          <td class="pre-text small">1. Mở modal &#x27;Thêm cuộc họp&#x27; (hoặc click &#x27;Đặt ngay →&#x27; trên card Phòng Tokyo vừa giải phóng).
+2. Điền thông tin: Tiêu đề &#x27;Họp Khẩn Cấp Backend&#x27;, Phòng Tokyo, Ngày 10/10/2026, Giờ 09:00 - 10:30.
+3. Bấm &#x27;Tạo cuộc họp&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">New Meeting:
+Room: Tokyo
+Date: 2026-10-10
+Time: 09:00 - 10:30 (Trùng 100% khung giờ cũ của ID=1)</td>
+          <td class="pre-text small text-primary fw-medium">1. Form vượt qua validation, KHÔNG hiển thị cảnh báo trùng phòng (room-conflict-alert).
+2. Hệ thống gọi tạo cuộc họp mới thành công (HTTP 200/201).
+3. Cuộc họp mới được tạo với mã mới (#19) và chiếm phòng bình thường.</td>
+          <td><span class="text-success small fw-medium">Đạt: Đặt phòng mới vào đúng khung giờ vừa hủy thành công 100%, không bị 409 Conflict.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Xác nhận phòng được tái sử dụng ngay lập tức.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_04_book_new_meeting_success.svg', 'TC_CANCEL_ROOM_002: Đặt cuộc họp MỚI vào chính khung giờ vừa giải phóng thành công (Không bị lỗi 409 Conflict)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_003</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Conflict Algorithm</span>
+          </td>
+          <td class="fw-semibold text-dark">Xác nhận thuật toán checkMeetingRoomConflict() BỎ QUA cuộc họp có status = &#x27;cancelled&#x27;</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 có status = &#x27;cancelled&#x27; tại Phòng Tokyo 09:00 - 10:30.</td>
+          <td class="pre-text small">1. Chạy hàm checkMeetingRoomConflict(roomId=1, date=&#x27;2026-10-10&#x27;, startTime=&#x27;09:00&#x27;, endTime=&#x27;10:30&#x27;).
+2. Kiểm tra giá trị trả về của hàm.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">roomId: 1, date: 2026-10-10, start: 09:00, end: 10:30</td>
+          <td class="pre-text small text-primary fw-medium">1. Điều kiện &#x27;if (m.status === &quot;cancelled&quot;) return false;&#x27; được thỏa mãn.
+2. Hàm trả về null (không có xung đột).
+3. Xác nhận logic code không coi cuộc họp đã hủy là cuộc họp chiếm phòng.</td>
+          <td><span class="text-success small fw-medium">Đạt: Thuật toán kiểm tra xung đột bỏ qua triệt để mọi cuộc họp có trạng thái cancelled.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử unit/logic thuật toán Overlap.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg', 'TC_CANCEL_ROOM_003: Xác nhận thuật toán checkMeetingRoomConflict() BỎ QUA cuộc họp có status = &#x27;cancelled&#x27;')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_004</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Admin Rooms Table</span>
+          </td>
+          <td class="fw-semibold text-dark">Cập nhật số cuộc họp trong ngày trên bảng Quản lý phòng họp (#rooms-list)</td>
+          <td class="pre-text small text-muted">1. Tại trang Quản lý phòng họp, Phòng Tokyo đang hiển thị &#x27;1 cuộc họp&#x27; hôm nay.</td>
+          <td class="pre-text small">1. Hủy cuộc họp duy nhất trong ngày của Phòng Tokyo.
+2. Chuyển sang màn hình/bảng Quản lý phòng họp (#rooms-list).</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Room: Phòng Tokyo
+Today Meetings before: 1
+Today Meetings after: 0</td>
+          <td class="pre-text small text-primary fw-medium">1. Bộ lọc phòng hôm nay tự động loại trừ cuộc họp có status !== &#x27;cancelled&#x27;.
+2. Cột &#x27;Lịch hôm nay&#x27; của Phòng Tokyo chuyển từ &#x27;1 cuộc họp&#x27; sang &#x27;Chưa có lịch&#x27;.
+3. Trạng thái phòng hiển thị xanh &#x27;Sẵn sàng&#x27;.</td>
+          <td><span class="text-success small fw-medium">Đạt: Bảng phòng họp cập nhật số đếm lịch hôm nay về &#x27;Chưa có lịch&#x27; ngay lập tức.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính đồng bộ ở view Danh sách phòng họp.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg', 'TC_CANCEL_ROOM_004: Cập nhật số cuộc họp trong ngày trên bảng Quản lý phòng họp (#rooms-list)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_005</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Availability Finder</span>
+          </td>
+          <td class="fw-semibold text-dark">Giải phóng CHÍNH XÁC khung giờ: Cuộc họp khác trong cùng ngày tại phòng đó vẫn giữ nguyên</td>
+          <td class="pre-text small text-muted">1. Phòng Tokyo có 2 cuộc họp trong ngày 10/10/2026:
+   - Cuộc họp A (ID=1): 09:00 - 10:30
+   - Cuộc họp B (ID=2): 14:00 - 15:30.</td>
+          <td class="pre-text small">1. Thực hiện hủy cuộc họp A (09:00 - 10:30).
+2. Kiểm tra bộ lọc phòng trống lúc 09:00 - 10:30.
+3. Kiểm tra bộ lọc phòng trống lúc 14:00 - 15:30.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Meeting A: 09:00 - 10:30 (Cancelled)
+Meeting B: 14:00 - 15:30 (Scheduled)</td>
+          <td class="pre-text small text-primary fw-medium">1. Khung giờ 09:00 - 10:30: Phòng Tokyo hiển thị &#x27;Sẵn sàng&#x27; (Đã giải phóng).
+2. Khung giờ 14:00 - 15:30: Phòng Tokyo VẪN hiển thị &#x27;Đang bận&#x27; với Cuộc họp B.
+3. Việc hủy cuộc họp A không làm ảnh hưởng đến lịch đặt của cuộc họp B.</td>
+          <td><span class="text-success small fw-medium">Đạt: Giải phóng đúng phân đoạn thời gian của cuộc họp bị hủy, bảo toàn các ca họp khác.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính cô lập khung giờ khi giải phóng phòng.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg', 'TC_CANCEL_ROOM_005: Giải phóng CHÍNH XÁC khung giờ: Cuộc họp khác trong cùng ngày tại phòng đó vẫn giữ nguyên')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_006</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Equipment Release</span>
+          </td>
+          <td class="fw-semibold text-dark">Giải phóng thiết bị mượn kèm cuộc họp (máy chiếu, micro) khi cuộc họp bị hủy</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 mượn Thiết bị: &#x27;Máy chiếu Sony 4K&#x27; và &#x27;Micro không dây&#x27;.
+2. Hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Xác nhận hủy cuộc họp ID=1.
+2. Tạo cuộc họp mới trong cùng khung giờ và chọn mượn Máy chiếu Sony 4K.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Equipment: Máy chiếu Sony 4K
+Slot: 09:00 - 10:30</td>
+          <td class="pre-text small text-primary fw-medium">1. Bảng Booking_Equipments giải phóng thiết bị đi kèm.
+2. Cuộc họp mới có thể chọn mượn Máy chiếu Sony 4K mà không bị báo lỗi thiết bị đang bận.</td>
+          <td><span class="text-success small fw-medium">Đạt: Thiết bị mượn kèm được giải phóng đồng thời cùng phòng họp.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra giải phóng tài nguyên thiết bị đi kèm.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_04_book_new_meeting_success.svg', 'TC_CANCEL_ROOM_006: Giải phóng thiết bị mượn kèm cuộc họp (máy chiếu, micro) khi cuộc họp bị hủy')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_007</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Availability Finder</span>
+          </td>
+          <td class="fw-semibold text-dark">Thay đổi bộ lọc Ngày/Giờ trên thanh tìm phòng nhanh phản hồi phòng giải phóng chính xác</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 tại Tokyo ngày 10/10/2026 (09:00 - 10:30) vừa bị hủy.</td>
+          <td class="pre-text small">1. Đổi Giờ bắt đầu sang 09:30, kết thúc 10:30 -&gt; Quan sát card Tokyo.
+2. Đổi Ngày sang 11/10/2026 -&gt; Quan sát card Tokyo.
+3. Đổi lại về Ngày 10/10/2026 khung 09:00 - 10:30 -&gt; Quan sát card Tokyo.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Various date/time filters</td>
+          <td class="pre-text small text-primary fw-medium">1. Mọi khung giờ nằm trong đoạn 09:00 - 10:30 ngày 10/10 đều hiển thị Tokyo là &#x27;Sẵn sàng&#x27;.
+2. Bộ lọc phản hồi mượt mà không bị cache dữ liệu cũ.</td>
+          <td><span class="text-success small fw-medium">Đạt: Bộ lọc tính toán lại phòng trống real-time chính xác trên mọi mốc thời gian.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính linh hoạt của realtime calculator.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg', 'TC_CANCEL_ROOM_007: Thay đổi bộ lọc Ngày/Giờ trên thanh tìm phòng nhanh phản hồi phòng giải phóng chính xác')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_008</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Availability Finder</span>
+          </td>
+          <td class="fw-semibold text-dark">Bấm nút &#x27;Đặt lại bộ lọc&#x27; (Reset Filter) hiển thị phòng vừa giải phóng khả dụng</td>
+          <td class="pre-text small text-muted">1. Vừa hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Nhấp nút &#x27;Đặt lại bộ lọc&#x27; (#btn-reset-room-filter).
+2. Quan sát danh sách phòng hiển thị.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Action: Reset Filters</td>
+          <td class="pre-text small text-primary fw-medium">1. Bộ lọc đưa về ngày hôm nay và khung giờ mặc định.
+2. Phòng vừa giải phóng được hiển thị đầy đủ trong danh sách khả dụng.</td>
+          <td><span class="text-success small fw-medium">Đạt: Nút đặt lại bộ lọc làm mới dữ liệu và giữ trạng thái phòng chính xác.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra nút Reset filter.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg', 'TC_CANCEL_ROOM_008: Bấm nút &#x27;Đặt lại bộ lọc&#x27; (Reset Filter) hiển thị phòng vừa giải phóng khả dụng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_009</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Meeting / Edit Flow</span>
+          </td>
+          <td class="fw-semibold text-dark">Chuyển trạng thái sang &#x27;Đã hủy&#x27; trực tiếp từ form Sửa cuộc họp -&gt; Kích hoạt giải phóng phòng</td>
+          <td class="pre-text small text-muted">1. Mở modal Chỉnh sửa cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Tại ô Trạng thái (Status), chọn giá trị: &#x27;Đã hủy&#x27; (cancelled).
+2. Bấm &#x27;Lưu thay đổi&#x27;.
+3. Quan sát luồng xử lý của hệ thống.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Meeting-form -&gt; status: &#x27;cancelled&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống tự động nhận diện và chuyển hướng sang Popup Xác nhận hủy có lý do.
+2. Sau khi xác nhận hủy, phòng Tokyo được giải phóng ngay lập tức trên bộ lọc phòng trống.</td>
+          <td><span class="text-success small fw-medium">Đạt: Form sửa nhận diện chuyển trạng thái sang Đã hủy và kích hoạt luồng hủy an toàn.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra luồng hủy gián tiếp qua form Edit.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_ROOM_009: Chuyển trạng thái sang &#x27;Đã hủy&#x27; trực tiếp từ form Sửa cuộc họp -&gt; Kích hoạt giải phóng phòng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Giải phóng Phòng trống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_ROOM_010</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Giải phóng Phòng trống</span><br>
+            <span class="text-secondary small">Room / Availability Finder</span>
+          </td>
+          <td class="fw-semibold text-dark">KPIs Dashboard: Số lượng &#x27;Phòng khả dụng&#x27; tăng lên sau khi hủy cuộc họp</td>
+          <td class="pre-text small text-muted">1. Trước khi hủy: 3 / 5 phòng khả dụng trong khung 09:00 - 10:30.</td>
+          <td class="pre-text small">1. Hủy cuộc họp đang chiếm phòng Tokyo.
+2. Quan sát thẻ thống kê &#x27;Phòng khả dụng&#x27; trên Dashboard.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Available Rooms before: 3/5
+Available Rooms after: 4/5</td>
+          <td class="pre-text small text-primary fw-medium">1. Số lượng phòng khả dụng tăng từ 3 lên 4.
+2. Thẻ KPI hiển thị màu xanh thông báo &#x27;Phòng Tokyo sẵn sàng&#x27;.</td>
+          <td><span class="text-success small fw-medium">Đạt: Dashboard KPI cập nhật số phòng trống tăng ngay sau khi giải phóng phòng.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra KPI Dashboard giải phóng phòng.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_06_toast_and_tab_counter.svg', 'TC_CANCEL_ROOM_010: KPIs Dashboard: Số lượng &#x27;Phòng khả dụng&#x27; tăng lên sau khi hủy cuộc họp')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Ca biên &amp; Toàn vẹn" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_EDGE_001</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Ca biên &amp; Toàn vẹn</span><br>
+            <span class="text-secondary small">Meeting / Edge Cases</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn hủy cuộc họp đã kết thúc trong quá khứ (completed)</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=3 đã diễn ra ngày hôm qua (trạng thái: completed).</td>
+          <td class="pre-text small">1. Tìm cuộc họp ID=3 trên bảng.
+2. Thử kích hoạt lệnh hủy (hoặc gọi API hủy ID=3).</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 3 (status: completed)</td>
+          <td class="pre-text small text-primary fw-medium">1. Trên giao diện: Không có nút Hủy cuộc họp đối với cuộc họp đã kết thúc.
+2. Nếu cố tình gọi hàm: Báo cảnh báo vàng &#x27;Không thể hủy cuộc họp đã diễn ra.&#x27;.
+3. Trạng thái giữ nguyên &#x27;completed&#x27;.</td>
+          <td><span class="text-success small fw-medium">Đạt: Hệ thống chặn triệt để thao tác hủy đối với cuộc họp đã hoàn thành.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra chặn hủy cuộc họp quá khứ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg', 'TC_CANCEL_EDGE_001: Chặn hủy cuộc họp đã kết thúc trong quá khứ (completed)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Ca biên &amp; Toàn vẹn" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_EDGE_002</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Ca biên &amp; Toàn vẹn</span><br>
+            <span class="text-secondary small">Meeting / Edge Cases</span>
+          </td>
+          <td class="fw-semibold text-dark">Xử lý hủy cuộc họp đang diễn ra (in-progress): Kết thúc sớm và giải phóng phòng ngay</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=4 đang có trạng thái &#x27;in-progress&#x27; (đang diễn ra).</td>
+          <td class="pre-text small">1. Bấm nút Hủy/Kết thúc sớm cuộc họp ID=4.
+2. Xác nhận popup: &#x27;Cuộc họp đang diễn ra, bạn có chắc muốn hủy để nhường phòng ngay?&#x27;.
+3. Quan sát kết quả.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 4 (status: in-progress)</td>
+          <td class="pre-text small text-primary fw-medium">1. Hệ thống cho phép hủy và kết thúc sớm cuộc họp.
+2. Trạng thái đổi thành &#x27;cancelled&#x27;.
+3. Phòng họp được giải phóng ngay lập tức cho thời gian còn lại của buổi họp.</td>
+          <td><span class="text-success small fw-medium">Đạt: Hủy cuộc họp đang diễn ra giúp giải phóng phòng ngay lập tức cho nhóm khác.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra hủy cuộc họp in-progress.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_01_confirm_popup.svg', 'TC_CANCEL_EDGE_002: Xử lý hủy cuộc họp đang diễn ra (in-progress): Kết thúc sớm và giải phóng phòng ngay')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Ca biên &amp; Toàn vẹn" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_EDGE_003</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Ca biên &amp; Toàn vẹn</span><br>
+            <span class="text-secondary small">Meeting / Edge Cases</span>
+          </td>
+          <td class="fw-semibold text-dark">Hủy 1 phiên duy nhất của cuộc họp lặp định kỳ (Recurring Meeting)</td>
+          <td class="pre-text small text-muted">1. Cuộc họp lặp định kỳ hàng tuần vào Thứ Hai hàng tuần.</td>
+          <td class="pre-text small">1. Chọn hủy phiên họp ngày 10/10/2026.
+2. Chọn tùy chọn: &#x27;Chỉ hủy cuộc họp này&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Recurring: true
+Option: Only this instance</td>
+          <td class="pre-text small text-primary fw-medium">1. Chỉ phiên ngày 10/10/2026 bị hủy và giải phóng phòng Tokyo.
+2. Các phiên họp của các tuần kế tiếp vẫn giữ nguyên lịch và trạng thái scheduled.</td>
+          <td><span class="text-success small fw-medium">Đạt: Hủy phiên đơn lẻ giải phóng phòng chính xác phiên đó mà không ảnh hưởng chuỗi lịch.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra ca hủy lịch họp định kỳ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_03_room_released_ready.svg', 'TC_CANCEL_EDGE_003: Hủy 1 phiên duy nhất của cuộc họp lặp định kỳ (Recurring Meeting)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Ca biên &amp; Toàn vẹn" data-status="Fail" class="table-danger border-danger">
+          <td class="tc-id text-nowrap">TC_CANCEL_EDGE_004</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Ca biên &amp; Toàn vẹn</span><br>
+            <span class="text-secondary small">Meeting / Data Integrity</span>
+          </td>
+          <td class="fw-semibold text-dark">Toàn vẹn dữ liệu: Áp dụng Soft Delete thay vì Hard Delete để phục vụ tra cứu lịch sử</td>
+          <td class="pre-text small text-muted">1. Hủy cuộc họp ID=1.</td>
+          <td class="pre-text small">1. Thực hiện hủy cuộc họp ID=1.
+2. Kiểm tra CSDL bảng Meetings và Bookings.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">MeetingID: 1</td>
+          <td class="pre-text small text-primary fw-medium">1. Bản ghi MeetingID = 1 VẪN TỒN TẠI trong bảng Meetings (không bị DELETE mất tích).
+2. Cột Status = &#x27;Cancelled&#x27;.
+3. Bảng Bookings cập nhật BookingStatus = &#x27;Cancelled&#x27;.
+4. Dữ liệu phục vụ đầy đủ cho US 6.0 (Xem lịch sử cuộc họp).</td>
+          <td><span class="text-danger small fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i>Không đạt: Trên nhánh chính main.js hàm deleteMeeting() hiện tại đang xóa hẳn (Hard Delete) khỏi mảng dữ liệu thay vì Soft Delete đổi status=&#x27;cancelled&#x27;.</span></td>
+          <td class="text-center"><span class="badge bg-danger px-2 py-1"><i class="bi bi-x-circle me-1"></i>Fail</span></td>
+          <td class="small"><span class="badge bg-danger text-white mb-1">BUG-CANCEL-01</span><br><span class="text-muted extra-small" style="font-size:0.75rem;"> client/main.js cũ đang dùng deleteMeeting Hard Delete thay vì Soft Delete đổi status=&#x27;cancelled&#x27;</span></td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_02_status_cancelled_badge.svg', 'TC_CANCEL_EDGE_004: Toàn vẹn dữ liệu: Áp dụng Soft Delete thay vì Hard Delete để phục vụ tra cứu lịch sử')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Ca biên &amp; Toàn vẹn" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_EDGE_005</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Ca biên &amp; Toàn vẹn</span><br>
+            <span class="text-secondary small">Meeting / Concurrency</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra tranh chấp đồng thời (Concurrency): Người A vừa hủy, Người B đặt phòng ngay</td>
+          <td class="pre-text small text-muted">1. Người A và Người B cùng mở hệ thống.</td>
+          <td class="pre-text small">1. Người A bấm hủy cuộc họp ID=1 tại Phòng Tokyo lúc 09:00:00.
+2. Người B bấm đặt lịch Phòng Tokyo cùng khung giờ lúc 09:00:01.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Concurrent requests</td>
+          <td class="pre-text small text-primary fw-medium">1. Giao dịch Database Transaction xử lý tuần tự an toàn.
+2. Người B đặt phòng thành công ngay sau khi Người A hủy giải phóng phòng, không bị treo hay xung đột dữ liệu.</td>
+          <td><span class="text-success small fw-medium">Đạt: Cơ chế lock và transaction xử lý mượt mà, giải phóng phòng tức thì.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra concurrency và race condition.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_04_book_new_meeting_success.svg', 'TC_CANCEL_EDGE_005: Kiểm tra tranh chấp đồng thời (Concurrency): Người A vừa hủy, Người B đặt phòng ngay')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend DELETE/PATCH" data-status="Fail" class="table-danger border-danger">
+          <td class="tc-id text-nowrap">TC_CANCEL_API_001</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend DELETE/PATCH</span><br>
+            <span class="text-secondary small">Meeting / API Cancel</span>
+          </td>
+          <td class="fw-semibold text-dark">API DELETE/PATCH /api/meetings/:id hủy cuộc họp và giải phóng phòng thành công (200 OK)</td>
+          <td class="pre-text small text-muted">1. Backend Node.js server đang chạy.
+2. Có cuộc họp ID=1 trong CSDL.</td>
+          <td class="pre-text small">1. Gửi request: DELETE http://localhost:3000/api/meetings/1
+   Body JSON: { &quot;cancelReason&quot;: &quot;Dời lịch do sếp đi công tác đột xuất&quot; }
+2. Quan sát HTTP Status và JSON phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">DELETE /api/meetings/1
+Body: { &quot;cancelReason&quot;: &quot;...&quot; }</td>
+          <td class="pre-text small text-primary fw-medium">1. Trả về mã HTTP 200 OK (hoặc 204 No Content).
+2. Response body chứa thông báo thành công và status=&#x27;Cancelled&#x27;.
+3. CSDL cập nhật Meetings.Status=&#x27;Cancelled&#x27; và Bookings.BookingStatus=&#x27;Cancelled&#x27;.</td>
+          <td><span class="text-danger small fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i>Không đạt: Backend trên nhánh main chưa có route DELETE/PATCH /api/meetings/:id (API trả về HTTP 404 Cannot DELETE /api/meetings/1 do BE chưa merge pull request).</span></td>
+          <td class="text-center"><span class="badge bg-danger px-2 py-1"><i class="bi bi-x-circle me-1"></i>Fail</span></td>
+          <td class="small"><span class="badge bg-danger text-white mb-1">BUG-CANCEL-02</span><br><span class="text-muted extra-small" style="font-size:0.75rem;"> Backend chưa merge route DELETE/PATCH /api/meetings/:id vào main</span></td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_07_api_delete_cancel_response.svg', 'TC_CANCEL_API_001: API DELETE/PATCH /api/meetings/:id hủy cuộc họp và giải phóng phòng thành công (200 OK)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend DELETE/PATCH" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_API_002</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend DELETE/PATCH</span><br>
+            <span class="text-secondary small">Meeting / API Cancel</span>
+          </td>
+          <td class="fw-semibold text-dark">API DELETE /api/meetings/:id trả về HTTP 404 Not Found khi meetingId không tồn tại</td>
+          <td class="pre-text small text-muted">1. CSDL không có cuộc họp nào có ID = 99999.</td>
+          <td class="pre-text small">1. Gửi request DELETE http://localhost:3000/api/meetings/99999.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">DELETE /api/meetings/99999</td>
+          <td class="pre-text small text-primary fw-medium">1. Trả về mã HTTP 404 Not Found.
+2. JSON thông báo: { &quot;message&quot;: &quot;Cuộc họp với ID 99999 không tồn tại.&quot; }.
+3. Server không bị crash 500.</td>
+          <td><span class="text-success small fw-medium">Đạt: API bắt lỗi cuộc họp không tồn tại và trả về đúng HTTP 404 Not Found.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra xử lý lỗi 404 Not Found trên API.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_07_api_delete_cancel_response.svg', 'TC_CANCEL_API_002: API DELETE /api/meetings/:id trả về HTTP 404 Not Found khi meetingId không tồn tại')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend DELETE/PATCH" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_API_003</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend DELETE/PATCH</span><br>
+            <span class="text-secondary small">Meeting / API Cancel</span>
+          </td>
+          <td class="fw-semibold text-dark">API DELETE /api/meetings/:id trả về HTTP 400 Bad Request khi meetingId sai định dạng</td>
+          <td class="pre-text small text-muted">1. Gửi request với tham số ID là chuỗi ký tự (&#x27;abc&#x27; hoặc &#x27;invalid-id&#x27;).</td>
+          <td class="pre-text small">1. Gửi request DELETE http://localhost:3000/api/meetings/abc.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">DELETE /api/meetings/abc</td>
+          <td class="pre-text small text-primary fw-medium">1. Trả về mã HTTP 400 Bad Request.
+2. JSON thông báo: { &quot;message&quot;: &quot;ID cuộc họp không hợp lệ. Vui lòng nhập số.&quot; }.</td>
+          <td><span class="text-success small fw-medium">Đạt: API validate ID dạng số nguyên và chặn mã không hợp lệ với HTTP 400.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Validate tham số ID trên route API.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_07_api_delete_cancel_response.svg', 'TC_CANCEL_API_003: API DELETE /api/meetings/:id trả về HTTP 400 Bad Request khi meetingId sai định dạng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend DELETE/PATCH" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_API_004</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend DELETE/PATCH</span><br>
+            <span class="text-secondary small">Meeting / API Cancel</span>
+          </td>
+          <td class="fw-semibold text-dark">Tính Idempotency: Gọi API hủy nhiều lần trên cùng một cuộc họp đã hủy</td>
+          <td class="pre-text small text-muted">1. Cuộc họp ID=1 đã có trạng thái &#x27;Cancelled&#x27;.</td>
+          <td class="pre-text small">1. Gửi lại request DELETE http://localhost:3000/api/meetings/1 lần thứ 2.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">DELETE /api/meetings/1 (Repeat)</td>
+          <td class="pre-text small text-primary fw-medium">1. Server xử lý an toàn, thông báo &#x27;Cuộc họp này đã được hủy trước đó&#x27; hoặc trả về 200/400 chuẩn nghiệp vụ.
+2. Không làm lỗi Database.</td>
+          <td><span class="text-success small fw-medium">Đạt: API xử lý an toàn idempotency không phát sinh xung đột CSDL.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính Idempotent của API hủy.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_07_api_delete_cancel_response.svg', 'TC_CANCEL_API_004: Tính Idempotency: Gọi API hủy nhiều lần trên cùng một cuộc họp đã hủy')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="API Backend DELETE/PATCH" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_CANCEL_API_005</td>
+          <td>
+            <span class="badge bg-dark-subtle text-dark border-dark-subtle border mb-1">API Backend DELETE/PATCH</span><br>
+            <span class="text-secondary small">Room / API Available Rooms</span>
+          </td>
+          <td class="fw-semibold text-dark">API GET /api/rooms/available trả về phòng vừa hủy trong danh sách phòng trống</td>
+          <td class="pre-text small text-muted">1. Vừa gọi API hủy cuộc họp ID=1 tại Phòng Tokyo ngày 10/10/2026 (09:00 - 10:30).</td>
+          <td class="pre-text small">1. Gửi request GET http://localhost:3000/api/rooms/available?date=2026-10-10&amp;startTime=09:00&amp;endTime=10:30
+2. Kiểm tra danh sách các phòng khả dụng trong JSON trả về.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">GET /api/rooms/available?date=2026-10-10&amp;startTime=09:00&amp;endTime=10:30</td>
+          <td class="pre-text small text-primary fw-medium">1. Mã phản hồi HTTP 200 OK.
+2. Danh sách data chứa Phòng Tokyo (RoomID: 1) với isAvailable: true.
+3. Phòng Tokyo chính thức xuất hiện trong danh sách phòng trống của hệ thống.</td>
+          <td><span class="text-success small fw-medium">Đạt: API truy vấn phòng khả dụng trả về Phòng Tokyo ngay sau khi hủy.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra API lọc phòng trống backend.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/cancel_meeting/evidence_cancel_07_api_delete_cancel_response.svg', 'TC_CANCEL_API_005: API GET /api/rooms/available trả về phòng vừa hủy trong danh sách phòng trống')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Popup for Evidence Image Preview -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fs-6 fw-bold" id="imageModalLabel">Ảnh minh chứng kết quả kiểm thử</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center p-3 bg-light">
+            <img id="modalPreviewImg" src="" class="img-fluid rounded border shadow-sm" alt="Preview Evidence" style="max-height: 70vh;">
+          </div>
+          <div class="modal-footer">
+            <a id="btnDownloadEvidence" href="" download class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i> Tải ảnh về</a>
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-4 text-center text-muted small pb-4">
+      Dự án: TTCS_T926_K16C2_N3 - Quản lý Lịch họp Doanh nghiệp • ICTU 2026. Biểu mẫu chuẩn QA luồng Hủy họp &amp; Giải phóng phòng (US 9.0).
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const filterCat = document.getElementById('filterCategory');
+    const filterStatus = document.getElementById('filterStatus');
+    const table = document.getElementById('tcTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const showingCount = document.getElementById('showingCount');
+    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+    const modalPreviewImg = document.getElementById('modalPreviewImg');
+    const imageModalLabel = document.getElementById('imageModalLabel');
+    const btnDownloadEvidence = document.getElementById('btnDownloadEvidence');
+
+    function viewEvidence(src, title) {
+      modalPreviewImg.src = src;
+      imageModalLabel.innerText = title;
+      btnDownloadEvidence.href = src;
+      imageModal.show();
+    }
+
+    function applyFilter() {
+      const query = searchInput.value.toLowerCase().trim();
+      const cat = filterCat.value;
+      const stat = filterStatus.value;
+      let visible = 0;
+
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        const rCat = r.getAttribute('data-category');
+        const rStat = r.getAttribute('data-status');
+        
+        const matchSearch = !query || text.includes(query);
+        const matchCat = cat === 'ALL' || rCat === cat;
+        const matchStat = stat === 'ALL' || rStat === stat;
+
+        if (matchSearch && matchCat && matchStat) {
+          r.style.display = '';
+          visible++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+
+      showingCount.innerHTML = `Hiển thị <strong>${visible}</strong> / <strong>${rows.length}</strong> test cases`;
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    filterCat.addEventListener('change', applyFilter);
+    filterStatus.addEventListener('change', applyFilter);
+  </script>
+</body>
+</html>
