@@ -281,7 +281,7 @@ const Meeting = {
 
     // Thực thi cập nhật
     update: async (meetingId, meetingData) => {
-        const { title, description, startTime, endTime, organizerId, isRecurring, roomId } = meetingData;
+        const { title, description, startTime, endTime, organizerId, isRecurring, roomId, participantIds } = meetingData;
         const connection = await db.getConnection();
 
         try {
@@ -312,6 +312,19 @@ const Meeting = {
                 WHERE MeetingID = ?
             `;
             await connection.execute(updateBookingQuery, [roomId, meetingId]);
+
+            // 3. Cập nhật bảng Meeting_Participants nếu có truyền participantIds
+            if (Array.isArray(participantIds)) {
+                await connection.execute('DELETE FROM Meeting_Participants WHERE MeetingID = ?', [meetingId]);
+                for (const userId of participantIds) {
+                    if (Number.isInteger(Number(userId))) {
+                        await connection.query(
+                            'INSERT IGNORE INTO Meeting_Participants (MeetingID, UserID, ResponseStatus) VALUES (?, ?, ?)',
+                            [meetingId, userId, 'Pending']
+                        );
+                    }
+                }
+            }
 
             await connection.commit();
             return true;

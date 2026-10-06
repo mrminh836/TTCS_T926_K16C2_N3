@@ -3910,4 +3910,490 @@ body {
 .was-validated .stitch-input[type="date"]:invalid {
   background-image: none !important;
   padding-right: 0.75rem !important;
+}
+
+/* ========================================================
+   MULTI-SELECT CHỌN ĐỒNG NGHIỆP THAM GIA CUỘC HỌP (STITCH SPEC)
+   Tác giả: Hoàng Minh Khánh (FE)
+   Đặc tả: US 4.0 - Chọn danh sách đồng nghiệp, lọc theo phòng ban,
+   cảnh báo sức chứa và đồng bộ hai chiều dữ liệu cuộc họp
+   ======================================================== */
+
+.stitch-multiselect-container {
+  position: relative;
+  width: 100%;
+}
+
+.stitch-multiselect-control {
+  min-height: 44px;
+  padding: 6px 10px;
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  cursor: text;
+  transition: all 0.15s ease-in-out;
+  position: relative;
+}
+
+.stitch-multiselect-control:hover {
+  border-color: var(--slate-300);
+}
+
+.stitch-multiselect-control.is-focused,
+.stitch-multiselect-control:focus-within {
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.stitch-multiselect-control.has-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.stitch-multiselect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.participant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  color: var(--primary-700);
+  padding: 3px 8px 3px 4px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: all 0.15s ease;
+  user-select: none;
+  animation: chipScaleIn 0.18s ease-out;
+}
+
+@keyframes chipScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.participant-chip:hover {
+  background: var(--primary-100);
+  border-color: var(--primary-500);
+}
+
+.participant-chip.is-host {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #4338ca;
+}
+
+.chip-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.chip-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-host-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #4338ca;
+  color: #ffffff;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chip-btn-remove {
+  background: transparent;
+  border: none;
+  color: var(--primary-600);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  font-size: 11px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.chip-btn-remove:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.stitch-multiselect-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  color: var(--slate-800);
+  flex: 1 1 140px;
+  min-width: 140px;
+}
+
+.stitch-multiselect-input::placeholder {
+  color: var(--slate-400);
+  font-size: 0.82rem;
+}
+
+.stitch-multiselect-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--slate-400);
+}
+
+.btn-clear-participants {
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+  color: var(--slate-400);
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.btn-clear-participants:hover {
+  color: #ef4444;
+}
+
+.stitch-multiselect-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.stitch-multiselect-control.is-open .stitch-multiselect-arrow {
+  transform: rotate(180deg);
+}
+
+/* Quick Department & Team Filters */
+.stitch-participant-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.btn-dept-chip {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  color: var(--slate-600);
+  padding: 2px 9px;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-dept-chip:hover {
+  background: var(--slate-50);
+  border-color: var(--slate-300);
+  color: var(--slate-800);
+}
+
+.btn-dept-chip.active {
+  background: var(--primary-600);
+  border-color: var(--primary-600);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-quick-select-action {
+  background: transparent;
+  border: 1px dashed var(--slate-300);
+  color: var(--primary-600);
+  padding: 2px 9px;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-quick-select-action:hover {
+  background: var(--primary-50);
+  border-color: var(--primary-500);
+}
+
+/* Dropdown Menu */
+.stitch-multiselect-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: multiselectDropdownFade 0.15s ease-out;
+}
+
+@keyframes multiselectDropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stitch-dropdown-header {
+  padding: 10px 14px;
+  background: var(--slate-50);
+  border-bottom: 1px solid var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stitch-dropdown-list {
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.participant-option-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  user-select: none;
+  gap: 10px;
+}
+
+.participant-option-item:hover {
+  background: var(--slate-100);
+}
+
+.participant-option-item.is-selected {
+  background: var(--primary-50);
+}
+
+.participant-option-item.is-selected:hover {
+  background: var(--primary-100);
+}
+
+.option-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.option-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid var(--slate-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: transparent;
+}
+
+.participant-option-item.is-selected .option-checkbox {
+  background: var(--primary-600);
+  border-color: var(--primary-600);
+  color: #ffffff;
+}
+
+.option-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.option-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.option-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--slate-800);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.option-email {
+  font-size: 0.72rem;
+  color: var(--slate-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.option-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.option-dept-badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--slate-100);
+  color: var(--slate-600);
+  border: 1px solid var(--slate-200);
+}
+
+.option-role-badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--primary-50);
+  color: var(--primary-700);
+  border: 1px solid var(--primary-200);
+  font-weight: 500;
+}
+
+.stitch-dropdown-footer {
+  padding: 8px 14px;
+  background: var(--slate-50);
+  border-top: 1px solid var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stitch-dropdown-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--slate-500);
+  font-size: 0.82rem;
+}
+
+.stitch-time-warning-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Detail View Participant Cards */
+.detail-participant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.detail-participant-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--slate-50);
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.detail-participant-card:hover {
+  background: #ffffff;
+  border-color: var(--primary-200);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.detail-participant-card.is-host {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.detail-participant-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.detail-participant-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--slate-800);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detail-participant-sub {
+  font-size: 0.7rem;
+  color: var(--slate-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

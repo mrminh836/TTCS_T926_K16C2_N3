@@ -478,7 +478,7 @@
         </div>
 
         <!-- Accordion / Thông tin bổ sung (Người tham gia, Trạng thái) -->
-        <details class="stitch-advanced-details">
+        <details class="stitch-advanced-details" open>
           <summary class="stitch-advanced-summary">
             <span><i class="bi bi-sliders me-1"></i> Thiết lập bổ sung (Người tổ chức, Người tham gia, Trạng thái)</span>
             <i class="bi bi-chevron-down stitch-chevron"></i>
@@ -490,26 +490,113 @@
                 <i class="bi bi-person-badge text-primary me-1"></i> Người tổ chức (Users / Organizer)
               </label>
               <select id="meeting-organizer" name="organizerId" class="form-select stitch-input" aria-label="Người tổ chức">
-                <option value="1">Nguyễn Văn An (ID: 1 - Employee)</option>
-                <option value="2">Trần Thu Hà (ID: 2 - Manager)</option>
-                <option value="3">Lê Minh Tuấn (ID: 3 - Employee)</option>
+                <option value="1">Nguyễn Văn An (ID: 1 - Kỹ thuật)</option>
+                <option value="2">Trần Thu Hà (ID: 2 - Quản trị / Manager)</option>
+                <option value="3">Lê Minh Tuấn (ID: 3 - Kỹ thuật)</option>
                 <option value="4">Hoàng Bảo Ngọc (ID: 4 - HR Lead)</option>
                 <option value="5">Phạm Quốc Dũng (ID: 5 - Tech Lead)</option>
                 <option value="6">Vũ Tuấn Kiệt (ID: 6 - Director)</option>
+                <option value="7">Hoàng Minh Khánh (ID: 7 - Frontend Dev)</option>
+                <option value="8">Nguyễn Minh Lượng (ID: 8 - Frontend Dev)</option>
+                <option value="9">Vũ Thị Thanh Ngân (ID: 9 - UI/UX Designer)</option>
+                <option value="10">Đặng Hùng (ID: 10 - QA Engineer)</option>
+                <option value="11">Hà Sỹ Nguyên (ID: 11 - Backend Lead)</option>
+                <option value="12">Đoàn Ngọc Mạnh (ID: 12 - Backend Dev)</option>
+                <option value="13">Đào Đức Mạnh (ID: 13 - Backend Dev)</option>
+                <option value="14">Hoàng Văn Khuyến (ID: 14 - QA Lead)</option>
+                <option value="15">Ngô Đức Khải (ID: 15 - QA Engineer)</option>
+                <option value="16">Triệu Quốc Khánh (ID: 16 - QA Engineer)</option>
+                <option value="17">Đỗ Quang Minh (ID: 17 - Scrum Master)</option>
               </select>
             </div>
 
-            <div class="mb-3">
-              <label for="meeting-participants" class="stitch-label">
-                Người tham gia
-              </label>
-              <input
-                type="text"
-                id="meeting-participants"
-                class="form-control stitch-input"
-                placeholder="Nguyễn A, Trần B, Lê C"
-                aria-label="Danh sách người tham gia"
-              />
+            <!-- BUSINESS 5: Chọn danh sách đồng nghiệp tham gia cuộc họp (Multi-select Colleague Selector) -->
+            <div class="mb-3 stitch-form-group" id="group-participants">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="participant-search-input" class="stitch-label m-0">
+                  <i class="bi bi-people-fill text-primary me-1"></i> Đồng nghiệp tham gia (Participants)
+                </label>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="stitch-hint" id="participants-count-badge">
+                    Đã chọn: <strong id="participants-selected-count">1</strong> đồng nghiệp
+                  </span>
+                </div>
+              </div>
+
+              <!-- Multi-select Interactive Box -->
+              <div class="stitch-multiselect-container" id="participant-multiselect-container">
+                <div class="stitch-multiselect-control" id="participant-multiselect-trigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-controls="participant-dropdown-menu">
+                  <!-- Selected Chips Container -->
+                  <div class="stitch-multiselect-chips" id="participant-selected-chips"></div>
+
+                  <!-- Inline Search Input -->
+                  <input
+                    type="text"
+                    id="participant-search-input"
+                    class="stitch-multiselect-input"
+                    placeholder="Tìm tên, email, vai trò, phòng ban..."
+                    aria-label="Tìm kiếm đồng nghiệp tham gia cuộc họp"
+                    autocomplete="off"
+                  />
+
+                  <!-- Control Action Icons -->
+                  <div class="stitch-multiselect-actions">
+                    <button type="button" class="btn-clear-participants hidden" id="btn-clear-participants" title="Bỏ chọn tất cả (trừ người tổ chức)" aria-label="Bỏ chọn tất cả">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                    <span class="stitch-multiselect-arrow">
+                      <i class="bi bi-chevron-down"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Quick Department / Team Filter Chips -->
+                <div class="stitch-participant-quick-filters">
+                  <span class="stitch-hint me-1"><i class="bi bi-funnel"></i> Lọc &amp; chọn nhanh:</span>
+                  <div class="d-flex flex-wrap gap-1 align-items-center" id="participant-quick-dept-chips">
+                    <button type="button" class="btn-dept-chip active" data-dept="all">Tất cả</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Kỹ thuật">Kỹ thuật</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Thiết kế">Thiết kế</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Kiểm thử">Kiểm thử</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Quản trị">Quản trị/HR</button>
+                    <span class="text-slate-300 mx-1">|</span>
+                    <button type="button" class="btn-quick-select-action" id="btn-select-tech-team" title="Chọn toàn bộ nhóm Kỹ thuật/Dev">+ Nhóm Dev</button>
+                    <button type="button" class="btn-quick-select-action" id="btn-select-qa-team" title="Chọn toàn bộ nhóm QA">+ Nhóm QA</button>
+                    <button type="button" class="btn-quick-select-action" id="btn-select-all-participants" title="Chọn tất cả đồng nghiệp">+ Chọn tất cả</button>
+                  </div>
+                </div>
+
+                <!-- Dropdown Menu -->
+                <div class="stitch-multiselect-dropdown hidden" id="participant-dropdown-menu" role="listbox" aria-multiselectable="true">
+                  <!-- Dropdown Header -->
+                  <div class="stitch-dropdown-header">
+                    <div class="small fw-semibold text-slate-700">
+                      <i class="bi bi-person-lines-fill text-primary me-1"></i> Danh bạ đồng nghiệp doanh nghiệp
+                    </div>
+                    <span class="stitch-hint" id="dropdown-selection-summary">Đã chọn 1 / 17</span>
+                  </div>
+
+                  <!-- Dropdown Colleagues List -->
+                  <div class="stitch-dropdown-list" id="participant-options-list">
+                    <!-- Populated dynamically -->
+                  </div>
+
+                  <!-- Dropdown Footer -->
+                  <div class="stitch-dropdown-footer">
+                    <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>Đồng nghiệp được chọn sẽ nhận thông báo mời họp tự động</span>
+                    <button type="button" class="btn btn-sm btn-light py-0 px-2" id="btn-close-participant-dropdown" style="font-size: 0.75rem;">Đóng</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cảnh báo sức chứa nếu người tham gia vượt quá sức chứa phòng -->
+              <div id="capacity-warning-alert" class="stitch-time-warning-box hidden mt-2">
+                <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0"></i>
+                <span id="capacity-warning-text">Số người tham gia vượt quá sức chứa phòng đã chọn.</span>
+              </div>
+
+              <!-- Input ẩn tương thích ngược với code cũ / test case -->
+              <input type="hidden" id="meeting-participants" name="participants" />
             </div>
 
             <div class="mb-3" id="group-status">
