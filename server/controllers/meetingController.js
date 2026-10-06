@@ -151,7 +151,7 @@ const updateMeeting = async (req, res) => {
             return res.status(400).json({ message: "ID cuộc họp không hợp lệ. Vui lòng nhập số." });
         }
 
-        const { title, description, startTime, endTime, organizerId, roomId, isRecurring } = req.body;
+        const { title, description, startTime, endTime, organizerId, roomId, isRecurring, participantIds } = req.body;
 
         // 1. Validate dữ liệu
         if (!title || !startTime || !endTime || !organizerId || !roomId) {
@@ -169,7 +169,7 @@ const updateMeeting = async (req, res) => {
         }
 
         // 3. Thực thi cập nhật
-        await Meeting.update(meetingId, { title, description, startTime, endTime, organizerId, roomId, isRecurring });
+        await Meeting.update(meetingId, { title, description, startTime, endTime, organizerId, roomId, isRecurring, participantIds });
 
         return res.status(200).json({
             message: "Cập nhật cuộc họp thành công",
