@@ -1,0 +1,23 @@
+{
+  "name": "meeting-room-booking-api",
+  "version": "1.0.0",
+  "description": "API Backend - Quản lý đặt phòng họp, thiết bị, người tham gia",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "knex migrate:latest --knexfile src/knexfile.js",
+    "migrate:rollback": "knex migrate:rollback --knexfile src/knexfile.js",
+    "seed": "knex seed:run --knexfile src/knexfile.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "knex": "^3.1.0",
+    "mysql2": "^3.11.0"
+  },
+  "devDependencies": {        
+    "nodemon": "^3.1.4"
+  }
+}
