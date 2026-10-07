@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // PRODUCT BACKLOG - MEETING MANAGEMENT
 // JavaScript thuần
 // Bootstrap 5 + Bootstrap Icons
@@ -74,12 +74,23 @@ let ROOMS = [
 ];
 
 const USERS = [
-  { id: 1, name: "Nguyễn Văn An", email: "an.nguyen@company.com", role: "Employee" },
-  { id: 2, name: "Trần Thu Hà", email: "ha.tran@company.com", role: "Manager" },
-  { id: 3, name: "Lê Minh Tuấn", email: "tuan.le@company.com", role: "Employee" },
-  { id: 4, name: "Hoàng Bảo Ngọc", email: "ngoc.hoang@company.com", role: "HR Lead" },
-  { id: 5, name: "Phạm Quốc Dũng", email: "dung.pham@company.com", role: "Tech Lead" },
-  { id: 6, name: "Vũ Tuấn Kiệt", email: "kiet.vu@company.com", role: "Director" }
+  { id: 1, name: "Nguyễn Văn An", email: "an.nguyen@company.com", role: "Employee", department: "Kỹ thuật", avatar: "NA", color: "#2563eb" },
+  { id: 2, name: "Trần Thu Hà", email: "ha.tran@company.com", role: "Manager", department: "Quản trị", avatar: "TH", color: "#7c3aed" },
+  { id: 3, name: "Lê Minh Tuấn", email: "tuan.le@company.com", role: "Employee", department: "Kỹ thuật", avatar: "MT", color: "#0891b2" },
+  { id: 4, name: "Hoàng Bảo Ngọc", email: "ngoc.hoang@company.com", role: "HR Lead", department: "Nhân sự", avatar: "BN", color: "#db2777" },
+  { id: 5, name: "Phạm Quốc Dũng", email: "dung.pham@company.com", role: "Tech Lead", department: "Kỹ thuật", avatar: "QD", color: "#d97706" },
+  { id: 6, name: "Vũ Tuấn Kiệt", email: "kiet.vu@company.com", role: "Director", department: "Ban Giám đốc", avatar: "TK", color: "#4f46e5" },
+  { id: 7, name: "Hoàng Minh Khánh", email: "khanh.hoang@company.com", role: "Frontend Dev", department: "Kỹ thuật", avatar: "MK", color: "#059669" },
+  { id: 8, name: "Nguyễn Minh Lượng", email: "luong.nguyen@company.com", role: "Frontend Dev", department: "Kỹ thuật", avatar: "ML", color: "#2563eb" },
+  { id: 9, name: "Vũ Thị Thanh Ngân", email: "ngan.vu@company.com", role: "UI/UX Designer", department: "Thiết kế", avatar: "TN", color: "#e11d48" },
+  { id: 10, name: "Đặng Hùng", email: "hung.dang@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "DH", color: "#9333ea" },
+  { id: 11, name: "Hà Sỹ Nguyên", email: "nguyen.ha@company.com", role: "Backend Lead", department: "Kỹ thuật", avatar: "SN", color: "#0d9488" },
+  { id: 12, name: "Đoàn Ngọc Mạnh", email: "manh.doan@company.com", role: "Backend Dev", department: "Kỹ thuật", avatar: "NM", color: "#0284c7" },
+  { id: 13, name: "Đào Đức Mạnh", email: "manh.dao@company.com", role: "Backend Dev", department: "Kỹ thuật", avatar: "DM", color: "#16a34a" },
+  { id: 14, name: "Hoàng Văn Khuyến", email: "khuyen.hoang@company.com", role: "QA Lead", department: "Kiểm thử", avatar: "VK", color: "#ca8a04" },
+  { id: 15, name: "Ngô Đức Khải", email: "khai.ngo@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "DK", color: "#ea580c" },
+  { id: 16, name: "Triệu Quốc Khánh", email: "khanh.trieu@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "QK", color: "#65a30d" },
+  { id: 17, name: "Đỗ Quang Minh", email: "minh.do@company.com", role: "Scrum Master", department: "Quản trị", avatar: "QM", color: "#475569" }
 ];
 
 const EQUIPMENTS = [
@@ -109,6 +120,7 @@ let meetings = [
       "Lê Minh Tuấn",
       "Phạm Quốc Dũng"
     ],
+    participantIds: [1, 2, 3, 5],
     status: "in-progress",
     notes: "Đánh giá kết quả Sprint và thống nhất công việc cho Sprint tiếp theo."
   },
@@ -132,6 +144,7 @@ let meetings = [
       "Đặng Hùng",
       "Vũ Tuấn Kiệt"
     ],
+    participantIds: [2, 8, 10, 6],
     status: "scheduled",
     notes: "Báo cáo chỉ số tăng trưởng doanh thu và phê duyệt ngân sách R&D."
   },
@@ -151,9 +164,10 @@ let meetings = [
     host: "Lê Minh Tuấn",
     participants: [
       "Lê Minh Tuấn",
-      "Vũ Ngọc",
-      "Trần Văn A"
+      "Vũ Thị Thanh Ngân",
+      "Hoàng Minh Khánh"
     ],
+    participantIds: [3, 9, 7],
     status: "scheduled",
     notes: "Rà soát tính nhất quán của bộ component Form và Dashboard."
   },
@@ -174,8 +188,9 @@ let meetings = [
     participants: [
       "Hoàng Bảo Ngọc",
       "Nguyễn Minh Lượng",
-      "Anh Tuấn"
+      "Hoàng Minh Khánh"
     ],
+    participantIds: [4, 8, 7],
     status: "scheduled",
     notes: "Đánh giá chuyên môn kỹ thuật và kinh nghiệm React/Tailwind."
   },
@@ -195,9 +210,10 @@ let meetings = [
     host: "Phạm Quốc Dũng",
     participants: [
       "Phạm Quốc Dũng",
-      "Trần Hùng",
-      "Lê Văn B"
+      "Đặng Hùng",
+      "Lê Minh Tuấn"
     ],
+    participantIds: [5, 10, 3],
     status: "completed",
     notes: "Cập nhật tiến độ API Gateway và giải quyết blocker."
   },
@@ -217,9 +233,10 @@ let meetings = [
     host: "Vũ Tuấn Kiệt",
     participants: [
       "Vũ Tuấn Kiệt",
-      "Nguyễn Dung",
-      "Trần Văn A"
+      "Trần Thu Hà",
+      "Nguyễn Văn An"
     ],
+    participantIds: [6, 2, 1],
     status: "cancelled",
     notes: "Thống nhất phạm vi triển khai và kế hoạch bàn giao milestone 1."
   }
@@ -2056,7 +2073,18 @@ function loadPersistedMeetings() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        meetings = parsed;
+        meetings = parsed.map(m => {
+          if (!m.participantIds && m.participants) {
+            m.participantIds = m.participants.map(name => {
+              const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
+              return u ? u.id : null;
+            }).filter(Boolean);
+            if (m.organizerId && !m.participantIds.includes(m.organizerId)) {
+              m.participantIds.unshift(m.organizerId);
+            }
+          }
+          return m;
+        });
       }
     }
   } catch (e) {
@@ -2205,6 +2233,11 @@ function clearMeetingFormErrors() {
     const el = document.getElementById(id);
     if (el) el.classList.remove("has-error", "is-invalid");
   });
+
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  if (trigger) trigger.classList.remove("has-error", "is-invalid");
+  const capacityAlert = document.getElementById("capacity-warning-alert");
+  if (capacityAlert) capacityAlert.classList.add("hidden");
 }
 
 function checkMeetingRoomConflict(roomId, date, startTime, endTime, editId = null) {
@@ -2391,17 +2424,38 @@ function validateMeetingForm(editId = null) {
     if (organizerSelect) organizerSelect.classList.add("has-error", "is-invalid");
   }
 
-  // Parse Người tham gia (Participants) & Thiết bị (Equipments)
-  const participants = participantsInput && participantsInput.value.trim()
-    ? participantsInput.value.split(",").map(p => p.trim()).filter(Boolean)
-    : [organizerObj?.name || "Nguyễn Văn An"];
-
-  const participantIds = participants.map(name => {
-    const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
-    return u ? u.id : null;
+  // 7. Parse Người tham gia (Participants) từ Multi-Select & Thiết bị (Equipments)
+  let participantIds = Array.from(selectedParticipantIds);
+  let participants = participantIds.map(id => {
+    const u = USERS.find(user => user.id === id);
+    return u ? u.name : null;
   }).filter(Boolean);
-  if (!participantIds.includes(organizerId) && organizerId) {
+
+  // Fallback đọc từ text input cũ nếu có dữ liệu bên ngoài
+  if (participants.length === 0 && participantsInput && participantsInput.value.trim()) {
+    const rawNames = participantsInput.value.split(",").map(p => p.trim()).filter(Boolean);
+    rawNames.forEach(name => {
+      const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
+      if (u) {
+        if (!participantIds.includes(u.id)) participantIds.push(u.id);
+        if (!participants.includes(u.name)) participants.push(u.name);
+      } else {
+        participants.push(name);
+      }
+    });
+  }
+
+  // Luôn đảm bảo Người tổ chức (Host) có mặt trong danh sách
+  if (organizerId && !participantIds.includes(organizerId)) {
     participantIds.unshift(organizerId);
+  }
+  if (organizerObj && !participants.includes(organizerObj.name)) {
+    participants.unshift(organizerObj.name);
+  }
+
+  // Đồng bộ lại input ẩn để tương thích ngược
+  if (participantsInput) {
+    participantsInput.value = participants.join(", ");
   }
 
   const equipmentCheckboxes = Array.from(document.querySelectorAll(".eq-checkbox:checked"));
@@ -2493,6 +2547,7 @@ function setupMeetingFormValidationEvents() {
 
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
+    renderRoomSuggestionBanner(); // Gợi ý phòng theo số người tham gia sau mỗi thay đổi ngày/giờ
 
     if (roomId && date && start && end && start < end) {
       const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
@@ -2580,6 +2635,746 @@ function setupMeetingFormValidationEvents() {
 
   // Khởi tạo các bộ chọn nhanh DateTime & Bộ lọc Phòng
   setupQuickDateTimePresets();
+
+  // Khởi tạo các sự kiện cho Multi-select Đồng nghiệp
+  setupParticipantSelectorEvents();
+}
+
+// =====================================================
+// 6H. MULTI-SELECT ĐỒNG NGHIỆP THAM GIA CUỘC HỌP (STITCH SPEC)
+// Tác giả: Hoàng Minh Khánh (FE)
+// Đặc tả: US 4.0 - Chọn danh sách đồng nghiệp tham gia,
+// phân loại phòng ban, cảnh báo sức chứa, đồng bộ CSDL & 2 chiều
+// =====================================================
+
+let selectedParticipantIds = new Set([1]);
+let currentParticipantDeptFilter = "all";
+let participantSearchQuery = "";
+let isParticipantDropdownOpen = false;
+
+/**
+ * Khởi tạo bộ chọn người tham gia với danh sách ID ban đầu và OrganizerID
+ * @param {Array<number|string>} initialIds Danh sách ID hoặc Tên người tham gia
+ * @param {number} organizerId ID người tổ chức
+ */
+function initParticipantSelector(initialIds = [1], organizerId = 1) {
+  selectedParticipantIds.clear();
+
+  const orgId = Number(organizerId) || 1;
+  selectedParticipantIds.add(orgId);
+
+  if (Array.isArray(initialIds)) {
+    initialIds.forEach(item => {
+      if (typeof item === "number" && !isNaN(item)) {
+        selectedParticipantIds.add(item);
+      } else if (typeof item === "string") {
+        const found = USERS.find(u => u.name.toLowerCase() === item.trim().toLowerCase());
+        if (found) {
+          selectedParticipantIds.add(found.id);
+        }
+      }
+    });
+  }
+
+  // Luôn đảm bảo Người tổ chức (Host) được chọn
+  if (orgId) {
+    selectedParticipantIds.add(orgId);
+  }
+
+  currentParticipantDeptFilter = "all";
+  participantSearchQuery = "";
+  isParticipantDropdownOpen = false;
+
+  const searchInput = document.getElementById("participant-search-input");
+  if (searchInput) searchInput.value = "";
+
+  document.querySelectorAll("#participant-quick-dept-chips .btn-dept-chip").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-dept") === "all");
+  });
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+  closeParticipantDropdown();
+}
+
+/**
+ * Render danh sách Chip của các đồng nghiệp đã chọn
+ */
+function renderParticipantChips() {
+  const container = document.getElementById("participant-selected-chips");
+  const countBadge = document.getElementById("participants-selected-count");
+  const clearBtn = document.getElementById("btn-clear-participants");
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (!container) return;
+
+  const count = selectedParticipantIds.size;
+  if (countBadge) countBadge.textContent = count;
+
+  // Hiển thị nút Clear khi có trên 1 người chọn (ngoài host)
+  if (clearBtn) {
+    if (count > 1 || (count === 1 && !selectedParticipantIds.has(currentOrgId))) {
+      clearBtn.classList.remove("hidden");
+    } else {
+      clearBtn.classList.add("hidden");
+    }
+  }
+
+  const chipsHtml = Array.from(selectedParticipantIds).map(userId => {
+    const user = USERS.find(u => u.id === userId);
+    if (!user) return "";
+
+    const isHost = (user.id === currentOrgId);
+    const initials = user.avatar || getInitials(user.name);
+    const color = user.color || getHostColor(user.name);
+
+    return `
+      <div class="participant-chip ${isHost ? 'is-host' : ''}" data-user-id="${user.id}" title="${escapeHTML(user.name)} • ${escapeHTML(user.role)} (${escapeHTML(user.department)})">
+        <span class="chip-avatar" style="background: ${color};">${escapeHTML(initials)}</span>
+        <span class="chip-name">${escapeHTML(user.name)}</span>
+        ${isHost ? '<span class="chip-host-badge" title="Người tổ chức cuộc họp">Host</span>' : `
+          <button type="button" class="chip-btn-remove" onclick="removeParticipant(${user.id}, event)" aria-label="Xóa ${escapeHTML(user.name)}" title="Bỏ chọn">
+            <i class="bi bi-x"></i>
+          </button>
+        `}
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML = chipsHtml;
+}
+
+/**
+ * Render danh sách đồng nghiệp trong Dropdown Menu
+ */
+function renderParticipantDropdownList() {
+  const listEl = document.getElementById("participant-options-list");
+  const summaryEl = document.getElementById("dropdown-selection-summary");
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (!listEl) return;
+
+  if (summaryEl) {
+    summaryEl.textContent = `Đã chọn ${selectedParticipantIds.size} / ${USERS.length}`;
+  }
+
+  // Lọc đồng nghiệp theo bộ lọc phòng ban và từ khóa tìm kiếm
+  const query = participantSearchQuery.trim().toLowerCase();
+  const filteredUsers = USERS.filter(user => {
+    const matchDept = (currentParticipantDeptFilter === "all") || (user.department === currentParticipantDeptFilter);
+    if (!matchDept) return false;
+
+    if (!query) return true;
+    return (
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.role.toLowerCase().includes(query) ||
+      user.department.toLowerCase().includes(query)
+    );
+  });
+
+  if (filteredUsers.length === 0) {
+    listEl.innerHTML = `
+      <div class="stitch-dropdown-empty">
+        <i class="bi bi-search text-slate-400 d-block mb-1" style="font-size: 1.25rem;"></i>
+        <span>Không tìm thấy đồng nghiệp phù hợp</span>
+        ${query ? `<div class="small text-muted mt-0.5">Thử từ khóa khác với "${escapeHTML(query)}"</div>` : ''}
+      </div>
+    `;
+    return;
+  }
+
+  const itemsHtml = filteredUsers.map(user => {
+    const isSelected = selectedParticipantIds.has(user.id);
+    const isHost = (user.id === currentOrgId);
+    const initials = user.avatar || getInitials(user.name);
+    const color = user.color || getHostColor(user.name);
+
+    return `
+      <div class="participant-option-item ${isSelected ? 'is-selected' : ''}" 
+           role="option" 
+           aria-selected="${isSelected}"
+           onclick="toggleParticipant(${user.id})"
+           tabindex="0"
+           onkeydown="if(event.key==='Enter'||event.key===' '){toggleParticipant(${user.id});event.preventDefault();}">
+        <div class="option-left">
+          <span class="option-checkbox">
+            <i class="bi bi-check-lg"></i>
+          </span>
+          <span class="option-avatar" style="background: ${color};">
+            ${escapeHTML(initials)}
+          </span>
+          <div class="option-info">
+            <div class="d-flex align-items-center gap-1">
+              <span class="option-name">${escapeHTML(user.name)}</span>
+              ${isHost ? '<span class="chip-host-badge ms-1">Host</span>' : ''}
+            </div>
+            <span class="option-email">${escapeHTML(user.email)}</span>
+          </div>
+        </div>
+        <div class="option-right">
+          <span class="option-dept-badge">${escapeHTML(user.department)}</span>
+          <span class="option-role-badge">${escapeHTML(user.role)}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  listEl.innerHTML = itemsHtml;
+}
+
+/**
+ * Toggle trạng thái chọn của một đồng nghiệp
+ * @param {number} userId ID đồng nghiệp
+ */
+function toggleParticipant(userId) {
+  const uid = Number(userId);
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (selectedParticipantIds.has(uid)) {
+    // Không cho bỏ chọn Host từ click nếu họ đang là Organizer
+    if (uid === currentOrgId) {
+      alert("Đồng nghiệp này là Người tổ chức cuộc họp (Host), bắt buộc phải có mặt.");
+      return;
+    }
+    selectedParticipantIds.delete(uid);
+  } else {
+    selectedParticipantIds.add(uid);
+  }
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+
+  // Focus lại vào input tìm kiếm để tiếp tục thao tác
+  const searchInput = document.getElementById("participant-search-input");
+  if (searchInput) {
+    searchInput.focus();
+  }
+}
+
+/**
+ * Xóa một đồng nghiệp khỏi danh sách đã chọn
+ * @param {number} userId ID đồng nghiệp
+ * @param {Event} event Sự kiện click
+ */
+function removeParticipant(userId, event) {
+  if (event) {
+    event.stopPropagation();
+  }
+  const uid = Number(userId);
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (uid === currentOrgId) {
+    alert("Đồng nghiệp này là Người tổ chức cuộc họp (Host), bắt buộc phải có mặt.");
+    return;
+  }
+
+  selectedParticipantIds.delete(uid);
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+}
+
+/**
+ * Bỏ chọn tất cả đồng nghiệp (giữ lại Host)
+ */
+function clearAllParticipants() {
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  selectedParticipantIds.clear();
+  selectedParticipantIds.add(currentOrgId);
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+}
+
+/**
+ * Chọn nhanh toàn bộ đồng nghiệp theo bộ lọc phòng ban
+ * @param {string} dept Tên phòng ban hoặc 'all'
+ */
+function selectAllParticipants(dept = "all") {
+  USERS.forEach(u => {
+    if (dept === "all" || u.department === dept) {
+      selectedParticipantIds.add(u.id);
+    }
+  });
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+}
+
+/**
+ * Mở dropdown menu chọn đồng nghiệp
+ */
+function openParticipantDropdown() {
+  const menu = document.getElementById("participant-dropdown-menu");
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  if (menu && trigger) {
+    menu.classList.remove("hidden");
+    trigger.classList.add("is-open", "is-focused");
+    trigger.setAttribute("aria-expanded", "true");
+    isParticipantDropdownOpen = true;
+    renderParticipantDropdownList();
+  }
+}
+
+/**
+ * Đóng dropdown menu chọn đồng nghiệp
+ */
+function closeParticipantDropdown() {
+  const menu = document.getElementById("participant-dropdown-menu");
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  if (menu && trigger) {
+    menu.classList.add("hidden");
+    trigger.classList.remove("is-open", "is-focused");
+    trigger.setAttribute("aria-expanded", "false");
+    isParticipantDropdownOpen = false;
+  }
+}
+
+// =====================================================
+/** Trạng thái bỏ qua banner gợi ý (giữ nguyên trong phiên làm việc modal hiện tại) */
+let _suggestionDismissedForCount = -1;
+
+// THUẬT TOÁN GỢI Ý PHÒNG THEO SỐ NGƯỜI THAM GIA
+// (Room Suggestion Algorithm by Participant Count)
+// =====================================================
+
+/**
+ * Tính điểm phù hợp cho một phòng dựa trên số người tham gia.
+ * Thuật toán ưu tiên phòng có sức chứa tối thiểu đủ chỗ,
+ * và phạt nặng phòng quá lớn (lãng phí) hoặc quá nhỏ (không đủ chỗ).
+ *
+ * Scoring:
+ *  - Phòng đúng sức chứa (0-20% dư): điểm cao nhất (100)
+ *  - Phòng dư vừa phải (20-50% dư): điểm tốt (80)
+ *  - Phòng dư nhiều (>50%): điểm thấp hơn (giảm dần)
+ *  - Phòng không đủ chỗ: loại
+ *  - Phòng đang bảo trì: loại
+ *
+ * @param {number} participantCount - Số người tham gia (đã bao gồm host)
+ * @param {string} date - Ngày họp (YYYY-MM-DD)
+ * @param {string} startTime - Giờ bắt đầu (HH:MM)
+ * @param {string} endTime - Giờ kết thúc (HH:MM)
+ * @param {number|null} editId - ID cuộc họp đang chỉnh sửa (null nếu tạo mới)
+ * @returns {Array} Danh sách phòng đã sắp xếp theo điểm phù hợp (cao → thấp)
+ */
+function suggestBestRooms(participantCount, date, startTime, endTime, editId = null) {
+  if (!participantCount || participantCount <= 0) return [];
+
+  const roomsStatus = calculateRoomAvailability(date, startTime, endTime, editId);
+
+  const scored = roomsStatus
+    .filter(room => {
+      // Loại phòng đang bảo trì
+      if (room.isMaintenance) return false;
+      // Loại phòng bận (có xung đột lịch họp)
+      if (room.isConflict) return false;
+      // Loại phòng không đủ sức chứa
+      if (room.capacity < participantCount) return false;
+      return true;
+    })
+    .map(room => {
+      const cap = room.capacity;
+      const surplus = cap - participantCount;          // Số chỗ dư
+      const surplusRatio = surplus / participantCount; // Tỉ lệ dư (0 = vừa đủ)
+
+      // Tính điểm phù hợp (0-100):
+      // Phòng "perfect fit" = vừa đủ (dư 0-20%): 100 → 85
+      // Phòng "good fit" = dư vừa (20-50%): 85 → 65
+      // Phòng "oversized" = dư nhiều (>50%): 65 → (giảm dần)
+      let score;
+      if (surplusRatio <= 0.2) {
+        // Vừa khớp hoàn hảo (0-20% dư) - tránh chen chúc quá mức
+        score = 100 - (surplusRatio / 0.2) * 15; // 100 → 85
+      } else if (surplusRatio <= 0.5) {
+        // Vừa đủ thoải mái (20-50% dư)
+        score = 85 - ((surplusRatio - 0.2) / 0.3) * 20; // 85 → 65
+      } else {
+        // Phòng quá lớn so với nhu cầu (>50% dư) - vẫn dùng được nhưng lãng phí
+        score = Math.max(10, 65 - ((surplusRatio - 0.5) / 2) * 55); // 65 → tối thiểu 10
+      }
+
+      return { ...room, score: Math.round(score), surplus, surplusRatio };
+    })
+    .sort((a, b) => b.score - a.score); // Sắp xếp điểm cao nhất lên trên
+
+  return scored;
+}
+
+/**
+ * Lấy phòng tối ưu nhất (phòng đứng đầu danh sách gợi ý)
+ */
+function getBestRoomSuggestion(participantCount, date, startTime, endTime, editId = null) {
+  const ranked = suggestBestRooms(participantCount, date, startTime, endTime, editId);
+  return ranked.length > 0 ? ranked[0] : null;
+}
+
+/**
+ * Render banner gợi ý phòng vào UI khi số người tham gia thay đổi.
+ * Banner hiển thị phòng tốt nhất + danh sách top 3 gợi ý thay thế.
+ * Tự động ẩn nếu phòng đang chọn đã là phòng tối ưu nhất.
+ */
+function renderRoomSuggestionBanner() {
+  const bannerEl = document.getElementById("room-suggestion-banner");
+  if (!bannerEl) return;
+
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const roomSelect = document.getElementById("meeting-room");
+  const idInput = document.getElementById("meeting-id");
+
+  const date = dateInput ? dateInput.value : "";
+  const start = startInput ? startInput.value : "";
+  const end = endInput ? endInput.value : "";
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
+  const selectedCount = selectedParticipantIds.size;
+
+  // Không hiện banner nếu người dùng vừa bỏ qua với cùng số người
+  if (selectedCount === _suggestionDismissedForCount) {
+    return;
+  }
+
+  if (selectedCount <= 0) {
+    bannerEl.classList.add("hidden");
+    return;
+  }
+
+  const suggestions = suggestBestRooms(selectedCount, date, start, end, editId);
+  const currentRoomId = roomSelect ? Number(roomSelect.value) : 0;
+
+  // Ẩn banner nếu không có gợi ý nào
+  if (suggestions.length === 0) {
+    bannerEl.innerHTML = `
+      <div class="room-suggest-inner room-suggest-warning">
+        <div class="room-suggest-icon"><i class="bi bi-exclamation-triangle-fill text-warning"></i></div>
+        <div class="room-suggest-content">
+          <div class="room-suggest-title">
+            <strong>Không tìm thấy phòng phù hợp</strong> cho ${selectedCount} người tham gia trong khung giờ này.
+            <span class="suggest-fit-badge suggest-fit-none">Cần điều chỉnh</span>
+          </div>
+          <div class="text-muted" style="font-size:0.78rem;">Vui lòng thay đổi ngày giờ hoặc giảm số người tham dự.</div>
+        </div>
+        <button type="button" class="suggest-dismiss-btn" onclick="dismissRoomSuggestion()" title="Bỏ qua">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    `;
+    bannerEl.classList.remove("hidden");
+    return;
+  }
+
+  const bestRoom = suggestions[0];
+
+  // Nếu phòng đang chọn đã là phòng gợi ý tốt nhất → ẩn banner
+  if (bestRoom.id === currentRoomId) {
+    bannerEl.classList.add("hidden");
+    return;
+  }
+
+  // Danh sách phòng thay thế (trừ phòng đang chọn, tối đa 3)
+  const altRooms = suggestions.filter(r => r.id !== currentRoomId).slice(0, 3);
+
+  // Badge phân loại mức độ phù hợp
+  const fitLabel = bestRoom.score >= 90
+    ? '<span class="suggest-fit-badge suggest-fit-perfect">Vừa khớp hoàn hảo</span>'
+    : bestRoom.score >= 70
+    ? '<span class="suggest-fit-badge suggest-fit-good">Phù hợp tốt</span>'
+    : '<span class="suggest-fit-badge suggest-fit-ok">Phù hợp</span>';
+
+  const altChips = altRooms.map(r => `
+    <button type="button"
+      class="suggest-alt-chip"
+      onclick="applySuggestedRoom(${r.id})"
+      title="${escapeHTML(r.name)} — ${r.capacity} chỗ (Điểm: ${r.score}/100)"
+    >
+      <i class="bi bi-door-open"></i>
+      ${escapeHTML(r.name)}
+      <span class="suggest-chip-cap">${r.capacity} chỗ</span>
+    </button>
+  `).join("");
+
+  bannerEl.innerHTML = `
+    <div class="room-suggest-inner">
+      <div class="room-suggest-icon">
+        <i class="bi bi-stars text-primary"></i>
+      </div>
+      <div class="room-suggest-content">
+        <div class="room-suggest-title">
+          <strong>Gợi ý phòng phù hợp nhất</strong> cho ${selectedCount} người tham gia
+          ${fitLabel}
+        </div>
+        <div class="room-suggest-best">
+          <button type="button"
+            class="suggest-best-btn"
+            onclick="applySuggestedRoom(${bestRoom.id})"
+            title="Áp dụng: ${escapeHTML(bestRoom.name)}"
+          >
+            <i class="bi bi-check-circle-fill text-success me-1"></i>
+            <strong>${escapeHTML(bestRoom.name)}</strong>
+            <span class="text-muted ms-1">— ${bestRoom.capacity} chỗ • ${escapeHTML(bestRoom.floor || "")}</span>
+          </button>
+          <span class="suggest-score-badge" title="Điểm phù hợp: số người / sức chứa / tính khả dụng">
+            <i class="bi bi-bar-chart-fill"></i> ${bestRoom.score}/100
+          </span>
+        </div>
+        ${altChips.length > 0 ? `
+          <div class="room-suggest-alts">
+            <span class="suggest-alts-label">Hoặc chọn:</span>
+            ${altChips}
+          </div>
+        ` : ""}
+      </div>
+      <button type="button" class="suggest-dismiss-btn" onclick="dismissRoomSuggestion()" title="Bỏ qua gợi ý">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  `;
+  bannerEl.classList.remove("hidden");
+}
+
+/** Áp dụng phòng được gợi ý: chọn phòng, cập nhật realtime grid và ẩn banner */
+function applySuggestedRoom(roomId) {
+  selectRealtimeRoom(roomId);
+  const bannerEl = document.getElementById("room-suggestion-banner");
+  if (bannerEl) bannerEl.classList.add("hidden");
+}
+
+
+/** Người dùng bỏ qua gợi ý - ẩn banner và không hiện lại với cùng số người */
+function dismissRoomSuggestion() {
+  _suggestionDismissedForCount = selectedParticipantIds.size;
+  const bannerEl = document.getElementById("room-suggestion-banner");
+  if (bannerEl) bannerEl.classList.add("hidden");
+}
+
+/**
+ * Kiểm tra và cảnh báo nếu số người tham gia vượt quá sức chứa phòng họp đã chọn.
+ * Đồng thời gọi renderRoomSuggestionBanner() để gợi ý phòng phù hợp hơn.
+ */
+function updateParticipantCapacityWarning() {
+  const roomSelect = document.getElementById("meeting-room");
+  const warningAlert = document.getElementById("capacity-warning-alert");
+  const warningText = document.getElementById("capacity-warning-text");
+
+  if (!roomSelect || !warningAlert) return;
+
+  const roomId = Number(roomSelect.value);
+  const room = ROOMS.find(r => r.id === roomId);
+  const selectedCount = selectedParticipantIds.size;
+
+  if (room && room.capacity && selectedCount > room.capacity) {
+    if (warningText) {
+      warningText.innerHTML = `<strong>Cảnh báo sức chứa:</strong> Đang chọn <strong>${selectedCount}</strong> người tham gia, vượt quá sức chứa tối đa của <strong>${escapeHTML(room.name)}</strong> (${room.capacity} chỗ). Hệ thống đã gợi ý phòng phù hợp hơn bên dưới.`;
+    }
+    warningAlert.classList.remove("hidden");
+  } else {
+    warningAlert.classList.add("hidden");
+  }
+
+  // Gọi thuật toán gợi ý phòng tự động sau mỗi thay đổi số người
+  renderRoomSuggestionBanner();
+}
+
+/**
+ * Đồng bộ hóa dữ liệu sang input ẩn #meeting-participants để đảm bảo tương thích ngược
+ */
+function syncHiddenParticipantsInput() {
+  const input = document.getElementById("meeting-participants");
+  if (!input) return;
+
+  const names = Array.from(selectedParticipantIds).map(id => {
+    const u = USERS.find(user => user.id === id);
+    return u ? u.name : null;
+  }).filter(Boolean);
+
+  input.value = names.join(", ");
+}
+
+/**
+ * Gắn toàn bộ sự kiện tương tác cho Component Multi-Select Đồng Nghiệp
+ */
+function setupParticipantSelectorEvents() {
+  const container = document.getElementById("participant-multiselect-container");
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  const searchInput = document.getElementById("participant-search-input");
+  const clearBtn = document.getElementById("btn-clear-participants");
+  const closeDropdownBtn = document.getElementById("btn-close-participant-dropdown");
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const roomSelect = document.getElementById("meeting-room");
+
+  if (trigger && searchInput) {
+    trigger.addEventListener("click", (e) => {
+      if (e.target.closest(".participant-chip") || e.target.closest(".btn-clear-participants")) {
+        return;
+      }
+      openParticipantDropdown();
+      searchInput.focus();
+    });
+
+    searchInput.addEventListener("focus", () => {
+      openParticipantDropdown();
+    });
+
+    searchInput.addEventListener("input", () => {
+      participantSearchQuery = searchInput.value;
+      openParticipantDropdown();
+      renderParticipantDropdownList();
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeParticipantDropdown();
+        searchInput.blur();
+      } else if (e.key === "Backspace" && searchInput.value === "") {
+        // Xóa chip không phải host gần nhất khi ấn Backspace trong ô tìm kiếm trống
+        const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+        const nonHostIds = Array.from(selectedParticipantIds).filter(id => id !== currentOrgId);
+        if (nonHostIds.length > 0) {
+          const lastId = nonHostIds[nonHostIds.length - 1];
+          removeParticipant(lastId);
+        }
+      }
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      clearAllParticipants();
+    });
+  }
+
+  if (closeDropdownBtn) {
+    closeDropdownBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeParticipantDropdown();
+    });
+  }
+
+  // Bộ lọc phòng ban nhanh
+  document.querySelectorAll("#participant-quick-dept-chips .btn-dept-chip").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const dept = btn.getAttribute("data-dept");
+      currentParticipantDeptFilter = dept;
+      document.querySelectorAll("#participant-quick-dept-chips .btn-dept-chip").forEach(b => {
+        b.classList.toggle("active", b === btn);
+      });
+      openParticipantDropdown();
+      renderParticipantDropdownList();
+    });
+  });
+
+  // Nút tiện ích chọn theo nhóm
+  const btnSelectTech = document.getElementById("btn-select-tech-team");
+  if (btnSelectTech) {
+    btnSelectTech.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectAllParticipants("Kỹ thuật");
+    });
+  }
+
+  const btnSelectQA = document.getElementById("btn-select-qa-team");
+  if (btnSelectQA) {
+    btnSelectQA.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectAllParticipants("Kiểm thử");
+    });
+  }
+
+  const btnSelectAll = document.getElementById("btn-select-all-participants");
+  if (btnSelectAll) {
+    btnSelectAll.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectAllParticipants("all");
+    });
+  }
+
+  // Đóng dropdown khi click ra ngoài
+  document.addEventListener("click", (e) => {
+    if (container && !container.contains(e.target)) {
+      closeParticipantDropdown();
+    }
+  });
+
+  // Tự động thêm & ghim Organizer khi thay đổi Người tổ chức
+  if (organizerSelect) {
+    organizerSelect.addEventListener("change", () => {
+      const newOrgId = Number(organizerSelect.value);
+      if (newOrgId) {
+        selectedParticipantIds.add(newOrgId);
+        renderParticipantChips();
+        renderParticipantDropdownList();
+        syncHiddenParticipantsInput();
+        updateParticipantCapacityWarning();
+      }
+    });
+  }
+
+  // Đồng bộ cảnh báo sức chứa khi đổi phòng
+  if (roomSelect) {
+    roomSelect.addEventListener("change", () => {
+      updateParticipantCapacityWarning();
+    });
+  }
+}
+
+/**
+ * Render giao diện danh sách đồng nghiệp tham gia cho Modal Chi tiết (Detail View)
+ * @param {Object} meeting Đối tượng cuộc họp
+ * @returns {string} HTML danh sách thẻ đồng nghiệp
+ */
+function renderDetailParticipantsHtml(meeting) {
+  if (!meeting.participants || meeting.participants.length === 0) {
+    return '<span class="text-muted small">Chưa có người tham gia</span>';
+  }
+
+  const cardsHtml = meeting.participants.map(pName => {
+    const user = USERS.find(u => u.name.toLowerCase() === pName.toLowerCase());
+    const isHost = (pName === meeting.host) || (user && user.id === meeting.organizerId);
+    const initials = user?.avatar || getInitials(pName);
+    const color = user?.color || getHostColor(pName);
+    const role = user?.role || (isHost ? "Người tổ chức" : "Thành viên");
+    const dept = user?.department ? ` • ${user.department}` : "";
+    const email = user?.email || "";
+
+    return `
+      <div class="detail-participant-card ${isHost ? 'is-host' : ''}">
+        <span class="option-avatar" style="background: ${color};">${escapeHTML(initials)}</span>
+        <div class="detail-participant-info">
+          <div class="d-flex align-items-center gap-1">
+            <span class="detail-participant-name">${escapeHTML(pName)}</span>
+            ${isHost ? '<span class="chip-host-badge ms-1">Host</span>' : ''}
+          </div>
+          <span class="detail-participant-sub">${escapeHTML(role + dept)}</span>
+          ${email ? `<span class="detail-participant-sub text-muted" style="font-size: 0.65rem;">${escapeHTML(email)}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="d-flex align-items-center justify-content-between mb-1">
+      <span class="small text-muted">Tổng số: <strong>${meeting.participants.length}</strong> đồng nghiệp tham gia</span>
+    </div>
+    <div class="detail-participant-grid">${cardsHtml}</div>
+  `;
 }
 
 // =====================================================
@@ -4482,6 +5277,8 @@ function openAddModal() {
 
   const organizerSelect = document.getElementById("meeting-organizer");
   if (organizerSelect) organizerSelect.value = "1";
+  const defaultOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  initParticipantSelector([defaultOrgId], defaultOrgId);
 
   const tagInput = document.getElementById("meeting-tag");
   if (tagInput) tagInput.value = "";
@@ -4527,6 +5324,8 @@ function openAddModal() {
 
   calcDuration();
   renderRealtimeRoomCards(null);
+  _suggestionDismissedForCount = -1; // Reset trạng thái bỏ qua gợi ý khi mở modal mới
+  renderRoomSuggestionBanner();      // Hiển thị gợi ý phòng ngay khi mở modal
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
@@ -4627,6 +5426,18 @@ function openEditModal(id) {
   if (endInput) endInput.value = endTime;
   if (locationInput) locationInput.value = meeting.location || (meeting.roomName || "");
   if (participantsInput) participantsInput.value = (meeting.participants || []).join(", ");
+
+  let editParticipantIds = meeting.participantIds || [];
+  if ((!editParticipantIds || editParticipantIds.length === 0) && meeting.participants) {
+    editParticipantIds = meeting.participants.map(name => {
+      const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
+      return u ? u.id : null;
+    }).filter(Boolean);
+  }
+  if (!editParticipantIds || editParticipantIds.length === 0) {
+    editParticipantIds = [meeting.organizerId || 1];
+  }
+  initParticipantSelector(editParticipantIds, meeting.organizerId || 1);
   if (statusInput) statusInput.value = meeting.status || "scheduled";
 
   // IsRecurring & Equipments
@@ -4640,6 +5451,8 @@ function openEditModal(id) {
 
   calcDuration();
   renderRealtimeRoomCards(meeting.id);
+  _suggestionDismissedForCount = -1; // Reset trạng thái bỏ qua gợi ý khi mở modal chỉnh sửa
+  renderRoomSuggestionBanner();      // Hiển thị gợi ý phòng khi mở modal sửa cuộc họp
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
@@ -5037,10 +5850,10 @@ function openDetailModal(id) {
     </div>
 
     <div class="mb-3">
-      <span class="text-muted small d-block mb-0.5">
+      <span class="text-muted small d-block mb-1">
         <i class="bi bi-people text-primary me-1"></i> NGƯỜI THAM GIA (Meeting_Participants)
       </span>
-      <div class="text-dark small">${(meeting.participants && meeting.participants.length) ? escapeHTML(meeting.participants.join(", ")) : "Chưa có"}</div>
+      ${renderDetailParticipantsHtml(meeting)}
     </div>
 
     <div class="row g-2 mb-3">
@@ -5088,6 +5901,7 @@ function openDetailModal(id) {
 function closeMeetingModal() {
   modalOverlay.classList.add("hidden");
   clearMeetingFormErrors();
+  closeParticipantDropdown();
 
   const form = document.getElementById("meeting-form");
   const successView = document.getElementById("success-view");

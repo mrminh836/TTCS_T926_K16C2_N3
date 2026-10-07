@@ -76,10 +76,23 @@ CREATE TABLE Booking_Equipments (
 -- =====================================================
 
 INSERT INTO Users (UserID, FullName, Email, PasswordHash, Role) VALUES
-    (1, 'Nguyễn Văn Quản Trị', 'admin@enterprise.vn', 'hash_admin_123', 'Admin'),
-    (2, 'Trần Thị Thư Ký', 'secretary@enterprise.vn', 'hash_sec_123', 'Secretary'),
-    (3, 'Lê Văn Trưởng Phòng', 'manager@enterprise.vn', 'hash_mgr_123', 'Manager'),
-    (4, 'Phạm Hoàng Nhân Viên', 'employee@enterprise.vn', 'hash_emp_123', 'Employee');
+    (1, 'Nguyễn Văn An', 'an.nguyen@enterprise.vn', 'hash_admin_123', 'Admin'),
+    (2, 'Trần Thu Hà', 'ha.tran@enterprise.vn', 'hash_mgr_123', 'Manager'),
+    (3, 'Lê Minh Tuấn', 'tuan.le@enterprise.vn', 'hash_emp_123', 'Employee'),
+    (4, 'Hoàng Bảo Ngọc', 'ngoc.hoang@enterprise.vn', 'hash_hr_123', 'HR Lead'),
+    (5, 'Phạm Quốc Dũng', 'dung.pham@enterprise.vn', 'hash_tech_123', 'Tech Lead'),
+    (6, 'Vũ Tuấn Kiệt', 'kiet.vu@enterprise.vn', 'hash_dir_123', 'Director'),
+    (7, 'Hoàng Minh Khánh', 'khanh.hoang@enterprise.vn', 'hash_fe_123', 'Frontend Dev'),
+    (8, 'Nguyễn Minh Lượng', 'luong.nguyen@enterprise.vn', 'hash_fe2_123', 'Frontend Dev'),
+    (9, 'Vũ Thị Thanh Ngân', 'ngan.vu@enterprise.vn', 'hash_ui_123', 'UI/UX Designer'),
+    (10, 'Đặng Hùng', 'hung.dang@enterprise.vn', 'hash_qa_123', 'QA Engineer'),
+    (11, 'Hà Sỹ Nguyên', 'nguyen.ha@enterprise.vn', 'hash_be_123', 'Backend Lead'),
+    (12, 'Đoàn Ngọc Mạnh', 'manh.doan@enterprise.vn', 'hash_be2_123', 'Backend Dev'),
+    (13, 'Đào Đức Mạnh', 'manh.dao@enterprise.vn', 'hash_be3_123', 'Backend Dev'),
+    (14, 'Hoàng Văn Khuyến', 'khuyen.hoang@enterprise.vn', 'hash_qa2_123', 'QA Lead'),
+    (15, 'Ngô Đức Khải', 'khai.ngo@enterprise.vn', 'hash_qa3_123', 'QA Engineer'),
+    (16, 'Triệu Quốc Khánh', 'khanh.trieu@enterprise.vn', 'hash_qa4_123', 'QA Engineer'),
+    (17, 'Đỗ Quang Minh', 'minh.do@enterprise.vn', 'hash_sm_123', 'Scrum Master');
 
 INSERT INTO Rooms (RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description) VALUES
     (1, 'RM-001', 'Phòng Tokyo (Tầng 4)', 20, 'Hội nghị', 'Tầng 4, Tòa A', 'Active', 'QR-ROOM-001', 'Phòng hội thảo tiêu chuẩn cao, view thoáng, cách âm tốt, chuyên tổ chức họp ban giám đốc và đối tác.'),
