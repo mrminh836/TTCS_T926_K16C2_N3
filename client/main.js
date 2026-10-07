@@ -2946,6 +2946,7 @@ function closeParticipantDropdown() {
   }
 }
 
+
 // =====================================================
 /** Trạng thái bỏ qua banner gợi ý (giữ nguyên trong phiên làm việc modal hiện tại) */
 let _suggestionDismissedForCount = -1;
@@ -3166,6 +3167,7 @@ function dismissRoomSuggestion() {
 /**
  * Kiểm tra và cảnh báo nếu số người tham gia vượt quá sức chứa phòng họp đã chọn.
  * Đồng thời gọi renderRoomSuggestionBanner() để gợi ý phòng phù hợp hơn.
+
  */
 function updateParticipantCapacityWarning() {
   const roomSelect = document.getElementById("meeting-room");
@@ -3180,15 +3182,22 @@ function updateParticipantCapacityWarning() {
 
   if (room && room.capacity && selectedCount > room.capacity) {
     if (warningText) {
+
       warningText.innerHTML = `<strong>Cảnh báo sức chứa:</strong> Đang chọn <strong>${selectedCount}</strong> người tham gia, vượt quá sức chứa tối đa của <strong>${escapeHTML(room.name)}</strong> (${room.capacity} chỗ). Hệ thống đã gợi ý phòng phù hợp hơn bên dưới.`;
+
+      warningText.innerHTML = `<strong>Cảnh báo sức chứa:</strong> Đang chọn <strong>${selectedCount}</strong> đồng nghiệp, vượt quá sức chứa tối đa của <strong>${escapeHTML(room.name)}</strong> (${room.capacity} chỗ). Vui lòng chọn phòng lớn hơn hoặc giảm số người tham dự.`;
+
     }
     warningAlert.classList.remove("hidden");
   } else {
     warningAlert.classList.add("hidden");
   }
 
+
   // Gọi thuật toán gợi ý phòng tự động sau mỗi thay đổi số người
   renderRoomSuggestionBanner();
+
+
 }
 
 /**
