@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -595,6 +595,11 @@
                 <span id="capacity-warning-text">Số người tham gia vượt quá sức chứa phòng đã chọn.</span>
               </div>
 
+              <!-- THUẬT TOÁN GỢI Ý PHÒNG TỰ ĐỘNG (Room Suggestion Banner) -->
+              <!-- Hiển thị phòng phù hợp nhất dựa trên số người tham gia -->
+              <div id="room-suggestion-banner" class="room-suggestion-banner hidden mt-2" aria-live="polite" aria-label="Gợi ý phòng họp tự động">
+                <!-- Nội dung được render động bởi renderRoomSuggestionBanner() trong main.js -->
+              </div>
               <!-- Input ẩn tương thích ngược với code cũ / test case -->
               <input type="hidden" id="meeting-participants" name="participants" />
             </div>

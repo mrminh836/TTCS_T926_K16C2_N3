@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // PRODUCT BACKLOG - MEETING MANAGEMENT
 // JavaScript thuần
 // Bootstrap 5 + Bootstrap Icons
@@ -2547,6 +2547,7 @@ function setupMeetingFormValidationEvents() {
 
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
+    renderRoomSuggestionBanner(); // Gợi ý phòng theo số người tham gia sau mỗi thay đổi ngày/giờ
 
     if (roomId && date && start && end && start < end) {
       const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
@@ -2945,8 +2946,228 @@ function closeParticipantDropdown() {
   }
 }
 
+
+// =====================================================
+/** Trạng thái bỏ qua banner gợi ý (giữ nguyên trong phiên làm việc modal hiện tại) */
+let _suggestionDismissedForCount = -1;
+
+// THUẬT TOÁN GỢI Ý PHÒNG THEO SỐ NGƯỜI THAM GIA
+// (Room Suggestion Algorithm by Participant Count)
+// =====================================================
+
 /**
- * Kiểm tra và cảnh báo nếu số người tham gia vượt quá sức chứa phòng họp đã chọn
+ * Tính điểm phù hợp cho một phòng dựa trên số người tham gia.
+ * Thuật toán ưu tiên phòng có sức chứa tối thiểu đủ chỗ,
+ * và phạt nặng phòng quá lớn (lãng phí) hoặc quá nhỏ (không đủ chỗ).
+ *
+ * Scoring:
+ *  - Phòng đúng sức chứa (0-20% dư): điểm cao nhất (100)
+ *  - Phòng dư vừa phải (20-50% dư): điểm tốt (80)
+ *  - Phòng dư nhiều (>50%): điểm thấp hơn (giảm dần)
+ *  - Phòng không đủ chỗ: loại
+ *  - Phòng đang bảo trì: loại
+ *
+ * @param {number} participantCount - Số người tham gia (đã bao gồm host)
+ * @param {string} date - Ngày họp (YYYY-MM-DD)
+ * @param {string} startTime - Giờ bắt đầu (HH:MM)
+ * @param {string} endTime - Giờ kết thúc (HH:MM)
+ * @param {number|null} editId - ID cuộc họp đang chỉnh sửa (null nếu tạo mới)
+ * @returns {Array} Danh sách phòng đã sắp xếp theo điểm phù hợp (cao → thấp)
+ */
+function suggestBestRooms(participantCount, date, startTime, endTime, editId = null) {
+  if (!participantCount || participantCount <= 0) return [];
+
+  const roomsStatus = calculateRoomAvailability(date, startTime, endTime, editId);
+
+  const scored = roomsStatus
+    .filter(room => {
+      // Loại phòng đang bảo trì
+      if (room.isMaintenance) return false;
+      // Loại phòng bận (có xung đột lịch họp)
+      if (room.isConflict) return false;
+      // Loại phòng không đủ sức chứa
+      if (room.capacity < participantCount) return false;
+      return true;
+    })
+    .map(room => {
+      const cap = room.capacity;
+      const surplus = cap - participantCount;          // Số chỗ dư
+      const surplusRatio = surplus / participantCount; // Tỉ lệ dư (0 = vừa đủ)
+
+      // Tính điểm phù hợp (0-100):
+      // Phòng "perfect fit" = vừa đủ (dư 0-20%): 100 → 85
+      // Phòng "good fit" = dư vừa (20-50%): 85 → 65
+      // Phòng "oversized" = dư nhiều (>50%): 65 → (giảm dần)
+      let score;
+      if (surplusRatio <= 0.2) {
+        // Vừa khớp hoàn hảo (0-20% dư) - tránh chen chúc quá mức
+        score = 100 - (surplusRatio / 0.2) * 15; // 100 → 85
+      } else if (surplusRatio <= 0.5) {
+        // Vừa đủ thoải mái (20-50% dư)
+        score = 85 - ((surplusRatio - 0.2) / 0.3) * 20; // 85 → 65
+      } else {
+        // Phòng quá lớn so với nhu cầu (>50% dư) - vẫn dùng được nhưng lãng phí
+        score = Math.max(10, 65 - ((surplusRatio - 0.5) / 2) * 55); // 65 → tối thiểu 10
+      }
+
+      return { ...room, score: Math.round(score), surplus, surplusRatio };
+    })
+    .sort((a, b) => b.score - a.score); // Sắp xếp điểm cao nhất lên trên
+
+  return scored;
+}
+
+/**
+ * Lấy phòng tối ưu nhất (phòng đứng đầu danh sách gợi ý)
+ */
+function getBestRoomSuggestion(participantCount, date, startTime, endTime, editId = null) {
+  const ranked = suggestBestRooms(participantCount, date, startTime, endTime, editId);
+  return ranked.length > 0 ? ranked[0] : null;
+}
+
+/**
+ * Render banner gợi ý phòng vào UI khi số người tham gia thay đổi.
+ * Banner hiển thị phòng tốt nhất + danh sách top 3 gợi ý thay thế.
+ * Tự động ẩn nếu phòng đang chọn đã là phòng tối ưu nhất.
+ */
+function renderRoomSuggestionBanner() {
+  const bannerEl = document.getElementById("room-suggestion-banner");
+  if (!bannerEl) return;
+
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const roomSelect = document.getElementById("meeting-room");
+  const idInput = document.getElementById("meeting-id");
+
+  const date = dateInput ? dateInput.value : "";
+  const start = startInput ? startInput.value : "";
+  const end = endInput ? endInput.value : "";
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
+  const selectedCount = selectedParticipantIds.size;
+
+  // Không hiện banner nếu người dùng vừa bỏ qua với cùng số người
+  if (selectedCount === _suggestionDismissedForCount) {
+    return;
+  }
+
+  if (selectedCount <= 0) {
+    bannerEl.classList.add("hidden");
+    return;
+  }
+
+  const suggestions = suggestBestRooms(selectedCount, date, start, end, editId);
+  const currentRoomId = roomSelect ? Number(roomSelect.value) : 0;
+
+  // Ẩn banner nếu không có gợi ý nào
+  if (suggestions.length === 0) {
+    bannerEl.innerHTML = `
+      <div class="room-suggest-inner room-suggest-warning">
+        <div class="room-suggest-icon"><i class="bi bi-exclamation-triangle-fill text-warning"></i></div>
+        <div class="room-suggest-content">
+          <div class="room-suggest-title">
+            <strong>Không tìm thấy phòng phù hợp</strong> cho ${selectedCount} người tham gia trong khung giờ này.
+            <span class="suggest-fit-badge suggest-fit-none">Cần điều chỉnh</span>
+          </div>
+          <div class="text-muted" style="font-size:0.78rem;">Vui lòng thay đổi ngày giờ hoặc giảm số người tham dự.</div>
+        </div>
+        <button type="button" class="suggest-dismiss-btn" onclick="dismissRoomSuggestion()" title="Bỏ qua">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    `;
+    bannerEl.classList.remove("hidden");
+    return;
+  }
+
+  const bestRoom = suggestions[0];
+
+  // Nếu phòng đang chọn đã là phòng gợi ý tốt nhất → ẩn banner
+  if (bestRoom.id === currentRoomId) {
+    bannerEl.classList.add("hidden");
+    return;
+  }
+
+  // Danh sách phòng thay thế (trừ phòng đang chọn, tối đa 3)
+  const altRooms = suggestions.filter(r => r.id !== currentRoomId).slice(0, 3);
+
+  // Badge phân loại mức độ phù hợp
+  const fitLabel = bestRoom.score >= 90
+    ? '<span class="suggest-fit-badge suggest-fit-perfect">Vừa khớp hoàn hảo</span>'
+    : bestRoom.score >= 70
+    ? '<span class="suggest-fit-badge suggest-fit-good">Phù hợp tốt</span>'
+    : '<span class="suggest-fit-badge suggest-fit-ok">Phù hợp</span>';
+
+  const altChips = altRooms.map(r => `
+    <button type="button"
+      class="suggest-alt-chip"
+      onclick="applySuggestedRoom(${r.id})"
+      title="${escapeHTML(r.name)} — ${r.capacity} chỗ (Điểm: ${r.score}/100)"
+    >
+      <i class="bi bi-door-open"></i>
+      ${escapeHTML(r.name)}
+      <span class="suggest-chip-cap">${r.capacity} chỗ</span>
+    </button>
+  `).join("");
+
+  bannerEl.innerHTML = `
+    <div class="room-suggest-inner">
+      <div class="room-suggest-icon">
+        <i class="bi bi-stars text-primary"></i>
+      </div>
+      <div class="room-suggest-content">
+        <div class="room-suggest-title">
+          <strong>Gợi ý phòng phù hợp nhất</strong> cho ${selectedCount} người tham gia
+          ${fitLabel}
+        </div>
+        <div class="room-suggest-best">
+          <button type="button"
+            class="suggest-best-btn"
+            onclick="applySuggestedRoom(${bestRoom.id})"
+            title="Áp dụng: ${escapeHTML(bestRoom.name)}"
+          >
+            <i class="bi bi-check-circle-fill text-success me-1"></i>
+            <strong>${escapeHTML(bestRoom.name)}</strong>
+            <span class="text-muted ms-1">— ${bestRoom.capacity} chỗ • ${escapeHTML(bestRoom.floor || "")}</span>
+          </button>
+          <span class="suggest-score-badge" title="Điểm phù hợp: số người / sức chứa / tính khả dụng">
+            <i class="bi bi-bar-chart-fill"></i> ${bestRoom.score}/100
+          </span>
+        </div>
+        ${altChips.length > 0 ? `
+          <div class="room-suggest-alts">
+            <span class="suggest-alts-label">Hoặc chọn:</span>
+            ${altChips}
+          </div>
+        ` : ""}
+      </div>
+      <button type="button" class="suggest-dismiss-btn" onclick="dismissRoomSuggestion()" title="Bỏ qua gợi ý">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  `;
+  bannerEl.classList.remove("hidden");
+}
+
+/** Áp dụng phòng được gợi ý: chọn phòng, cập nhật realtime grid và ẩn banner */
+function applySuggestedRoom(roomId) {
+  selectRealtimeRoom(roomId);
+  const bannerEl = document.getElementById("room-suggestion-banner");
+  if (bannerEl) bannerEl.classList.add("hidden");
+}
+
+
+/** Người dùng bỏ qua gợi ý - ẩn banner và không hiện lại với cùng số người */
+function dismissRoomSuggestion() {
+  _suggestionDismissedForCount = selectedParticipantIds.size;
+  const bannerEl = document.getElementById("room-suggestion-banner");
+  if (bannerEl) bannerEl.classList.add("hidden");
+}
+
+/**
+ * Kiểm tra và cảnh báo nếu số người tham gia vượt quá sức chứa phòng họp đã chọn.
+ * Đồng thời gọi renderRoomSuggestionBanner() để gợi ý phòng phù hợp hơn.
+
  */
 function updateParticipantCapacityWarning() {
   const roomSelect = document.getElementById("meeting-room");
@@ -2961,12 +3182,22 @@ function updateParticipantCapacityWarning() {
 
   if (room && room.capacity && selectedCount > room.capacity) {
     if (warningText) {
+
+      warningText.innerHTML = `<strong>Cảnh báo sức chứa:</strong> Đang chọn <strong>${selectedCount}</strong> người tham gia, vượt quá sức chứa tối đa của <strong>${escapeHTML(room.name)}</strong> (${room.capacity} chỗ). Hệ thống đã gợi ý phòng phù hợp hơn bên dưới.`;
+
       warningText.innerHTML = `<strong>Cảnh báo sức chứa:</strong> Đang chọn <strong>${selectedCount}</strong> đồng nghiệp, vượt quá sức chứa tối đa của <strong>${escapeHTML(room.name)}</strong> (${room.capacity} chỗ). Vui lòng chọn phòng lớn hơn hoặc giảm số người tham dự.`;
+
     }
     warningAlert.classList.remove("hidden");
   } else {
     warningAlert.classList.add("hidden");
   }
+
+
+  // Gọi thuật toán gợi ý phòng tự động sau mỗi thay đổi số người
+  renderRoomSuggestionBanner();
+
+
 }
 
 /**
@@ -5102,6 +5333,8 @@ function openAddModal() {
 
   calcDuration();
   renderRealtimeRoomCards(null);
+  _suggestionDismissedForCount = -1; // Reset trạng thái bỏ qua gợi ý khi mở modal mới
+  renderRoomSuggestionBanner();      // Hiển thị gợi ý phòng ngay khi mở modal
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
@@ -5227,6 +5460,8 @@ function openEditModal(id) {
 
   calcDuration();
   renderRealtimeRoomCards(meeting.id);
+  _suggestionDismissedForCount = -1; // Reset trạng thái bỏ qua gợi ý khi mở modal chỉnh sửa
+  renderRoomSuggestionBanner();      // Hiển thị gợi ý phòng khi mở modal sửa cuộc họp
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
