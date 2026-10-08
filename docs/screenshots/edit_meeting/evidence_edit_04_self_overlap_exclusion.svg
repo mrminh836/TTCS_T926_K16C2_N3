@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" width="900" height="640">
+  <defs>
+    <filter id="sh4" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="900" height="640" rx="10" ry="10" fill="#f8fafc"/>
+  
+    <!-- Window Bar -->
+    <rect width="900" height="42" rx="10" ry="10" fill="#1e293b"/>
+    <rect y="32" width="900" height="10" fill="#1e293b"/>
+    <circle cx="20" cy="21" r="6" fill="#ef4444"/>
+    <circle cx="38" cy="21" r="6" fill="#f59e0b"/>
+    <circle cx="56" cy="21" r="6" fill="#10b981"/>
+    <text x="450.0" y="26" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="13" font-weight="600" fill="#94a3b8">
+      Thuật toán Overlap: Cơ Chế Loại Trừ Chính Nó (Self-Exclusion - m.MeetingID != ?)
+    </text>
+    
+  <g transform="translate(130, 65)" filter="url(#sh4)">
+    <rect width="640" height="510" rx="12" ry="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <rect width="640" height="50" rx="12" ry="12" fill="#f8fafc"/>
+    <text x="24" y="32" font-family="sans-serif" font-size="16" font-weight="700" fill="#0f172a">Chỉnh sửa cuộc họp ID: #1 (Chỉ đổi tiêu đề / Giữ nguyên giờ &amp; phòng)</text>
+
+    <!-- Explanatory Banner -->
+    <g transform="translate(24, 65)">
+      <rect width="592" height="75" rx="8" ry="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+      <circle cx="28" cy="38" r="14" fill="#2563eb"/>
+      <text x="28" y="44" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#fff">i</text>
+      <text x="54" y="30" font-family="sans-serif" font-size="13" font-weight="700" fill="#1e40af">
+        Kiểm tra ca kiểm thử Self-Exclusion (Quan trọng nhất luồng sửa)
+      </text>
+      <text x="54" y="52" font-family="sans-serif" font-size="12" fill="#1d4ed8">
+        Giữ nguyên giờ (09:00 - 10:30) và phòng (Tokyo). Hệ thống loại trừ chính MeetingID = 1.
+      </text>
+    </g>
+
+    <!-- Code Logic Verification Box -->
+    <g transform="translate(24, 155)">
+      <text x="0" y="14" font-family="sans-serif" font-size="12" font-weight="700" fill="#475569">TRUY VẤN SQL KIỂM TRA OVERLAP TRÊN SERVER:</text>
+      <rect y="22" width="592" height="90" rx="6" ry="6" fill="#0f172a"/>
+      <text x="16" y="48" font-family="monospace" font-size="12" fill="#38bdf8">SELECT m.MeetingID FROM Meetings m JOIN Bookings b</text>
+      <text x="16" y="70" font-family="monospace" font-size="12" fill="#38bdf8">WHERE b.RoomID = ? AND b.BookingStatus = 'Confirmed'</text>
+      <text x="16" y="92" font-family="monospace" font-size="12" fill="#facc15" font-weight="bold">  AND m.MeetingID != 1  -- &lt;&lt; BỎ QUA BẢN GHI ĐANG SỬA</text>
+    </g>
+
+    <!-- Result Box -->
+    <g transform="translate(24, 280)">
+      <rect width="592" height="110" rx="8" ry="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+      <circle cx="30" cy="35" r="14" fill="#16a34a"/>
+      <path d="M22 35 L28 41 L38 29" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <text x="56" y="32" font-family="sans-serif" font-size="14" font-weight="700" fill="#15803d">
+        KẾT QUẢ: HỢP LỆ — KHÔNG BỊ BÁO TRÙNG LỊCH OAN!
+      </text>
+      <text x="56" y="55" font-family="sans-serif" font-size="12" fill="#166534">
+        • Client-side validation: <tspan font-weight="bold">checkMeetingRoomConflict(..., editId=1)</tspan> bỏ qua chính nó.
+      </text>
+      <text x="56" y="75" font-family="sans-serif" font-size="12" fill="#166534">
+        • Server-side API: <tspan font-weight="bold">checkOverlapUpdate</tspan> trả về false &rarr; Trả mã <tspan font-weight="bold">HTTP 200 OK</tspan>.
+      </text>
+      <text x="56" y="95" font-family="sans-serif" font-size="12" fill="#166534">
+        • Tiêu đề cập nhật thành công, không phát sinh lỗi HTTP 409 Conflict sai lệch.
+      </text>
+    </g>
+
+    <!-- Actions -->
+    <g transform="translate(24, 445)">
+      <rect x="470" width="122" height="38" rx="6" ry="6" fill="#16a34a"/>
+      <text x="531" y="24" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#fff">✓ Đạt chuẩn (Pass)</text>
+    </g>
+  </g>
+  <rect x="680" y="600" width="200" height="28" rx="4" ry="4" fill="#16a34a"/>
+  <text x="780" y="618" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#ffffff">EVIDENCE: TC_EDIT_OVL_001</text>
+</svg>

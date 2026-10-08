@@ -84,6 +84,8 @@ function validateMeetingInput(input, options = {}) {
             errors.push(`Tiêu đề cuộc họp phải có ít nhất ${VALIDATION_CONFIG.TITLE_MIN_LENGTH} ký tự.`);
         } else if (trimmedTitle.length > VALIDATION_CONFIG.TITLE_MAX_LENGTH) {
             errors.push(`Tiêu đề cuộc họp không được vượt quá ${VALIDATION_CONFIG.TITLE_MAX_LENGTH} ký tự.`);
+        } else if (/[<>]/.test(trimmedTitle)) {
+            errors.push('Tiêu đề cuộc họp không được chứa ký tự đặc biệt nguy hiểm (<, >).');
         }
     }
 

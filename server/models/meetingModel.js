@@ -2,13 +2,120 @@ const db = require('../config/database');
 
 const Meeting = {
     /**
+     * Lấy danh sách cuộc họp với bộ lọc và phân trang
+     * @param {Object} filters - Các tham số lọc
+     * @param {string} [filters.date] - Lọc theo ngày cụ thể (YYYY-MM-DD)
+     * @param {string} [filters.startDate] - Lọc từ ngày (YYYY-MM-DD)
+     * @param {string} [filters.endDate] - Lọc đến ngày (YYYY-MM-DD)
+     * @param {string} [filters.status] - Lọc theo trạng thái booking (Confirmed, Cancelled, Completed)
+     * @param {number} [filters.page=1] - Trang hiện tại
+     * @param {number} [filters.limit=10] - Số bản ghi mỗi trang
+     * @returns {Object} { meetings, pagination }
+     */
+    getAll: async (filters = {}) => {
+        const {
+            date,
+            startDate,
+            endDate,
+            status,
+            page = 1,
+            limit = 10
+        } = filters;
+
+        // ── Xây dựng câu truy vấn cơ bản với JOIN đầy đủ ──
+        let baseQuery = `
+            FROM Meetings m
+            LEFT JOIN Users u ON m.OrganizerID = u.UserID
+            LEFT JOIN Bookings b ON m.MeetingID = b.MeetingID
+            LEFT JOIN Rooms r ON b.RoomID = r.RoomID
+        `;
+
+        const conditions = [];
+        const params = [];
+
+        // ── Lọc theo ngày cụ thể (date=2026-10-01) ──
+        if (date) {
+            conditions.push('DATE(m.StartTime) = ?');
+            params.push(date);
+        }
+
+        // ── Lọc theo khoảng ngày (startDate & endDate) ──
+        if (startDate) {
+            conditions.push('DATE(m.StartTime) >= ?');
+            params.push(startDate);
+        }
+        if (endDate) {
+            conditions.push('DATE(m.StartTime) <= ?');
+            params.push(endDate);
+        }
+
+        // ── Lọc theo trạng thái booking ──
+        if (status) {
+            conditions.push('b.BookingStatus = ?');
+            params.push(status);
+        }
+
+        // ── Ghép điều kiện WHERE ──
+        if (conditions.length > 0) {
+            baseQuery += ' WHERE ' + conditions.join(' AND ');
+        }
+
+        // ── Đếm tổng số bản ghi (cho phân trang) ──
+        const countQuery = `SELECT COUNT(DISTINCT m.MeetingID) AS total ${baseQuery}`;
+        const [countRows] = await db.execute(countQuery, params);
+        const total = countRows[0].total;
+
+        // ── Tính toán phân trang ──
+        const offset = (page - 1) * limit;
+        const totalPages = Math.ceil(total / limit);
+
+        // ── Truy vấn dữ liệu chính với đầy đủ thông tin ──
+        const dataQuery = `
+            SELECT 
+                m.MeetingID     AS meetingId,
+                m.Title         AS title,
+                m.Description   AS description,
+                m.StartTime     AS startTime,
+                m.EndTime       AS endTime,
+                m.IsRecurring   AS isRecurring,
+                m.CreatedAt     AS createdAt,
+                m.OrganizerID   AS organizerId,
+                u.FullName      AS organizerName,
+                u.Email         AS organizerEmail,
+                b.BookingID     AS bookingId,
+                b.BookingStatus AS bookingStatus,
+                r.RoomID        AS roomId,
+                r.RoomName      AS roomName,
+                r.Capacity      AS roomCapacity
+            ${baseQuery}
+            ORDER BY m.StartTime DESC
+            LIMIT ? OFFSET ?
+        `;
+
+        const dataParams = [...params, String(limit), String(offset)];
+        const [rows] = await db.execute(dataQuery, dataParams);
+
+        return {
+            meetings: rows,
+            pagination: {
+                currentPage: page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+        };
+    },
+
+    /**
      * Tra cứu xem phòng có bị trùng lịch hay không (dùng cho API kiểm tra phòng trống độc lập)
      */
     checkOverlap: async (roomId, startTime, endTime) => {
         const query = `
             SELECT m.MeetingID, m.Title, m.StartTime, m.EndTime
-            FROM meetings m
-            JOIN bookings b ON m.MeetingID = b.MeetingID
+            FROM Meetings m
+            JOIN Bookings b ON m.MeetingID = b.MeetingID
             WHERE b.RoomID = ? 
               AND b.BookingStatus = 'Confirmed'
               AND (m.StartTime < ?) AND (m.EndTime > ?)
@@ -37,11 +144,13 @@ const Meeting = {
         const connection = await db.getConnection();
 
         try {
+            // Đặt isolation level SERIALIZABLE để đảm bảo chống Race Condition
+            await connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
             await connection.beginTransaction();
 
             // 1. Kiểm tra sự tồn tại của Người tổ chức (Organizer)
-            const [organizers] = await connection.execute(
-                'SELECT UserID, FullName FROM users WHERE UserID = ?',
+            const [organizers] = await connection.query(
+                'SELECT UserID, FullName FROM Users WHERE UserID = ?',
                 [organizerId]
             );
             if (organizers.length === 0) {
@@ -51,8 +160,8 @@ const Meeting = {
             }
 
             // 2. Khóa dòng phòng họp (FOR UPDATE) để ngăn Race Condition và kiểm tra trạng thái phòng
-            const [rooms] = await connection.execute(
-                'SELECT RoomID, RoomName, Capacity, Status FROM rooms WHERE RoomID = ? FOR UPDATE',
+            const [rooms] = await connection.query(
+                'SELECT RoomID, RoomName, Capacity, Status FROM Rooms WHERE RoomID = ? FOR UPDATE',
                 [roomId]
             );
             if (rooms.length === 0) {
@@ -71,13 +180,14 @@ const Meeting = {
             // 3. Kiểm tra xung đột lịch (Overlap Check) ngay trong Transaction đã khóa phòng
             const overlapQuery = `
                 SELECT m.MeetingID, m.Title, m.StartTime, m.EndTime
-                FROM meetings m
-                JOIN bookings b ON m.MeetingID = b.MeetingID
+                FROM Meetings m
+                JOIN Bookings b ON m.MeetingID = b.MeetingID
                 WHERE b.RoomID = ? 
                   AND b.BookingStatus = 'Confirmed'
                   AND (m.StartTime < ?) AND (m.EndTime > ?)
+                FOR UPDATE
             `;
-            const [overlapRows] = await connection.execute(overlapQuery, [roomId, endTime, startTime]);
+            const [overlapRows] = await connection.query(overlapQuery, [roomId, endTime, startTime]);
             if (overlapRows.length > 0) {
                 const error = new Error(`Phòng họp "${room.RoomName}" đã có người đặt trong khung giờ này.`);
                 error.status = 409;
@@ -86,10 +196,10 @@ const Meeting = {
 
             // 4. Tạo bản ghi Cuộc họp (Meetings)
             const insertMeetingQuery = `
-                INSERT INTO meetings (Title, Description, StartTime, EndTime, OrganizerID, IsRecurring)
+                INSERT INTO Meetings (Title, Description, StartTime, EndTime, OrganizerID, IsRecurring)
                 VALUES (?, ?, ?, ?, ?, ?)
             `;
-            const [meetingResult] = await connection.execute(insertMeetingQuery, [
+            const [meetingResult] = await connection.query(insertMeetingQuery, [
                 title.trim(),
                 description ? description.trim() : null,
                 startTime,
@@ -101,18 +211,18 @@ const Meeting = {
 
             // 5. Tạo bản ghi Đặt phòng (Bookings)
             const insertBookingQuery = `
-                INSERT INTO bookings (MeetingID, RoomID, BookingStatus)
+                INSERT INTO Bookings (MeetingID, RoomID, BookingStatus)
                 VALUES (?, ?, 'Confirmed')
             `;
-            const [bookingResult] = await connection.execute(insertBookingQuery, [meetingId, roomId]);
+            const [bookingResult] = await connection.query(insertBookingQuery, [meetingId, roomId]);
             const bookingId = bookingResult.insertId;
 
             // 6. Thêm danh sách Người tham gia (meeting_participants) nếu có
             if (Array.isArray(participantIds) && participantIds.length > 0) {
                 for (const userId of participantIds) {
                     if (Number.isInteger(Number(userId))) {
-                        await connection.execute(
-                            'INSERT IGNORE INTO meeting_participants (MeetingID, UserID, ResponseStatus) VALUES (?, ?, ?)',
+                        await connection.query(
+                            'INSERT IGNORE INTO Meeting_Participants (MeetingID, UserID, ResponseStatus) VALUES (?, ?, ?)',
                             [meetingId, userId, 'Pending']
                         );
                     }
@@ -123,8 +233,8 @@ const Meeting = {
             if (Array.isArray(equipmentIds) && equipmentIds.length > 0) {
                 for (const eqId of equipmentIds) {
                     if (Number.isInteger(Number(eqId))) {
-                        await connection.execute(
-                            'INSERT IGNORE INTO booking_equipments (BookingID, EquipmentID) VALUES (?, ?)',
+                        await connection.query(
+                            'INSERT IGNORE INTO Booking_Equipments (BookingID, EquipmentID) VALUES (?, ?)',
                             [bookingId, eqId]
                         );
                     }
@@ -148,6 +258,66 @@ const Meeting = {
         } catch (error) {
             await connection.rollback();
             throw error;
+        } finally {
+            connection.release();
+        }
+    },
+
+    // Kiểm tra trùng giờ khi cập nhật (loại trừ cuộc họp đang sửa)
+    checkOverlapUpdate: async (roomId, startTime, endTime, currentMeetingId) => {
+        const query = `
+            SELECT m.MeetingID 
+            FROM Meetings m
+            JOIN Bookings b ON m.MeetingID = b.MeetingID
+            WHERE b.RoomID = ? 
+            AND b.BookingStatus = 'Confirmed'
+            AND m.MeetingID != ? 
+            AND (m.StartTime < ?) AND (m.EndTime > ?)
+        `;
+        // Thứ tự truyền: roomId, currentMeetingId, endTime mới, startTime mới
+        const [rows] = await db.execute(query, [roomId, currentMeetingId, endTime, startTime]);
+        return rows.length > 0;
+    },
+
+    // Thực thi cập nhật
+    update: async (meetingId, meetingData) => {
+        const { title, description, startTime, endTime, organizerId, isRecurring, roomId } = meetingData;
+        const connection = await db.getConnection();
+
+        try {
+            await connection.beginTransaction();
+
+            // KIỂM TRA SỰ TỒN TẠI TRƯỚC KHI CẬP NHẬT
+            const [existing] = await connection.execute('SELECT MeetingID FROM Meetings WHERE MeetingID = ?', [meetingId]);
+            if (existing.length === 0) {
+                const error = new Error(`Cuộc họp với ID ${meetingId} không tồn tại.`);
+                error.status = 404; // Gắn cờ lỗi 404 để Controller nhận biết
+                throw error;
+            }
+
+            // 1. Cập nhật bảng Meetings (Thống nhất dùng execute)
+            const updateMeetingQuery = `
+                UPDATE Meetings 
+                SET Title = ?, Description = ?, StartTime = ?, EndTime = ?, OrganizerID = ?, IsRecurring = ?
+                WHERE MeetingID = ?
+            `;
+            await connection.execute(updateMeetingQuery, [
+                title, description || null, startTime, endTime, organizerId, isRecurring || false, meetingId
+            ]);
+
+            // 2. Cập nhật bảng Bookings (Thống nhất dùng execute)
+            const updateBookingQuery = `
+                UPDATE Bookings 
+                SET RoomID = ?
+                WHERE MeetingID = ?
+            `;
+            await connection.execute(updateBookingQuery, [roomId, meetingId]);
+
+            await connection.commit();
+            return true;
+        } catch (error) {
+            await connection.rollback();
+            throw error; // Ném lỗi ra để Controller bắt lấy
         } finally {
             connection.release();
         }

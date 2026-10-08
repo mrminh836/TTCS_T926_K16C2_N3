@@ -1,4 +1,70 @@
+ feature/qa-crud-room
 # Báo cáo QA: CRUD cuộc họp và phòng họp
+=======
+# Báo cáo QA: CRUD danh mục phòng họp
+
+## 1. Mục tiêu và phạm vi
+
+Kiểm thử API quản lý danh mục phòng họp (Room): liệt kê, xem chi tiết, tạo, cập nhật, xóa; bao gồm validation, dữ liệu trùng và bảo vệ ràng buộc booking. Đây là CRUD phòng họp, không phải CRUD cuộc họp (Meeting).
+
+- Bộ test cases: [QA_TEST_CASES_MEETING_CRUD.csv](QA_TEST_CASES_MEETING_CRUD.csv), 16 ca theo mẫu QA 10 cột.
+- API dự kiến/thực tế được đăng ký: `GET /api/rooms`, `GET /api/rooms/:id`, `POST /api/rooms`, `PUT /api/rooms/:id`, `DELETE /api/rooms/:id`.
+- Ngoài CRUD chính: validation tên/mã/sức chứa/loại/trạng thái, xử lý ID không hợp lệ/không tồn tại, chống trùng và không xóa phòng đang có cuộc họp đã xác nhận chưa kết thúc.
+- Không bao gồm kiểm thử giao diện quản trị phòng, phân quyền, hiệu năng hoặc kiểm thử bảo mật chuyên sâu.
+
+## 2. Môi trường và phương pháp
+
+| Hạng mục | Kết quả |
+|---|---|
+| Ngày | 2026-09-28 |
+| Hệ điều hành | Windows |
+| API base URL | `http://localhost:3000/api/rooms` |
+| Runtime | Không tìm thấy `node`/`npm` trong PATH hoặc vị trí cài đặt phổ biến đã kiểm tra |
+| Backend | Không chạy; truy cập `http://localhost:3000/api/rooms` trả `ERR_CONNECTION_REFUSED` |
+| Database | Chưa kiểm thử kết nối/tích hợp |
+| Kiểm tra mã | Đã đối chiếu route, controller, validator, model và test `server/test/roomCrud.test.js` |
+
+## 3. Kết quả thực thi
+
+| Trạng thái | Số ca | Ghi chú |
+|---|---:|---|
+| Pass | 0 | Chưa có API response thực tế để xác nhận. |
+| Fail | 0 | Không có đủ điều kiện chạy để kết luận lỗi runtime. |
+| Blocked | 16 | Backend không lắng nghe tại localhost:3000; Node/npm hiện không khả dụng để chạy test tự động. |
+| Tổng | 16 | Xem từng ca và expected result trong CSV. |
+
+**Kết luận:** Mã nguồn hiện có các endpoint CRUD phòng họp và unit tests tương ứng. Tuy nhiên, trong phiên QA này chưa chạy được API hoặc automated tests, do đó chưa thể nghiệm thu chức năng runtime. Không đánh dấu Pass dựa riêng trên việc đọc mã.
+
+## 4. Thiết kế dữ liệu và quy tắc kiểm thử
+
+Bảng `Rooms` trong `database/init_database.sql` gồm `RoomID`, `RoomCode`, `RoomName`, `Capacity`, `Type`, `Floor`, `Status`, `QRCode`, `Description`, `CreatedAt`, `UpdatedAt`.
+
+Theo validator hiện tại:
+
+- Tên phòng bắt buộc, 2-100 ký tự, không được chứa `<` hoặc `>`.
+- Sức chứa bắt buộc, số nguyên từ 1 đến 500.
+- Mã phòng là tùy chọn; nếu nhập phải dài 2-50 ký tự, chỉ gồm chữ, số, `_` hoặc `-`.
+- Trạng thái: `Active`, `Maintenance`, `Inactive`.
+- Loại phòng: `Hội nghị`, `Nhóm / Tech`, `Hội trường lớn`, `Đại sảnh / Board`, `VIP / Phỏng vấn`.
+- Tên và mã phòng trùng được kiểm tra không phân biệt hoa thường; trùng trả HTTP 409.
+- Không cho xóa phòng có booking `Confirmed` gắn với meeting có `EndTime >= NOW()`; API dự kiến trả HTTP 409 với code `CANNOT_DELETE_ACTIVE_MEETINGS`.
+
+Expected status code trong CSV được đối chiếu từ controller: list/detail thành công `200`, tạo `201`, cập nhật/xóa `200`, dữ liệu không hợp lệ `400`, không tìm thấy `404`, dữ liệu trùng hoặc xóa bị ràng buộc `409`.
+
+## 5. Coverage đã có trong mã nguồn
+
+Route được đăng ký trong [roomRoutes.js](../server/routes/roomRoutes.js) và gắn vào `/api` trong [server.js](../server/server.js). Test [roomCrud.test.js](../server/test/roomCrud.test.js) có kiểm tra model CRUD, controller list/detail/create/update/delete, validation, trùng tên/mã và ràng buộc xóa khi có meeting hoạt động. Đây là coverage đã được kiểm tra tĩnh, chưa phải kết quả chạy test.
+
+## 6. Điều kiện để chạy lại
+
+1. Cài Node.js/npm và dependencies tại thư mục `server/`.
+2. Khởi chạy MySQL/backend theo cấu hình `.env` và `docker-compose.yml`, hoặc dùng môi trường test có DB tương ứng.
+3. Chạy `npm test` trong `server/`; lưu lại số test pass/fail và log.
+4. Chạy các ca API trong CSV bằng Postman hoặc công cụ tương đương; dùng dữ liệu test riêng, không xóa dữ liệu seed dùng chung.
+5. Chạy lại riêng ca xóa có booking tương lai và ca xóa thành công sau khi xác nhận database có trạng thái cần thiết.
+
+**Tiêu chí nghiệm thu:** 16 ca hoàn thành; các mã HTTP/body khớp expected result; create/update được xác minh bằng GET lại; delete thành công không còn trả về bản ghi; delete bị chặn không làm mất phòng/booking liên quan.# Báo cáo QA: CRUD cuộc họp và phòng họp
+main
 
 ## 1. Mục tiêu
 

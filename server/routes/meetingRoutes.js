@@ -4,5 +4,7 @@ const meetingController = require('../controllers/meetingController');
 const { validateMeetingMiddleware } = require('../validators/meetingValidator');
 
 router.post('/meetings', validateMeetingMiddleware, meetingController.createMeeting);
+router.get('/meetings', meetingController.getMeetings);
+router.put('/meetings/:id', meetingController.updateMeeting);
 
-module.exports = router;
+module.exports = router;
