@@ -1,6 +1,3 @@
- feature/qa-crud-room
-# Báo cáo QA: CRUD cuộc họp và phòng họp
-=======
 # Báo cáo QA: CRUD danh mục phòng họp
 
 ## 1. Mục tiêu và phạm vi
@@ -64,7 +61,6 @@ Route được đăng ký trong [roomRoutes.js](../server/routes/roomRoutes.js) 
 5. Chạy lại riêng ca xóa có booking tương lai và ca xóa thành công sau khi xác nhận database có trạng thái cần thiết.
 
 **Tiêu chí nghiệm thu:** 16 ca hoàn thành; các mã HTTP/body khớp expected result; create/update được xác minh bằng GET lại; delete thành công không còn trả về bản ghi; delete bị chặn không làm mất phòng/booking liên quan.# Báo cáo QA: CRUD cuộc họp và phòng họp
-main
 
 ## 1. Mục tiêu
 
