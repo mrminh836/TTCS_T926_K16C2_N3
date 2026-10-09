@@ -1819,7 +1819,12 @@ const RoomAPI = {
         const json = await res.json();
         this.isBackendConnected = true;
         this.updateStatusBadge();
-        return { success: true, data: json.data || json, isFallback: false };
+        const serverRooms = json.data || json;
+        if (Array.isArray(serverRooms) && serverRooms.length > 0) {
+          ROOMS = serverRooms;
+          persistRoomsToStorage();
+        }
+        return { success: true, data: ROOMS, isFallback: false };
       }
     } catch (err) {
       this.isBackendConnected = false;
@@ -2154,6 +2159,56 @@ const MeetingAPI = {
         message: "Lưu tạm trên bộ nhớ cục bộ (Local Store Fallback)"
       };
     }
+  },
+
+  async createRecurring(payload) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch("http://localhost:3000/api/meetings/recurring", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        this.isBackendConnected = true;
+        this.updateStatusBadges();
+        return {
+          success: false,
+          status: res.status,
+          message: json.message || "Không thể tạo chuỗi cuộc họp lặp định kỳ trên máy chủ.",
+          errors: json.errors || [json.message],
+          conflicts: json.conflicts || [],
+          isConflict: res.status === 409
+        };
+      }
+
+      this.isBackendConnected = true;
+      this.updateStatusBadges();
+      return {
+        success: true,
+        data: json.data || json,
+        message: json.message || "Tạo chuỗi cuộc họp lặp định kỳ thành công.",
+        isFallback: false
+      };
+    } catch (err) {
+      console.warn("Backend Recurring API offline hoặc timeout, chuyển sang Local Store Fallback:", err);
+      this.isBackendConnected = false;
+      this.updateStatusBadges();
+      return {
+        success: true,
+        isFallback: true,
+        data: null,
+        message: "Lưu tạm trên bộ nhớ cục bộ (Local Store Fallback)"
+      };
+    }
   }
 };
 
@@ -2411,6 +2466,39 @@ function validateMeetingForm(editId = null) {
     return eq ? eq.name : `Thiết bị #${eid}`;
   });
 
+  // 7. Kiểm tra Tùy chọn Lặp định kỳ (nếu bật isRecurring và là tạo mới)
+  if (isRecurring && !editId) {
+    const totalInput = document.getElementById("recurring-total");
+    const intervalInput = document.getElementById("recurring-interval");
+    const totalVal = parseInt(totalInput ? totalInput.value : "4", 10);
+    const intervalVal = parseInt(intervalInput ? intervalInput.value : "1", 10);
+
+    if (isNaN(totalVal) || totalVal < 2 || totalVal > 52) {
+      isValid = false;
+      if (globalError && globalErrorTitle && globalErrorDesc) {
+        globalErrorTitle.innerText = "Tùy chọn lặp định kỳ chưa hợp lệ";
+        globalErrorDesc.innerText = "Tổng số lần lặp phải từ 2 đến 52 buổi.";
+        globalError.classList.remove("hidden");
+      }
+      if (totalInput) {
+        totalInput.classList.add("has-error", "is-invalid");
+        if (!firstErrorField) firstErrorField = totalInput;
+      }
+    }
+    if (isNaN(intervalVal) || intervalVal < 1 || intervalVal > 12) {
+      isValid = false;
+      if (globalError && globalErrorTitle && globalErrorDesc) {
+        globalErrorTitle.innerText = "Tùy chọn lặp định kỳ chưa hợp lệ";
+        globalErrorDesc.innerText = "Khoảng cách lặp (interval) phải từ 1 đến 12.";
+        globalError.classList.remove("hidden");
+      }
+      if (intervalInput) {
+        intervalInput.classList.add("has-error", "is-invalid");
+        if (!firstErrorField) firstErrorField = intervalInput;
+      }
+    }
+  }
+
   // Hiển thị Global Error Banner & Trigger Shake nếu có lỗi
   if (!isValid) {
     if (globalError && globalErrorTitle && globalErrorDesc) {
@@ -2580,7 +2668,174 @@ function setupMeetingFormValidationEvents() {
 
   // Khởi tạo các bộ chọn nhanh DateTime & Bộ lọc Phòng
   setupQuickDateTimePresets();
+
+  // Khởi tạo tính năng tùy chọn cuộc họp lặp định kỳ (Sprint 3)
+  setupRecurringOptionsEvents();
 }
+
+// =====================================================
+// SPRINT 3: TÙY CHỌN LẶP ĐỊNH KỲ (WEEKLY / MONTHLY)
+// =====================================================
+
+function updateRecurringPreview() {
+  const recurringSwitch = document.getElementById("meeting-recurring");
+  const previewList = document.getElementById("recurring-preview-list");
+  const previewCount = document.getElementById("recurring-preview-count");
+  const conflictAlert = document.getElementById("recurring-conflict-alert");
+  if (!previewList) return;
+
+  if (conflictAlert) conflictAlert.classList.add("d-none");
+
+  if (!recurringSwitch || !recurringSwitch.checked) {
+    previewList.innerHTML = "";
+    return;
+  }
+
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const typeSelect = document.getElementById("recurring-type");
+  const intervalInput = document.getElementById("recurring-interval");
+  const totalInput = document.getElementById("recurring-total");
+  const daySelect = document.getElementById("recurring-day-select");
+
+  const startDateStr = dateInput ? dateInput.value : "";
+  const startTime = startInput ? startInput.value : "09:00";
+  const endTime = endInput ? endInput.value : "10:30";
+  const recurrenceType = typeSelect ? typeSelect.value : "weekly";
+  const intervalValue = Math.max(1, parseInt(intervalInput ? intervalInput.value : "1", 10) || 1);
+  const totalOccurrences = Math.min(52, Math.max(2, parseInt(totalInput ? totalInput.value : "4", 10) || 4));
+
+  if (previewCount) {
+    previewCount.textContent = `${totalOccurrences} buổi`;
+  }
+
+  if (!startDateStr) {
+    previewList.innerHTML = `<span class="text-muted small fst-italic">Vui lòng chọn Ngày bắt đầu để xem trước chuỗi lịch...</span>`;
+    return;
+  }
+
+  const dayNames = ["CN", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+  const sessions = [];
+  const baseDate = new Date(startDateStr + "T00:00:00");
+
+  if (recurrenceType === "weekly" || recurrenceType === "custom") {
+    const targetDayOfWeek = daySelect && daySelect.value !== "" ? parseInt(daySelect.value, 10) : baseDate.getDay();
+    let curDate = new Date(baseDate);
+    const diff = (targetDayOfWeek - curDate.getDay() + 7) % 7;
+    curDate.setDate(curDate.getDate() + diff);
+
+    for (let i = 0; i < totalOccurrences; i++) {
+      sessions.push(new Date(curDate));
+      curDate.setDate(curDate.getDate() + 7 * intervalValue);
+    }
+  } else if (recurrenceType === "monthly") {
+    const targetDayOfMonth = daySelect && daySelect.value !== "" ? parseInt(daySelect.value, 10) : baseDate.getDate();
+    let curYear = baseDate.getFullYear();
+    let curMonth = baseDate.getMonth();
+
+    for (let i = 0; i < totalOccurrences; i++) {
+      const maxDaysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+      const actualDay = Math.min(targetDayOfMonth, maxDaysInMonth);
+      sessions.push(new Date(curYear, curMonth, actualDay));
+      curMonth += intervalValue;
+      while (curMonth > 11) {
+        curMonth -= 12;
+        curYear += 1;
+      }
+    }
+  }
+
+  previewList.innerHTML = sessions.map((s, idx) => {
+    const dStr = s.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const dayName = dayNames[s.getDay()];
+    return `
+      <span class="badge bg-white text-dark border d-inline-flex align-items-center gap-1 py-1 px-2 mb-1" style="font-size: 11px;">
+        <span class="badge bg-primary text-white rounded-pill px-1" style="font-size: 9px;">#${idx + 1}</span>
+        <strong>${dayName}</strong>, ${dStr}
+        <span class="text-secondary">(${startTime} - ${endTime})</span>
+      </span>
+    `;
+  }).join("");
+}
+
+function setupRecurringOptionsEvents() {
+  const recurringSwitch = document.getElementById("meeting-recurring");
+  const optionsPanel = document.getElementById("recurring-options-panel");
+  const typeSelect = document.getElementById("recurring-type");
+  const intervalUnit = document.getElementById("recurring-interval-unit");
+  const dayLabel = document.getElementById("recurring-day-label");
+  const daySelect = document.getElementById("recurring-day-select");
+  const intervalInput = document.getElementById("recurring-interval");
+  const totalInput = document.getElementById("recurring-total");
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+
+  if (!recurringSwitch) return;
+
+  const togglePanel = () => {
+    if (recurringSwitch.checked) {
+      if (optionsPanel) optionsPanel.style.display = "block";
+      syncDaySelectWithDate();
+      updateRecurringPreview();
+    } else {
+      if (optionsPanel) optionsPanel.style.display = "none";
+    }
+  };
+
+  const syncDaySelectWithDate = () => {
+    if (!dateInput || !dateInput.value || !daySelect) return;
+    const d = new Date(dateInput.value + "T00:00:00");
+    const recType = typeSelect ? typeSelect.value : "weekly";
+    if (recType === "weekly" || recType === "custom") {
+      daySelect.value = String(d.getDay());
+    } else if (recType === "monthly") {
+      daySelect.value = String(d.getDate());
+    }
+  };
+
+  const updateTypeOptions = () => {
+    if (!typeSelect || !daySelect) return;
+    const recType = typeSelect.value;
+    if (recType === "weekly" || recType === "custom") {
+      if (intervalUnit) intervalUnit.textContent = "tuần";
+      if (dayLabel) dayLabel.innerHTML = `<i class="bi bi-calendar-event text-primary me-1"></i> Ngày lặp trong tuần`;
+      daySelect.innerHTML = `
+        <option value="1">Thứ Hai hàng tuần</option>
+        <option value="2">Thứ Ba hàng tuần</option>
+        <option value="3">Thứ Tư hàng tuần</option>
+        <option value="4">Thứ Năm hàng tuần</option>
+        <option value="5">Thứ Sáu hàng tuần</option>
+        <option value="6">Thứ Bảy hàng tuần</option>
+        <option value="0">Chủ Nhật hàng tuần</option>
+      `;
+    } else if (recType === "monthly") {
+      if (intervalUnit) intervalUnit.textContent = "tháng";
+      if (dayLabel) dayLabel.innerHTML = `<i class="bi bi-calendar-month text-primary me-1"></i> Ngày lặp trong tháng`;
+      let opts = "";
+      for (let i = 1; i <= 31; i++) {
+        opts += `<option value="${i}">Ngày ${i} hàng tháng</option>`;
+      }
+      daySelect.innerHTML = opts;
+    }
+    syncDaySelectWithDate();
+    updateRecurringPreview();
+  };
+
+  recurringSwitch.addEventListener("change", togglePanel);
+  if (typeSelect) typeSelect.addEventListener("change", updateTypeOptions);
+  if (intervalInput) intervalInput.addEventListener("input", updateRecurringPreview);
+  if (totalInput) totalInput.addEventListener("input", updateRecurringPreview);
+  if (daySelect) daySelect.addEventListener("change", updateRecurringPreview);
+  if (dateInput) dateInput.addEventListener("change", () => {
+    syncDaySelectWithDate();
+    updateRecurringPreview();
+  });
+  if (startInput) startInput.addEventListener("change", updateRecurringPreview);
+  if (endInput) endInput.addEventListener("change", updateRecurringPreview);
+}
+
 
 // =====================================================
 // 6B. ENGINE DANH SÁCH PHÒNG TRỐNG THEO THỜI GIAN THỰC
@@ -4311,6 +4566,7 @@ function renderMeetingTable() {
               ${escapeHTML(meeting.title)}
             </span>
             ${meeting.tag ? `<span class="stitch-tag-chip ${tagClass}">${escapeHTML(meeting.tag)}</span>` : ""}
+            ${meeting.isRecurring ? `<span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1" style="font-size: 11px;" title="Cuộc họp lặp định kỳ"><i class="bi bi-arrow-repeat me-1"></i>${meeting.occurrenceIndex ? 'Buổi ' + meeting.occurrenceIndex + (meeting.totalOccurrences ? '/' + meeting.totalOccurrences : '') : 'Định kỳ'}</span>` : ""}
           </div>
           <p class="meeting-desc-sub">${escapeHTML(meeting.notes || 'Chưa có ghi chú')}</p>
         </div>
@@ -4489,7 +4745,19 @@ function openAddModal() {
 
   // Reset IsRecurring & Equipments
   const recurringInput = document.getElementById("meeting-recurring");
-  if (recurringInput) recurringInput.checked = false;
+  if (recurringInput) {
+    recurringInput.checked = false;
+    const panel = document.getElementById("recurring-options-panel");
+    if (panel) panel.style.display = "none";
+    const conflictAlert = document.getElementById("recurring-conflict-alert");
+    if (conflictAlert) conflictAlert.classList.add("d-none");
+    const intervalInput = document.getElementById("recurring-interval");
+    if (intervalInput) intervalInput.value = "1";
+    const totalInput = document.getElementById("recurring-total");
+    if (totalInput) totalInput.value = "4";
+    const typeSelect = document.getElementById("recurring-type");
+    if (typeSelect) typeSelect.value = "weekly";
+  }
   document.querySelectorAll(".eq-checkbox").forEach(cb => { cb.checked = false; });
 
   const descCount = document.getElementById("desc-char-count");
@@ -4631,7 +4899,21 @@ function openEditModal(id) {
 
   // IsRecurring & Equipments
   const recurringInput = document.getElementById("meeting-recurring");
-  if (recurringInput) recurringInput.checked = Boolean(meeting.isRecurring);
+  const recurringPanel = document.getElementById("recurring-options-panel");
+  if (recurringInput) {
+    recurringInput.checked = Boolean(meeting.isRecurring);
+  }
+  if (recurringPanel) {
+    if (meeting.isRecurring) {
+      recurringPanel.style.display = "block";
+      const totalInput = document.getElementById("recurring-total");
+      if (totalInput && meeting.totalOccurrences) totalInput.value = meeting.totalOccurrences;
+      const conflictAlert = document.getElementById("recurring-conflict-alert");
+      if (conflictAlert) conflictAlert.classList.add("d-none");
+    } else {
+      recurringPanel.style.display = "none";
+    }
+  }
 
   const eqIds = meeting.equipmentIds || [];
   document.querySelectorAll(".eq-checkbox").forEach(cb => {
@@ -4704,96 +4986,219 @@ async function saveMeeting(event) {
     let syncMsg = "";
 
     if (!editId) {
-      // Chuẩn bị payload chuẩn theo API POST /api/meetings
-      const payload = {
-        title,
-        description: description || null,
-        startTime: startTimeISO,
-        endTime: endTimeISO,
-        organizerId,
-        roomId,
-        isRecurring: Boolean(isRecurring),
-        participantIds,
-        equipmentIds
-      };
+      if (isRecurring) {
+        // Thu thập thông số lặp định kỳ từ form
+        const recurrenceType = document.getElementById("recurring-type")?.value || "weekly";
+        const intervalValue = parseInt(document.getElementById("recurring-interval")?.value, 10) || 1;
+        const totalOccurrences = parseInt(document.getElementById("recurring-total")?.value, 10) || 4;
+        const daySelectVal = document.getElementById("recurring-day-select")?.value;
 
-      const apiResult = await MeetingAPI.create(payload);
+        const recurringPayload = {
+          title,
+          description: description || null,
+          organizerId,
+          roomId,
+          recurrenceType,
+          intervalValue,
+          totalOccurrences,
+          meetingStartTime: startTime,
+          meetingEndTime: endTime,
+          seriesStartDate: date,
+          participantIds,
+          equipmentIds
+        };
 
-      // Nếu API trả về lỗi nghiệp vụ từ backend (400, 404, 409...)
-      if (!apiResult.success) {
-        if (btnSubmit) btnSubmit.disabled = false;
-        if (submitSpinner) submitSpinner.classList.add("hidden");
-        if (submitIcon) submitIcon.classList.remove("hidden");
-        if (submitText) submitText.innerText = "Tạo cuộc họp";
-
-        const globalError = document.getElementById("global-error");
-        const globalErrorTitle = document.getElementById("global-error-title");
-        const globalErrorDesc = document.getElementById("global-error-desc");
-        if (globalError && globalErrorTitle && globalErrorDesc) {
-          globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch đặt phòng (409 Conflict)" : "Máy chủ từ chối yêu cầu";
-          globalErrorDesc.innerText = apiResult.message;
-          globalError.classList.remove("hidden");
+        if (recurrenceType === "monthly") {
+          const dom = parseInt(daySelectVal, 10);
+          recurringPayload.dayOfMonth = !isNaN(dom) ? dom : new Date(date).getDate();
+        } else {
+          const dow = parseInt(daySelectVal, 10);
+          recurringPayload.dayOfWeek = !isNaN(dow) ? dow : new Date(date).getDay();
         }
 
-        const modalCard = document.querySelector(".meeting-modal-card");
-        if (modalCard) {
-          modalCard.classList.remove("stitch-shake");
-          void modalCard.offsetWidth;
-          modalCard.classList.add("stitch-shake");
-        }
+        const apiResult = await MeetingAPI.createRecurring(recurringPayload);
 
-        if (apiResult.isConflict) {
-          const roomConflictAlert = document.getElementById("room-conflict-alert");
-          const roomConflictText = document.getElementById("room-conflict-text");
-          if (roomConflictAlert && roomConflictText) {
-            roomConflictText.innerHTML = `<strong>Máy chủ thông báo:</strong> ${escapeHTML(apiResult.message)}`;
-            roomConflictAlert.classList.remove("hidden");
+        // Xử lý khi API trả về lỗi hoặc xung đột (409 Conflict)
+        if (!apiResult.success) {
+          if (btnSubmit) btnSubmit.disabled = false;
+          if (submitSpinner) submitSpinner.classList.add("hidden");
+          if (submitIcon) submitIcon.classList.remove("hidden");
+          if (submitText) submitText.innerText = "Tạo cuộc họp";
+
+          const conflictAlert = document.getElementById("recurring-conflict-alert");
+          const conflictList = document.getElementById("recurring-conflict-list");
+          if (conflictAlert && conflictList) {
+            if (apiResult.conflicts && apiResult.conflicts.length > 0) {
+              conflictList.innerHTML = apiResult.conflicts.map(c => {
+                const confNames = (c.conflictsWith || []).map(m => `"${escapeHTML(m.title)}"`).join(", ");
+                return `<li><strong>Buổi ${c.occurrenceIndex} (${c.requestedStartTime ? c.requestedStartTime.substring(0, 16) : ''}):</strong> Trùng lịch với ${confNames || 'lịch họp khác'}</li>`;
+              }).join("");
+              conflictAlert.classList.remove("d-none");
+            } else {
+              conflictList.innerHTML = `<li>${escapeHTML(apiResult.message || 'Xung đột lịch họp')}</li>`;
+              conflictAlert.classList.remove("d-none");
+            }
           }
-          const roomSelect = document.getElementById("meeting-room");
-          if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+
+          const globalError = document.getElementById("global-error");
+          const globalErrorTitle = document.getElementById("global-error-title");
+          const globalErrorDesc = document.getElementById("global-error-desc");
+          if (globalError && globalErrorTitle && globalErrorDesc) {
+            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch họp định kỳ (409 Conflict)" : "Máy chủ từ chối yêu cầu";
+            globalErrorDesc.innerText = apiResult.message || "Không thể tạo chuỗi lịch họp định kỳ do xung đột phòng.";
+            globalError.classList.remove("hidden");
+          }
+
+          const modalCard = document.querySelector(".meeting-modal-card");
+          if (modalCard) {
+            modalCard.classList.remove("stitch-shake");
+            void modalCard.offsetWidth;
+            modalCard.classList.add("stitch-shake");
+          }
+          return;
         }
-        return;
-      }
 
-      isFallback = apiResult.isFallback;
-      if (!isFallback && apiResult.data?.meetingId) {
-        finalMeetingId = apiResult.data.meetingId;
-        syncMsg = `Đã đồng bộ trực tiếp vào CSDL MySQL (Mã cuộc họp: #${finalMeetingId})`;
+        // Tạo thành công chuỗi recurring!
+        isFallback = apiResult.isFallback;
+        const createdMeetings = apiResult.data?.meetings || [];
+        const patternId = apiResult.data?.pattern?.patternId || getNextId();
+        syncMsg = !isFallback
+          ? `Đã tạo chuỗi ${createdMeetings.length} buổi họp định kỳ vào CSDL MySQL (Mã chuỗi: #${patternId})`
+          : `Đã lưu chuỗi ${createdMeetings.length} buổi họp định kỳ vào bộ nhớ cục bộ (Local Fallback)`;
+
+        const statusSelect = document.getElementById("meeting-status");
+        const status = statusSelect ? statusSelect.value : "scheduled";
+
+        // Thêm tất cả các buổi đã tạo vào mảng meetings
+        createdMeetings.slice().reverse().forEach(item => {
+          const itemDate = item.startTime ? item.startTime.substring(0, 10) : date;
+          const itemStart = item.startTime ? item.startTime.substring(11, 16) : startTime;
+          const itemEnd = item.endTime ? item.endTime.substring(11, 16) : endTime;
+          const itemTimeDisplay = `${itemStart} - ${itemEnd}`;
+
+          const newMeeting = {
+            id: item.meetingId || getNextId(),
+            title: item.title,
+            tag: tag || "Định kỳ",
+            date: itemDate,
+            startTime: itemStart,
+            endTime: itemEnd,
+            time: itemTimeDisplay,
+            roomId: roomObj.id,
+            roomName: roomObj.name,
+            capacity: roomObj.capacity,
+            organizerId: organizerObj.id,
+            host: organizerObj.name,
+            location: roomObj.name,
+            participants: participants.length > 0 ? participants : [organizerObj.name],
+            participantIds,
+            status,
+            notes: description,
+            isRecurring: true,
+            recurringPatternId: patternId,
+            occurrenceIndex: item.occurrenceIndex,
+            totalOccurrences: totalOccurrences,
+            equipmentIds,
+            equipmentNames,
+            startTimeISO: `${itemDate}T${itemStart}:00`,
+            endTimeISO: `${itemDate}T${itemEnd}:00`
+          };
+          meetings.unshift(newMeeting);
+        });
+        persistMeetingsToStorage();
+
       } else {
-        finalMeetingId = getNextId();
-        syncMsg = "Đã lưu vào bộ nhớ cục bộ (Local Store Fallback - Tự động đồng bộ CSDL)";
+        // Chuẩn bị payload chuẩn theo API POST /api/meetings
+        const payload = {
+          title,
+          description: description || null,
+          startTime: startTimeISO,
+          endTime: endTimeISO,
+          organizerId,
+          roomId,
+          isRecurring: Boolean(isRecurring),
+          participantIds,
+          equipmentIds
+        };
+
+        const apiResult = await MeetingAPI.create(payload);
+
+        // Nếu API trả về lỗi nghiệp vụ từ backend (400, 404, 409...)
+        if (!apiResult.success) {
+          if (btnSubmit) btnSubmit.disabled = false;
+          if (submitSpinner) submitSpinner.classList.add("hidden");
+          if (submitIcon) submitIcon.classList.remove("hidden");
+          if (submitText) submitText.innerText = "Tạo cuộc họp";
+
+          const globalError = document.getElementById("global-error");
+          const globalErrorTitle = document.getElementById("global-error-title");
+          const globalErrorDesc = document.getElementById("global-error-desc");
+          if (globalError && globalErrorTitle && globalErrorDesc) {
+            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch đặt phòng (409 Conflict)" : "Máy chủ từ chối yêu cầu";
+            globalErrorDesc.innerText = apiResult.message;
+            globalError.classList.remove("hidden");
+          }
+
+          const modalCard = document.querySelector(".meeting-modal-card");
+          if (modalCard) {
+            modalCard.classList.remove("stitch-shake");
+            void modalCard.offsetWidth;
+            modalCard.classList.add("stitch-shake");
+          }
+
+          if (apiResult.isConflict) {
+            const roomConflictAlert = document.getElementById("room-conflict-alert");
+            const roomConflictText = document.getElementById("room-conflict-text");
+            if (roomConflictAlert && roomConflictText) {
+              roomConflictText.innerHTML = `<strong>Máy chủ thông báo:</strong> ${escapeHTML(apiResult.message)}`;
+              roomConflictAlert.classList.remove("hidden");
+            }
+            const roomSelect = document.getElementById("meeting-room");
+            if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+          }
+          return;
+        }
+
+        isFallback = apiResult.isFallback;
+        if (!isFallback && apiResult.data?.meetingId) {
+          finalMeetingId = apiResult.data.meetingId;
+          syncMsg = `Đã đồng bộ trực tiếp vào CSDL MySQL (Mã cuộc họp: #${finalMeetingId})`;
+        } else {
+          finalMeetingId = getNextId();
+          syncMsg = "Đã lưu vào bộ nhớ cục bộ (Local Store Fallback - Tự động đồng bộ CSDL)";
+        }
+
+        const statusSelect = document.getElementById("meeting-status");
+        const status = statusSelect ? statusSelect.value : "scheduled";
+
+        const newMeeting = {
+          id: finalMeetingId,
+          title,
+          tag,
+          date,
+          startTime,
+          endTime,
+          time: timeDisplay,
+          roomId: roomObj.id,
+          roomName: roomObj.name,
+          capacity: roomObj.capacity,
+          organizerId: organizerObj.id,
+          host: organizerObj.name,
+          location: roomObj.name,
+          participants: participants.length > 0 ? participants : [organizerObj.name],
+          participantIds,
+          status,
+          notes: description,
+          isRecurring,
+          equipmentIds,
+          equipmentNames,
+          startTimeISO,
+          endTimeISO
+        };
+
+        meetings.unshift(newMeeting);
+        persistMeetingsToStorage();
       }
-
-      const statusSelect = document.getElementById("meeting-status");
-      const status = statusSelect ? statusSelect.value : "scheduled";
-
-      const newMeeting = {
-        id: finalMeetingId,
-        title,
-        tag,
-        date,
-        startTime,
-        endTime,
-        time: timeDisplay,
-        roomId: roomObj.id,
-        roomName: roomObj.name,
-        capacity: roomObj.capacity,
-        organizerId: organizerObj.id,
-        host: organizerObj.name,
-        location: roomObj.name,
-        participants: participants.length > 0 ? participants : [organizerObj.name],
-        participantIds,
-        status,
-        notes: description,
-        isRecurring,
-        equipmentIds,
-        equipmentNames,
-        startTimeISO,
-        endTimeISO
-      };
-
-      meetings.unshift(newMeeting);
-      persistMeetingsToStorage();
     } else {
       // Chỉnh sửa (Edit)
       const index = meetings.findIndex(item => item.id === editId);
@@ -4851,13 +5256,14 @@ async function saveMeeting(event) {
       const successStatus = document.getElementById("success-status-display");
       const successSyncStatus = document.getElementById("success-sync-status");
 
-      if (successTitle) successTitle.innerText = `"${title}"`;
+      const totalOccVal = isRecurring ? (document.getElementById("recurring-total")?.value || "") : "";
+      if (successTitle) successTitle.innerText = isRecurring ? `"${title}" (${totalOccVal} buổi lặp)` : `"${title}"`;
       if (successTime) {
         const durText = document.getElementById("duration-text");
         const durLabel = durText ? durText.innerText.replace("Thời lượng: ", "") : "";
         successTime.innerText = `${timeDisplay} (${durLabel})`;
       }
-      if (successDate) successDate.innerText = formatDate(date);
+      if (successDate) successDate.innerText = isRecurring ? `${formatDate(date)} (Bắt đầu chuỗi)` : formatDate(date);
       if (successRoom) successRoom.innerText = `${roomObj.name} (${roomObj.capacity} chỗ)`;
       const statusSelect = document.getElementById("meeting-status");
       if (successStatus) successStatus.innerText = getStatusText(statusSelect ? statusSelect.value : "scheduled");
@@ -5050,7 +5456,7 @@ function openDetailModal(id) {
         </span>
         <div>
           ${meeting.isRecurring 
-            ? '<span class="badge bg-primary-subtle text-primary border border-primary"><i class="bi bi-check2-circle me-1"></i>Có (Lặp lại định kỳ)</span>' 
+            ? `<span class="badge bg-primary-subtle text-primary border border-primary"><i class="bi bi-arrow-repeat me-1"></i>Có (${meeting.occurrenceIndex ? `Buổi #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp lại định kỳ'})</span>` 
             : '<span class="badge bg-light text-muted border">Không (Cuộc họp một lần)</span>'}
         </div>
       </div>
@@ -5376,7 +5782,16 @@ loadPersistedRooms();
 loadPersistedMeetings();
 setupRoomFormValidationEvents();
 setupMeetingFormValidationEvents();
-RoomAPI.checkHealth();
+RoomAPI.checkHealth().then(async (connected) => {
+  if (connected) {
+    await RoomAPI.getAll();
+    syncMeetingRoomOptions();
+    const current = getCurrentRoute();
+    if (current === "/admin/rooms" || current === "/rooms" || current === "/" || current === "/home") {
+      router();
+    }
+  }
+});
 MeetingAPI.checkHealth();
 syncMeetingRoomOptions();
 router();

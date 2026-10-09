@@ -261,6 +261,66 @@ const Meeting = {
         } finally {
             connection.release();
         }
+    },
+
+    // Kiểm tra trùng giờ khi cập nhật (loại trừ cuộc họp đang sửa)
+    checkOverlapUpdate: async (roomId, startTime, endTime, currentMeetingId) => {
+        const query = `
+            SELECT m.MeetingID 
+            FROM Meetings m
+            JOIN Bookings b ON m.MeetingID = b.MeetingID
+            WHERE b.RoomID = ? 
+            AND b.BookingStatus = 'Confirmed'
+            AND m.MeetingID != ? 
+            AND (m.StartTime < ?) AND (m.EndTime > ?)
+        `;
+        // Thứ tự truyền: roomId, currentMeetingId, endTime mới, startTime mới
+        const [rows] = await db.execute(query, [roomId, currentMeetingId, endTime, startTime]);
+        return rows.length > 0;
+    },
+
+    // Thực thi cập nhật
+    update: async (meetingId, meetingData) => {
+        const { title, description, startTime, endTime, organizerId, isRecurring, roomId } = meetingData;
+        const connection = await db.getConnection();
+
+        try {
+            await connection.beginTransaction();
+
+            // KIỂM TRA SỰ TỒN TẠI TRƯỚC KHI CẬP NHẬT
+            const [existing] = await connection.execute('SELECT MeetingID FROM Meetings WHERE MeetingID = ?', [meetingId]);
+            if (existing.length === 0) {
+                const error = new Error(`Cuộc họp với ID ${meetingId} không tồn tại.`);
+                error.status = 404; // Gắn cờ lỗi 404 để Controller nhận biết
+                throw error;
+            }
+
+            // 1. Cập nhật bảng Meetings (Thống nhất dùng execute)
+            const updateMeetingQuery = `
+                UPDATE Meetings 
+                SET Title = ?, Description = ?, StartTime = ?, EndTime = ?, OrganizerID = ?, IsRecurring = ?
+                WHERE MeetingID = ?
+            `;
+            await connection.execute(updateMeetingQuery, [
+                title, description || null, startTime, endTime, organizerId, isRecurring || false, meetingId
+            ]);
+
+            // 2. Cập nhật bảng Bookings (Thống nhất dùng execute)
+            const updateBookingQuery = `
+                UPDATE Bookings 
+                SET RoomID = ?
+                WHERE MeetingID = ?
+            `;
+            await connection.execute(updateBookingQuery, [roomId, meetingId]);
+
+            await connection.commit();
+            return true;
+        } catch (error) {
+            await connection.rollback();
+            throw error; // Ném lỗi ra để Controller bắt lấy
+        } finally {
+            connection.release();
+        }
     }
 };
 
