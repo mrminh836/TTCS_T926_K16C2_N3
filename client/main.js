@@ -74,12 +74,23 @@ let ROOMS = [
 ];
 
 const USERS = [
-  { id: 1, name: "Nguyễn Văn An", email: "an.nguyen@company.com", role: "Employee" },
-  { id: 2, name: "Trần Thu Hà", email: "ha.tran@company.com", role: "Manager" },
-  { id: 3, name: "Lê Minh Tuấn", email: "tuan.le@company.com", role: "Employee" },
-  { id: 4, name: "Hoàng Bảo Ngọc", email: "ngoc.hoang@company.com", role: "HR Lead" },
-  { id: 5, name: "Phạm Quốc Dũng", email: "dung.pham@company.com", role: "Tech Lead" },
-  { id: 6, name: "Vũ Tuấn Kiệt", email: "kiet.vu@company.com", role: "Director" }
+  { id: 1, name: "Nguyễn Văn An", email: "an.nguyen@company.com", role: "Employee", department: "Kỹ thuật", avatar: "NA", color: "#2563eb" },
+  { id: 2, name: "Trần Thu Hà", email: "ha.tran@company.com", role: "Manager", department: "Quản trị", avatar: "TH", color: "#7c3aed" },
+  { id: 3, name: "Lê Minh Tuấn", email: "tuan.le@company.com", role: "Employee", department: "Kỹ thuật", avatar: "MT", color: "#0891b2" },
+  { id: 4, name: "Hoàng Bảo Ngọc", email: "ngoc.hoang@company.com", role: "HR Lead", department: "Nhân sự", avatar: "BN", color: "#db2777" },
+  { id: 5, name: "Phạm Quốc Dũng", email: "dung.pham@company.com", role: "Tech Lead", department: "Kỹ thuật", avatar: "QD", color: "#d97706" },
+  { id: 6, name: "Vũ Tuấn Kiệt", email: "kiet.vu@company.com", role: "Director", department: "Ban Giám đốc", avatar: "TK", color: "#4f46e5" },
+  { id: 7, name: "Hoàng Minh Khánh", email: "khanh.hoang@company.com", role: "Frontend Dev", department: "Kỹ thuật", avatar: "MK", color: "#059669" },
+  { id: 8, name: "Nguyễn Minh Lượng", email: "luong.nguyen@company.com", role: "Frontend Dev", department: "Kỹ thuật", avatar: "ML", color: "#2563eb" },
+  { id: 9, name: "Vũ Thị Thanh Ngân", email: "ngan.vu@company.com", role: "UI/UX Designer", department: "Thiết kế", avatar: "TN", color: "#e11d48" },
+  { id: 10, name: "Đặng Hùng", email: "hung.dang@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "DH", color: "#9333ea" },
+  { id: 11, name: "Hà Sỹ Nguyên", email: "nguyen.ha@company.com", role: "Backend Lead", department: "Kỹ thuật", avatar: "SN", color: "#0d9488" },
+  { id: 12, name: "Đoàn Ngọc Mạnh", email: "manh.doan@company.com", role: "Backend Dev", department: "Kỹ thuật", avatar: "NM", color: "#0284c7" },
+  { id: 13, name: "Đào Đức Mạnh", email: "manh.dao@company.com", role: "Backend Dev", department: "Kỹ thuật", avatar: "DM", color: "#16a34a" },
+  { id: 14, name: "Hoàng Văn Khuyến", email: "khuyen.hoang@company.com", role: "QA Lead", department: "Kiểm thử", avatar: "VK", color: "#ca8a04" },
+  { id: 15, name: "Ngô Đức Khải", email: "khai.ngo@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "DK", color: "#ea580c" },
+  { id: 16, name: "Triệu Quốc Khánh", email: "khanh.trieu@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "QK", color: "#65a30d" },
+  { id: 17, name: "Đỗ Quang Minh", email: "minh.do@company.com", role: "Scrum Master", department: "Quản trị", avatar: "QM", color: "#475569" }
 ];
 
 const EQUIPMENTS = [
@@ -109,6 +120,7 @@ let meetings = [
       "Lê Minh Tuấn",
       "Phạm Quốc Dũng"
     ],
+    participantIds: [1, 2, 3, 5],
     status: "in-progress",
     notes: "Đánh giá kết quả Sprint và thống nhất công việc cho Sprint tiếp theo."
   },
@@ -132,6 +144,7 @@ let meetings = [
       "Đặng Hùng",
       "Vũ Tuấn Kiệt"
     ],
+    participantIds: [2, 8, 10, 6],
     status: "scheduled",
     notes: "Báo cáo chỉ số tăng trưởng doanh thu và phê duyệt ngân sách R&D."
   },
@@ -151,9 +164,10 @@ let meetings = [
     host: "Lê Minh Tuấn",
     participants: [
       "Lê Minh Tuấn",
-      "Vũ Ngọc",
-      "Trần Văn A"
+      "Vũ Thị Thanh Ngân",
+      "Hoàng Minh Khánh"
     ],
+    participantIds: [3, 9, 7],
     status: "scheduled",
     notes: "Rà soát tính nhất quán của bộ component Form và Dashboard."
   },
@@ -174,8 +188,9 @@ let meetings = [
     participants: [
       "Hoàng Bảo Ngọc",
       "Nguyễn Minh Lượng",
-      "Anh Tuấn"
+      "Hoàng Minh Khánh"
     ],
+    participantIds: [4, 8, 7],
     status: "scheduled",
     notes: "Đánh giá chuyên môn kỹ thuật và kinh nghiệm React/Tailwind."
   },
@@ -195,9 +210,10 @@ let meetings = [
     host: "Phạm Quốc Dũng",
     participants: [
       "Phạm Quốc Dũng",
-      "Trần Hùng",
-      "Lê Văn B"
+      "Đặng Hùng",
+      "Lê Minh Tuấn"
     ],
+    participantIds: [5, 10, 3],
     status: "completed",
     notes: "Cập nhật tiến độ API Gateway và giải quyết blocker."
   },
@@ -217,9 +233,10 @@ let meetings = [
     host: "Vũ Tuấn Kiệt",
     participants: [
       "Vũ Tuấn Kiệt",
-      "Nguyễn Dung",
-      "Trần Văn A"
+      "Trần Thu Hà",
+      "Nguyễn Văn An"
     ],
+    participantIds: [6, 2, 1],
     status: "cancelled",
     notes: "Thống nhất phạm vi triển khai và kế hoạch bàn giao milestone 1."
   }
@@ -2061,7 +2078,18 @@ function loadPersistedMeetings() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        meetings = parsed;
+        meetings = parsed.map(m => {
+          if (!m.participantIds && m.participants) {
+            m.participantIds = m.participants.map(name => {
+              const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
+              return u ? u.id : null;
+            }).filter(Boolean);
+            if (m.organizerId && !m.participantIds.includes(m.organizerId)) {
+              m.participantIds.unshift(m.organizerId);
+            }
+          }
+          return m;
+        });
       }
     }
   } catch (e) {
@@ -2282,6 +2310,11 @@ function clearMeetingFormErrors() {
     const el = document.getElementById(id);
     if (el) el.classList.remove("has-error", "is-invalid");
   });
+
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  if (trigger) trigger.classList.remove("has-error", "is-invalid");
+  const capacityAlert = document.getElementById("capacity-warning-alert");
+  if (capacityAlert) capacityAlert.classList.add("hidden");
 }
 
 function checkMeetingRoomConflict(roomId, date, startTime, endTime, editId = null) {
@@ -2468,17 +2501,38 @@ function validateMeetingForm(editId = null) {
     if (organizerSelect) organizerSelect.classList.add("has-error", "is-invalid");
   }
 
-  // Parse Người tham gia (Participants) & Thiết bị (Equipments)
-  const participants = participantsInput && participantsInput.value.trim()
-    ? participantsInput.value.split(",").map(p => p.trim()).filter(Boolean)
-    : [organizerObj?.name || "Nguyễn Văn An"];
-
-  const participantIds = participants.map(name => {
-    const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
-    return u ? u.id : null;
+  // 7. Parse Người tham gia (Participants) từ Multi-Select & Thiết bị (Equipments)
+  let participantIds = Array.from(selectedParticipantIds);
+  let participants = participantIds.map(id => {
+    const u = USERS.find(user => user.id === id);
+    return u ? u.name : null;
   }).filter(Boolean);
-  if (!participantIds.includes(organizerId) && organizerId) {
+
+  // Fallback đọc từ text input cũ nếu có dữ liệu bên ngoài
+  if (participants.length === 0 && participantsInput && participantsInput.value.trim()) {
+    const rawNames = participantsInput.value.split(",").map(p => p.trim()).filter(Boolean);
+    rawNames.forEach(name => {
+      const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
+      if (u) {
+        if (!participantIds.includes(u.id)) participantIds.push(u.id);
+        if (!participants.includes(u.name)) participants.push(u.name);
+      } else {
+        participants.push(name);
+      }
+    });
+  }
+
+  // Luôn đảm bảo Người tổ chức (Host) có mặt trong danh sách
+  if (organizerId && !participantIds.includes(organizerId)) {
     participantIds.unshift(organizerId);
+  }
+  if (organizerObj && !participants.includes(organizerObj.name)) {
+    participants.unshift(organizerObj.name);
+  }
+
+  // Đồng bộ lại input ẩn để tương thích ngược
+  if (participantsInput) {
+    participantsInput.value = participants.join(", ");
   }
 
   const equipmentCheckboxes = Array.from(document.querySelectorAll(".eq-checkbox:checked"));
@@ -2690,9 +2744,526 @@ function setupMeetingFormValidationEvents() {
 
   // Khởi tạo các bộ chọn nhanh DateTime & Bộ lọc Phòng
   setupQuickDateTimePresets();
-
+  // Khởi tạo các sự kiện cho Multi-select Đồng nghiệp
+  setupParticipantSelectorEvents();
   // Khởi tạo tính năng tùy chọn cuộc họp lặp định kỳ (Sprint 3)
   setupRecurringOptionsEvents();
+}
+
+// =====================================================
+// 6H. MULTI-SELECT ĐỒNG NGHIỆP THAM GIA CUỘC HỌP (STITCH SPEC)
+// Tác giả: Hoàng Minh Khánh (FE)
+// Đặc tả: US 4.0 - Chọn danh sách đồng nghiệp tham gia,
+// phân loại phòng ban, cảnh báo sức chứa, đồng bộ CSDL & 2 chiều
+// =====================================================
+
+let selectedParticipantIds = new Set([1]);
+let currentParticipantDeptFilter = "all";
+let participantSearchQuery = "";
+let isParticipantDropdownOpen = false;
+
+/**
+ * Khởi tạo bộ chọn người tham gia với danh sách ID ban đầu và OrganizerID
+ * @param {Array<number|string>} initialIds Danh sách ID hoặc Tên người tham gia
+ * @param {number} organizerId ID người tổ chức
+ */
+function initParticipantSelector(initialIds = [1], organizerId = 1) {
+  selectedParticipantIds.clear();
+
+  const orgId = Number(organizerId) || 1;
+  selectedParticipantIds.add(orgId);
+
+  if (Array.isArray(initialIds)) {
+    initialIds.forEach(item => {
+      if (typeof item === "number" && !isNaN(item)) {
+        selectedParticipantIds.add(item);
+      } else if (typeof item === "string") {
+        const found = USERS.find(u => u.name.toLowerCase() === item.trim().toLowerCase());
+        if (found) {
+          selectedParticipantIds.add(found.id);
+        }
+      }
+    });
+  }
+
+  // Luôn đảm bảo Người tổ chức (Host) được chọn
+  if (orgId) {
+    selectedParticipantIds.add(orgId);
+  }
+
+  currentParticipantDeptFilter = "all";
+  participantSearchQuery = "";
+  isParticipantDropdownOpen = false;
+
+  const searchInput = document.getElementById("participant-search-input");
+  if (searchInput) searchInput.value = "";
+
+  document.querySelectorAll("#participant-quick-dept-chips .btn-dept-chip").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-dept") === "all");
+  });
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+  closeParticipantDropdown();
+}
+
+/**
+ * Render danh sách Chip của các đồng nghiệp đã chọn
+ */
+function renderParticipantChips() {
+  const container = document.getElementById("participant-selected-chips");
+  const countBadge = document.getElementById("participants-selected-count");
+  const clearBtn = document.getElementById("btn-clear-participants");
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (!container) return;
+
+  const count = selectedParticipantIds.size;
+  if (countBadge) countBadge.textContent = count;
+
+  // Hiển thị nút Clear khi có trên 1 người chọn (ngoài host)
+  if (clearBtn) {
+    if (count > 1 || (count === 1 && !selectedParticipantIds.has(currentOrgId))) {
+      clearBtn.classList.remove("hidden");
+    } else {
+      clearBtn.classList.add("hidden");
+    }
+  }
+
+  const chipsHtml = Array.from(selectedParticipantIds).map(userId => {
+    const user = USERS.find(u => u.id === userId);
+    if (!user) return "";
+
+    const isHost = (user.id === currentOrgId);
+    const initials = user.avatar || getInitials(user.name);
+    const color = user.color || getHostColor(user.name);
+
+    return `
+      <div class="participant-chip ${isHost ? 'is-host' : ''}" data-user-id="${user.id}" title="${escapeHTML(user.name)} • ${escapeHTML(user.role)} (${escapeHTML(user.department)})">
+        <span class="chip-avatar" style="background: ${color};">${escapeHTML(initials)}</span>
+        <span class="chip-name">${escapeHTML(user.name)}</span>
+        ${isHost ? '<span class="chip-host-badge" title="Người tổ chức cuộc họp">Host</span>' : `
+          <button type="button" class="chip-btn-remove" onclick="removeParticipant(${user.id}, event)" aria-label="Xóa ${escapeHTML(user.name)}" title="Bỏ chọn">
+            <i class="bi bi-x"></i>
+          </button>
+        `}
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML = chipsHtml;
+}
+
+/**
+ * Render danh sách đồng nghiệp trong Dropdown Menu
+ */
+function renderParticipantDropdownList() {
+  const listEl = document.getElementById("participant-options-list");
+  const summaryEl = document.getElementById("dropdown-selection-summary");
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (!listEl) return;
+
+  if (summaryEl) {
+    summaryEl.textContent = `Đã chọn ${selectedParticipantIds.size} / ${USERS.length}`;
+  }
+
+  // Lọc đồng nghiệp theo bộ lọc phòng ban và từ khóa tìm kiếm
+  const query = participantSearchQuery.trim().toLowerCase();
+  const filteredUsers = USERS.filter(user => {
+    const matchDept = (currentParticipantDeptFilter === "all") || (user.department === currentParticipantDeptFilter);
+    if (!matchDept) return false;
+
+    if (!query) return true;
+    return (
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.role.toLowerCase().includes(query) ||
+      user.department.toLowerCase().includes(query)
+    );
+  });
+
+  if (filteredUsers.length === 0) {
+    listEl.innerHTML = `
+      <div class="stitch-dropdown-empty">
+        <i class="bi bi-search text-slate-400 d-block mb-1" style="font-size: 1.25rem;"></i>
+        <span>Không tìm thấy đồng nghiệp phù hợp</span>
+        ${query ? `<div class="small text-muted mt-0.5">Thử từ khóa khác với "${escapeHTML(query)}"</div>` : ''}
+      </div>
+    `;
+    return;
+  }
+
+  const itemsHtml = filteredUsers.map(user => {
+    const isSelected = selectedParticipantIds.has(user.id);
+    const isHost = (user.id === currentOrgId);
+    const initials = user.avatar || getInitials(user.name);
+    const color = user.color || getHostColor(user.name);
+
+    return `
+      <div class="participant-option-item ${isSelected ? 'is-selected' : ''}" 
+           role="option" 
+           aria-selected="${isSelected}"
+           onclick="toggleParticipant(${user.id})"
+           tabindex="0"
+           onkeydown="if(event.key==='Enter'||event.key===' '){toggleParticipant(${user.id});event.preventDefault();}">
+        <div class="option-left">
+          <span class="option-checkbox">
+            <i class="bi bi-check-lg"></i>
+          </span>
+          <span class="option-avatar" style="background: ${color};">
+            ${escapeHTML(initials)}
+          </span>
+          <div class="option-info">
+            <div class="d-flex align-items-center gap-1">
+              <span class="option-name">${escapeHTML(user.name)}</span>
+              ${isHost ? '<span class="chip-host-badge ms-1">Host</span>' : ''}
+            </div>
+            <span class="option-email">${escapeHTML(user.email)}</span>
+          </div>
+        </div>
+        <div class="option-right">
+          <span class="option-dept-badge">${escapeHTML(user.department)}</span>
+          <span class="option-role-badge">${escapeHTML(user.role)}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  listEl.innerHTML = itemsHtml;
+}
+
+/**
+ * Toggle trạng thái chọn của một đồng nghiệp
+ * @param {number} userId ID đồng nghiệp
+ */
+function toggleParticipant(userId) {
+  const uid = Number(userId);
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (selectedParticipantIds.has(uid)) {
+    // Không cho bỏ chọn Host từ click nếu họ đang là Organizer
+    if (uid === currentOrgId) {
+      alert("Đồng nghiệp này là Người tổ chức cuộc họp (Host), bắt buộc phải có mặt.");
+      return;
+    }
+    selectedParticipantIds.delete(uid);
+  } else {
+    selectedParticipantIds.add(uid);
+  }
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+
+  // Focus lại vào input tìm kiếm để tiếp tục thao tác
+  const searchInput = document.getElementById("participant-search-input");
+  if (searchInput) {
+    searchInput.focus();
+  }
+}
+
+/**
+ * Xóa một đồng nghiệp khỏi danh sách đã chọn
+ * @param {number} userId ID đồng nghiệp
+ * @param {Event} event Sự kiện click
+ */
+function removeParticipant(userId, event) {
+  if (event) {
+    event.stopPropagation();
+  }
+  const uid = Number(userId);
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  if (uid === currentOrgId) {
+    alert("Đồng nghiệp này là Người tổ chức cuộc họp (Host), bắt buộc phải có mặt.");
+    return;
+  }
+
+  selectedParticipantIds.delete(uid);
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+}
+
+/**
+ * Bỏ chọn tất cả đồng nghiệp (giữ lại Host)
+ */
+function clearAllParticipants() {
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+
+  selectedParticipantIds.clear();
+  selectedParticipantIds.add(currentOrgId);
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+}
+
+/**
+ * Chọn nhanh toàn bộ đồng nghiệp theo bộ lọc phòng ban
+ * @param {string} dept Tên phòng ban hoặc 'all'
+ */
+function selectAllParticipants(dept = "all") {
+  USERS.forEach(u => {
+    if (dept === "all" || u.department === dept) {
+      selectedParticipantIds.add(u.id);
+    }
+  });
+
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+}
+
+/**
+ * Mở dropdown menu chọn đồng nghiệp
+ */
+function openParticipantDropdown() {
+  const menu = document.getElementById("participant-dropdown-menu");
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  if (menu && trigger) {
+    menu.classList.remove("hidden");
+    trigger.classList.add("is-open", "is-focused");
+    trigger.setAttribute("aria-expanded", "true");
+    isParticipantDropdownOpen = true;
+    renderParticipantDropdownList();
+  }
+}
+
+/**
+ * Đóng dropdown menu chọn đồng nghiệp
+ */
+function closeParticipantDropdown() {
+  const menu = document.getElementById("participant-dropdown-menu");
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  if (menu && trigger) {
+    menu.classList.add("hidden");
+    trigger.classList.remove("is-open", "is-focused");
+    trigger.setAttribute("aria-expanded", "false");
+    isParticipantDropdownOpen = false;
+  }
+}
+
+/**
+ * Kiểm tra và cảnh báo nếu số người tham gia vượt quá sức chứa phòng họp đã chọn
+ */
+function updateParticipantCapacityWarning() {
+  const roomSelect = document.getElementById("meeting-room");
+  const warningAlert = document.getElementById("capacity-warning-alert");
+  const warningText = document.getElementById("capacity-warning-text");
+
+  if (!roomSelect || !warningAlert) return;
+
+  const roomId = Number(roomSelect.value);
+  const room = ROOMS.find(r => r.id === roomId);
+  const selectedCount = selectedParticipantIds.size;
+
+  if (room && room.capacity && selectedCount > room.capacity) {
+    if (warningText) {
+      warningText.innerHTML = `<strong>Cảnh báo sức chứa:</strong> Đang chọn <strong>${selectedCount}</strong> đồng nghiệp, vượt quá sức chứa tối đa của <strong>${escapeHTML(room.name)}</strong> (${room.capacity} chỗ). Vui lòng chọn phòng lớn hơn hoặc giảm số người tham dự.`;
+    }
+    warningAlert.classList.remove("hidden");
+  } else {
+    warningAlert.classList.add("hidden");
+  }
+}
+
+/**
+ * Đồng bộ hóa dữ liệu sang input ẩn #meeting-participants để đảm bảo tương thích ngược
+ */
+function syncHiddenParticipantsInput() {
+  const input = document.getElementById("meeting-participants");
+  if (!input) return;
+
+  const names = Array.from(selectedParticipantIds).map(id => {
+    const u = USERS.find(user => user.id === id);
+    return u ? u.name : null;
+  }).filter(Boolean);
+
+  input.value = names.join(", ");
+}
+
+/**
+ * Gắn toàn bộ sự kiện tương tác cho Component Multi-Select Đồng Nghiệp
+ */
+function setupParticipantSelectorEvents() {
+  const container = document.getElementById("participant-multiselect-container");
+  const trigger = document.getElementById("participant-multiselect-trigger");
+  const searchInput = document.getElementById("participant-search-input");
+  const clearBtn = document.getElementById("btn-clear-participants");
+  const closeDropdownBtn = document.getElementById("btn-close-participant-dropdown");
+  const organizerSelect = document.getElementById("meeting-organizer");
+  const roomSelect = document.getElementById("meeting-room");
+
+  if (trigger && searchInput) {
+    trigger.addEventListener("click", (e) => {
+      if (e.target.closest(".participant-chip") || e.target.closest(".btn-clear-participants")) {
+        return;
+      }
+      openParticipantDropdown();
+      searchInput.focus();
+    });
+
+    searchInput.addEventListener("focus", () => {
+      openParticipantDropdown();
+    });
+
+    searchInput.addEventListener("input", () => {
+      participantSearchQuery = searchInput.value;
+      openParticipantDropdown();
+      renderParticipantDropdownList();
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeParticipantDropdown();
+        searchInput.blur();
+      } else if (e.key === "Backspace" && searchInput.value === "") {
+        // Xóa chip không phải host gần nhất khi ấn Backspace trong ô tìm kiếm trống
+        const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+        const nonHostIds = Array.from(selectedParticipantIds).filter(id => id !== currentOrgId);
+        if (nonHostIds.length > 0) {
+          const lastId = nonHostIds[nonHostIds.length - 1];
+          removeParticipant(lastId);
+        }
+      }
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      clearAllParticipants();
+    });
+  }
+
+  if (closeDropdownBtn) {
+    closeDropdownBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeParticipantDropdown();
+    });
+  }
+
+  // Bộ lọc phòng ban nhanh
+  document.querySelectorAll("#participant-quick-dept-chips .btn-dept-chip").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const dept = btn.getAttribute("data-dept");
+      currentParticipantDeptFilter = dept;
+      document.querySelectorAll("#participant-quick-dept-chips .btn-dept-chip").forEach(b => {
+        b.classList.toggle("active", b === btn);
+      });
+      openParticipantDropdown();
+      renderParticipantDropdownList();
+    });
+  });
+
+  // Nút tiện ích chọn theo nhóm
+  const btnSelectTech = document.getElementById("btn-select-tech-team");
+  if (btnSelectTech) {
+    btnSelectTech.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectAllParticipants("Kỹ thuật");
+    });
+  }
+
+  const btnSelectQA = document.getElementById("btn-select-qa-team");
+  if (btnSelectQA) {
+    btnSelectQA.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectAllParticipants("Kiểm thử");
+    });
+  }
+
+  const btnSelectAll = document.getElementById("btn-select-all-participants");
+  if (btnSelectAll) {
+    btnSelectAll.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectAllParticipants("all");
+    });
+  }
+
+  // Đóng dropdown khi click ra ngoài
+  document.addEventListener("click", (e) => {
+    if (container && !container.contains(e.target)) {
+      closeParticipantDropdown();
+    }
+  });
+
+  // Tự động thêm & ghim Organizer khi thay đổi Người tổ chức
+  if (organizerSelect) {
+    organizerSelect.addEventListener("change", () => {
+      const newOrgId = Number(organizerSelect.value);
+      if (newOrgId) {
+        selectedParticipantIds.add(newOrgId);
+        renderParticipantChips();
+        renderParticipantDropdownList();
+        syncHiddenParticipantsInput();
+        updateParticipantCapacityWarning();
+      }
+    });
+  }
+
+  // Đồng bộ cảnh báo sức chứa khi đổi phòng
+  if (roomSelect) {
+    roomSelect.addEventListener("change", () => {
+      updateParticipantCapacityWarning();
+    });
+  }
+}
+
+/**
+ * Render giao diện danh sách đồng nghiệp tham gia cho Modal Chi tiết (Detail View)
+ * @param {Object} meeting Đối tượng cuộc họp
+ * @returns {string} HTML danh sách thẻ đồng nghiệp
+ */
+function renderDetailParticipantsHtml(meeting) {
+  if (!meeting.participants || meeting.participants.length === 0) {
+    return '<span class="text-muted small">Chưa có người tham gia</span>';
+  }
+
+  const cardsHtml = meeting.participants.map(pName => {
+    const user = USERS.find(u => u.name.toLowerCase() === pName.toLowerCase());
+    const isHost = (pName === meeting.host) || (user && user.id === meeting.organizerId);
+    const initials = user?.avatar || getInitials(pName);
+    const color = user?.color || getHostColor(pName);
+    const role = user?.role || (isHost ? "Người tổ chức" : "Thành viên");
+    const dept = user?.department ? ` • ${user.department}` : "";
+    const email = user?.email || "";
+
+    return `
+      <div class="detail-participant-card ${isHost ? 'is-host' : ''}">
+        <span class="option-avatar" style="background: ${color};">${escapeHTML(initials)}</span>
+        <div class="detail-participant-info">
+          <div class="d-flex align-items-center gap-1">
+            <span class="detail-participant-name">${escapeHTML(pName)}</span>
+            ${isHost ? '<span class="chip-host-badge ms-1">Host</span>' : ''}
+          </div>
+          <span class="detail-participant-sub">${escapeHTML(role + dept)}</span>
+          ${email ? `<span class="detail-participant-sub text-muted" style="font-size: 0.65rem;">${escapeHTML(email)}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="d-flex align-items-center justify-content-between mb-1">
+      <span class="small text-muted">Tổng số: <strong>${meeting.participants.length}</strong> đồng nghiệp tham gia</span>
+    </div>
+    <div class="detail-participant-grid">${cardsHtml}</div>
+  `;
 }
 
 // =====================================================
@@ -4760,6 +5331,8 @@ function openAddModal() {
 
   const organizerSelect = document.getElementById("meeting-organizer");
   if (organizerSelect) organizerSelect.value = "1";
+  const defaultOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  initParticipantSelector([defaultOrgId], defaultOrgId);
 
   const tagInput = document.getElementById("meeting-tag");
   if (tagInput) tagInput.value = "";
@@ -4917,6 +5490,18 @@ function openEditModal(id) {
   if (endInput) endInput.value = endTime;
   if (locationInput) locationInput.value = meeting.location || (meeting.roomName || "");
   if (participantsInput) participantsInput.value = (meeting.participants || []).join(", ");
+
+  let editParticipantIds = meeting.participantIds || [];
+  if ((!editParticipantIds || editParticipantIds.length === 0) && meeting.participants) {
+    editParticipantIds = meeting.participants.map(name => {
+      const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
+      return u ? u.id : null;
+    }).filter(Boolean);
+  }
+  if (!editParticipantIds || editParticipantIds.length === 0) {
+    editParticipantIds = [meeting.organizerId || 1];
+  }
+  initParticipantSelector(editParticipantIds, meeting.organizerId || 1);
   if (statusInput) statusInput.value = meeting.status || "scheduled";
 
   // IsRecurring & Equipments
@@ -5472,9 +6057,7 @@ function openDetailModal(id) {
         <span id="detail-participant-summary-badges" class="small"></span>
       </div>
       <div id="detail-participants-list" class="text-dark small d-flex flex-wrap gap-1">
-        ${(meeting.participants && meeting.participants.length) 
-          ? meeting.participants.map(p => `<span class="badge bg-light text-dark border me-1">${escapeHTML(p)}</span>`).join("")
-          : "Chưa có"}
+        ${renderDetailParticipantsHtml(meeting)}
       </div>
     </div>
 
@@ -5568,6 +6151,7 @@ function openDetailModal(id) {
 function closeMeetingModal() {
   modalOverlay.classList.add("hidden");
   clearMeetingFormErrors();
+  closeParticipantDropdown();
 
   const form = document.getElementById("meeting-form");
   const successView = document.getElementById("success-view");
