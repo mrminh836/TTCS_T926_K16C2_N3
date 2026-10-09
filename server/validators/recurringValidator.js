@@ -53,14 +53,11 @@ function generateOccurrences(params) {
             // Cộng thêm (i * intervalValue) tuần
             occDate.setDate(occDate.getDate() + (i * intervalValue * 7));
         } else if (recurrenceType === 'monthly') {
-            // Cộng thêm (i * intervalValue) tháng
-            occDate.setMonth(occDate.getMonth() + (i * intervalValue));
-            // Xử lý edge case: ngày 31 của tháng chỉ có 30 ngày → lùi về ngày cuối tháng
-            if (dayOfMonth) {
-                const targetDay = dayOfMonth;
-                const lastDayOfMonth = new Date(occDate.getFullYear(), occDate.getMonth() + 1, 0).getDate();
-                occDate.setDate(Math.min(targetDay, lastDayOfMonth));
-            }
+            const targetYear = startDate.getFullYear();
+            const targetMonth = startDate.getMonth() + (i * intervalValue);
+            const targetDay = dayOfMonth || startDate.getDate();
+            const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+            occDate = new Date(targetYear, targetMonth, Math.min(targetDay, lastDayOfMonth));
         }
 
         // Gán giờ bắt đầu/kết thúc cho mỗi buổi

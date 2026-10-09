@@ -40,34 +40,38 @@ describe('Meeting Model - (Kiểm thử Unit Test Model & Transaction)', () => {
 
             const executedQueries = [];
 
+            const handler = async (sql, params) => {
+                executedQueries.push({ sql, params });
+                if (customHandlers.execute) {
+                    return customHandlers.execute(sql, params);
+                }
+                const lowerSql = (sql || '').toLowerCase();
+                // Mặc định phản hồi thành công
+                if (lowerSql.includes('from users where userid')) {
+                    return [[{ UserID: params ? params[0] : 1, FullName: 'Nguyen Van A' }]];
+                }
+                if (lowerSql.includes('from rooms where roomid')) {
+                    return [[{ RoomID: params ? params[0] : 1, RoomName: 'Phòng Hội Nghị A', Capacity: 20, Status: 'Active' }]];
+                }
+                if (lowerSql.includes("bookingstatus = 'confirmed'")) {
+                    return [[]]; // Không bị trùng
+                }
+                if (lowerSql.includes('insert into meetings')) {
+                    return [{ insertId: 1001 }];
+                }
+                if (lowerSql.includes('insert into bookings')) {
+                    return [{ insertId: 2001 }];
+                }
+                return [{}];
+            };
+
             const mockConnection = {
                 beginTransaction: async () => { transactionStarted = true; },
                 commit: async () => { transactionCommitted = true; },
                 rollback: async () => { transactionRolledBack = true; },
                 release: () => { connectionReleased = true; },
-                execute: async (sql, params) => {
-                    executedQueries.push({ sql, params });
-                    if (customHandlers.execute) {
-                        return customHandlers.execute(sql, params);
-                    }
-                    // Mặc định phản hồi thành công
-                    if (sql.includes('FROM users WHERE UserID')) {
-                        return [[{ UserID: params[0], FullName: 'Nguyen Van A' }]];
-                    }
-                    if (sql.includes('FROM rooms WHERE RoomID')) {
-                        return [[{ RoomID: params[0], RoomName: 'Phòng Hội Nghị A', Capacity: 20, Status: 'Active' }]];
-                    }
-                    if (sql.includes('BookingStatus = \'Confirmed\'')) {
-                        return [[]]; // Không bị trùng
-                    }
-                    if (sql.includes('INSERT INTO meetings')) {
-                        return [{ insertId: 1001 }];
-                    }
-                    if (sql.includes('INSERT INTO bookings')) {
-                        return [{ insertId: 2001 }];
-                    }
-                    return [{}];
-                },
+                execute: handler,
+                query: handler,
                 getFlags: () => ({
                     transactionStarted,
                     transactionCommitted,
@@ -120,7 +124,8 @@ describe('Meeting Model - (Kiểm thử Unit Test Model & Transaction)', () => {
         it('should rollback and throw 404 when organizer does not exist', async () => {
             const mockConn = createMockConnection({
                 execute: async (sql, params) => {
-                    if (sql.includes('FROM users WHERE UserID')) {
+                    const lowerSql = (sql || '').toLowerCase();
+                    if (lowerSql.includes('from users where userid')) {
                         return [[]]; // Không tìm thấy User
                     }
                     return [[]];
@@ -159,10 +164,11 @@ describe('Meeting Model - (Kiểm thử Unit Test Model & Transaction)', () => {
         it('should rollback and throw 404 when room does not exist', async () => {
             const mockConn = createMockConnection({
                 execute: async (sql, params) => {
-                    if (sql.includes('FROM users WHERE UserID')) {
+                    const lowerSql = (sql || '').toLowerCase();
+                    if (lowerSql.includes('from users where userid')) {
                         return [[{ UserID: params[0], FullName: 'Nguyen Van A' }]];
                     }
-                    if (sql.includes('FROM rooms WHERE RoomID')) {
+                    if (lowerSql.includes('from rooms where roomid')) {
                         return [[]]; // Không tìm thấy phòng
                     }
                     return [[]];
@@ -201,10 +207,11 @@ describe('Meeting Model - (Kiểm thử Unit Test Model & Transaction)', () => {
         it('should rollback and throw 400 when room is not in Active status (e.g. Maintenance)', async () => {
             const mockConn = createMockConnection({
                 execute: async (sql, params) => {
-                    if (sql.includes('FROM users WHERE UserID')) {
+                    const lowerSql = (sql || '').toLowerCase();
+                    if (lowerSql.includes('from users where userid')) {
                         return [[{ UserID: params[0], FullName: 'Nguyen Van A' }]];
                     }
-                    if (sql.includes('FROM rooms WHERE RoomID')) {
+                    if (lowerSql.includes('from rooms where roomid')) {
                         return [[{ RoomID: params[0], RoomName: 'Phòng B', Capacity: 10, Status: 'Maintenance' }]];
                     }
                     return [[]];
@@ -243,13 +250,14 @@ describe('Meeting Model - (Kiểm thử Unit Test Model & Transaction)', () => {
         it('should rollback and throw 409 when room has schedule overlap', async () => {
             const mockConn = createMockConnection({
                 execute: async (sql, params) => {
-                    if (sql.includes('FROM users WHERE UserID')) {
+                    const lowerSql = (sql || '').toLowerCase();
+                    if (lowerSql.includes('from users where userid')) {
                         return [[{ UserID: params[0], FullName: 'Nguyen Van A' }]];
                     }
-                    if (sql.includes('FROM rooms WHERE RoomID')) {
+                    if (lowerSql.includes('from rooms where roomid')) {
                         return [[{ RoomID: params[0], RoomName: 'Phòng VIP', Capacity: 10, Status: 'Active' }]];
                     }
-                    if (sql.includes('BookingStatus = \'Confirmed\'')) {
+                    if (lowerSql.includes("bookingstatus = 'confirmed'")) {
                         return [[{ MeetingID: 88, Title: 'Họp Trùng Giờ' }]]; // Đã có cuộc họp trùng
                     }
                     return [[]];

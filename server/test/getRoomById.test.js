@@ -112,7 +112,8 @@ describe('API GET /rooms/:id - Chi tiết phòng và Sức chứa tối đa (US 
             db.execute = async (sql, params) => {
                 capturedSql = sql;
                 capturedParams = params;
-                if (sql.includes('FROM rooms') && sql.includes('RoomID = ?')) {
+                const lowerSql = (sql || '').toLowerCase();
+                if (lowerSql.includes('from rooms') && lowerSql.includes('roomid = ?')) {
                     return [[
                         {
                             RoomID: 1,
@@ -129,7 +130,7 @@ describe('API GET /rooms/:id - Chi tiết phòng và Sức chứa tối đa (US 
                         }
                     ]];
                 }
-                if (sql.includes('bookings') && sql.includes('COUNT(*)')) {
+                if (lowerSql.includes('bookings') && lowerSql.includes('count(*)')) {
                     return [[{ count: 3 }]];
                 }
                 return [[]];

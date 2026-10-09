@@ -205,7 +205,7 @@ describe('Phòng Họp: Unit Test Model Room & CRUD APIs (Luồng 1.1, 1.2, 1.3)
                 if (sql.includes('SELECT MAX(RoomID)')) {
                     return [[{ maxId: 5 }]];
                 }
-                if (sql.includes('INSERT INTO rooms')) {
+                if (sql.toUpperCase().includes('INSERT INTO ROOMS')) {
                     insertedData = params;
                     return [{ insertId: 6 }];
                 }

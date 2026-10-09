@@ -561,7 +561,7 @@ const Room = {
      * @returns {Promise<Array>} Danh sách phòng trống
      */
     findAvailableRooms: async ({ startTime, endTime, minCapacity = null, excludeMeetingId = null }) => {
-        let sql = `
+        const query = `
             SELECT 
                 r.RoomID,
                 r.RoomCode,
@@ -572,39 +572,39 @@ const Room = {
                 r.Status,
                 r.QRCode,
                 r.Description
-            FROM Rooms r
+            FROM rooms r
             WHERE r.Status = 'Active'
-        `;
-        const params = [];
-
-        if (minCapacity !== null && minCapacity !== undefined && minCapacity !== '') {
-            sql += ` AND r.Capacity >= ?`;
-            params.push(Number(minCapacity));
-        }
-
-        sql += `
+              AND (? IS NULL OR r.Capacity >= ?)
               AND NOT EXISTS (
                   SELECT 1
-                  FROM Bookings b
-                  JOIN Meetings m ON b.MeetingID = m.MeetingID
+                  FROM bookings b
+                  JOIN meetings m ON b.MeetingID = m.MeetingID
                   WHERE b.RoomID = r.RoomID
                     AND b.BookingStatus = 'Confirmed'
                     AND (m.StartTime < ?) AND (m.EndTime > ?)
-        `;
-        params.push(endTime, startTime);
-
-        if (excludeMeetingId) {
-            sql += ` AND m.MeetingID != ?`;
-            params.push(Number(excludeMeetingId));
-        }
-
-        sql += `
+                    AND (? IS NULL OR m.MeetingID != ?)
               )
             ORDER BY r.Capacity ASC, r.RoomName ASC
         `;
 
+        const parsedMinCapacity = (minCapacity !== null && minCapacity !== undefined && minCapacity !== '')
+            ? Number(minCapacity)
+            : null;
+        const parsedExcludeId = (excludeMeetingId !== null && excludeMeetingId !== undefined && excludeMeetingId !== '')
+            ? Number(excludeMeetingId)
+            : null;
+
+        const params = [
+            parsedMinCapacity,
+            parsedMinCapacity,
+            endTime,
+            startTime,
+            parsedExcludeId,
+            parsedExcludeId
+        ];
+
         try {
-            const [rows] = await db.query(sql, params);
+            const [rows] = await db.execute(query, params);
             return rows.map(r => ({
                 ...formatRoomRow(r),
                 isAvailable: true
