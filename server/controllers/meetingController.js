@@ -151,7 +151,7 @@ const updateMeeting = async (req, res) => {
             return res.status(400).json({ message: "ID cuộc họp không hợp lệ. Vui lòng nhập số." });
         }
 
-        const { title, description, startTime, endTime, organizerId, roomId, isRecurring } = req.body;
+        const { title, description, startTime, endTime, organizerId, roomId, isRecurring, participantIds } = req.body;
 
         // 1. Validate dữ liệu
         if (!title || !startTime || !endTime || !organizerId || !roomId) {
@@ -168,12 +168,21 @@ const updateMeeting = async (req, res) => {
             return res.status(409).json({ message: "Cập nhật thất bại! Phòng này đã có cuộc họp khác trong khung giờ bạn chọn." });
         }
 
-        // 3. Thực thi cập nhật
-        await Meeting.update(meetingId, { title, description, startTime, endTime, organizerId, roomId, isRecurring });
+        // 3. Thực thi cập nhật (kèm đồng bộ bảng Meeting_Participants)
+        await Meeting.update(meetingId, { 
+            title, 
+            description, 
+            startTime, 
+            endTime, 
+            organizerId, 
+            roomId, 
+            isRecurring, 
+            participantIds 
+        });
 
         return res.status(200).json({
             message: "Cập nhật cuộc họp thành công",
-            data: { meetingId, title, roomId, startTime, endTime }
+            data: { meetingId, title, roomId, startTime, endTime, participantIds }
         });
 
     } catch (error) {
@@ -187,5 +196,37 @@ const updateMeeting = async (req, res) => {
     }
 };
 
-module.exports = { createMeeting, getMeetings, updateMeeting };
+/**
+ * GET /api/meetings/:id
+ * Lấy chi tiết cuộc họp kèm phòng, thiết bị và người tham gia (với trạng thái phản hồi)
+ */
+const getMeetingById = async (req, res, next) => {
+    try {
+        const meetingId = parseInt(req.params.id, 10);
+        if (isNaN(meetingId) || meetingId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "ID cuộc họp không hợp lệ (phải là số nguyên dương)."
+            });
+        }
+
+        const meeting = await Meeting.getById(meetingId);
+        if (!meeting) {
+            return res.status(404).json({
+                success: false,
+                message: `Cuộc họp với ID ${meetingId} không tồn tại.`
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: meeting
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { createMeeting, getMeetings, getMeetingById, updateMeeting };
+
 

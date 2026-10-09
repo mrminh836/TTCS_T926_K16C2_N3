@@ -2209,6 +2209,28 @@ const MeetingAPI = {
         message: "Lưu tạm trên bộ nhớ cục bộ (Local Store Fallback)"
       };
     }
+  },
+
+  async getParticipants(meetingId) {
+    try {
+      const res = await fetch(`http://localhost:3000/api/meetings/${meetingId}/participants`);
+      return await res.json();
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  },
+
+  async updateParticipantStatus(meetingId, userId, responseStatus) {
+    try {
+      const res = await fetch(`http://localhost:3000/api/meetings/${meetingId}/participants/${userId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ responseStatus })
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
   }
 };
 
@@ -5443,10 +5465,17 @@ function openDetailModal(id) {
     </div>
 
     <div class="mb-3">
-      <span class="text-muted small d-block mb-0.5">
-        <i class="bi bi-people text-primary me-1"></i> NGƯỜI THAM GIA (Meeting_Participants)
-      </span>
-      <div class="text-dark small">${(meeting.participants && meeting.participants.length) ? escapeHTML(meeting.participants.join(", ")) : "Chưa có"}</div>
+      <div class="d-flex align-items-center justify-content-between mb-1">
+        <span class="text-muted small">
+          <i class="bi bi-people text-primary me-1"></i> NGƯỜI THAM GIA & PHẢN HỒI (Meeting_Participants)
+        </span>
+        <span id="detail-participant-summary-badges" class="small"></span>
+      </div>
+      <div id="detail-participants-list" class="text-dark small d-flex flex-wrap gap-1">
+        ${(meeting.participants && meeting.participants.length) 
+          ? meeting.participants.map(p => `<span class="badge bg-light text-dark border me-1">${escapeHTML(p)}</span>`).join("")
+          : "Chưa có"}
+      </div>
     </div>
 
     <div class="row g-2 mb-3">
@@ -5484,6 +5513,51 @@ function openDetailModal(id) {
   `;
 
   detailOverlay.classList.remove("hidden");
+
+  // Truy vấn trực tiếp trạng thái phản hồi của người tham gia từ Backend API
+  MeetingAPI.getParticipants(meeting.id).then(res => {
+    if (res.success && res.data && res.data.participants) {
+      const pListEl = document.getElementById("detail-participants-list");
+      const summaryEl = document.getElementById("detail-participant-summary-badges");
+      if (pListEl && res.data.participants.length > 0) {
+        pListEl.innerHTML = res.data.participants.map(p => {
+          let badgeClass = "bg-warning-subtle text-warning border-warning-subtle";
+          let icon = "bi-clock";
+          let label = "Chờ phản hồi";
+          if (p.responseStatus === "Accepted") {
+            badgeClass = "bg-success-subtle text-success border-success-subtle";
+            icon = "bi-check-circle-fill";
+            label = "Đồng ý";
+          } else if (p.responseStatus === "Declined") {
+            badgeClass = "bg-danger-subtle text-danger border-danger-subtle";
+            icon = "bi-x-circle-fill";
+            label = "Từ chối";
+          } else if (p.responseStatus === "Tentative") {
+            badgeClass = "bg-info-subtle text-info border-info-subtle";
+            icon = "bi-question-circle-fill";
+            label = "Cân nhắc";
+          }
+
+          return `
+            <div class="d-inline-flex align-items-center gap-1 border rounded-pill px-2 py-0.5 bg-white small mb-1 shadow-sm">
+              <span class="fw-semibold text-dark">${escapeHTML(p.fullName)}</span>
+              <span class="badge ${badgeClass} border rounded-pill" style="font-size: 10px;">
+                <i class="bi ${icon} me-1"></i>${label}
+              </span>
+            </div>
+          `;
+        }).join("");
+      }
+      if (summaryEl && res.data.summary) {
+        const s = res.data.summary;
+        summaryEl.innerHTML = `
+          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill me-1">${s.accepted} đồng ý</span>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill me-1">${s.declined} từ chối</span>
+          <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">${s.pending} chờ</span>
+        `;
+      }
+    }
+  });
 }
 
 
