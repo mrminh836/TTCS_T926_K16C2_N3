@@ -58,6 +58,27 @@ services:
     networks:
       - meeting_net
 
+  # ==========================================
+  # Service phpMyAdmin (Database UI)
+  # ==========================================
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: meeting_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "${PMA_PORT:-8082}:80"
+    environment:
+      PMA_HOST: mysql_db
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USER:-root}
+      PMA_PASSWORD: ${DB_PASSWORD:-root123}
+      UPLOAD_LIMIT: 64M
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    networks:
+      - meeting_net
+
 # ==========================================
 # Volumes
 # ==========================================

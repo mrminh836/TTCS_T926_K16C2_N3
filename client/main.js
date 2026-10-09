@@ -1819,7 +1819,12 @@ const RoomAPI = {
         const json = await res.json();
         this.isBackendConnected = true;
         this.updateStatusBadge();
-        return { success: true, data: json.data || json, isFallback: false };
+        const serverRooms = json.data || json;
+        if (Array.isArray(serverRooms) && serverRooms.length > 0) {
+          ROOMS = serverRooms;
+          persistRoomsToStorage();
+        }
+        return { success: true, data: ROOMS, isFallback: false };
       }
     } catch (err) {
       this.isBackendConnected = false;
@@ -5376,7 +5381,16 @@ loadPersistedRooms();
 loadPersistedMeetings();
 setupRoomFormValidationEvents();
 setupMeetingFormValidationEvents();
-RoomAPI.checkHealth();
+RoomAPI.checkHealth().then(async (connected) => {
+  if (connected) {
+    await RoomAPI.getAll();
+    syncMeetingRoomOptions();
+    const current = getCurrentRoute();
+    if (current === "/admin/rooms" || current === "/rooms" || current === "/" || current === "/home") {
+      router();
+    }
+  }
+});
 MeetingAPI.checkHealth();
 syncMeetingRoomOptions();
 router();
