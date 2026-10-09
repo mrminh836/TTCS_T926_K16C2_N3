@@ -279,9 +279,78 @@ const Meeting = {
         return rows.length > 0;
     },
 
+    /**
+     * Lấy chi tiết một cuộc họp theo ID kèm phòng, người tổ chức, thiết bị và người tham gia (với trạng thái phản hồi)
+     */
+    getById: async (meetingId) => {
+        const query = `
+            SELECT 
+                m.MeetingID     AS meetingId,
+                m.Title         AS title,
+                m.Description   AS description,
+                m.StartTime     AS startTime,
+                m.EndTime       AS endTime,
+                m.IsRecurring   AS isRecurring,
+                m.CreatedAt     AS createdAt,
+                m.OrganizerID   AS organizerId,
+                u.FullName      AS organizerName,
+                u.Email         AS organizerEmail,
+                b.BookingID     AS bookingId,
+                b.BookingStatus AS bookingStatus,
+                r.RoomID        AS roomId,
+                r.RoomName      AS roomName,
+                r.Capacity      AS roomCapacity
+            FROM Meetings m
+            LEFT JOIN Users u ON m.OrganizerID = u.UserID
+            LEFT JOIN Bookings b ON m.MeetingID = b.MeetingID
+            LEFT JOIN Rooms r ON b.RoomID = r.RoomID
+            WHERE m.MeetingID = ?
+        `;
+        const [rows] = await db.execute(query, [meetingId]);
+        if (rows.length === 0) return null;
+
+        const meeting = rows[0];
+
+        // Lấy danh sách người tham gia kèm trạng thái phản hồi
+        const [participants] = await db.execute(`
+            SELECT 
+                mp.UserID         AS userId,
+                u.FullName        AS fullName,
+                u.Email           AS email,
+                u.Role            AS role,
+                mp.ResponseStatus AS responseStatus
+            FROM Meeting_Participants mp
+            JOIN Users u ON mp.UserID = u.UserID
+            WHERE mp.MeetingID = ?
+            ORDER BY u.FullName ASC
+        `, [meetingId]);
+
+        // Lấy danh sách thiết bị đã đặt
+        let equipments = [];
+        if (meeting.bookingId) {
+            const [eqRows] = await db.execute(`
+                SELECT 
+                    e.EquipmentID   AS equipmentId,
+                    e.EquipmentName AS equipmentName,
+                    e.Type          AS type,
+                    e.Status        AS status
+                FROM Booking_Equipments be
+                JOIN Equipments e ON be.EquipmentID = e.EquipmentID
+                WHERE be.BookingID = ?
+            `, [meeting.bookingId]);
+            equipments = eqRows;
+        }
+
+        return {
+            ...meeting,
+            participants,
+            equipments
+        };
+    },
+
     // Thực thi cập nhật
     update: async (meetingId, meetingData) => {
-        const { title, description, startTime, endTime, organizerId, isRecurring, roomId } = meetingData;
+        const { title, description, startTime, endTime, organizerId, isRecurring, roomId, participantIds } = meetingData;
         const connection = await db.getConnection();
 
         try {
@@ -312,6 +381,28 @@ const Meeting = {
                 WHERE MeetingID = ?
             `;
             await connection.execute(updateBookingQuery, [roomId, meetingId]);
+
+            // 3. Cập nhật bảng Meeting_Participants nếu có truyền participantIds
+            if (participantIds !== undefined && Array.isArray(participantIds)) {
+                const cleanIds = [...new Set(participantIds.map(Number).filter(id => Number.isInteger(id) && id > 0))];
+                if (cleanIds.length === 0) {
+                    await connection.execute('DELETE FROM Meeting_Participants WHERE MeetingID = ?', [meetingId]);
+                } else {
+                    // Xóa những người không còn trong danh sách mới
+                    const placeholders = cleanIds.map(() => '?').join(',');
+                    await connection.query(
+                        `DELETE FROM Meeting_Participants WHERE MeetingID = ? AND UserID NOT IN (${placeholders})`,
+                        [meetingId, ...cleanIds]
+                    );
+                    // Thêm người mới với trạng thái 'Pending' (giữ nguyên nếu đã có bằng INSERT IGNORE)
+                    for (const uId of cleanIds) {
+                        await connection.query(
+                            'INSERT IGNORE INTO Meeting_Participants (MeetingID, UserID, ResponseStatus) VALUES (?, ?, ?)',
+                            [meetingId, uId, 'Pending']
+                        );
+                    }
+                }
+            }
 
             await connection.commit();
             return true;
