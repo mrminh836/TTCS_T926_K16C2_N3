@@ -144,8 +144,6 @@ const Meeting = {
         const connection = await db.getConnection();
 
         try {
-            // Đặt isolation level SERIALIZABLE để đảm bảo chống Race Condition
-            await connection.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
             await connection.beginTransaction();
 
             // 1. Kiểm tra sự tồn tại của Người tổ chức (Organizer)
@@ -194,6 +192,66 @@ const Meeting = {
                 throw error;
             }
 
+            // 3.1. Kiểm tra và xác thực danh sách Thiết bị mượn kèm (Equipment Validation & Concurrency Lock)
+            const cleanEquipmentIds = Array.isArray(equipmentIds)
+                ? [...new Set(equipmentIds.map(Number).filter(id => Number.isInteger(id) && id > 0))]
+                : [];
+
+            if (cleanEquipmentIds.length > 0) {
+                // a. Khóa dòng (FOR UPDATE) và kiểm tra sự tồn tại của thiết bị
+                const [eqRows] = await connection.query(
+                    'SELECT EquipmentID, EquipmentName, Status FROM Equipments WHERE EquipmentID IN (?) FOR UPDATE',
+                    [cleanEquipmentIds]
+                );
+
+                if (eqRows.length !== cleanEquipmentIds.length) {
+                    const foundIds = new Set(eqRows.map(r => r.EquipmentID));
+                    const missingIds = cleanEquipmentIds.filter(id => !foundIds.has(id));
+                    const error = new Error(`Thiết bị với ID [${missingIds.join(', ')}] không tồn tại trong hệ thống.`);
+                    error.status = 404;
+                    throw error;
+                }
+
+                // b. Quy tắc 1: Chặn mượn thiết bị đang bảo trì hoặc hư hỏng (Status != 'Available')
+                const unavailableEq = eqRows.find(r => (r.Status || '').toLowerCase() !== 'available');
+                if (unavailableEq) {
+                    const statusText = (unavailableEq.Status || '').toLowerCase() === 'maintenance'
+                        ? 'bảo trì'
+                        : ((unavailableEq.Status || '').toLowerCase() === 'broken' ? 'hư hỏng' : unavailableEq.Status);
+                    const error = new Error(`Thiết bị "${unavailableEq.EquipmentName}" hiện đang ở trạng thái ${statusText}, không thể mượn.`);
+                    error.status = 400;
+                    throw error;
+                }
+
+                // c. Quy tắc 2: Chặn mượn thiết bị trùng khung giờ (Equipment Overlap Concurrency)
+                const eqOverlapQuery = `
+                    SELECT 
+                        e.EquipmentID, 
+                        e.EquipmentName, 
+                        m.MeetingID, 
+                        m.Title, 
+                        m.StartTime, 
+                        m.EndTime, 
+                        r.RoomName
+                    FROM Booking_Equipments be
+                    JOIN Equipments e ON be.EquipmentID = e.EquipmentID
+                    JOIN Bookings b ON be.BookingID = b.BookingID
+                    JOIN Meetings m ON b.MeetingID = m.MeetingID
+                    JOIN Rooms r ON b.RoomID = r.RoomID
+                    WHERE be.EquipmentID IN (?)
+                      AND b.BookingStatus = 'Confirmed'
+                      AND (m.StartTime < ?) AND (m.EndTime > ?)
+                    FOR UPDATE
+                `;
+                const [conflicts] = await connection.query(eqOverlapQuery, [cleanEquipmentIds, endTime, startTime]);
+                if (conflicts.length > 0) {
+                    const conflict = conflicts[0];
+                    const error = new Error(`Thiết bị "${conflict.EquipmentName}" đã được đặt cho cuộc họp "${conflict.Title}" tại "${conflict.RoomName}" trong khung giờ này.`);
+                    error.status = 409;
+                    throw error;
+                }
+            }
+
             // 4. Tạo bản ghi Cuộc họp (Meetings)
             const insertMeetingQuery = `
                 INSERT INTO Meetings (Title, Description, StartTime, EndTime, OrganizerID, IsRecurring)
@@ -229,15 +287,13 @@ const Meeting = {
                 }
             }
 
-            // 7. Thêm danh sách Thiết bị yêu cầu (booking_equipments) nếu có
-            if (Array.isArray(equipmentIds) && equipmentIds.length > 0) {
-                for (const eqId of equipmentIds) {
-                    if (Number.isInteger(Number(eqId))) {
-                        await connection.query(
-                            'INSERT IGNORE INTO Booking_Equipments (BookingID, EquipmentID) VALUES (?, ?)',
-                            [bookingId, eqId]
-                        );
-                    }
+            // 7. Thêm danh sách Thiết bị yêu cầu (Booking_Equipments) nếu có
+            if (cleanEquipmentIds.length > 0) {
+                for (const eqId of cleanEquipmentIds) {
+                    await connection.query(
+                        'INSERT INTO Booking_Equipments (BookingID, EquipmentID, Quantity) VALUES (?, ?, 1)',
+                        [bookingId, eqId]
+                    );
                 }
             }
 
@@ -257,6 +313,11 @@ const Meeting = {
             };
         } catch (error) {
             await connection.rollback();
+            if (error.code === 'ER_LOCK_DEADLOCK' || error.code === 'ER_LOCK_WAIT_TIMEOUT') {
+                const conflictError = new Error('Tài nguyên thiết bị hoặc phòng họp đang có giao dịch song song. Đã kích hoạt cơ chế chống Race Condition.');
+                conflictError.status = 409;
+                throw conflictError;
+            }
             throw error;
         } finally {
             connection.release();
@@ -350,7 +411,7 @@ const Meeting = {
 
     // Thực thi cập nhật
     update: async (meetingId, meetingData) => {
-        const { title, description, startTime, endTime, organizerId, isRecurring, roomId, participantIds } = meetingData;
+        const { title, description, startTime, endTime, organizerId, isRecurring, roomId, participantIds, equipmentIds } = meetingData;
         const connection = await db.getConnection();
 
         try {
@@ -382,6 +443,10 @@ const Meeting = {
             `;
             await connection.execute(updateBookingQuery, [roomId, meetingId]);
 
+            // Lấy BookingID phục vụ cập nhật thiết bị
+            const [bookingRows] = await connection.execute('SELECT BookingID FROM Bookings WHERE MeetingID = ?', [meetingId]);
+            const bookingId = bookingRows.length > 0 ? bookingRows[0].BookingID : null;
+
             // 3. Cập nhật bảng Meeting_Participants nếu có truyền participantIds
             if (participantIds !== undefined && Array.isArray(participantIds)) {
                 const cleanIds = [...new Set(participantIds.map(Number).filter(id => Number.isInteger(id) && id > 0))];
@@ -404,10 +469,84 @@ const Meeting = {
                 }
             }
 
+            // 4. Cập nhật và kiểm tra bảng Booking_Equipments nếu có truyền equipmentIds
+            if (equipmentIds !== undefined && Array.isArray(equipmentIds) && bookingId) {
+                const cleanEqIds = [...new Set(equipmentIds.map(Number).filter(id => Number.isInteger(id) && id > 0))];
+                if (cleanEqIds.length === 0) {
+                    await connection.execute('DELETE FROM Booking_Equipments WHERE BookingID = ?', [bookingId]);
+                } else {
+                    // a. Khóa dòng và kiểm tra sự tồn tại của thiết bị
+                    const [eqRows] = await connection.query(
+                        'SELECT EquipmentID, EquipmentName, Status FROM Equipments WHERE EquipmentID IN (?) FOR UPDATE',
+                        [cleanEqIds]
+                    );
+
+                    if (eqRows.length !== cleanEqIds.length) {
+                        const foundIds = new Set(eqRows.map(r => r.EquipmentID));
+                        const missingIds = cleanEqIds.filter(id => !foundIds.has(id));
+                        const error = new Error(`Thiết bị với ID [${missingIds.join(', ')}] không tồn tại trong hệ thống.`);
+                        error.status = 404;
+                        throw error;
+                    }
+
+                    // b. Quy tắc 1: Chặn thiết bị đang bảo trì hoặc hư hỏng (Status != 'Available')
+                    const unavailableEq = eqRows.find(r => (r.Status || '').toLowerCase() !== 'available');
+                    if (unavailableEq) {
+                        const statusText = (unavailableEq.Status || '').toLowerCase() === 'maintenance'
+                            ? 'bảo trì'
+                            : ((unavailableEq.Status || '').toLowerCase() === 'broken' ? 'hư hỏng' : unavailableEq.Status);
+                        const error = new Error(`Thiết bị "${unavailableEq.EquipmentName}" hiện đang ở trạng thái ${statusText}, không thể mượn.`);
+                        error.status = 400;
+                        throw error;
+                    }
+
+                    // c. Quy tắc 2: Chặn trùng lịch với cuộc họp khác (loại trừ chính meetingId)
+                    const eqOverlapQuery = `
+                        SELECT 
+                            e.EquipmentID, 
+                            e.EquipmentName, 
+                            m.MeetingID, 
+                            m.Title, 
+                            r.RoomName
+                        FROM Booking_Equipments be
+                        JOIN Equipments e ON be.EquipmentID = e.EquipmentID
+                        JOIN Bookings b ON be.BookingID = b.BookingID
+                        JOIN Meetings m ON b.MeetingID = m.MeetingID
+                        JOIN Rooms r ON b.RoomID = r.RoomID
+                        WHERE be.EquipmentID IN (?)
+                          AND b.BookingStatus = 'Confirmed'
+                          AND m.MeetingID != ?
+                          AND (m.StartTime < ?) AND (m.EndTime > ?)
+                        FOR UPDATE
+                    `;
+                    const [conflicts] = await connection.query(eqOverlapQuery, [cleanEqIds, meetingId, endTime, startTime]);
+                    if (conflicts.length > 0) {
+                        const conflict = conflicts[0];
+                        const error = new Error(`Thiết bị "${conflict.EquipmentName}" đã được đặt cho cuộc họp "${conflict.Title}" tại "${conflict.RoomName}" trong khung giờ này.`);
+                        error.status = 409;
+                        throw error;
+                    }
+
+                    // Đồng bộ lại thiết bị
+                    await connection.execute('DELETE FROM Booking_Equipments WHERE BookingID = ?', [bookingId]);
+                    for (const eqId of cleanEqIds) {
+                        await connection.query(
+                            'INSERT INTO Booking_Equipments (BookingID, EquipmentID, Quantity) VALUES (?, ?, 1)',
+                            [bookingId, eqId]
+                        );
+                    }
+                }
+            }
+
             await connection.commit();
             return true;
         } catch (error) {
             await connection.rollback();
+            if (error.code === 'ER_LOCK_DEADLOCK' || error.code === 'ER_LOCK_WAIT_TIMEOUT') {
+                const conflictError = new Error('Tài nguyên thiết bị hoặc phòng họp đang có giao dịch song song. Đã kích hoạt cơ chế chống Race Condition.');
+                conflictError.status = 409;
+                throw conflictError;
+            }
             throw error; // Ném lỗi ra để Controller bắt lấy
         } finally {
             connection.release();
