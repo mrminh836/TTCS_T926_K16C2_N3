@@ -165,6 +165,197 @@ const Equipment = {
             const found = mockEquipmentsFallback.find(e => e.id === parsedId);
             return found ? formatEquipmentRow(found) : null;
         }
+    },
+
+    /**
+     * Tạo mới thiết bị (POST /api/equipments)
+     * @param {Object} data - { equipmentName, type, status }
+     */
+    create: async (data) => {
+        const { equipmentName, type = 'Thiết bị', status = 'Available' } = data;
+
+        try {
+            const sql = `
+                INSERT INTO Equipments (EquipmentName, Type, Status)
+                VALUES (?, ?, ?)
+            `;
+            const [result] = await db.query(sql, [equipmentName.trim(), type ? type.trim() : 'Thiết bị', status]);
+            const newId = result.insertId;
+
+            return await Equipment.findById(newId);
+        } catch (error) {
+            console.warn('[Equipment Model] create fallback:', error.message);
+            const newId = mockEquipmentsFallback.length ? Math.max(...mockEquipmentsFallback.map(e => e.id)) + 1 : 1;
+            const newEq = {
+                id: newId,
+                equipmentId: newId,
+                name: equipmentName.trim(),
+                equipmentName: equipmentName.trim(),
+                type: type ? type.trim() : 'Thiết bị',
+                status
+            };
+            mockEquipmentsFallback.push(newEq);
+            return formatEquipmentRow(newEq);
+        }
+    },
+
+    /**
+     * Cập nhật thông tin thiết bị (PUT /api/equipments/:id)
+     * @param {number} id
+     * @param {Object} data - { equipmentName, type, status }
+     */
+    update: async (id, data) => {
+        const parsedId = Number(id);
+        if (isNaN(parsedId) || parsedId <= 0) return null;
+
+        const existing = await Equipment.findById(parsedId);
+        if (!existing) return null;
+
+        const { equipmentName, type, status } = data;
+        const newName = equipmentName !== undefined ? equipmentName.trim() : existing.name;
+        const newType = type !== undefined ? type.trim() : existing.type;
+        const newStatus = status !== undefined ? status : existing.status;
+
+        try {
+            const sql = `
+                UPDATE Equipments
+                SET EquipmentName = ?, Type = ?, Status = ?
+                WHERE EquipmentID = ?
+            `;
+            await db.query(sql, [newName, newType, newStatus, parsedId]);
+            return await Equipment.findById(parsedId);
+        } catch (error) {
+            console.warn(`[Equipment Model] update(${parsedId}) fallback:`, error.message);
+            const idx = mockEquipmentsFallback.findIndex(e => e.id === parsedId);
+            if (idx !== -1) {
+                mockEquipmentsFallback[idx] = {
+                    ...mockEquipmentsFallback[idx],
+                    name: newName,
+                    equipmentName: newName,
+                    type: newType,
+                    status: newStatus
+                };
+                return formatEquipmentRow(mockEquipmentsFallback[idx]);
+            }
+            return null;
+        }
+    },
+
+    /**
+     * Cập nhật nhanh trạng thái thiết bị (PATCH /api/equipments/:id/status)
+     * @param {number} id
+     * @param {string} status - 'Available' | 'Maintenance' | 'Broken'
+     */
+    updateStatus: async (id, status) => {
+        const parsedId = Number(id);
+        if (isNaN(parsedId) || parsedId <= 0) return null;
+
+        const existing = await Equipment.findById(parsedId);
+        if (!existing) return null;
+
+        try {
+            const sql = `
+                UPDATE Equipments
+                SET Status = ?
+                WHERE EquipmentID = ?
+            `;
+            await db.query(sql, [status, parsedId]);
+            return await Equipment.findById(parsedId);
+        } catch (error) {
+            console.warn(`[Equipment Model] updateStatus(${parsedId}) fallback:`, error.message);
+            const idx = mockEquipmentsFallback.findIndex(e => e.id === parsedId);
+            if (idx !== -1) {
+                mockEquipmentsFallback[idx].status = status;
+                return formatEquipmentRow(mockEquipmentsFallback[idx]);
+            }
+            return null;
+        }
+    },
+
+    /**
+     * Kiểm tra các cuộc họp Confirmed đang mượn thiết bị này
+     * @param {number} id
+     */
+    checkActiveBookings: async (id) => {
+        const parsedId = Number(id);
+        if (isNaN(parsedId) || parsedId <= 0) return [];
+
+        try {
+            const sql = `
+                SELECT 
+                    b.BookingID     AS bookingId,
+                    m.MeetingID     AS meetingId,
+                    m.Title         AS title,
+                    m.StartTime     AS startTime,
+                    m.EndTime       AS endTime,
+                    b.BookingStatus AS bookingStatus
+                FROM Booking_Equipments be
+                JOIN Bookings b ON be.BookingID = b.BookingID
+                JOIN Meetings m ON b.MeetingID = m.MeetingID
+                WHERE be.EquipmentID = ?
+                  AND LOWER(b.BookingStatus) = 'confirmed'
+                ORDER BY m.StartTime DESC
+            `;
+            const [rows] = await db.query(sql, [parsedId]);
+            return rows;
+        } catch (error) {
+            console.warn(`[Equipment Model] checkActiveBookings(${parsedId}) fallback:`, error.message);
+            return [];
+        }
+    },
+
+    /**
+     * Xóa thiết bị an toàn
+     * @param {number} id
+     * @returns {Object} { exists, hasActiveBookings, deleted, activeBookings }
+     */
+    delete: async (id) => {
+        const parsedId = Number(id);
+        if (isNaN(parsedId) || parsedId <= 0) {
+            return { exists: false, hasActiveBookings: false, deleted: false };
+        }
+
+        const existing = await Equipment.findById(parsedId);
+        if (!existing) {
+            return { exists: false, hasActiveBookings: false, deleted: false };
+        }
+
+        // Kiểm tra ràng buộc cuộc họp đã xác nhận (Confirmed)
+        const activeBookings = await Equipment.checkActiveBookings(parsedId);
+        if (activeBookings.length > 0) {
+            return {
+                exists: true,
+                hasActiveBookings: true,
+                deleted: false,
+                activeBookings
+            };
+        }
+
+        try {
+            // Xóa các bản ghi tham chiếu cũ không còn Confirmed (ví dụ Cancelled) nếu có
+            await db.query('DELETE FROM Booking_Equipments WHERE EquipmentID = ?', [parsedId]);
+            // Xóa thiết bị khỏi bảng Equipments
+            await db.query('DELETE FROM Equipments WHERE EquipmentID = ?', [parsedId]);
+
+            return {
+                exists: true,
+                hasActiveBookings: false,
+                deleted: true,
+                deletedEquipment: existing
+            };
+        } catch (error) {
+            console.warn(`[Equipment Model] delete(${parsedId}) fallback:`, error.message);
+            const idx = mockEquipmentsFallback.findIndex(e => e.id === parsedId);
+            if (idx !== -1) {
+                mockEquipmentsFallback.splice(idx, 1);
+            }
+            return {
+                exists: true,
+                hasActiveBookings: false,
+                deleted: true,
+                deletedEquipment: existing
+            };
+        }
     }
 };
 

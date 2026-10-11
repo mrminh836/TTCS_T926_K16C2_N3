@@ -152,9 +152,172 @@ function validateAvailableEquipmentsMiddleware(req, res, next) {
     next();
 }
 
+const VALID_EQUIPMENT_STATUSES = ['Available', 'Maintenance', 'Broken'];
+
+function normalizeStatus(status) {
+    if (!status || typeof status !== 'string') return null;
+    const lower = status.trim().toLowerCase();
+    if (lower === 'available') return 'Available';
+    if (lower === 'maintenance') return 'Maintenance';
+    if (lower === 'broken') return 'Broken';
+    return null;
+}
+
+/**
+ * Xác thực dữ liệu tạo mới thiết bị (POST /api/equipments)
+ */
+function validateCreateEquipment(body) {
+    const errors = [];
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        return { isValid: false, errors: ['Dữ liệu thiết bị phải là một đối tượng JSON.'], data: null };
+    }
+
+    const name = body.equipmentName || body.name;
+    const type = body.type;
+    const status = body.status;
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+        errors.push('Tên thiết bị (equipmentName) là bắt buộc và không được để trống.');
+    } else {
+        const trimmed = name.trim();
+        if (trimmed.length < 2) {
+            errors.push('Tên thiết bị phải có ít nhất 2 ký tự.');
+        } else if (trimmed.length > 100) {
+            errors.push('Tên thiết bị không được vượt quá 100 ký tự.');
+        } else if (/[<>]/.test(trimmed)) {
+            errors.push('Tên thiết bị không được chứa ký tự đặc biệt nguy hiểm (<, >).');
+        }
+    }
+
+    if (type !== undefined && type !== null) {
+        if (typeof type !== 'string') {
+            errors.push('Loại thiết bị (type) phải là chuỗi ký tự.');
+        } else if (type.trim().length > 50) {
+            errors.push('Loại thiết bị không được vượt quá 50 ký tự.');
+        }
+    }
+
+    let finalStatus = 'Available';
+    if (status !== undefined && status !== null && status !== '') {
+        const normalized = normalizeStatus(status);
+        if (!normalized) {
+            errors.push(`Trạng thái thiết bị không hợp lệ. Chỉ chấp nhận một trong các giá trị: ${VALID_EQUIPMENT_STATUSES.join(', ')}.`);
+        } else {
+            finalStatus = normalized;
+        }
+    }
+
+    if (errors.length > 0) {
+        return { isValid: false, errors, data: null };
+    }
+
+    return {
+        isValid: true,
+        errors: [],
+        data: {
+            equipmentName: name.trim(),
+            type: (type && typeof type === 'string' && type.trim()) ? type.trim() : 'Thiết bị',
+            status: finalStatus
+        }
+    };
+}
+
+/**
+ * Xác thực dữ liệu cập nhật toàn diện thiết bị (PUT /api/equipments/:id)
+ */
+function validateUpdateEquipment(body) {
+    return validateCreateEquipment(body);
+}
+
+/**
+ * Xác thực dữ liệu cập nhật trạng thái thiết bị (PATCH /api/equipments/:id/status)
+ */
+function validatePatchStatus(body) {
+    const errors = [];
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        return { isValid: false, errors: ['Dữ liệu cập nhật trạng thái phải là một đối tượng JSON.'], data: null };
+    }
+
+    const status = body.status;
+    if (!status || typeof status !== 'string' || !status.trim()) {
+        errors.push('Trạng thái thiết bị (status) là bắt buộc.');
+        return { isValid: false, errors, data: null };
+    }
+
+    const normalized = normalizeStatus(status);
+    if (!normalized) {
+        errors.push(`Trạng thái thiết bị không hợp lệ. Chỉ chấp nhận một trong các giá trị: ${VALID_EQUIPMENT_STATUSES.join(', ')}.`);
+        return { isValid: false, errors, data: null };
+    }
+
+    return {
+        isValid: true,
+        errors: [],
+        data: {
+            status: normalized
+        }
+    };
+}
+
+/**
+ * Middleware xác thực tạo mới thiết bị
+ */
+function validateCreateEquipmentMiddleware(req, res, next) {
+    const result = validateCreateEquipment(req.body);
+    if (!result.isValid) {
+        return res.status(400).json({
+            success: false,
+            message: result.errors[0],
+            errors: result.errors
+        });
+    }
+    req.validatedEquipmentBody = result.data;
+    next();
+}
+
+/**
+ * Middleware xác thực cập nhật thiết bị
+ */
+function validateUpdateEquipmentMiddleware(req, res, next) {
+    const result = validateUpdateEquipment(req.body);
+    if (!result.isValid) {
+        return res.status(400).json({
+            success: false,
+            message: result.errors[0],
+            errors: result.errors
+        });
+    }
+    req.validatedEquipmentBody = result.data;
+    next();
+}
+
+/**
+ * Middleware xác thực cập nhật trạng thái thiết bị
+ */
+function validatePatchStatusMiddleware(req, res, next) {
+    const result = validatePatchStatus(req.body);
+    if (!result.isValid) {
+        return res.status(400).json({
+            success: false,
+            message: result.errors[0],
+            errors: result.errors
+        });
+    }
+    req.validatedPatchStatusBody = result.data;
+    next();
+}
+
 module.exports = {
     validateAvailableEquipmentsQuery,
     validateAvailableEquipmentsMiddleware,
+    validateCreateEquipment,
+    validateCreateEquipmentMiddleware,
+    validateUpdateEquipment,
+    validateUpdateEquipmentMiddleware,
+    validatePatchStatus,
+    validatePatchStatusMiddleware,
+    normalizeStatus,
+    VALID_EQUIPMENT_STATUSES,
     parseDateTimeString,
     formatToMySQLDateTime,
     isPositiveInteger

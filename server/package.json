@@ -8,6 +8,7 @@
     "dev": "node --watch server.js",
     "test": "node --test",
     "test:equipment": "node ../QA/AutomatedTests/run_equipment_conflict_tests.js",
+    "test:equipment-crud": "node ../QA/AutomatedTests/run_equipment_crud_tests.js",
     "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
