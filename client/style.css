@@ -4527,4 +4527,312 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
+}
+
+/* =====================================================
+   ADMIN EQUIPMENT MANAGEMENT MODULE (ENTERPRISE STITCH SPEC)
+   ===================================================== */
+
+.admin-equipments-view-wrapper {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.equipment-modal-card {
+  max-width: 620px;
+}
+
+.equipment-delete-modal-card {
+  max-width: 540px;
+}
+
+/* Equipment KPI Cards Grid */
+.equipment-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 992px) {
+  .equipment-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .equipment-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Equipment Filter Toolbar */
+.equipment-filter-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.equipment-status-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  background: var(--slate-100);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.equipment-status-tab-btn:hover {
+  background: var(--slate-200);
+  color: var(--slate-800);
+}
+
+.equipment-status-tab-btn.active {
+  background: var(--primary-600);
+  color: #ffffff;
+  border-color: var(--primary-600);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.equipment-status-tab-btn .tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+}
+
+.equipment-status-tab-btn.active .tab-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Table Item Elements */
+.equipment-row-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.equipment-icon-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.equipment-icon-avatar.type-projector {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.equipment-icon-avatar.type-tv {
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+}
+
+.equipment-icon-avatar.type-camera {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.equipment-icon-avatar.type-mic {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.equipment-icon-avatar.type-speaker {
+  background: #faf5ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+
+.equipment-icon-avatar.type-board {
+  background: #f0fdfa;
+  color: #0d9488;
+  border: 1px solid #99f6e4;
+}
+
+.equipment-icon-avatar.type-network {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.equipment-icon-avatar.type-other {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.equipment-name-title {
+  font-weight: 600;
+  color: var(--slate-900);
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.equipment-code-text {
+  font-size: 0.75rem;
+  color: var(--slate-400);
+  font-family: monospace;
+}
+
+/* Category Badge */
+.equipment-category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: var(--slate-100);
+  color: var(--slate-700);
+  border: 1px solid var(--slate-200);
+}
+
+/* Status Pill */
+.eq-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.eq-status-badge.status-available {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.eq-status-badge.status-available .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.eq-status-badge.status-maintenance {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.eq-status-badge.status-maintenance .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.eq-status-badge.status-broken {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.eq-status-badge.status-broken .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+/* Action Buttons */
+.btn-action-status-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-action-status-toggle.to-maintenance {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.btn-action-status-toggle.to-maintenance:hover {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.btn-action-status-toggle.to-available {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.btn-action-status-toggle.to-available:hover {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+.btn-action-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--slate-200);
+  background: #ffffff;
+  color: var(--slate-600);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-icon:hover {
+  background: var(--slate-100);
+  color: var(--slate-900);
+  border-color: var(--slate-300);
+}
+
+.btn-action-icon.btn-edit:hover {
+  background: var(--primary-50);
+  color: var(--primary-600);
+  border-color: var(--primary-200);
+}
+
+.btn-action-icon.btn-delete:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+

@@ -1,7 +1,7 @@
 # 📊 BÁO CÁO KIỂM THỬ TỰ ĐỘNG HÓA: TRỌN BỘ CRUD API THIẾT BỊ
 
 > **Dự án:** Quản lý Lịch họp Doanh nghiệp (`TTCS_T926_K16C2_N3`)  
-> **Thời gian thực thi:** 20:42:46 11/10/2026  
+> **Thời gian thực thi:** 21:05:06 11/10/2026  
 > **Môi trường:** Docker Container `meeting_backend` (Port 3000) & MySQL 8.0 (Port 3306)  
 > **Tổng số Test Cases:** 19  
 > **Kết quả:** **19/19 ĐẠT** (Tỷ lệ: **100.0%**)  
@@ -19,16 +19,16 @@
 | `CRUD_POST_002` | `POST` | `/api/equipments` | Từ chối khi thiếu tên thiết bị (equipmentName) | `400` | `400` | ✅ **PASS** |
 | `CRUD_POST_003` | `POST` | `/api/equipments` | Từ chối khi trạng thái (status) không thuộc danh mục hợp lệ | `400` | `400` | ✅ **PASS** |
 | `CRUD_POST_004` | `POST` | `/api/equipments` | Ngăn chặn ký tự nguy hiểm (<, >) trong tên thiết bị | `400` | `400` | ✅ **PASS** |
-| `CRUD_PUT_001` | `PUT` | `/api/equipments/12` | Cập nhật toàn diện thông tin thiết bị thành công | `200` | `200` | ✅ **PASS** |
+| `CRUD_PUT_001` | `PUT` | `/api/equipments/14` | Cập nhật toàn diện thông tin thiết bị thành công | `200` | `200` | ✅ **PASS** |
 | `CRUD_PUT_002` | `PUT` | `/api/equipments/999999` | Báo lỗi 404 khi cập nhật thiết bị không tồn tại | `404` | `404` | ✅ **PASS** |
-| `CRUD_PATCH_001` | `PATCH` | `/api/equipments/12/status` | Chuyển nhanh trạng thái thiết bị sang Maintenance (Bảo trì) | `200` | `200` | ✅ **PASS** |
-| `CRUD_PATCH_002` | `PATCH` | `/api/equipments/12/status` | Chuyển nhanh trạng thái thiết bị sang Broken (Hư hỏng) | `200` | `200` | ✅ **PASS** |
-| `CRUD_PATCH_003` | `PATCH` | `/api/equipments/12/status` | Chuyển trạng thái trở lại Available (Có sẵn) | `200` | `200` | ✅ **PASS** |
-| `CRUD_PATCH_004` | `PATCH` | `/api/equipments/12/status` | Từ chối cập nhật trạng thái không hợp lệ | `400` | `400` | ✅ **PASS** |
+| `CRUD_PATCH_001` | `PATCH` | `/api/equipments/14/status` | Chuyển nhanh trạng thái thiết bị sang Maintenance (Bảo trì) | `200` | `200` | ✅ **PASS** |
+| `CRUD_PATCH_002` | `PATCH` | `/api/equipments/14/status` | Chuyển nhanh trạng thái thiết bị sang Broken (Hư hỏng) | `200` | `200` | ✅ **PASS** |
+| `CRUD_PATCH_003` | `PATCH` | `/api/equipments/14/status` | Chuyển trạng thái trở lại Available (Có sẵn) | `200` | `200` | ✅ **PASS** |
+| `CRUD_PATCH_004` | `PATCH` | `/api/equipments/14/status` | Từ chối cập nhật trạng thái không hợp lệ | `400` | `400` | ✅ **PASS** |
 | `CRUD_DEL_001` | `DELETE` | `/api/equipments/1` | Chặn xóa thiết bị đang được gán cho cuộc họp Confirmed (409 Conflict) | `409` | `409` | ✅ **PASS** |
-| `CRUD_DEL_002` | `DELETE` | `/api/equipments/12` | Xóa thành công thiết bị không có ràng buộc lịch họp | `200` | `200` | ✅ **PASS** |
-| `CRUD_DEL_003` | `GET` | `/api/equipments/12` | Xác minh thiết bị đã xóa không còn tồn tại trong hệ thống (404) | `404` | `404` | ✅ **PASS** |
-| `CRUD_DEL_004` | `DELETE` | `/api/equipments/12` | Báo lỗi 404 khi xóa thiết bị không tồn tại | `404` | `404` | ✅ **PASS** |
+| `CRUD_DEL_002` | `DELETE` | `/api/equipments/14` | Xóa thành công thiết bị không có ràng buộc lịch họp | `200` | `200` | ✅ **PASS** |
+| `CRUD_DEL_003` | `GET` | `/api/equipments/14` | Xác minh thiết bị đã xóa không còn tồn tại trong hệ thống (404) | `404` | `404` | ✅ **PASS** |
+| `CRUD_DEL_004` | `DELETE` | `/api/equipments/14` | Báo lỗi 404 khi xóa thiết bị không tồn tại | `404` | `404` | ✅ **PASS** |
 
 ## 2. Kết Luận & Đánh Giá Chất Lượng
 
