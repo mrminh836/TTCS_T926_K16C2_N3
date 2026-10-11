@@ -4589,6 +4589,15 @@ body {
   background-size: 14px 10px;
 }
 
+.equipment-modal-card .stitch-modal-footer,
+.equipment-delete-modal-card .stitch-modal-footer {
+  padding: 16px 24px 24px 24px !important;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
 .equipment-delete-modal-card {
   max-width: 540px;
 }
