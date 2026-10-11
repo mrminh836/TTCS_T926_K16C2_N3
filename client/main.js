@@ -2887,12 +2887,30 @@ async function saveEquipment(event) {
   const type = typeSelect.value;
   const status = statusSelect.value;
 
-  // Validation
+  // Validation ca biên (Boundary Checks)
   if (!name || name.length < 2) {
     nameInput.classList.add("is-invalid");
     if (errorBox) {
       errorBox.classList.remove("d-none");
       errorMsg.textContent = "Vui lòng nhập tên thiết bị hợp lệ (tối thiểu 2 ký tự).";
+    }
+    nameInput.focus();
+    return;
+  }
+  if (name.length > 100) {
+    nameInput.classList.add("is-invalid");
+    if (errorBox) {
+      errorBox.classList.remove("d-none");
+      errorMsg.textContent = "Tên thiết bị không được vượt quá 100 ký tự.";
+    }
+    nameInput.focus();
+    return;
+  }
+  if (/[<>]/.test(name)) {
+    nameInput.classList.add("is-invalid");
+    if (errorBox) {
+      errorBox.classList.remove("d-none");
+      errorMsg.textContent = "Tên thiết bị không được chứa ký tự đặc biệt nguy hiểm (<, >).";
     }
     nameInput.focus();
     return;
@@ -7550,6 +7568,15 @@ const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay
 const equipmentForm = document.getElementById("equipment-form");
 if (equipmentForm) {
   equipmentForm.addEventListener("submit", saveEquipment);
+}
+
+const equipmentNameInput = document.getElementById("equipment-name");
+if (equipmentNameInput) {
+  equipmentNameInput.addEventListener("input", () => {
+    equipmentNameInput.classList.remove("is-invalid");
+    const errorBox = document.getElementById("equipment-form-error");
+    if (errorBox) errorBox.classList.add("d-none");
+  });
 }
 
 const btnCloseEquipmentModal = document.getElementById("btn-close-equipment-modal");
