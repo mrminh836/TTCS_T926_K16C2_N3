@@ -15,7 +15,7 @@ services:
         required: false
     environment:
       PORT: ${PORT:-3000}
-      DB_HOST: ${DB_HOST:-mysql_db}
+      DB_HOST: mysql_db
       DB_PORT: ${DB_PORT:-3306}
       DB_USER: ${DB_USER:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root123}

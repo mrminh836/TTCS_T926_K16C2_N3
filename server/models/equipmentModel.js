@@ -107,7 +107,6 @@ const Equipment = {
                       JOIN Meetings m ON b.MeetingID = m.MeetingID
                       WHERE be.EquipmentID = e.EquipmentID
                         AND LOWER(b.BookingStatus) != 'cancelled'
-                        AND LOWER(m.Status) != 'cancelled'
                         AND (m.StartTime < ? AND m.EndTime > ?)
             `;
             const params = [endTime, startTime];

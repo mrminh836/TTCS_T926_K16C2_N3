@@ -29,11 +29,11 @@ async function runMigrations() {
             console.log(`Đang chạy migration: ${file}...`);
             const sqlContent = fs.readFileSync(filePath, 'utf8');
 
-            // Tách các câu lệnh theo dấu ;
+            // Loại bỏ dòng comment và tách các câu lệnh theo dấu ;
             const statements = sqlContent
-                .split(/;\s*$/m)
-                .map(s => s.trim())
-                .filter(s => s.length > 0 && !s.startsWith('--'));
+                .split(';')
+                .map(s => s.replace(/^--.*$/gm, '').trim())
+                .filter(s => s.length > 0);
 
             for (const statement of statements) {
                 if (statement.length > 0) {
