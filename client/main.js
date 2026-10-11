@@ -4143,6 +4143,21 @@ function renderParticipantDropdownList() {
 }
 
 /**
+ * Hàm điều phối cập nhật toàn diện khi danh sách người tham gia thay đổi:
+ * Cập nhật chips, dropdown list, cảnh báo quá tải sức chứa và thuật toán gợi ý phòng thời gian thực
+ */
+function triggerParticipantChangeUpdate() {
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+
+  const idInput = document.getElementById("meeting-id");
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
+  renderRealtimeRoomCards(editId);
+}
+
+/**
  * Toggle trạng thái chọn của một đồng nghiệp
  * @param {number} userId ID đồng nghiệp
  */
@@ -4162,10 +4177,7 @@ function toggleParticipant(userId) {
     selectedParticipantIds.add(uid);
   }
 
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 
   // Focus lại vào input tìm kiếm để tiếp tục thao tác
   const searchInput = document.getElementById("participant-search-input");
@@ -4193,10 +4205,7 @@ function removeParticipant(userId, event) {
   }
 
   selectedParticipantIds.delete(uid);
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 }
 
 /**
@@ -4209,10 +4218,7 @@ function clearAllParticipants() {
   selectedParticipantIds.clear();
   selectedParticipantIds.add(currentOrgId);
 
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 }
 
 /**
@@ -4226,10 +4232,7 @@ function selectAllParticipants(dept = "all") {
     }
   });
 
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 }
 
 /**
@@ -4413,10 +4416,7 @@ function setupParticipantSelectorEvents() {
       const newOrgId = Number(organizerSelect.value);
       if (newOrgId) {
         selectedParticipantIds.add(newOrgId);
-        renderParticipantChips();
-        renderParticipantDropdownList();
-        syncHiddenParticipantsInput();
-        updateParticipantCapacityWarning();
+        triggerParticipantChangeUpdate();
       }
     });
   }
@@ -4690,6 +4690,249 @@ function calculateRoomAvailability(date, startTime, endTime, editId = null) {
   });
 }
 
+/**
+ * Thuật toán tự động gợi ý phòng có sức chứa phù hợp nhất với số lượng người tham gia
+ * (Best-Fit Optimization Room Recommendation Algorithm)
+ * 
+ * Các nguyên lý cốt lõi:
+ * 1. Khả dụng thực tế: Chỉ gợi ý các phòng hoàn toàn trống trong khung giờ (Active, không trùng lịch, không bảo trì).
+ * 2. Đủ sức chứa (Capacity >= N): Ưu tiên tuyệt đối các phòng có sức chứa đủ cho toàn bộ người tham gia đã chọn.
+ * 3. Tối ưu hóa độ dư thừa (Min Slack): Chọn phòng có (capacity - N) nhỏ nhất để tránh lãng phí hội trường lớn.
+ * 4. Tính toán tỷ lệ lấp đầy (Fill Rate): (N / capacity) * 100%.
+ * 5. Ca biên quá tải (Overflow): Nếu không phòng nào đủ chỗ, gợi ý phòng lớn nhất hiện có kèm cảnh báo thiếu chỗ.
+ * 6. Ca biên hết phòng (No Room): Đưa ra thông điệp khuyến nghị đổi khung giờ.
+ *
+ * @param {number} participantCount Số lượng người tham gia
+ * @param {string} date Ngày họp (YYYY-MM-DD)
+ * @param {string} startTime Giờ bắt đầu (HH:mm)
+ * @param {string} endTime Giờ kết thúc (HH:mm)
+ * @param {number|null} editId ID cuộc họp đang sửa (nếu có)
+ * @returns {Object} Kết quả gợi ý { status, room, participantCount, slack, fillRate, message, badgeText, recommendationType, alternatives }
+ */
+function recommendBestFitRoom(participantCount, date, startTime, endTime, editId = null) {
+  const count = Math.max(1, Number(participantCount) || 1);
+  const roomsStatus = calculateRoomAvailability(date, startTime, endTime, editId);
+
+  // 1. Lọc danh sách phòng hoàn toàn khả dụng
+  const availableRooms = roomsStatus.filter(r => r.isAvailable && !r.isMaintenance && !r.isConflict);
+
+  // Ca biên A: Không còn phòng nào trống trong khung giờ
+  if (availableRooms.length === 0) {
+    return {
+      status: "no_room",
+      room: null,
+      participantCount: count,
+      slack: null,
+      fillRate: null,
+      isPerfectMatch: false,
+      message: "Không còn phòng họp nào trống trong khung giờ đã chọn. Vui lòng chuyển sang khung giờ hoặc ngày làm việc khác.",
+      badgeText: "Hết phòng trống",
+      recommendationType: "none",
+      alternatives: []
+    };
+  }
+
+  // 2. Phân loại phòng: Đủ sức chứa (capacity >= count)
+  const fitRooms = availableRooms.filter(r => (Number(r.capacity) || 0) >= count);
+
+  // Ca biên B: Có ít nhất một phòng đủ sức chứa -> Thuật toán Best-Fit
+  if (fitRooms.length > 0) {
+    fitRooms.sort((a, b) => {
+      const capA = Number(a.capacity) || 0;
+      const capB = Number(b.capacity) || 0;
+      const slackA = capA - count;
+      const slackB = capB - count;
+
+      // Ưu tiên 1: Độ dư thừa slack nhỏ nhất (vừa vặn nhất)
+      if (slackA !== slackB) {
+        return slackA - slackB;
+      }
+
+      // Ưu tiên 2: Cùng sức chứa -> ưu tiên phòng nhiều thiết bị hỗ trợ hơn
+      const eqCountA = (a.equipments || []).length;
+      const eqCountB = (b.equipments || []).length;
+      if (eqCountA !== eqCountB) {
+        return eqCountB - eqCountA;
+      }
+
+      // Ưu tiên 3: ID nhỏ hơn
+      return a.id - b.id;
+    });
+
+    const bestRoom = fitRooms[0];
+    const bestCap = Number(bestRoom.capacity) || count;
+    const slack = bestCap - count;
+    const fillRate = Math.min(100, Math.round((count / bestCap) * 100));
+    const isPerfectMatch = slack === 0;
+
+    let message = "";
+    if (isPerfectMatch) {
+      message = `Khớp 100% sức chứa (${bestRoom.capacity} chỗ cho ${count} người). Tận dụng tối đa công suất phòng họp!`;
+    } else {
+      message = `Tối ưu nhất cho ${count} người: Sức chứa ${bestRoom.capacity} chỗ, tỉ lệ lấp đầy ${fillRate}%, dư ${slack} chỗ. Giúp tiết kiệm các phòng họp quy mô lớn hơn.`;
+    }
+
+    const badgeText = isPerfectMatch ? `⭐ Khớp 100% sức chứa` : `⭐ Gợi ý tối ưu (${fillRate}%)`;
+
+    return {
+      status: "optimal",
+      room: bestRoom,
+      participantCount: count,
+      slack,
+      fillRate,
+      isPerfectMatch,
+      message,
+      badgeText,
+      recommendationType: isPerfectMatch ? "perfect" : "best_fit",
+      alternatives: fitRooms.slice(1)
+    };
+  }
+
+  // Ca biên C: Tất cả phòng trống đều nhỏ hơn số người tham gia (Quá tải / Overflow)
+  // Sắp xếp giảm dần theo sức chứa để gợi ý phòng lớn nhất có thể
+  availableRooms.sort((a, b) => {
+    const capA = Number(a.capacity) || 0;
+    const capB = Number(b.capacity) || 0;
+    if (capA !== capB) return capB - capA;
+    return a.id - b.id;
+  });
+
+  const largestRoom = availableRooms[0];
+  const largestCap = Number(largestRoom.capacity) || 0;
+  const shortage = count - largestCap;
+
+  return {
+    status: "overflow",
+    room: largestRoom,
+    participantCount: count,
+    shortage,
+    fillRate: 100,
+    isPerfectMatch: false,
+    message: `Số người (${count}) vượt quá sức chứa mọi phòng trống. Gợi ý phòng lớn nhất khả dụng là "${largestRoom.name}" (${largestCap} chỗ, thiếu ${shortage} chỗ).`,
+    badgeText: `Phòng lớn nhất (${largestCap} chỗ)`,
+    recommendationType: "overflow_largest",
+    alternatives: availableRooms.slice(1)
+  };
+}
+
+/**
+ * Render Banner gợi ý phòng thông minh trong modal tạo/sửa cuộc họp
+ * @param {Object} recommendation Kết quả từ recommendBestFitRoom
+ * @param {number} selectedRoomId ID phòng đang được người dùng chọn
+ */
+function renderSmartRecommendationBanner(recommendation, selectedRoomId) {
+  const box = document.getElementById("smart-room-recommendation-box");
+  if (!box) return;
+
+  if (!recommendation) {
+    box.innerHTML = "";
+    return;
+  }
+
+  const { status, room, participantCount, message, fillRate, slack, shortage } = recommendation;
+
+  if (status === "no_room") {
+    box.innerHTML = `
+      <div class="smart-room-recommendation-card is-no-room mb-2.5" role="status" aria-live="polite">
+        <div class="recommendation-content">
+          <div class="recommendation-header">
+            <span class="recommendation-badge-pill" style="background: #fee2e2; color: #991b1b;">
+              <i class="bi bi-calendar-x-fill me-1"></i> Hết phòng trống
+            </span>
+          </div>
+          <div class="recommendation-body">
+            <div class="small text-danger fw-semibold">
+              ${escapeHTML(message)}
+            </div>
+            <div class="recommendation-desc text-muted">
+              Gợi ý: Thử đổi khung giờ sớm hơn, muộn hơn hoặc chọn ngày làm việc khác.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (!room) {
+    box.innerHTML = "";
+    return;
+  }
+
+  const isCurrentRoomSelected = room.id === selectedRoomId;
+  const isOverflow = status === "overflow";
+
+  let headerBadgeHtml = "";
+  if (isOverflow) {
+    headerBadgeHtml = `
+      <span class="recommendation-badge-pill" style="background: #fef3c7; color: #92400e;">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i> Quá tải sức chứa
+      </span>
+      <span class="recommendation-util-pill" style="background: #fee2e2; color: #991b1b;">
+        Thiếu ${shortage} chỗ
+      </span>
+    `;
+  } else {
+    headerBadgeHtml = `
+      <span class="recommendation-badge-pill">
+        <i class="bi bi-magic me-1"></i> Gợi ý thuật toán thông minh
+      </span>
+      <span class="recommendation-util-pill">
+        <i class="bi bi-pie-chart-fill me-1"></i> Lấp đầy ${fillRate}% (Dư ${slack} chỗ)
+      </span>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="smart-room-recommendation-card ${isOverflow ? 'is-overflow' : ''} mb-2.5" role="region" aria-label="Gợi ý phòng họp tối ưu nhất">
+      <div class="recommendation-content">
+        <div class="recommendation-header">
+          ${headerBadgeHtml}
+        </div>
+        <div class="recommendation-body">
+          <div>
+            <span class="recommendation-room-name">
+              <i class="bi bi-door-closed-fill text-primary me-1"></i> ${escapeHTML(room.name)}
+            </span>
+            <span class="recommendation-room-meta ms-1">
+              (${room.capacity} chỗ • ${escapeHTML(room.floor || 'Tòa nhà')})
+            </span>
+          </div>
+          <p class="recommendation-desc mb-0">
+            ${escapeHTML(message)}
+          </p>
+        </div>
+      </div>
+      <div class="recommendation-action">
+        ${isCurrentRoomSelected ? `
+          <button type="button" class="btn-stitch-recommend is-applied" disabled title="Phòng này đang được chọn">
+            <i class="bi bi-check-circle-fill me-1 text-success"></i> Đang áp dụng
+          </button>
+        ` : `
+          <button type="button" class="btn-stitch-recommend" id="btn-apply-smart-room" onclick="applySmartRoomRecommendation(${room.id})" title="Tự động chọn phòng tối ưu này">
+            <i class="bi bi-lightning-charge-fill me-1"></i> Áp dụng gợi ý
+          </button>
+        `}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Tự động chọn phòng được thuật toán gợi ý và cuộn mượt đến thẻ phòng
+ * @param {number} roomId ID phòng
+ */
+function applySmartRoomRecommendation(roomId) {
+  selectRealtimeRoom(roomId);
+  const targetCard = document.querySelector(`.realtime-room-card[data-room-id="${roomId}"]`);
+  if (targetCard) {
+    targetCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    targetCard.classList.remove("pulse-highlight");
+    void targetCard.offsetWidth;
+    targetCard.classList.add("pulse-highlight");
+  }
+}
+
 function renderRealtimeRoomCards(editId = null) {
   const container = document.getElementById("realtime-room-grid");
   if (!container) return;
@@ -4724,6 +4967,13 @@ function renderRealtimeRoomCards(editId = null) {
   if (elBusy) elBusy.textContent = String(busyCount);
   if (elMaint) elMaint.textContent = String(maintCount);
 
+  // 1. Chạy thuật toán gợi ý phòng có sức chứa phù hợp nhất (Best-Fit Optimization)
+  const participantCount = selectedParticipantIds ? selectedParticipantIds.size : 1;
+  const recommendation = recommendBestFitRoom(participantCount, date, startTime, endTime, editId);
+
+  // 2. Render Smart Recommendation Banner phía trên grid
+  renderSmartRecommendationBanner(recommendation, selectedRoomId);
+
   // Lọc theo Sức chứa & Chỉ phòng trống
   let filtered = roomsStatus;
   if (currentOnlyAvailFilter) {
@@ -4751,6 +5001,7 @@ function renderRealtimeRoomCards(editId = null) {
 
   container.innerHTML = filtered.map(room => {
     const isSelected = room.id === selectedRoomId;
+    const isRecommended = recommendation && recommendation.room && recommendation.room.id === room.id;
     let cardStatusClass = "status-available";
     let statusBadgeHtml = `
       <div class="room-card-status-bar">
@@ -4779,10 +5030,15 @@ function renderRealtimeRoomCards(editId = null) {
     }
 
     const eqChips = (room.equipments || []).slice(0, 3).map(eq => `<span class="room-eq-pill">${escapeHTML(eq)}</span>`).join("");
+    const recommendBadgeHtml = isRecommended ? `
+      <div class="room-recommend-badge" title="${escapeHTML(recommendation.message)}">
+        <i class="bi bi-stars"></i> ${escapeHTML(recommendation.badgeText)}
+      </div>
+    ` : "";
 
     return `
       <div
-        class="realtime-room-card ${cardStatusClass} ${isSelected ? 'is-selected' : ''}"
+        class="realtime-room-card ${cardStatusClass} ${isSelected ? 'is-selected' : ''} ${isRecommended ? 'is-recommended' : ''}"
         data-room-id="${room.id}"
         role="radio"
         aria-checked="${isSelected}"
@@ -4790,6 +5046,7 @@ function renderRealtimeRoomCards(editId = null) {
         onclick="selectRealtimeRoom(${room.id})"
         onkeydown="if(event.key==='Enter'||event.key===' '){selectRealtimeRoom(${room.id});event.preventDefault();}"
       >
+        ${recommendBadgeHtml}
         <div class="room-card-top">
           <div>
             <div class="room-card-name">${escapeHTML(room.name)}</div>
