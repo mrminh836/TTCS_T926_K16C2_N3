@@ -108,7 +108,7 @@ INSERT INTO Rooms (RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QR
     (4, 'TH.01', 'Hội Trường Innovation Hall', 100, 'Hội trường lớn', 'Tầng Trệt, Tòa Trụ sở', 'Maintenance', 'QR-TH01-INNOVATION-HALL', 'Hội trường lớn sức chứa 100 người, hệ thống âm thanh vòm, 3 màn hình LED sân khấu phục vụ Town Hall toàn công ty.'),
     (5, 'A3.01', 'Phòng Focus & Phỏng Vấn (Hạ Long)', 6, 'VIP / Phỏng vấn', 'Tầng 3, Tòa Trụ sở', 'Active', 'QR-A301-HA-LONG', 'Không gian yên tĩnh chuyên dụng cho phỏng vấn tuyển dụng ứng viên, họp 1-on-1 và đàm phán hợp đồng bảo mật.'),
     (6, 'B2.02', 'Creative Lab Sa Pa', 10, 'Nhóm / Tech', 'Tầng 2, Tòa Công nghệ', 'Active', 'QR-B202-CREATIVE-LAB', 'Phòng nghiên cứu sáng tạo và thiết kế UI/UX, trang bị Smart TV, bảng vẽ số và sofa thảo luận mở.'),
-    (7, 'B3.01', 'Phòng Khánh Tiết Sài Gòn', 20, 'Hội nghị', 'Tầng 3, Tòa Công nghệ', 'Active', 'QR-B301-SAI-GON', 'Phòng tiếp khách đối tác chiến lược và ký kết thỏa thuận hợp tác, nội thất phong cách trang trọng hiện đại.'),
+    (7, 'B3.01', 'Phòng Khánh Tiết Sài Gòn', 20, 'Hội nghị', 'Tầng 3, Tòa Công nghệ', 'Inactive', 'QR-B301-SAI-GON', 'Phòng tiếp khách đối tác chiến lược và ký kết thỏa thuận hợp tác, nội thất phong cách trang trọng hiện đại.'),
     (8, 'A5.01', 'Executive Suite Tràng An', 16, 'VIP / Phỏng vấn', 'Tầng 5, Tòa Trụ sở', 'Active', 'QR-A501-TRANG-AN', 'Phòng họp VIP view toàn cảnh thành phố, chuyên dành cho cuộc họp chiến lược tài chính và đối tác cao cấp.');
 
 -- 3. Danh mục thiết bị hội nghị hiện đại
@@ -122,7 +122,7 @@ INSERT INTO Equipments (EquipmentID, EquipmentName, Type, Status) VALUES
     (7, 'Máy chiếu di động Epson EB-2250U', 'Máy chiếu', 'Maintenance'),
     (8, 'Bộ chia sẻ màn hình không dây Barco ClickShare CX-30', 'Thiết bị trình chiếu', 'Available'),
     (9, 'Webcam hội nghị trực tuyến Polycom Studio 4K', 'Camera hội nghị', 'Available'),
-    (10, 'Hệ thống phiên dịch cabin đa ngôn ngữ BOSCH', 'Thiết bị dịch', 'Available');
+    (10, 'Hệ thống phiên dịch cabin đa ngôn ngữ BOSCH', 'Thiết bị dịch', 'Broken');
 
 -- 4. Danh sách các cuộc họp mẫu thực tế
 INSERT INTO Meetings (MeetingID, Title, Description, StartTime, EndTime, OrganizerID, IsRecurring) VALUES

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Quản lý Cuộc họp - ICTU</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14'>📅</text></svg>">
 
   <!-- Google Fonts - Inter & Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +26,7 @@
   />
 
   <!-- CSS riêng của project -->
-  <link rel="stylesheet" href="style.css?v=1.6" />
+  <link rel="stylesheet" href="style.css?v=1.7" />
 </head>
 
 <body>
@@ -59,9 +60,9 @@
           <span>Cuộc họp</span>
         </a>
 
-        <a href="#/admin/rooms" class="nav-link-custom">
-          <i class="bi bi-door-open-fill"></i>
-          <span>Phòng họp (Admin)</span>
+        <a href="#/admin" class="nav-link-custom">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>Quản trị (Admin)</span>
         </a>
       </nav>
 
@@ -1224,7 +1225,210 @@
   </div>
 
 
-  <!-- ================= KHU VỰC CHUYÊN DỤNG IN MÃ QR DÁN CỬA PHÒNG (DOOR PLACARD) ================= -->
+  <!-- ================= MODAL THÊM / SỬA THIẾT BỊ (ADMIN EQUIPMENT MODAL) ================= -->
+  <div id="equipment-modal-overlay" class="modal-overlay hidden">
+    <div class="modal meeting-modal-card equipment-modal-card">
+
+      <!-- Header Area -->
+      <div class="stitch-modal-header">
+        <div class="stitch-header-content">
+          <div class="stitch-title-wrapper">
+            <h3 id="equipment-modal-title" class="stitch-modal-title">
+              Thêm thiết bị mới
+            </h3>
+            <span id="equipment-modal-badge" class="stitch-badge">Danh mục Admin</span>
+          </div>
+          <p id="equipment-modal-subtitle" class="stitch-modal-subtitle">
+            Khai báo thiết bị kỹ thuật phục vụ đặt lịch phòng họp doanh nghiệp
+          </p>
+        </div>
+
+        <button
+          type="button"
+          id="btn-close-equipment-modal"
+          class="stitch-close-btn"
+          aria-label="Đóng modal thiết bị">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <form id="equipment-form" novalidate>
+        <div class="stitch-modal-body p-4">
+
+          <!-- Alert box thông báo lỗi nếu có -->
+          <div id="equipment-form-error" class="alert alert-danger d-none align-items-center gap-2 mb-3" role="alert">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <span id="equipment-form-error-msg"></span>
+          </div>
+
+          <input type="hidden" id="equipment-id" name="equipmentId" value="" />
+
+          <!-- Field 1: Tên thiết bị -->
+          <div class="stitch-form-group mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="equipment-name" class="stitch-label m-0">
+                Tên thiết bị <span class="text-danger">*</span>
+              </label>
+              <span class="stitch-hint">Tối đa 100 ký tự</span>
+            </div>
+            <div class="stitch-input-with-icon">
+              <i class="bi bi-cpu stitch-input-icon"></i>
+              <input
+                type="text"
+                id="equipment-name"
+                name="equipmentName"
+                class="form-control stitch-input"
+                placeholder="VD: Máy chiếu Laser Sony 4K, Loa họp Jabra Speak 710..."
+                maxlength="100"
+                aria-label="Tên thiết bị"
+                required
+              />
+            </div>
+            <div class="invalid-feedback" id="equipment-name-feedback">Vui lòng nhập tên thiết bị (tối thiểu 2 ký tự).</div>
+          </div>
+
+          <!-- Row: Phân loại & Trạng thái -->
+          <div class="row g-3 mb-3">
+            <!-- Field 2: Loại thiết bị -->
+            <div class="col-md-6">
+              <div class="stitch-form-group">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="equipment-type" class="stitch-label m-0">
+                    Phân loại thiết bị <span class="text-danger">*</span>
+                  </label>
+                </div>
+                <div class="stitch-input-with-icon">
+                  <i class="bi bi-tag-fill stitch-input-icon"></i>
+                  <select
+                    id="equipment-type"
+                    name="type"
+                    class="form-select stitch-input"
+                    aria-label="Phân loại thiết bị"
+                    required>
+                    <option value="Máy chiếu">Máy chiếu (Projector)</option>
+                    <option value="Màn hình tương tác">Màn hình tương tác (TV / Smart Display)</option>
+                    <option value="Camera hội nghị">Camera hội nghị (Webcam / PTZ)</option>
+                    <option value="Micro hội nghị">Micro hội nghị (Mic cổ ngỗng / Wireless)</option>
+                    <option value="Thiết bị âm thanh">Thiết bị âm thanh (Loa / Soundbar)</option>
+                    <option value="Bảng trắng">Bảng trắng / Bút cảm ứng</option>
+                    <option value="Thiết bị mạng">Thiết bị mạng / Switch / Hub</option>
+                    <option value="Thiết bị">Khác / Thiết bị phụ trợ</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Field 3: Trạng thái thiết bị -->
+            <div class="col-md-6">
+              <div class="stitch-form-group">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="equipment-status" class="stitch-label m-0">
+                    Trạng thái vận hành <span class="text-danger">*</span>
+                  </label>
+                </div>
+                <div class="stitch-input-with-icon">
+                  <i class="bi bi-activity stitch-input-icon"></i>
+                  <select
+                    id="equipment-status"
+                    name="status"
+                    class="form-select stitch-input"
+                    aria-label="Trạng thái vận hành thiết bị"
+                    required>
+                    <option value="Available">Có sẵn / Hoạt động tốt (Available)</option>
+                    <option value="Maintenance">Đang bảo trì / Kiểm tra (Maintenance)</option>
+                    <option value="Broken">Hư hỏng / Chờ thay thế (Broken)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ghi chú nghiệp vụ tự động cập nhật khi đổi trạng thái -->
+          <div id="equipment-status-alert-box" class="p-3 rounded-3 border bg-light small d-flex align-items-start gap-2">
+            <i class="bi bi-info-circle-fill text-primary mt-0.5"></i>
+            <div>
+              <span class="fw-semibold text-dark">Lưu ý nghiệp vụ:</span>
+              <span id="equipment-status-alert-desc" class="text-secondary ms-1">
+                Thiết bị ở trạng thái "Có sẵn" sẽ được hiển thị cho người dùng chọn mượn khi đặt lịch phòng họp.
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer Area -->
+        <div class="stitch-modal-footer d-flex justify-content-end align-items-center gap-2">
+          <button
+            type="button"
+            id="btn-equipment-cancel"
+            class="btn btn-outline-secondary stitch-btn-cancel">
+            Hủy
+          </button>
+
+          <button
+            type="submit"
+            id="btn-equipment-submit"
+            class="btn btn-primary stitch-btn-submit">
+            <i id="equipment-submit-icon" class="bi bi-plus-lg me-1"></i>
+            <span id="equipment-submit-spinner" class="spinner-border spinner-border-sm me-1 hidden" role="status" aria-hidden="true"></span>
+            <span id="equipment-submit-text">Lưu thiết bị</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL XÁC NHẬN XÓA THIẾT BỊ (ADMIN EQUIPMENT DELETE MODAL) ================= -->
+  <div id="equipment-delete-overlay" class="modal-overlay hidden">
+    <div class="modal meeting-modal-card equipment-delete-modal-card">
+
+      <div class="stitch-modal-header">
+        <div class="stitch-header-content">
+          <div class="stitch-title-wrapper">
+            <h3 id="equipment-delete-title" class="stitch-modal-title text-danger">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              Xác nhận xóa thiết bị
+            </h3>
+            <span class="stitch-badge badge-danger">Ràng buộc nghiệp vụ</span>
+          </div>
+          <p class="stitch-modal-subtitle">Kiểm tra tính toàn vẹn dữ liệu cuộc họp trước khi loại bỏ</p>
+        </div>
+
+        <button
+          type="button"
+          id="btn-close-equipment-delete"
+          class="stitch-close-btn"
+          aria-label="Đóng modal xác nhận xóa thiết bị">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div id="equipment-delete-content" class="p-4">
+        <!-- Render động thông tin thiết bị và cảnh báo ràng buộc -->
+      </div>
+
+      <div class="stitch-modal-footer d-flex justify-content-end align-items-center gap-2" id="equipment-delete-footer">
+        <button
+          type="button"
+          id="btn-cancel-equipment-delete"
+          class="btn btn-outline-secondary stitch-btn-cancel">
+          Đóng
+        </button>
+
+        <button
+          type="button"
+          id="btn-confirm-equipment-delete"
+          class="btn btn-danger stitch-btn-submit">
+          <i class="bi bi-trash3-fill me-1"></i>
+          <span>Xác nhận xóa</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
   <div id="print-room-placard-area" class="print-placard-container" aria-hidden="true"></div>
 
 
@@ -1234,7 +1438,7 @@
   </script>
 
   <!-- JavaScript của project -->
-  <script src="main.js?v=1.6"></script>
+  <script src="main.js?v=1.7"></script>
 
 
 </body>

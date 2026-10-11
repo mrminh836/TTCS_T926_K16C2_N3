@@ -455,8 +455,11 @@ const routes = {
   "/": renderHome,
   "/home": renderHome,
   "/meetings": renderMeetingsPage,
+  "/admin": renderAdminRoomsPage,
   "/admin/rooms": renderAdminRoomsPage,
   "/rooms": renderAdminRoomsPage,
+  "/admin/equipments": renderAdminEquipmentsPage,
+  "/equipments": renderAdminEquipmentsPage,
   "/404": render404
 };
 
@@ -482,9 +485,12 @@ function updateActiveNav(route) {
     const isHome =
       (route === "/" || route === "/home") &&
       (linkRoute === "/" || linkRoute === "/home");
+    const isAdmin =
+      (route.startsWith("/admin") || route === "/rooms" || route === "/equipments") &&
+      linkRoute === "/admin";
     const isMatch = route === linkRoute;
 
-    if (isHome || isMatch) {
+    if (isHome || isAdmin || isMatch) {
       link.classList.add("active");
     } else {
       link.classList.remove("active");
@@ -541,13 +547,9 @@ function renderHome() {
           <i class="bi bi-calendar3 me-2"></i> Vào Quản lý cuộc họp
         </a>
 
-        <a href="#/admin/rooms" class="btn btn-outline-primary stitch-btn-export hero-btn-sub">
-          <i class="bi bi-door-open-fill me-1"></i> Quản lý phòng họp (Admin)
+        <a href="#/admin" class="btn btn-outline-primary stitch-btn-export hero-btn-sub">
+          <i class="bi bi-shield-lock-fill me-1"></i> Quản trị hệ thống (Admin)
         </a>
-
-        <button type="button" onclick="openAddModal()" class="btn btn-outline-secondary stitch-btn-cancel hero-btn-sub">
-          <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp mới
-        </button>
       </div>
 
       <div class="hero-metrics-strip mt-5">
@@ -582,9 +584,11 @@ function renderHome() {
           </div>
           <h3 class="feature-title">Quản Lý Phòng &amp; Thiết Bị</h3>
           <p class="feature-desc">Theo dõi trực quan trạng thái sức chứa phòng họp, máy chiếu, màn hình TV và thiết bị kèm theo.</p>
-          <a href="#/admin/rooms" class="text-primary fw-semibold small text-decoration-none mt-2 d-inline-block">
-            Vào cổng quản trị phòng &rarr;
-          </a>
+          <div class="mt-2 d-flex align-items-center gap-3">
+            <a href="#/admin" class="text-primary fw-semibold small text-decoration-none">
+              Trung tâm Quản trị Admin &rarr;
+            </a>
+          </div>
         </div>
 
         <div class="feature-card">
@@ -1093,6 +1097,64 @@ function getFilteredRooms() {
   });
 }
 
+// =====================================================
+// HELPER: RENDER ADMIN PORTAL TABS
+// Hệ thống Tab phân hệ Admin hợp nhất (Phòng họp & Thiết bị)
+// =====================================================
+function renderAdminNavigationTabs(activeTab = 'rooms') {
+  const roomsCount = ROOMS.length;
+  const equipmentsCount = EQUIPMENTS.length;
+  return `
+    <div class="admin-portal-header">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-2">
+        <div>
+          <div class="breadcrumb-nav mb-1">
+            <span>Hệ thống Quản trị</span>
+            <i class="bi bi-chevron-right breadcrumb-separator"></i>
+            <span class="breadcrumb-active">${activeTab === 'rooms' ? 'Quản lý Danh mục Phòng họp' : 'Quản lý Danh mục Thiết bị'}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <h1 class="page-title m-0">Trung tâm Quản trị Hệ thống</h1>
+            <span class="admin-badge-indicator">
+              <i class="bi bi-shield-lock-fill"></i> Admin Portal
+            </span>
+          </div>
+          <p class="page-subtitle m-0">
+            Quản lý tập trung hạ tầng tài nguyên doanh nghiệp: phòng họp, sức chứa, mã QR check-in và trang thiết bị kỹ thuật.
+          </p>
+        </div>
+      </div>
+
+      <!-- Segmented Navigation Tabs giữa các chức năng Admin -->
+      <div class="admin-feature-tabs-container">
+        <div class="admin-feature-tabs" role="tablist">
+          <a href="#/admin/rooms" class="admin-feature-tab ${activeTab === 'rooms' ? 'active' : ''}">
+            <div class="tab-icon-box">
+              <i class="bi bi-door-open-fill"></i>
+            </div>
+            <div class="tab-content-box">
+              <span class="tab-title">Danh mục Phòng họp</span>
+              <span class="tab-desc">${roomsCount} phòng họp • Sức chứa &amp; QR check-in</span>
+            </div>
+            <span class="tab-counter-pill">${roomsCount}</span>
+          </a>
+
+          <a href="#/admin/equipments" class="admin-feature-tab ${activeTab === 'equipments' ? 'active' : ''}">
+            <div class="tab-icon-box">
+              <i class="bi bi-tools"></i>
+            </div>
+            <div class="tab-content-box">
+              <span class="tab-title">Danh mục Thiết bị</span>
+              <span class="tab-desc">${equipmentsCount} thiết bị • Bảo trì &amp; Khả dụng</span>
+            </div>
+            <span class="tab-counter-pill">${equipmentsCount}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderAdminRoomsPage() {
   const totalRooms = ROOMS.length;
   const activeRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "active").length;
@@ -1106,23 +1168,13 @@ function renderAdminRoomsPage() {
   app.innerHTML = `
     <div id="admin-rooms-section" class="admin-rooms-view-wrapper">
 
-      <!-- Breadcrumbs & Page Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
-        <div>
-          <div class="breadcrumb-nav mb-1">
-            <span>Quản trị hệ thống</span>
-            <i class="bi bi-chevron-right breadcrumb-separator"></i>
-            <span class="breadcrumb-active">Danh mục phòng họp</span>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <h1 class="page-title m-0">Quản lý Danh mục Phòng họp</h1>
-            <span class="admin-badge-indicator">
-              <i class="bi bi-shield-lock-fill"></i> Admin Portal
-            </span>
-          </div>
-          <p class="page-subtitle m-0">
-            Quản trị trạng thái hoạt động, sức chứa, trang thiết bị và mã QR Check-in tức thì cho toàn bộ phòng họp doanh nghiệp.
-          </p>
+      ${renderAdminNavigationTabs('rooms')}
+
+      <!-- Action Bar của Tab Phòng họp -->
+      <div class="admin-action-bar d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+        <div class="admin-tab-section-title">
+          <i class="bi bi-door-open text-primary fs-5"></i>
+          <span class="fw-bold text-dark">Danh sách Phòng họp Doanh nghiệp</span>
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">
@@ -2062,6 +2114,961 @@ function loadPersistedRooms() {
   } catch (e) {
     console.warn("Lỗi khi đọc phòng từ localStorage:", e);
   }
+}
+
+// =====================================================
+// 6D. QUẢN TRỊ DANH MỤC THIẾT BỊ (ADMIN EQUIPMENTS MODULE)
+// =====================================================
+
+const EQUIPMENT_API_URL = "http://localhost:3000/api/equipments";
+
+const EquipmentAPI = {
+  isBackendConnected: false,
+
+  async getAll() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(EQUIPMENT_API_URL, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        const list = json.data || json;
+        if (Array.isArray(list) && list.length > 0) {
+          EQUIPMENTS = list.map(eq => ({
+            id: Number(eq.equipmentId || eq.id),
+            name: eq.equipmentName || eq.name,
+            type: eq.type || 'Thiết bị',
+            status: eq.status || 'Available',
+            icon: getEquipmentIconClass(eq)
+          }));
+        }
+        return { success: true, data: EQUIPMENTS, isFallback: false };
+      }
+    } catch (err) {
+      console.warn("API thiết bị offline, dùng danh mục cục bộ:", err);
+      this.isBackendConnected = false;
+    }
+    return { success: true, data: EQUIPMENTS, isFallback: true };
+  },
+
+  async create(data) {
+    try {
+      const res = await fetch(EQUIPMENT_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          equipmentName: data.name,
+          type: data.type,
+          status: data.status
+        })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const created = json.data;
+        const mapped = {
+          id: Number(created.equipmentId || created.id),
+          name: created.equipmentName || created.name,
+          type: created.type || 'Thiết bị',
+          status: created.status || 'Available',
+          icon: getEquipmentIconClass(created)
+        };
+        const idx = EQUIPMENTS.findIndex(e => e.id === mapped.id);
+        if (idx >= 0) EQUIPMENTS[idx] = mapped;
+        else EQUIPMENTS.push(mapped);
+        return { success: true, data: mapped };
+      }
+      return { success: false, message: json.message || "Không thể tạo thiết bị." };
+    } catch (err) {
+      const maxId = EQUIPMENTS.reduce((max, e) => Math.max(max, e.id), 0);
+      const newId = maxId + 1;
+      const newEq = {
+        id: newId,
+        name: data.name,
+        type: data.type || "Thiết bị",
+        status: data.status || "Available",
+        icon: getEquipmentIconClass(data)
+      };
+      EQUIPMENTS.push(newEq);
+      return { success: true, data: newEq, isFallback: true };
+    }
+  },
+
+  async update(id, data) {
+    try {
+      const res = await fetch(`${EQUIPMENT_API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          equipmentName: data.name,
+          type: data.type,
+          status: data.status
+        })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const updated = json.data;
+        const mapped = {
+          id: Number(updated.equipmentId || updated.id),
+          name: updated.equipmentName || updated.name,
+          type: updated.type || 'Thiết bị',
+          status: updated.status || 'Available',
+          icon: getEquipmentIconClass(updated)
+        };
+        const idx = EQUIPMENTS.findIndex(e => e.id === id);
+        if (idx >= 0) EQUIPMENTS[idx] = mapped;
+        return { success: true, data: mapped };
+      }
+      return { success: false, message: json.message || "Không thể cập nhật thiết bị." };
+    } catch (err) {
+      const idx = EQUIPMENTS.findIndex(e => e.id === id);
+      if (idx >= 0) {
+        EQUIPMENTS[idx].name = data.name;
+        EQUIPMENTS[idx].type = data.type;
+        EQUIPMENTS[idx].status = data.status;
+        EQUIPMENTS[idx].icon = getEquipmentIconClass(data);
+        return { success: true, data: EQUIPMENTS[idx], isFallback: true };
+      }
+      return { success: false, message: err.message };
+    }
+  },
+
+  async updateStatus(id, newStatus) {
+    try {
+      const res = await fetch(`${EQUIPMENT_API_URL}/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const idx = EQUIPMENTS.findIndex(e => e.id === id);
+        if (idx >= 0) EQUIPMENTS[idx].status = newStatus;
+        return { success: true, data: json.data };
+      }
+      return { success: false, message: json.message || "Không thể cập nhật trạng thái thiết bị." };
+    } catch (err) {
+      const idx = EQUIPMENTS.findIndex(e => e.id === id);
+      if (idx >= 0) {
+        EQUIPMENTS[idx].status = newStatus;
+        return { success: true, data: EQUIPMENTS[idx], isFallback: true };
+      }
+      return { success: false, message: err.message };
+    }
+  },
+
+  async delete(id) {
+    try {
+      const res = await fetch(`${EQUIPMENT_API_URL}/${id}`, {
+        method: "DELETE"
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        EQUIPMENTS = EQUIPMENTS.filter(e => e.id !== id);
+        return { success: true, message: json.message };
+      }
+      return {
+        success: false,
+        status: res.status,
+        message: json.message || "Không thể xóa thiết bị.",
+        conflictCount: json.conflictCount || 0
+      };
+    } catch (err) {
+      EQUIPMENTS = EQUIPMENTS.filter(e => e.id !== id);
+      return { success: true, message: "Đã xóa thiết bị khỏi bộ nhớ cục bộ." };
+    }
+  }
+};
+
+let equipmentFilterState = {
+  search: "",
+  status: "all",
+  type: "all",
+  sortBy: "id-asc"
+};
+
+function getEquipmentVisualMeta(eq) {
+  const name = (eq.name || eq.equipmentName || "").toLowerCase();
+  const type = (eq.type || "").toLowerCase();
+  if (name.includes("máy chiếu") || type.includes("máy chiếu") || type.includes("projector")) {
+    return { icon: "bi-projector-fill", typeClass: "type-projector", label: "Máy chiếu" };
+  }
+  if (name.includes("màn hình") || name.includes("tv") || type.includes("màn hình") || type.includes("display")) {
+    return { icon: "bi-tv-fill", typeClass: "type-tv", label: "Màn hình tương tác" };
+  }
+  if (name.includes("camera") || name.includes("webcam") || type.includes("camera")) {
+    return { icon: "bi-camera-video-fill", typeClass: "type-camera", label: "Camera hội nghị" };
+  }
+  if (name.includes("micro") || name.includes("mic") || type.includes("micro")) {
+    return { icon: "bi-mic-fill", typeClass: "type-mic", label: "Micro hội nghị" };
+  }
+  if (name.includes("loa") || type.includes("loa") || type.includes("audio") || type.includes("âm thanh")) {
+    return { icon: "bi-speaker-fill", typeClass: "type-speaker", label: "Thiết bị âm thanh" };
+  }
+  if (name.includes("bảng") || type.includes("bảng") || type.includes("whiteboard")) {
+    return { icon: "bi-easel-fill", typeClass: "type-board", label: "Bảng trắng" };
+  }
+  if (name.includes("mạng") || type.includes("mạng") || type.includes("switch") || type.includes("hub")) {
+    return { icon: "bi-router-fill", typeClass: "type-network", label: "Thiết bị mạng" };
+  }
+  return { icon: "bi-cpu-fill", typeClass: "type-other", label: eq.type || "Thiết bị" };
+}
+
+function filterEquipmentsList() {
+  return EQUIPMENTS.filter(eq => {
+    if (equipmentFilterState.search) {
+      const q = equipmentFilterState.search.trim().toLowerCase();
+      const matchName = (eq.name || eq.equipmentName || "").toLowerCase().includes(q);
+      const matchType = (eq.type || "").toLowerCase().includes(q);
+      const matchId = `eq-${eq.id}`.toLowerCase().includes(q) || String(eq.id) === q;
+      if (!matchName && !matchType && !matchId) return false;
+    }
+
+    if (equipmentFilterState.status !== "all") {
+      const s = (eq.status || "").toLowerCase();
+      if (s !== equipmentFilterState.status.toLowerCase()) return false;
+    }
+
+    if (equipmentFilterState.type !== "all") {
+      const t = (eq.type || "").toLowerCase();
+      if (!t.includes(equipmentFilterState.type.toLowerCase())) return false;
+    }
+
+    return true;
+  });
+}
+
+function renderAdminEquipmentsPage() {
+  const totalEquipments = EQUIPMENTS.length;
+  const availableEquipments = EQUIPMENTS.filter(e => (e.status || "").toLowerCase() === "available").length;
+  const maintenanceEquipments = EQUIPMENTS.filter(e => (e.status || "").toLowerCase() === "maintenance").length;
+  const brokenEquipments = EQUIPMENTS.filter(e => (e.status || "").toLowerCase() === "broken").length;
+
+  app.innerHTML = `
+    <div id="admin-equipments-section" class="admin-equipments-view-wrapper">
+
+      ${renderAdminNavigationTabs('equipments')}
+
+      <!-- Action Bar của Tab Thiết bị -->
+      <div class="admin-action-bar d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+        <div class="admin-tab-section-title">
+          <i class="bi bi-tools text-primary fs-5"></i>
+          <span class="fw-bold text-dark">Danh mục Trang thiết bị Kỹ thuật</span>
+        </div>
+
+        <div class="header-action-buttons d-flex align-items-center gap-2">
+          <button type="button" id="btn-export-equipments-csv" class="btn-stitch-export" title="Xuất danh sách thiết bị ra file CSV">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            <span>Xuất CSV / Excel</span>
+          </button>
+
+          <button type="button" id="btn-add-equipment" class="btn-stitch-create">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Thêm thiết bị mới</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Overview Cards (4 Metrics) -->
+      <div class="equipment-kpi-grid">
+        <!-- KPI 1: Tổng số thiết bị -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Tổng số thiết bị</span>
+              <div class="kpi-value" id="eq-kpi-total">${totalEquipments}</div>
+            </div>
+            <div class="kpi-icon-box kpi-blue">
+              <i class="bi bi-cpu-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-neutral">
+              <i class="bi bi-hdd-stack"></i> Danh mục toàn hệ thống
+            </span>
+            <span class="kpi-delta-text">Trang bị phòng họp</span>
+          </div>
+          <div class="kpi-bottom-bar bar-blue"></div>
+        </div>
+
+        <!-- KPI 2: Có sẵn / Sẵn sàng phục vụ -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Sẵn sàng phục vụ</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="eq-kpi-available">${availableEquipments}</span>
+                <span class="kpi-value-unit">thiết bị</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box kpi-emerald">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-positive">
+              <i class="bi bi-check-lg"></i> Có thể mượn ngay
+            </span>
+            <span class="kpi-delta-text">${totalEquipments > 0 ? Math.round((availableEquipments / totalEquipments) * 100) : 0}% khả dụng</span>
+          </div>
+          <div class="kpi-bottom-bar bar-emerald"></div>
+        </div>
+
+        <!-- KPI 3: Đang bảo trì -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Đang bảo trì / Kiểm tra</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="eq-kpi-maintenance">${maintenanceEquipments}</span>
+                <span class="kpi-value-unit">thiết bị</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box kpi-amber">
+              <i class="bi bi-tools"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-live">
+              <span class="ping-dot-live"></span> Đang kiểm định
+            </span>
+            <span class="kpi-delta-text">Tạm dừng cho mượn</span>
+          </div>
+          <div class="kpi-bottom-bar bar-amber"></div>
+        </div>
+
+        <!-- KPI 4: Hư hỏng / Chờ thay -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Hỏng hóc kỹ thuật</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="eq-kpi-broken">${brokenEquipments}</span>
+                <span class="kpi-value-unit">thiết bị</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box" style="background: #fef2f2; color: #dc2626;">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-neutral text-danger" style="background: #fee2e2; border-color: #fca5a5;">
+              <i class="bi bi-x-circle"></i> Chờ sửa chữa
+            </span>
+            <span class="kpi-delta-text">Cần xử lý kỹ thuật</span>
+          </div>
+          <div class="kpi-bottom-bar" style="background: #ef4444;"></div>
+        </div>
+      </div>
+
+      <!-- Filter Panel & Toolbar -->
+      <div class="equipment-filter-card">
+        <div class="row g-3 align-items-center">
+
+          <!-- Search Input -->
+          <div class="col-lg-4 col-md-6">
+            <div class="search-input-wrapper">
+              <i class="bi bi-search search-input-icon"></i>
+              <input
+                type="text"
+                id="equipment-search-input"
+                class="form-control table-search-input"
+                placeholder="Tìm theo tên thiết bị, mã (#EQ-01), loại..."
+                aria-label="Tìm kiếm thiết bị"
+                value="${escapeHTML(equipmentFilterState.search)}"
+              />
+              ${equipmentFilterState.search ? `
+                <button type="button" id="btn-clear-equipment-search" class="btn-clear-search" aria-label="Xóa tìm kiếm">
+                  <i class="bi bi-x-circle-fill"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Status Tabs -->
+          <div class="col-lg-5 col-md-6">
+            <div class="d-flex align-items-center gap-1 flex-wrap" role="tablist">
+              <button
+                type="button"
+                id="tab-eq-status-all"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'all' ? 'active' : ''}"
+                data-status="all">
+                <span>Tất cả</span>
+                <span class="tab-count" id="eq-tab-count-all">${totalEquipments}</span>
+              </button>
+
+              <button
+                type="button"
+                id="tab-eq-status-available"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'Available' ? 'active' : ''}"
+                data-status="Available">
+                <span>Có sẵn</span>
+                <span class="tab-count" id="eq-tab-count-avail">${availableEquipments}</span>
+              </button>
+
+              <button
+                type="button"
+                id="tab-eq-status-maintenance"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'Maintenance' ? 'active' : ''}"
+                data-status="Maintenance">
+                <span>Bảo trì</span>
+                <span class="tab-count" id="eq-tab-count-maint">${maintenanceEquipments}</span>
+              </button>
+
+              <button
+                type="button"
+                id="tab-eq-status-broken"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'Broken' ? 'active' : ''}"
+                data-status="Broken">
+                <span>Hư hỏng</span>
+                <span class="tab-count" id="eq-tab-count-broken">${brokenEquipments}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Dropdown Filter & Reset -->
+          <div class="col-lg-3 col-md-12 d-flex align-items-center gap-2">
+            <select id="equipment-category-filter" class="form-select stitch-input" aria-label="Lọc theo phân loại thiết bị">
+              <option value="all" ${equipmentFilterState.type === 'all' ? 'selected' : ''}>Tất cả phân loại</option>
+              <option value="Máy chiếu" ${equipmentFilterState.type === 'Máy chiếu' ? 'selected' : ''}>Máy chiếu</option>
+              <option value="Màn hình" ${equipmentFilterState.type === 'Màn hình' ? 'selected' : ''}>Màn hình tương tác</option>
+              <option value="Camera" ${equipmentFilterState.type === 'Camera' ? 'selected' : ''}>Camera hội nghị</option>
+              <option value="Micro" ${equipmentFilterState.type === 'Micro' ? 'selected' : ''}>Micro hội nghị</option>
+              <option value="Thiết bị âm thanh" ${equipmentFilterState.type === 'Thiết bị âm thanh' ? 'selected' : ''}>Thiết bị âm thanh</option>
+              <option value="Bảng trắng" ${equipmentFilterState.type === 'Bảng trắng' ? 'selected' : ''}>Bảng trắng</option>
+            </select>
+
+            <button type="button" id="btn-reset-equipment-filter" class="btn btn-outline-secondary stitch-btn-cancel flex-shrink-0" title="Đặt lại bộ lọc" aria-label="Đặt lại bộ lọc">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Equipment Table Card -->
+      <div class="stitch-table-card">
+        <div class="stitch-table-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="stitch-table-title">Danh sách thiết bị trang bị phòng họp</span>
+            <span class="stitch-table-count" id="equipment-table-count">Đang tải...</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="stitch-hint"><i class="bi bi-shield-check text-success me-1"></i>Kiểm soát lịch mượn trùng giờ thời gian thực</span>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table stitch-table align-middle" id="admin-equipments-table">
+            <thead>
+              <tr>
+                <th style="width: 44px;" class="text-center">
+                  <input type="checkbox" id="check-all-equipments" class="stitch-checkbox" aria-label="Chọn tất cả thiết bị" />
+                </th>
+                <th style="width: 100px;" class="text-center">Mã TB</th>
+                <th style="min-width: 260px;">Tên thiết bị &amp; Nhận diện</th>
+                <th style="width: 170px;">Phân loại</th>
+                <th style="width: 160px;" class="text-center">Trạng thái vận hành</th>
+                <th style="width: 160px;" class="text-center">Điều phối bảo trì</th>
+                <th style="width: 120px;" class="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="admin-equipments-tbody">
+              <!-- Render by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer -->
+        <div class="stitch-table-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="stitch-table-info" id="equipment-footer-info"></div>
+          <div class="stitch-pagination d-flex align-items-center gap-1">
+            <button type="button" class="btn-page-nav disabled" aria-label="Trang trước"><i class="bi bi-chevron-left"></i></button>
+            <span class="btn-page-nav active">1</span>
+            <button type="button" class="btn-page-nav disabled" aria-label="Trang kế tiếp"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  setupAdminEquipmentEvents();
+  renderAdminEquipmentsTable();
+}
+
+function renderAdminEquipmentsTable() {
+  const tbody = document.getElementById("admin-equipments-tbody");
+  if (!tbody) return;
+
+  const filtered = filterEquipmentsList();
+  const countEl = document.getElementById("equipment-table-count");
+  const footerEl = document.getElementById("equipment-footer-info");
+
+  if (countEl) countEl.textContent = `${filtered.length} thiết bị`;
+  if (footerEl) footerEl.textContent = `Hiển thị ${filtered.length} trên tổng số ${EQUIPMENTS.length} thiết bị`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center py-5">
+          <div class="empty-state-card text-center py-4">
+            <i class="bi bi-cpu text-muted" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold text-dark mt-2">Không tìm thấy thiết bị nào</h5>
+            <p class="text-secondary small">Không có thiết bị phù hợp với điều kiện tìm kiếm hoặc bộ lọc hiện tại.</p>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="resetEquipmentFilters()">
+              <i class="bi bi-arrow-counterclockwise me-1"></i> Đặt lại bộ lọc
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    const meta = getEquipmentVisualMeta(eq);
+    const statusLower = (eq.status || "available").toLowerCase();
+
+    // Badge status
+    let statusBadge = "";
+    if (statusLower === "available") {
+      statusBadge = `<span class="eq-status-badge status-available"><span class="status-dot"></span>Có sẵn</span>`;
+    } else if (statusLower === "maintenance") {
+      statusBadge = `<span class="eq-status-badge status-maintenance"><span class="status-dot"></span>Đang bảo trì</span>`;
+    } else {
+      statusBadge = `<span class="eq-status-badge status-broken"><span class="status-dot"></span>Hư hỏng</span>`;
+    }
+
+    // Nút chuyển bảo trì nhanh
+    let toggleBtn = "";
+    if (statusLower === "available") {
+      toggleBtn = `
+        <button type="button" class="btn-action-status-toggle to-maintenance"
+          onclick="handleQuickToggleEquipmentStatus(${eqId}, 'Available')"
+          title="Chuyển thiết bị sang trạng thái bảo trì">
+          <i class="bi bi-tools"></i>
+          <span>Bảo trì</span>
+        </button>
+      `;
+    } else if (statusLower === "maintenance") {
+      toggleBtn = `
+        <button type="button" class="btn-action-status-toggle to-available"
+          onclick="handleQuickToggleEquipmentStatus(${eqId}, 'Maintenance')"
+          title="Hoàn tất bảo trì, đưa thiết bị về trạng thái sẵn sàng">
+          <i class="bi bi-check2-circle"></i>
+          <span>Hoàn tất bảo trì</span>
+        </button>
+      `;
+    } else {
+      toggleBtn = `
+        <button type="button" class="btn-action-status-toggle to-available"
+          onclick="handleQuickToggleEquipmentStatus(${eqId}, 'Broken')"
+          title="Khôi phục thiết bị về trạng thái sẵn sàng">
+          <i class="bi bi-arrow-repeat"></i>
+          <span>Khôi phục</span>
+        </button>
+      `;
+    }
+
+    return `
+      <tr class="equipment-table-row" data-id="${eqId}">
+        <td class="text-center">
+          <input type="checkbox" class="stitch-checkbox equipment-row-checkbox" value="${eqId}" aria-label="Chọn thiết bị ${escapeHTML(eq.name || eq.equipmentName)}" />
+        </td>
+        <td class="text-center font-monospace small fw-bold text-secondary">
+          #EQ-${String(eqId).padStart(2, '0')}
+        </td>
+        <td>
+          <div class="equipment-row-item">
+            <div class="equipment-icon-avatar ${meta.typeClass}">
+              <i class="bi ${meta.icon}"></i>
+            </div>
+            <div>
+              <div class="equipment-name-title">${escapeHTML(eq.name || eq.equipmentName)}</div>
+              <div class="equipment-code-text">Mã định danh hệ thống: EQ-SYS-${eqId}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="equipment-category-badge">
+            <i class="bi ${meta.icon} text-primary"></i>
+            <span>${escapeHTML(eq.type || meta.label)}</span>
+          </span>
+        </td>
+        <td class="text-center">
+          ${statusBadge}
+        </td>
+        <td class="text-center">
+          ${toggleBtn}
+        </td>
+        <td class="text-center">
+          <div class="d-flex align-items-center justify-content-center gap-1">
+            <button type="button" class="btn-action-icon btn-edit"
+              onclick="openEditEquipmentModal(${eqId})"
+              title="Chỉnh sửa thông tin thiết bị"
+              aria-label="Chỉnh sửa thiết bị ${escapeHTML(eq.name || eq.equipmentName)}">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button type="button" class="btn-action-icon btn-delete"
+              onclick="openEquipmentDeleteModal(${eqId})"
+              title="Xóa thiết bị"
+              aria-label="Xóa thiết bị ${escapeHTML(eq.name || eq.equipmentName)}">
+              <i class="bi bi-trash3-fill"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function setupAdminEquipmentEvents() {
+  const searchInput = document.getElementById("equipment-search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      equipmentFilterState.search = e.target.value;
+      renderAdminEquipmentsPage();
+      const inputAfter = document.getElementById("equipment-search-input");
+      if (inputAfter) {
+        inputAfter.focus();
+        inputAfter.setSelectionRange(inputAfter.value.length, inputAfter.value.length);
+      }
+    });
+  }
+
+  const btnClearSearch = document.getElementById("btn-clear-equipment-search");
+  if (btnClearSearch) {
+    btnClearSearch.addEventListener("click", () => {
+      equipmentFilterState.search = "";
+      renderAdminEquipmentsPage();
+    });
+  }
+
+  document.querySelectorAll(".equipment-status-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const status = btn.getAttribute("data-status");
+      equipmentFilterState.status = status;
+      renderAdminEquipmentsPage();
+    });
+  });
+
+  const categoryFilter = document.getElementById("equipment-category-filter");
+  if (categoryFilter) {
+    categoryFilter.addEventListener("change", (e) => {
+      equipmentFilterState.type = e.target.value;
+      renderAdminEquipmentsTable();
+    });
+  }
+
+  const btnReset = document.getElementById("btn-reset-equipment-filter");
+  if (btnReset) {
+    btnReset.addEventListener("click", resetEquipmentFilters);
+  }
+
+  const btnAdd = document.getElementById("btn-add-equipment");
+  if (btnAdd) {
+    btnAdd.addEventListener("click", openAddEquipmentModal);
+  }
+
+  const btnExport = document.getElementById("btn-export-equipments-csv");
+  if (btnExport) {
+    btnExport.addEventListener("click", exportEquipmentsToCSV);
+  }
+
+  const checkAll = document.getElementById("check-all-equipments");
+  if (checkAll) {
+    checkAll.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      document.querySelectorAll(".equipment-row-checkbox").forEach(cb => {
+        cb.checked = isChecked;
+      });
+    });
+  }
+}
+
+function resetEquipmentFilters() {
+  equipmentFilterState.search = "";
+  equipmentFilterState.status = "all";
+  equipmentFilterState.type = "all";
+  renderAdminEquipmentsPage();
+}
+
+function openAddEquipmentModal() {
+  const overlay = document.getElementById("equipment-modal-overlay");
+  const form = document.getElementById("equipment-form");
+  const title = document.getElementById("equipment-modal-title");
+  const submitText = document.getElementById("equipment-submit-text");
+  const errorBox = document.getElementById("equipment-form-error");
+
+  if (form) form.reset();
+  if (errorBox) errorBox.classList.add("d-none");
+  const idInput = document.getElementById("equipment-id");
+  if (idInput) idInput.value = "";
+  if (title) title.textContent = "Thêm thiết bị mới";
+  if (submitText) submitText.textContent = "Thêm thiết bị";
+
+  updateEquipmentStatusAlertDesc("Available");
+
+  if (overlay) overlay.classList.remove("hidden");
+  setTimeout(() => {
+    const nameInput = document.getElementById("equipment-name");
+    if (nameInput) nameInput.focus();
+  }, 100);
+}
+
+function openEditEquipmentModal(id) {
+  const eq = EQUIPMENTS.find(e => e.id === id);
+  if (!eq) return;
+
+  const overlay = document.getElementById("equipment-modal-overlay");
+  const title = document.getElementById("equipment-modal-title");
+  const submitText = document.getElementById("equipment-submit-text");
+  const errorBox = document.getElementById("equipment-form-error");
+
+  if (errorBox) errorBox.classList.add("d-none");
+  if (title) title.textContent = "Chỉnh sửa thông tin thiết bị";
+  if (submitText) submitText.textContent = "Cập nhật thiết bị";
+
+  const idInput = document.getElementById("equipment-id");
+  const nameInput = document.getElementById("equipment-name");
+  const typeSelect = document.getElementById("equipment-type");
+  const statusSelect = document.getElementById("equipment-status");
+
+  if (idInput) idInput.value = eq.id;
+  if (nameInput) nameInput.value = eq.name || eq.equipmentName;
+  if (typeSelect) typeSelect.value = eq.type || "Thiết bị";
+  if (statusSelect) statusSelect.value = eq.status || "Available";
+
+  updateEquipmentStatusAlertDesc(eq.status || "Available");
+
+  if (overlay) overlay.classList.remove("hidden");
+  setTimeout(() => {
+    if (nameInput) nameInput.focus();
+  }, 100);
+}
+
+function closeEquipmentModal() {
+  const overlay = document.getElementById("equipment-modal-overlay");
+  if (overlay) overlay.classList.add("hidden");
+  const errorBox = document.getElementById("equipment-form-error");
+  if (errorBox) errorBox.classList.add("d-none");
+  const nameInput = document.getElementById("equipment-name");
+  if (nameInput) nameInput.classList.remove("is-invalid");
+}
+
+function updateEquipmentStatusAlertDesc(status) {
+  const descEl = document.getElementById("equipment-status-alert-desc");
+  if (!descEl) return;
+  if (status === "Available") {
+    descEl.textContent = "Thiết bị ở trạng thái 'Có sẵn' sẽ được hiển thị cho người dùng chọn mượn khi đặt lịch phòng họp.";
+  } else if (status === "Maintenance") {
+    descEl.textContent = "Thiết bị đang bảo trì sẽ bị khóa (disable) trên giao diện đặt phòng và hệ thống sẽ tự động chặn mượn.";
+  } else {
+    descEl.textContent = "Thiết bị hư hỏng sẽ được đánh dấu để phòng kỹ thuật kiểm tra và tạm thời không thể đưa vào sử dụng.";
+  }
+}
+
+async function saveEquipment(event) {
+  if (event) event.preventDefault();
+
+  const idVal = document.getElementById("equipment-id").value;
+  const nameInput = document.getElementById("equipment-name");
+  const typeSelect = document.getElementById("equipment-type");
+  const statusSelect = document.getElementById("equipment-status");
+  const errorBox = document.getElementById("equipment-form-error");
+  const errorMsg = document.getElementById("equipment-form-error-msg");
+  const spinner = document.getElementById("equipment-submit-spinner");
+  const submitBtn = document.getElementById("btn-equipment-submit");
+
+  const name = nameInput.value.trim();
+  const type = typeSelect.value;
+  const status = statusSelect.value;
+
+  // Validation
+  if (!name || name.length < 2) {
+    nameInput.classList.add("is-invalid");
+    if (errorBox) {
+      errorBox.classList.remove("d-none");
+      errorMsg.textContent = "Vui lòng nhập tên thiết bị hợp lệ (tối thiểu 2 ký tự).";
+    }
+    nameInput.focus();
+    return;
+  }
+  nameInput.classList.remove("is-invalid");
+  if (errorBox) errorBox.classList.add("d-none");
+
+  // Loading
+  if (spinner) spinner.classList.remove("hidden");
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    let res;
+    if (idVal) {
+      res = await EquipmentAPI.update(Number(idVal), { name, type, status });
+    } else {
+      res = await EquipmentAPI.create({ name, type, status });
+    }
+
+    if (res && res.success) {
+      closeEquipmentModal();
+      const current = getCurrentRoute();
+      if (current === "/admin/equipments" || current === "/equipments") {
+        renderAdminEquipmentsPage();
+      }
+    } else {
+      if (errorBox) {
+        errorBox.classList.remove("d-none");
+        errorMsg.textContent = res ? res.message : "Đã xảy ra lỗi khi lưu thiết bị.";
+      }
+    }
+  } catch (err) {
+    if (errorBox) {
+      errorBox.classList.remove("d-none");
+      errorMsg.textContent = err.message || "Lỗi hệ thống khi lưu thiết bị.";
+    }
+  } finally {
+    if (spinner) spinner.classList.add("hidden");
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+async function handleQuickToggleEquipmentStatus(id, currentStatus) {
+  let newStatus = "Maintenance";
+  if (currentStatus === "Maintenance" || currentStatus === "Broken") {
+    newStatus = "Available";
+  }
+
+  const res = await EquipmentAPI.updateStatus(id, newStatus);
+  if (res && res.success) {
+    const current = getCurrentRoute();
+    if (current === "/admin/equipments" || current === "/equipments") {
+      renderAdminEquipmentsPage();
+    }
+  } else {
+    alert(res ? res.message : "Không thể thay đổi trạng thái thiết bị.");
+  }
+}
+
+function openEquipmentDeleteModal(id) {
+  const eq = EQUIPMENTS.find(e => e.id === id);
+  if (!eq) return;
+
+  window.currentDeletingEquipmentId = id;
+  const overlay = document.getElementById("equipment-delete-overlay");
+  const content = document.getElementById("equipment-delete-content");
+
+  const activeMeetingUsing = meetings.filter(m =>
+    m.equipmentIds && m.equipmentIds.includes(id) &&
+    (m.status === "scheduled" || m.status === "in-progress")
+  );
+
+  let warningNote = "";
+  if (activeMeetingUsing.length > 0) {
+    warningNote = `
+      <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div>
+          <strong>Cảnh báo ràng buộc:</strong> Thiết bị này đang được mượn trong <strong>${activeMeetingUsing.length} cuộc họp</strong> đang/sắp diễn ra. Backend sẽ kiểm tra chặn xóa (409 Conflict) để bảo toàn tính toàn vẹn.
+        </div>
+      </div>
+    `;
+  }
+
+  if (content) {
+    content.innerHTML = `
+      ${warningNote}
+      <div class="p-3 bg-light rounded-3 border mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="equipment-icon-avatar ${getEquipmentVisualMeta(eq).typeClass}">
+            <i class="bi ${getEquipmentVisualMeta(eq).icon}"></i>
+          </div>
+          <div>
+            <div class="fw-bold text-dark fs-6">${escapeHTML(eq.name || eq.equipmentName)}</div>
+            <div class="text-secondary small font-monospace">Mã TB: #EQ-${String(id).padStart(2, '0')} • Phân loại: ${escapeHTML(eq.type || 'Thiết bị')}</div>
+          </div>
+        </div>
+      </div>
+      <p class="text-danger small mb-0">
+        <i class="bi bi-info-circle me-1"></i>
+        Hành động này sẽ xóa vĩnh viễn thiết bị khỏi danh mục hệ thống. Bạn có chắc chắn muốn thực hiện?
+      </p>
+    `;
+  }
+
+  if (overlay) overlay.classList.remove("hidden");
+}
+
+function closeEquipmentDeleteModal() {
+  const overlay = document.getElementById("equipment-delete-overlay");
+  if (overlay) overlay.classList.add("hidden");
+  window.currentDeletingEquipmentId = null;
+}
+
+async function confirmDeleteEquipment() {
+  const id = window.currentDeletingEquipmentId;
+  if (!id) return;
+
+  const btnConfirm = document.getElementById("btn-confirm-equipment-delete");
+  if (btnConfirm) btnConfirm.disabled = true;
+
+  try {
+    const res = await EquipmentAPI.delete(id);
+    if (res && res.success) {
+      closeEquipmentDeleteModal();
+      const current = getCurrentRoute();
+      if (current === "/admin/equipments" || current === "/equipments") {
+        renderAdminEquipmentsPage();
+      }
+    } else {
+      const content = document.getElementById("equipment-delete-content");
+      if (content) {
+        content.innerHTML = `
+          <div class="alert alert-danger d-flex align-items-start gap-2 mb-0">
+            <i class="bi bi-x-octagon-fill fs-5 mt-1"></i>
+            <div>
+              <strong>Không thể xóa thiết bị (409 Conflict):</strong><br>
+              ${escapeHTML(res.message || "Thiết bị đang được sử dụng trong các cuộc họp sắp diễn ra.")}
+              <div class="mt-2 text-dark small">Vui lòng hủy lịch mượn hoặc điều phối thiết bị thay thế trước khi xóa.</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+  } catch (err) {
+    alert("Lỗi khi xóa thiết bị: " + err.message);
+  } finally {
+    if (btnConfirm) btnConfirm.disabled = false;
+  }
+}
+
+function exportEquipmentsToCSV() {
+  const headers = [
+    "Mã thiết bị",
+    "Tên thiết bị",
+    "Phân loại",
+    "Trạng thái vận hành",
+    "Mã định danh hệ thống"
+  ];
+
+  const rows = EQUIPMENTS.map(eq => [
+    `"EQ-${String(eq.id).padStart(2, '0')}"`,
+    `"${(eq.name || eq.equipmentName || '').replace(/"/g, '""')}"`,
+    `"${(eq.type || 'Thiết bị').replace(/"/g, '""')}"`,
+    `"${eq.status || 'Available'}"`,
+    `"EQ-SYS-${eq.id}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `danh_muc_thiet_bi_${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 // =====================================================
@@ -6536,6 +7543,48 @@ if (btnCloseRoomDelete) {
   btnCloseRoomDelete.addEventListener("click", closeRoomDeleteModal);
 }
 
+// Modal Quản trị Thiết bị
+const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+
+const equipmentForm = document.getElementById("equipment-form");
+if (equipmentForm) {
+  equipmentForm.addEventListener("submit", saveEquipment);
+}
+
+const btnCloseEquipmentModal = document.getElementById("btn-close-equipment-modal");
+if (btnCloseEquipmentModal) {
+  btnCloseEquipmentModal.addEventListener("click", closeEquipmentModal);
+}
+
+const btnEquipmentCancel = document.getElementById("btn-equipment-cancel");
+if (btnEquipmentCancel) {
+  btnEquipmentCancel.addEventListener("click", closeEquipmentModal);
+}
+
+const equipmentStatusSelect = document.getElementById("equipment-status");
+if (equipmentStatusSelect) {
+  equipmentStatusSelect.addEventListener("change", (e) => {
+    updateEquipmentStatusAlertDesc(e.target.value);
+  });
+}
+
+// Modal Xóa Thiết bị
+const btnCloseEquipmentDelete = document.getElementById("btn-close-equipment-delete");
+if (btnCloseEquipmentDelete) {
+  btnCloseEquipmentDelete.addEventListener("click", closeEquipmentDeleteModal);
+}
+
+const btnCancelEquipmentDelete = document.getElementById("btn-cancel-equipment-delete");
+if (btnCancelEquipmentDelete) {
+  btnCancelEquipmentDelete.addEventListener("click", closeEquipmentDeleteModal);
+}
+
+const btnConfirmEquipmentDelete = document.getElementById("btn-confirm-equipment-delete");
+if (btnConfirmEquipmentDelete) {
+  btnConfirmEquipmentDelete.addEventListener("click", confirmDeleteEquipment);
+}
+
 // Click ra ngoài modal
 if (roomModalOverlay) {
   roomModalOverlay.addEventListener("click", function (event) {
@@ -6557,6 +7606,22 @@ if (roomDeleteOverlay) {
   roomDeleteOverlay.addEventListener("click", function (event) {
     if (event.target === roomDeleteOverlay) {
       closeRoomDeleteModal();
+    }
+  });
+}
+
+if (equipmentModalOverlay) {
+  equipmentModalOverlay.addEventListener("click", function (event) {
+    if (event.target === equipmentModalOverlay) {
+      closeEquipmentModal();
+    }
+  });
+}
+
+if (equipmentDeleteOverlay) {
+  equipmentDeleteOverlay.addEventListener("click", function (event) {
+    if (event.target === equipmentDeleteOverlay) {
+      closeEquipmentDeleteModal();
     }
   });
 }
@@ -6606,6 +7671,18 @@ document.addEventListener(
       closeRoomDeleteModal();
     }
 
+    if (
+      equipmentModalOverlay && !equipmentModalOverlay.classList.contains("hidden")
+    ) {
+      closeEquipmentModal();
+    }
+
+    if (
+      equipmentDeleteOverlay && !equipmentDeleteOverlay.classList.contains("hidden")
+    ) {
+      closeEquipmentDeleteModal();
+    }
+
   }
 );
 
@@ -6646,15 +7723,12 @@ MeetingAPI.getUsers().then((res) => {
 });
 
 // Đồng bộ danh mục thiết bị từ Backend API
-MeetingAPI.getAllEquipments().then((res) => {
+EquipmentAPI.getAll().then((res) => {
   if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-    EQUIPMENTS = res.data.map(eq => ({
-      id: Number(eq.id || eq.equipmentId),
-      name: eq.name || eq.equipmentName,
-      type: eq.type || 'Thiết bị',
-      status: eq.status || 'Available',
-      icon: getEquipmentIconClass(eq)
-    }));
+    const current = getCurrentRoute();
+    if (current === "/admin/equipments" || current === "/equipments") {
+      renderAdminEquipmentsPage();
+    }
   }
 });
 
