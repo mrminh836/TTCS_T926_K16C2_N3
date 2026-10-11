@@ -2661,7 +2661,7 @@ body {
 /* Equipment checkbox cards in modal */
 .room-equipment-checkbox-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -2677,11 +2677,13 @@ body {
   align-items: center;
   border: 1.5px solid var(--slate-200);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   background: #ffffff;
   cursor: pointer;
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .eq-check-card:hover {
@@ -2707,6 +2709,7 @@ body {
   align-items: center;
   gap: 10px;
   width: 100%;
+  min-width: 0;
 }
 
 .eq-icon-box {
@@ -2735,11 +2738,38 @@ body {
   color: var(--primary-600);
 }
 
+.eq-card-text-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
 .eq-card-name {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--slate-700);
   transition: color 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-width: 100%;
+}
+
+.eq-card-sub {
+  font-size: 0.72rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-width: 100%;
+}
+
+.eq-card-right {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .eq-check-card:has(input:checked) .eq-card-name {
@@ -4541,6 +4571,33 @@ body {
   max-width: 620px;
 }
 
+.equipment-modal-card .stitch-input-with-icon .stitch-input {
+  padding-left: 36px !important;
+  padding-right: 28px !important;
+  font-size: 0.85rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.equipment-modal-card .stitch-input-with-icon .stitch-input-icon {
+  left: 12px;
+  font-size: 0.95rem;
+}
+
+.equipment-modal-card .form-select.stitch-input {
+  background-position: right 0.65rem center;
+  background-size: 14px 10px;
+}
+
+.equipment-modal-card .stitch-modal-footer,
+.equipment-delete-modal-card .stitch-modal-footer {
+  padding: 16px 24px 24px 24px !important;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
 .equipment-delete-modal-card {
   max-width: 540px;
 }
@@ -4969,5 +5026,197 @@ body {
   color: var(--slate-900);
   letter-spacing: -0.01em;
 }
+
+/* =====================================================
+ * 16. SMART ROOM RECOMMENDATION (BEST-FIT CAPACITY OPTIMIZER)
+ * ===================================================== */
+
+.smart-room-recommendation-card {
+  position: relative;
+  background: linear-gradient(135deg, #f0f7ff 0%, #f5f3ff 100%);
+  border: 1.5px solid #c7d2fe;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.smart-room-recommendation-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #2563eb, #7c3aed);
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.smart-room-recommendation-card.is-overflow {
+  background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%);
+  border-color: #fde68a;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.08);
+}
+
+.smart-room-recommendation-card.is-overflow::before {
+  background: linear-gradient(180deg, #f59e0b, #d97706);
+}
+
+.smart-room-recommendation-card.is-no-room {
+  background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+  border-color: #fecaca;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.08);
+}
+
+.smart-room-recommendation-card.is-no-room::before {
+  background: #ef4444;
+}
+
+.recommendation-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.recommendation-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.recommendation-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #4338ca;
+  background: #e0e7ff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.01em;
+}
+
+.recommendation-util-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #065f46;
+  background: #d1fae5;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.recommendation-body {
+  font-size: 0.8rem;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.recommendation-room-name {
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+.recommendation-room-meta {
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.recommendation-desc {
+  font-size: 0.75rem;
+  color: #475569;
+  margin-top: 3px;
+}
+
+.recommendation-action {
+  flex-shrink: 0;
+}
+
+.btn-stitch-recommend {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.btn-stitch-recommend:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+.btn-stitch-recommend:active {
+  transform: translateY(0);
+}
+
+.btn-stitch-recommend.is-applied {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1.5px solid #10b981;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* Badge nổi bật trên thẻ phòng */
+.room-recommend-badge {
+  position: absolute;
+  top: -9px;
+  right: 12px;
+  background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 2;
+  letter-spacing: 0.02em;
+}
+
+.realtime-room-card.is-recommended {
+  border-color: #818cf8;
+  background: #fdfefe;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2), 0 4px 12px rgba(99, 102, 241, 0.08);
+}
+
+.realtime-room-card.is-recommended.is-selected {
+  border-color: #2563eb;
+  background: #f0f7ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3), 0 6px 16px rgba(37, 99, 235, 0.15);
+}
+
+@keyframes recommendPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5); }
+  50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+.realtime-room-card.pulse-highlight {
+  animation: recommendPulse 0.8s ease-out;
+}
+
 
 
