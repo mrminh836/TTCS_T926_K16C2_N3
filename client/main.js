@@ -280,21 +280,21 @@ function calcDurationString(start, end) {
 
 function exportToCSV() {
   const headers = [
-    "Mã cuộc họp (MeetingID)",
-    "Tiêu đề (Title)",
-    "Nhãn phân loại (Tag)",
+    "Mã cuộc họp",
+    "Tiêu đề cuộc họp",
+    "Phân loại",
     "Ngày họp",
-    "Thời gian (StartTime - EndTime)",
-    "Phòng họp (RoomName)",
-    "Sức chứa (Capacity)",
-    "Mã phòng (RoomID)",
-    "Người tổ chức (Host)",
-    "Mã người tổ chức (OrganizerID)",
-    "Người tham gia (Participants)",
-    "Trạng thái đặt phòng (BookingStatus)",
-    "Lặp lại định kỳ (IsRecurring)",
-    "Thiết bị yêu cầu (Equipments)",
-    "Mô tả / Ghi chú (Description)"
+    "Thời gian",
+    "Phòng họp",
+    "Sức chứa",
+    "Mã phòng",
+    "Người chủ trì",
+    "Mã người chủ trì",
+    "Người tham gia",
+    "Trạng thái",
+    "Lặp lại định kỳ",
+    "Thiết bị phòng họp",
+    "Nội dung / Ghi chú"
   ];
   const rows = meetings.map(m => [
     m.id,
@@ -628,8 +628,8 @@ function renderMeetingsPage() {
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">
-          <span id="meeting-page-api-badge" class="stitch-badge-api me-1 d-none d-sm-inline-flex" title="Trạng thái kết nối API Backend">
-            <span class="api-dot-status"></span> <span id="meeting-page-api-text">API Live</span>
+          <span id="meeting-page-api-badge" class="stitch-badge-api me-1 d-none d-sm-inline-flex" title="Trạng thái hệ thống">
+            <span class="api-dot-status"></span> <span id="meeting-page-api-text">Trực tuyến</span>
           </span>
 
           <button type="button" id="btn-export-excel" class="btn-stitch-export" title="Xuất danh sách ra file CSV">
@@ -1821,12 +1821,12 @@ const RoomAPI = {
     if (!badge || !text) return;
     if (this.isBackendConnected) {
       badge.classList.remove("offline");
-      badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật";
-      text.textContent = "API Live (Port 3000)";
+      badge.title = "Hệ thống kết nối trực tuyến";
+      text.textContent = "Trực tuyến";
     } else {
       badge.classList.add("offline");
-      badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
-      text.textContent = "Client Fallback";
+      badge.title = "Hệ thống đang hoạt động ở chế độ cục bộ";
+      text.textContent = "Chế độ ngoại tuyến";
     }
   },
 
@@ -2134,12 +2134,12 @@ const MeetingAPI = {
       if (!badge || !text) return;
       if (this.isBackendConnected) {
         badge.classList.remove("offline");
-        badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật (Port 3000)";
-        text.textContent = "API Live (Port 3000)";
+        badge.title = "Hệ thống kết nối trực tuyến";
+        text.textContent = "Trực tuyến";
       } else {
         badge.classList.add("offline");
-        badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
-        text.textContent = "Client Fallback";
+        badge.title = "Hệ thống đang hoạt động ở chế độ cục bộ";
+        text.textContent = "Chế độ ngoại tuyến";
       }
     });
   },
@@ -4876,11 +4876,11 @@ function confirmDeleteRoom(roomId) {
           <div>
             <h5 class="text-danger fw-bold mb-1">Ràng buộc nghiệp vụ: Không thể xóa phòng họp</h5>
             <p class="text-secondary small mb-2">
-              Phòng họp <strong>"${escapeHTML(room.name)}"</strong> hiện đang có <strong>${activeMeetings.length} cuộc họp</strong> đã xác nhận sắp diễn ra hoặc đang diễn ra. Theo quy chuẩn bảo đảm toàn vẹn dữ liệu hệ thống (Luồng 1.3), bạn không được phép xóa phòng này.
+              Phòng họp <strong>"${escapeHTML(room.name)}"</strong> hiện đang có <strong>${activeMeetings.length} cuộc họp</strong> đã xác nhận sắp diễn ra hoặc đang diễn ra. Để bảo đảm tính liên tục của lịch làm việc, bạn không thể xóa phòng này.
             </p>
             <div class="alert alert-warning py-2 px-3 small mb-0">
               <i class="bi bi-lightbulb-fill text-warning me-1"></i>
-              <strong>Khuyến nghị:</strong> Bạn có thể chuyển trạng thái phòng sang <strong>"Bảo trì" (Maintenance)</strong> để tạm dừng nhận lịch mới mà không làm gián đoạn các cuộc họp đã lên lịch.
+              <strong>Khuyến nghị:</strong> Bạn có thể chuyển trạng thái phòng sang <strong>"Bảo trì"</strong> để tạm dừng tiếp nhận lịch đặt mới.
             </div>
           </div>
         </div>
@@ -5832,8 +5832,8 @@ async function saveMeeting(event) {
           const globalErrorTitle = document.getElementById("global-error-title");
           const globalErrorDesc = document.getElementById("global-error-desc");
           if (globalError && globalErrorTitle && globalErrorDesc) {
-            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch họp định kỳ (409 Conflict)" : "Máy chủ từ chối yêu cầu";
-            globalErrorDesc.innerText = apiResult.message || "Không thể tạo chuỗi lịch họp định kỳ do xung đột phòng.";
+            globalErrorTitle.innerText = apiResult.isConflict ? "Phát hiện trùng lịch phòng họp" : "Không thể tạo chuỗi lịch họp";
+            globalErrorDesc.innerText = apiResult.message || "Không thể tạo chuỗi lịch họp định kỳ do xung đột thời gian.";
             globalError.classList.remove("hidden");
           }
 
@@ -5849,10 +5849,7 @@ async function saveMeeting(event) {
         // Tạo thành công chuỗi recurring!
         isFallback = apiResult.isFallback;
         const createdMeetings = apiResult.data?.meetings || [];
-        const patternId = apiResult.data?.pattern?.patternId || getNextId();
-        syncMsg = !isFallback
-          ? `Đã tạo chuỗi ${createdMeetings.length} buổi họp định kỳ vào CSDL MySQL (Mã chuỗi: #${patternId})`
-          : `Đã lưu chuỗi ${createdMeetings.length} buổi họp định kỳ vào bộ nhớ cục bộ (Local Fallback)`;
+        syncMsg = `Đã tạo thành công chuỗi ${createdMeetings.length} cuộc họp định kỳ.`;
 
         const statusSelect = document.getElementById("meeting-status");
         const status = statusSelect ? statusSelect.value : "scheduled";
@@ -5922,7 +5919,7 @@ async function saveMeeting(event) {
           const globalErrorTitle = document.getElementById("global-error-title");
           const globalErrorDesc = document.getElementById("global-error-desc");
           if (globalError && globalErrorTitle && globalErrorDesc) {
-            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch đặt phòng (409 Conflict)" : "Máy chủ từ chối yêu cầu";
+            globalErrorTitle.innerText = apiResult.isConflict ? "Phát hiện trùng lịch phòng họp" : "Không thể đặt lịch họp";
             globalErrorDesc.innerText = apiResult.message;
             globalError.classList.remove("hidden");
           }
@@ -5938,7 +5935,7 @@ async function saveMeeting(event) {
             const roomConflictAlert = document.getElementById("room-conflict-alert");
             const roomConflictText = document.getElementById("room-conflict-text");
             if (roomConflictAlert && roomConflictText) {
-              roomConflictText.innerHTML = `<strong>Máy chủ thông báo:</strong> ${escapeHTML(apiResult.message)}`;
+              roomConflictText.innerHTML = `<strong>Thông báo:</strong> ${escapeHTML(apiResult.message)}`;
               roomConflictAlert.classList.remove("hidden");
             }
             const roomSelect = document.getElementById("meeting-room");
@@ -5950,10 +5947,10 @@ async function saveMeeting(event) {
         isFallback = apiResult.isFallback;
         if (!isFallback && apiResult.data?.meetingId) {
           finalMeetingId = apiResult.data.meetingId;
-          syncMsg = `Đã đồng bộ trực tiếp vào CSDL MySQL (Mã cuộc họp: #${finalMeetingId})`;
+          syncMsg = `Thông tin cuộc họp đã được lưu thành công.`;
         } else {
           finalMeetingId = getNextId();
-          syncMsg = "Đã lưu vào bộ nhớ cục bộ (Local Store Fallback - Tự động đồng bộ CSDL)";
+          syncMsg = "Thông tin cuộc họp đã được lưu vào hệ thống.";
         }
 
         const statusSelect = document.getElementById("meeting-status");
@@ -6176,7 +6173,7 @@ function openDetailModal(id) {
   content.innerHTML = `
     <div class="mb-3 pb-2 border-bottom">
       <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small fw-medium">MÃ CUỘC HỌP (MeetingID)</span>
+        <span class="text-muted small fw-medium">MÃ CUỘC HỌP</span>
         <span class="badge bg-light text-dark border">#${meeting.id}</span>
       </div>
       <h5 class="fw-bold text-dark m-0 d-flex align-items-center flex-wrap">
@@ -6189,7 +6186,7 @@ function openDetailModal(id) {
       <div class="col-12 col-md-6">
         <div class="p-2 rounded border bg-light">
           <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP (Rooms)
+            <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP
           </span>
           <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
             <div class="fw-semibold text-primary cursor-pointer" onclick="closeDetailModal(); openRoomQRModal(${roomId});" title="Nhấp để xem chi tiết phòng &amp; mã QR" style="cursor: pointer;">
@@ -6204,7 +6201,7 @@ function openDetailModal(id) {
       <div class="col-12 col-md-6">
         <div class="p-2 rounded border bg-light">
           <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-clock-history text-primary me-1"></i> THỜI GIAN (Meetings)
+            <i class="bi bi-clock-history text-primary me-1"></i> THỜI GIAN HỌP
           </span>
           <div class="fw-semibold text-dark">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
           <div class="small text-muted">Ngày: ${formatDate(meeting.date)} (${calcDurationString(meeting.startTime, meeting.endTime)})</div>
@@ -6215,14 +6212,14 @@ function openDetailModal(id) {
     <div class="row g-2 mb-3">
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-person-badge text-primary me-1"></i> NGƯỜI TỔ CHỨC (Users / OrganizerID)
+          <i class="bi bi-person-badge text-primary me-1"></i> NGƯỜI CHỦ TRÌ
         </span>
         <div class="fw-medium text-dark">${escapeHTML(organizerName)} <span class="text-muted small">(ID: ${organizerId})</span></div>
       </div>
 
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-shield-check text-success me-1"></i> TRẠNG THÁI ĐẶT PHÒNG (Bookings)
+          <i class="bi bi-shield-check text-success me-1"></i> TRẠNG THÁI
         </span>
         <span class="${getStatusClass(meeting.status)}">
           ${getStatusText(meeting.status)}
@@ -6233,7 +6230,7 @@ function openDetailModal(id) {
     <div class="mb-3">
       <div class="d-flex align-items-center justify-content-between mb-1">
         <span class="text-muted small">
-          <i class="bi bi-people text-primary me-1"></i> NGƯỜI THAM GIA & PHẢN HỒI (Meeting_Participants)
+          <i class="bi bi-people text-primary me-1"></i> THÀNH VIÊN THAM GIA
         </span>
         <span id="detail-participant-summary-badges" class="small"></span>
       </div>
@@ -6245,7 +6242,7 @@ function openDetailModal(id) {
     <div class="row g-2 mb-3">
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-arrow-repeat text-primary me-1"></i> CUỘC HỌP ĐỊNH KỲ (Meetings.IsRecurring)
+          <i class="bi bi-arrow-repeat text-primary me-1"></i> LỊCH HỌP ĐỊNH KỲ
         </span>
         <div>
           ${meeting.isRecurring 
@@ -6256,7 +6253,7 @@ function openDetailModal(id) {
 
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-laptop text-primary me-1"></i> THIẾT BỊ PHÒNG HỌP (Booking_Equipments)
+          <i class="bi bi-laptop text-primary me-1"></i> THIẾT BỊ PHÒNG HỌP
         </span>
         <div class="text-dark small">
           ${(meeting.equipmentNames && meeting.equipmentNames.length) 
@@ -6270,7 +6267,7 @@ function openDetailModal(id) {
 
     <div>
       <span class="text-muted small d-block mb-0.5">
-        <i class="bi bi-card-text text-primary me-1"></i> MÔ TẢ (Meetings.Description)
+        <i class="bi bi-card-text text-primary me-1"></i> NỘI DUNG CUỘC HỌP
       </span>
       <div class="p-2 rounded bg-light border small text-dark">${escapeHTML(meeting.notes || "Không có ghi chú")}</div>
     </div>
