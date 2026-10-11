@@ -455,6 +455,7 @@ const routes = {
   "/": renderHome,
   "/home": renderHome,
   "/meetings": renderMeetingsPage,
+  "/admin": renderAdminRoomsPage,
   "/admin/rooms": renderAdminRoomsPage,
   "/rooms": renderAdminRoomsPage,
   "/admin/equipments": renderAdminEquipmentsPage,
@@ -484,9 +485,12 @@ function updateActiveNav(route) {
     const isHome =
       (route === "/" || route === "/home") &&
       (linkRoute === "/" || linkRoute === "/home");
+    const isAdmin =
+      (route.startsWith("/admin") || route === "/rooms" || route === "/equipments") &&
+      linkRoute === "/admin";
     const isMatch = route === linkRoute;
 
-    if (isHome || isMatch) {
+    if (isHome || isAdmin || isMatch) {
       link.classList.add("active");
     } else {
       link.classList.remove("active");
@@ -543,12 +547,8 @@ function renderHome() {
           <i class="bi bi-calendar3 me-2"></i> Vào Quản lý cuộc họp
         </a>
 
-        <a href="#/admin/rooms" class="btn btn-outline-primary stitch-btn-export hero-btn-sub">
-          <i class="bi bi-door-open-fill me-1"></i> Quản lý phòng họp (Admin)
-        </a>
-
-        <a href="#/admin/equipments" class="btn btn-outline-secondary stitch-btn-cancel hero-btn-sub">
-          <i class="bi bi-tools me-1"></i> Quản lý thiết bị (Admin)
+        <a href="#/admin" class="btn btn-outline-primary stitch-btn-export hero-btn-sub">
+          <i class="bi bi-shield-lock-fill me-1"></i> Quản trị hệ thống (Admin)
         </a>
       </div>
 
@@ -585,12 +585,8 @@ function renderHome() {
           <h3 class="feature-title">Quản Lý Phòng &amp; Thiết Bị</h3>
           <p class="feature-desc">Theo dõi trực quan trạng thái sức chứa phòng họp, máy chiếu, màn hình TV và thiết bị kèm theo.</p>
           <div class="mt-2 d-flex align-items-center gap-3">
-            <a href="#/admin/rooms" class="text-primary fw-semibold small text-decoration-none">
-              Quản trị phòng &rarr;
-            </a>
-            <span class="text-muted">•</span>
-            <a href="#/admin/equipments" class="text-primary fw-semibold small text-decoration-none">
-              Quản trị thiết bị &rarr;
+            <a href="#/admin" class="text-primary fw-semibold small text-decoration-none">
+              Trung tâm Quản trị Admin &rarr;
             </a>
           </div>
         </div>
@@ -1101,6 +1097,64 @@ function getFilteredRooms() {
   });
 }
 
+// =====================================================
+// HELPER: RENDER ADMIN PORTAL TABS
+// Hệ thống Tab phân hệ Admin hợp nhất (Phòng họp & Thiết bị)
+// =====================================================
+function renderAdminNavigationTabs(activeTab = 'rooms') {
+  const roomsCount = ROOMS.length;
+  const equipmentsCount = EQUIPMENTS.length;
+  return `
+    <div class="admin-portal-header">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-2">
+        <div>
+          <div class="breadcrumb-nav mb-1">
+            <span>Hệ thống Quản trị</span>
+            <i class="bi bi-chevron-right breadcrumb-separator"></i>
+            <span class="breadcrumb-active">${activeTab === 'rooms' ? 'Quản lý Danh mục Phòng họp' : 'Quản lý Danh mục Thiết bị'}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <h1 class="page-title m-0">Trung tâm Quản trị Hệ thống</h1>
+            <span class="admin-badge-indicator">
+              <i class="bi bi-shield-lock-fill"></i> Admin Portal
+            </span>
+          </div>
+          <p class="page-subtitle m-0">
+            Quản lý tập trung hạ tầng tài nguyên doanh nghiệp: phòng họp, sức chứa, mã QR check-in và trang thiết bị kỹ thuật.
+          </p>
+        </div>
+      </div>
+
+      <!-- Segmented Navigation Tabs giữa các chức năng Admin -->
+      <div class="admin-feature-tabs-container">
+        <div class="admin-feature-tabs" role="tablist">
+          <a href="#/admin/rooms" class="admin-feature-tab ${activeTab === 'rooms' ? 'active' : ''}">
+            <div class="tab-icon-box">
+              <i class="bi bi-door-open-fill"></i>
+            </div>
+            <div class="tab-content-box">
+              <span class="tab-title">Danh mục Phòng họp</span>
+              <span class="tab-desc">${roomsCount} phòng họp • Sức chứa &amp; QR check-in</span>
+            </div>
+            <span class="tab-counter-pill">${roomsCount}</span>
+          </a>
+
+          <a href="#/admin/equipments" class="admin-feature-tab ${activeTab === 'equipments' ? 'active' : ''}">
+            <div class="tab-icon-box">
+              <i class="bi bi-tools"></i>
+            </div>
+            <div class="tab-content-box">
+              <span class="tab-title">Danh mục Thiết bị</span>
+              <span class="tab-desc">${equipmentsCount} thiết bị • Bảo trì &amp; Khả dụng</span>
+            </div>
+            <span class="tab-counter-pill">${equipmentsCount}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderAdminRoomsPage() {
   const totalRooms = ROOMS.length;
   const activeRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "active").length;
@@ -1114,23 +1168,13 @@ function renderAdminRoomsPage() {
   app.innerHTML = `
     <div id="admin-rooms-section" class="admin-rooms-view-wrapper">
 
-      <!-- Breadcrumbs & Page Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
-        <div>
-          <div class="breadcrumb-nav mb-1">
-            <span>Quản trị hệ thống</span>
-            <i class="bi bi-chevron-right breadcrumb-separator"></i>
-            <span class="breadcrumb-active">Danh mục phòng họp</span>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <h1 class="page-title m-0">Quản lý Danh mục Phòng họp</h1>
-            <span class="admin-badge-indicator">
-              <i class="bi bi-shield-lock-fill"></i> Admin Portal
-            </span>
-          </div>
-          <p class="page-subtitle m-0">
-            Quản trị trạng thái hoạt động, sức chứa, trang thiết bị và mã QR Check-in tức thì cho toàn bộ phòng họp doanh nghiệp.
-          </p>
+      ${renderAdminNavigationTabs('rooms')}
+
+      <!-- Action Bar của Tab Phòng họp -->
+      <div class="admin-action-bar d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+        <div class="admin-tab-section-title">
+          <i class="bi bi-door-open text-primary fs-5"></i>
+          <span class="fw-bold text-dark">Danh sách Phòng họp Doanh nghiệp</span>
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">
@@ -2304,23 +2348,13 @@ function renderAdminEquipmentsPage() {
   app.innerHTML = `
     <div id="admin-equipments-section" class="admin-equipments-view-wrapper">
 
-      <!-- Breadcrumbs & Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
-        <div>
-          <div class="breadcrumb-nav mb-1">
-            <span>Quản trị hệ thống</span>
-            <i class="bi bi-chevron-right breadcrumb-separator"></i>
-            <span class="breadcrumb-active">Danh mục thiết bị</span>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <h1 class="page-title m-0">Quản lý Danh mục Thiết bị</h1>
-            <span class="admin-badge-indicator">
-              <i class="bi bi-shield-lock-fill"></i> Admin Portal
-            </span>
-          </div>
-          <p class="page-subtitle m-0">
-            Quản trị vòng đời thiết bị, theo dõi trạng thái khả dụng, điều phối bảo trì và ngăn ngừa xung đột lịch họp.
-          </p>
+      ${renderAdminNavigationTabs('equipments')}
+
+      <!-- Action Bar của Tab Thiết bị -->
+      <div class="admin-action-bar d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+        <div class="admin-tab-section-title">
+          <i class="bi bi-tools text-primary fs-5"></i>
+          <span class="fw-bold text-dark">Danh mục Trang thiết bị Kỹ thuật</span>
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">

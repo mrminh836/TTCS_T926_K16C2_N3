@@ -4835,4 +4835,139 @@ body {
   color: #dc2626;
   border-color: #fecaca;
 }
+
+/* =====================================================
+   ADMIN UNIFIED HUB & FEATURE TABS (STITCH SPEC)
+   ===================================================== */
+.admin-portal-header {
+  margin-bottom: 24px;
+}
+
+.admin-feature-tabs-container {
+  background: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  border-radius: 14px;
+  padding: 6px;
+  margin-top: 18px;
+}
+
+.admin-feature-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .admin-feature-tabs {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-feature-tab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--slate-600);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.admin-feature-tab:hover {
+  background: #ffffff;
+  color: var(--slate-900);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.admin-feature-tab.active {
+  background: #ffffff;
+  color: var(--primary-700);
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
+}
+
+.admin-feature-tab .tab-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  background: var(--slate-200);
+  color: var(--slate-600);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.admin-feature-tab:hover .tab-icon-box {
+  background: var(--primary-50);
+  color: var(--primary-600);
+}
+
+.admin-feature-tab.active .tab-icon-box {
+  background: var(--primary-600);
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.25);
+}
+
+.admin-feature-tab .tab-content-box {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-feature-tab .tab-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.admin-feature-tab .tab-desc {
+  font-size: 0.74rem;
+  color: var(--slate-500);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.admin-feature-tab.active .tab-desc {
+  color: var(--primary-600);
+}
+
+.admin-feature-tab .tab-counter-pill {
+  margin-left: auto;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--slate-200);
+  color: var(--slate-700);
+  transition: all 0.2s ease;
+}
+
+.admin-feature-tab.active .tab-counter-pill {
+  background: var(--primary-100);
+  color: var(--primary-700);
+}
+
+.admin-action-bar {
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--slate-200);
+  padding-bottom: 14px;
+}
+
+.admin-tab-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--slate-900);
+  letter-spacing: -0.01em;
+}
+
 
