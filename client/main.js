@@ -714,8 +714,8 @@ function renderFinderRoomCards() {
   if (!roomsStatus || roomsStatus.length === 0) {
     container.innerHTML = `
       <div class="col-12 text-center py-4 text-muted w-100">
-        <i class="bi bi-hdd-network-fill d-block fs-3 mb-2 text-secondary opacity-50"></i>
-        <span>Chưa có dữ liệu phòng họp. Vui lòng khởi động máy chủ Backend và CSDL.</span>
+        <i class="bi bi-door-closed d-block fs-3 mb-2 text-secondary opacity-50"></i>
+        <span>Chưa có dữ liệu phòng họp nào trong hệ thống.</span>
       </div>
     `;
     return;
@@ -6095,13 +6095,16 @@ function syncMeetingRoomOptions() {
   if (roomSelect) {
     const currentVal = roomSelect.value;
     if (ROOMS.length === 0) {
-      roomSelect.innerHTML = `<option value="">-- Chưa có dữ liệu phòng (Vui lòng bật CSDL/Backend) --</option>`;
+      roomSelect.innerHTML = `<option value="">-- Chọn phòng họp --</option>`;
     } else {
-      roomSelect.innerHTML = ROOMS.map(r => `
-        <option value="${r.id}" ${r.status !== 'Active' ? 'disabled' : ''}>
-          ${escapeHTML(r.name)} (${r.capacity} chỗ)${r.status !== 'Active' ? ' - [' + (r.status === 'Maintenance' ? 'Bảo trì' : 'Tạm ngừng') + ']' : ''}
-        </option>
-      `).join("");
+      roomSelect.innerHTML = `
+        <option value="">-- Chọn phòng họp --</option>
+        ${ROOMS.map(r => `
+          <option value="${r.id}" ${r.status !== 'Active' ? 'disabled' : ''}>
+            ${escapeHTML(r.name)} (${r.capacity} chỗ)${r.status !== 'Active' ? ' - [' + (r.status === 'Maintenance' ? 'Bảo trì' : 'Tạm ngừng') + ']' : ''}
+          </option>
+        `).join("")}
+      `;
 
       if (currentVal && ROOMS.some(r => r.id === parseInt(currentVal, 10))) {
         roomSelect.value = currentVal;
@@ -6113,7 +6116,7 @@ function syncMeetingRoomOptions() {
   if (filterRoom) {
     const currFilter = filterRoom.value;
     if (ROOMS.length === 0) {
-      filterRoom.innerHTML = `<option value="">Tất cả phòng họp (Chưa có dữ liệu CSDL)</option>`;
+      filterRoom.innerHTML = `<option value="">Tất cả phòng họp</option>`;
     } else {
       filterRoom.innerHTML = `
         <option value="">Tất cả phòng họp</option>
