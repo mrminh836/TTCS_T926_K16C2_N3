@@ -93,11 +93,15 @@ let USERS = [
   { id: 17, name: "Đỗ Quang Minh", email: "minh.do@company.com", role: "Scrum Master", department: "Quản trị", avatar: "QM", color: "#475569" }
 ];
 
-const EQUIPMENTS = [
-  { id: 1, name: "Máy chiếu Full HD", type: "Visual", status: "Available" },
-  { id: 2, name: "Màn hình TV 75\"", type: "Display", status: "Available" },
-  { id: 3, name: "Micro & Loa họp", type: "Audio", status: "Available" },
-  { id: 4, name: "Bảng trắng viết", type: "Stationery", status: "Available" }
+let EQUIPMENTS = [
+  { id: 1, name: "Máy chiếu Laser Sony 4K", type: "Máy chiếu", status: "Available", icon: "bi-projector-fill" },
+  { id: 2, name: "Màn hình tương tác Samsung Flip Pro 75\"", type: "Màn hình tương tác", status: "Available", icon: "bi-tv-fill" },
+  { id: 3, name: "Camera hội nghị Logitech Rally Plus", type: "Camera hội nghị", status: "Available", icon: "bi-camera-video-fill" },
+  { id: 4, name: "Bộ Micro cổ ngỗng Shure MXW6 (4 mic)", type: "Micro hội nghị", status: "Available", icon: "bi-mic-fill" },
+  { id: 5, name: "Loa hội nghị chuyên dụng Jabra Speak 810", type: "Loa hội nghị", status: "Available", icon: "bi-speaker-fill" },
+  { id: 6, name: "Bảng kính thảo luận di động 1.8m", type: "Bảng thảo luận", status: "Available", icon: "bi-easel-fill" },
+  { id: 7, name: "Máy chiếu di động Epson EB-2250U", type: "Máy chiếu", status: "Maintenance", icon: "bi-tools" },
+  { id: 8, name: "Bộ chia sẻ không dây Barco ClickShare CX-30", type: "Trình chiếu", status: "Available", icon: "bi-laptop-fill" }
 ];
 
 let meetings = [
@@ -2292,6 +2296,18 @@ const MeetingAPI = {
       console.warn("Lỗi kiểm tra thiết bị khả dụng từ API, sử dụng fallback:", err);
       return { success: false, data: EQUIPMENTS.filter(e => e.status.toLowerCase() === 'available'), message: err.message };
     }
+  },
+
+  async getAllEquipments() {
+    try {
+      const res = await fetch("http://localhost:3000/api/equipments");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json;
+    } catch (err) {
+      console.warn("Lỗi fetch danh mục thiết bị từ API, sử dụng EQUIPMENTS fallback:", err);
+      return { success: false, data: EQUIPMENTS, message: err.message };
+    }
   }
 };
 
@@ -2655,6 +2671,134 @@ function validateMeetingForm(editId = null) {
   };
 }
 
+// =====================================================
+// 6H. KHỐI HIỂN THỊ TRẠNG THÁI THIẾT BỊ VÀ BADGE (STITCH SPEC)
+// =====================================================
+
+function getEquipmentIconClass(eq) {
+  if (eq.icon) return eq.icon;
+  const name = (eq.name || eq.equipmentName || "").toLowerCase();
+  const type = (eq.type || "").toLowerCase();
+  if (name.includes("máy chiếu") || type.includes("máy chiếu") || type.includes("visual")) return "bi-projector-fill";
+  if (name.includes("màn hình") || name.includes("tv") || type.includes("màn hình") || type.includes("display")) return "bi-tv-fill";
+  if (name.includes("camera") || name.includes("webcam") || type.includes("camera")) return "bi-camera-video-fill";
+  if (name.includes("micro") || name.includes("mic") || type.includes("micro")) return "bi-mic-fill";
+  if (name.includes("loa") || type.includes("loa") || type.includes("audio")) return "bi-speaker-fill";
+  if (name.includes("bảng") || type.includes("bảng") || type.includes("stationery")) return "bi-easel-fill";
+  if (name.includes("chia sẻ") || name.includes("trình chiếu")) return "bi-laptop-fill";
+  return "bi-laptop";
+}
+
+function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
+  const container = document.getElementById("equipment-checkbox-group");
+  if (!container) return;
+
+  const summaryEl = document.getElementById("equipment-avail-summary");
+  let availableCount = 0;
+  const totalCount = EQUIPMENTS.length;
+
+  const html = EQUIPMENTS.map(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    const isMaintenance = (eq.status || "").toLowerCase() === "maintenance";
+    const isAvailable = !isMaintenance && (availabilityMap === null || availabilityMap.has(eqId));
+    const isBusy = !isMaintenance && availabilityMap !== null && !availabilityMap.has(eqId);
+
+    if (isAvailable) availableCount++;
+
+    let badgeHTML = "";
+    let cardClass = "";
+    let isDisabled = false;
+    let tooltip = "";
+
+    if (isMaintenance) {
+      badgeHTML = `<span class="badge badge-eq-status badge-eq-maint" title="Thiết bị đang bảo dưỡng kỹ thuật"><i class="bi bi-tools me-1"></i>Bảo trì</span>`;
+      cardClass = "is-maint";
+      isDisabled = true;
+      tooltip = "Thiết bị đang trong quá trình bảo dưỡng kỹ thuật (Không khả dụng)";
+    } else if (isBusy) {
+      badgeHTML = `<span class="badge badge-eq-status badge-eq-busy" title="Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>`;
+      cardClass = "is-busy";
+      isDisabled = true;
+      tooltip = "Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ (Không thể chọn)";
+    } else {
+      badgeHTML = `<span class="badge badge-eq-status badge-eq-avail" title="Thiết bị sẵn sàng để sử dụng"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>`;
+      cardClass = "";
+      isDisabled = false;
+      tooltip = "Thiết bị sẵn sàng phục vụ cuộc họp";
+    }
+
+    const isChecked = !isDisabled && selectedIds.includes(eqId);
+    const iconClass = getEquipmentIconClass(eq);
+
+    return `
+      <label class="eq-check-card ${cardClass}" for="eq-${eqId}" id="eq-card-${eqId}" data-id="${eqId}" title="${escapeHTML(tooltip)}">
+        <input
+          type="checkbox"
+          class="form-check-input eq-checkbox"
+          value="${eqId}"
+          id="eq-${eqId}"
+          ${isDisabled ? "disabled" : ""}
+          ${isChecked ? "checked" : ""}
+          aria-label="${escapeHTML(eq.name || eq.equipmentName)}"
+        />
+        <div class="eq-card-content">
+          <div class="eq-icon-box">
+            <i class="bi ${iconClass} eq-card-icon"></i>
+          </div>
+          <div class="eq-card-text-group">
+            <span class="eq-card-name">${escapeHTML(eq.name || eq.equipmentName)}</span>
+            <span class="eq-card-sub text-muted">${escapeHTML(eq.type || 'Thiết bị hội nghị')}</span>
+          </div>
+          <div class="eq-card-right ms-auto d-flex align-items-center gap-2">
+            ${badgeHTML}
+            <div class="eq-check-indicator">
+              <i class="bi bi-check-lg"></i>
+            </div>
+          </div>
+        </div>
+      </label>
+    `;
+  }).join("");
+
+  container.innerHTML = html;
+
+  if (summaryEl) {
+    if (availabilityMap !== null) {
+      summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị sẵn sàng`;
+    } else {
+      summaryEl.innerHTML = `<i class="bi bi-info-circle me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị hoạt động`;
+    }
+  }
+}
+
+function updateEquipmentCardsAvailability(editId = null) {
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const date = dateInput ? dateInput.value : "";
+  const start = startInput ? startInput.value : "";
+  const end = endInput ? endInput.value : "";
+
+  // Thu thập các ID hiện đang được người dùng tick chọn
+  const currentCheckedIds = Array.from(document.querySelectorAll(".eq-checkbox:checked")).map(cb => Number(cb.value));
+
+  if (date && start && end && start < end) {
+    MeetingAPI.getAvailableEquipments({ date, startTime: start, endTime: end, excludeMeetingId: editId }).then(res => {
+      if (res && res.success && Array.isArray(res.data)) {
+        const availIds = new Set(res.data.map(e => Number(e.id || e.equipmentId)));
+        renderEquipmentCheckboxGrid(currentCheckedIds, availIds);
+      } else {
+        renderEquipmentCheckboxGrid(currentCheckedIds, null);
+      }
+    }).catch(err => {
+      console.warn("Lỗi kiểm tra thiết bị khả dụng từ server:", err);
+      renderEquipmentCheckboxGrid(currentCheckedIds, null);
+    });
+  } else {
+    renderEquipmentCheckboxGrid(currentCheckedIds, null);
+  }
+}
+
 function setupMeetingFormValidationEvents() {
   const titleInput = document.getElementById("meeting-title");
   const dateInput = document.getElementById("meeting-date");
@@ -2691,44 +2835,8 @@ function setupMeetingFormValidationEvents() {
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
 
-    // Tự động rà soát thiết bị khả dụng theo thời gian thực (Luồng 2.3)
-    if (date && start && end && start < end) {
-      MeetingAPI.getAvailableEquipments({ date, startTime: start, endTime: end, excludeMeetingId: editId }).then(res => {
-        if (res && res.success && Array.isArray(res.data)) {
-          const availIds = new Set(res.data.map(e => e.id || e.equipmentId));
-          document.querySelectorAll(".eq-checkbox").forEach(cb => {
-            const eqId = Number(cb.value);
-            const label = document.querySelector(`label[for="${cb.id}"]`);
-            if (label && !label.dataset.origText) {
-              label.dataset.origText = label.innerText;
-            }
-            if (!availIds.has(eqId)) {
-              cb.disabled = true;
-              if (cb.checked) cb.checked = false;
-              if (label) {
-                label.innerText = `${label.dataset.origText} (Bận/Bảo trì)`;
-                label.classList.add("text-muted");
-              }
-            } else {
-              cb.disabled = false;
-              if (label && label.dataset.origText) {
-                label.innerText = label.dataset.origText;
-                label.classList.remove("text-muted");
-              }
-            }
-          });
-        }
-      });
-    } else {
-      document.querySelectorAll(".eq-checkbox").forEach(cb => {
-        cb.disabled = false;
-        const label = document.querySelector(`label[for="${cb.id}"]`);
-        if (label && label.dataset.origText) {
-          label.innerText = label.dataset.origText;
-          label.classList.remove("text-muted");
-        }
-      });
-    }
+    // Tự động rà soát và cập nhật Badge trạng thái thiết bị thời gian thực (Luồng 2.3)
+    updateEquipmentCardsAvailability(editId);
 
     if (roomId && date && start && end && start < end) {
       const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
@@ -5462,6 +5570,8 @@ function openAddModal() {
 
   calcDuration();
   renderRealtimeRoomCards(null);
+  renderEquipmentCheckboxGrid([]);
+  updateEquipmentCardsAvailability(null);
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
@@ -5595,9 +5705,8 @@ function openEditModal(id) {
   }
 
   const eqIds = meeting.equipmentIds || [];
-  document.querySelectorAll(".eq-checkbox").forEach(cb => {
-    cb.checked = eqIds.includes(Number(cb.value));
-  });
+  renderEquipmentCheckboxGrid(eqIds);
+  updateEquipmentCardsAvailability(meeting.id);
 
   calcDuration();
   renderRealtimeRoomCards(meeting.id);
@@ -6538,5 +6647,19 @@ MeetingAPI.getUsers().then((res) => {
     initParticipantSelector([1], 1);
   }
 });
+
+// Đồng bộ danh mục thiết bị từ Backend API
+MeetingAPI.getAllEquipments().then((res) => {
+  if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+    EQUIPMENTS = res.data.map(eq => ({
+      id: Number(eq.id || eq.equipmentId),
+      name: eq.name || eq.equipmentName,
+      type: eq.type || 'Thiết bị',
+      status: eq.status || 'Available',
+      icon: getEquipmentIconClass(eq)
+    }));
+  }
+});
+
 syncMeetingRoomOptions();
 router();

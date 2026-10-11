@@ -705,29 +705,32 @@
             </div>
 
             <!-- THIẾT BỊ PHÒNG HỌP (Equipments & Booking_Equipments Tables) -->
-            <div class="mb-2" id="group-equipments">
-              <span class="stitch-label d-block mb-1">
-                <i class="bi bi-laptop text-primary me-1"></i> Thiết bị yêu cầu (Equipments)
-              </span>
-              <div class="d-flex flex-wrap gap-3 pt-1" id="equipment-checkbox-group">
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="1" id="eq-1" aria-label="Máy chiếu Full HD">
-                  <label class="form-check-label small" for="eq-1">Máy chiếu Full HD</label>
+            <div class="mb-3" id="group-equipments">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <div>
+                  <span class="stitch-label d-block mb-0">
+                    <i class="bi bi-laptop text-primary me-1"></i> Thiết bị yêu cầu (Equipments)
+                  </span>
+                  <span class="stitch-hint">Tự động kiểm tra trạng thái khả dụng theo ngày &amp; khung giờ họp</span>
                 </div>
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="2" id="eq-2" aria-label="Màn hình TV 75 inch">
-                  <label class="form-check-label small" for="eq-2">Màn hình TV 75"</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="3" id="eq-3" aria-label="Micro và Loa họp">
-                  <label class="form-check-label small" for="eq-3">Micro & Loa họp</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="4" id="eq-4" aria-label="Bảng trắng viết">
-                  <label class="form-check-label small" for="eq-4">Bảng trắng viết</label>
+                <div class="equipment-legend d-flex gap-2 align-items-center small">
+                  <span class="eq-legend-pill pill-avail"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>
+                  <span class="eq-legend-pill pill-busy"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>
+                  <span class="eq-legend-pill pill-maint"><i class="bi bi-tools me-1"></i>Bảo trì</span>
                 </div>
               </div>
-              <small class="stitch-field-help">Thiết bị sẽ được điều phối và ghi nhận vào bảng Booking_Equipments</small>
+
+              <!-- Lưới các thẻ thiết bị có Badge & Checkbox -->
+              <div class="room-equipment-checkbox-grid" id="equipment-checkbox-group">
+                <!-- Sẽ được khởi tạo và render động từ main.js -->
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mt-2 pt-1 border-top" style="border-color: var(--slate-100) !important;">
+                <small class="stitch-field-help mb-0">
+                  <i class="bi bi-info-circle me-1"></i>Thiết bị sẽ được điều phối và ghi nhận vào bảng <code>Booking_Equipments</code>
+                </small>
+                <div id="equipment-avail-summary" class="small fw-semibold text-primary"></div>
+              </div>
             </div>
           </div>
         </details>

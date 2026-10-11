@@ -2767,6 +2767,137 @@ body {
   color: #ffffff;
 }
 
+/* Equipment Status Legend Pills */
+.equipment-legend {
+  user-select: none;
+}
+
+.eq-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.73rem;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 999px;
+  line-height: 1.2;
+}
+
+.eq-legend-pill.pill-avail {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.eq-legend-pill.pill-busy {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.eq-legend-pill.pill-maint {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Equipment Status Badges inside Cards */
+.badge-eq-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.70rem;
+  font-weight: 600;
+  padding: 2.5px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.badge-eq-status.badge-eq-avail {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-eq-status.badge-eq-busy {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-eq-status.badge-eq-maint {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Equipment Card Text Groups */
+.eq-card-text-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.eq-card-sub {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  color: var(--slate-400);
+}
+
+/* Equipment Status Card Modifiers & Disabled States */
+.eq-check-card.is-busy {
+  background: #fffdf5 !important;
+  border-color: #fef08a !important;
+  cursor: not-allowed !important;
+  opacity: 0.82;
+}
+
+.eq-check-card.is-busy:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.eq-check-card.is-busy .eq-card-icon {
+  color: #d97706 !important;
+}
+
+.eq-check-card.is-busy .eq-icon-box {
+  background: #fef3c7 !important;
+}
+
+.eq-check-card.is-maint {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.68;
+}
+
+.eq-check-card.is-maint:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.eq-check-card.is-maint .eq-card-icon {
+  color: #94a3b8 !important;
+}
+
+.eq-check-card.is-maint .eq-card-name {
+  color: var(--slate-500) !important;
+  text-decoration: line-through;
+}
+
+.eq-check-card:has(input:disabled) {
+  cursor: not-allowed !important;
+}
+
+.eq-check-card:has(input:disabled) .eq-check-indicator {
+  background: var(--slate-100);
+  border-color: var(--slate-200);
+  color: transparent;
+  opacity: 0.6;
+}
+
 /* =====================================================
    ROOM DETAIL MODAL & DOOR PLACARD (STITCH SPEC)
    ===================================================== */
