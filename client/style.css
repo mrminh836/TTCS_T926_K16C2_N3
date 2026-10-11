@@ -2661,7 +2661,7 @@ body {
 /* Equipment checkbox cards in modal */
 .room-equipment-checkbox-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -2677,11 +2677,13 @@ body {
   align-items: center;
   border: 1.5px solid var(--slate-200);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   background: #ffffff;
   cursor: pointer;
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .eq-check-card:hover {
@@ -2707,6 +2709,7 @@ body {
   align-items: center;
   gap: 10px;
   width: 100%;
+  min-width: 0;
 }
 
 .eq-icon-box {
@@ -2735,11 +2738,38 @@ body {
   color: var(--primary-600);
 }
 
+.eq-card-text-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
 .eq-card-name {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--slate-700);
   transition: color 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-width: 100%;
+}
+
+.eq-card-sub {
+  font-size: 0.72rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-width: 100%;
+}
+
+.eq-card-right {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .eq-check-card:has(input:checked) .eq-card-name {

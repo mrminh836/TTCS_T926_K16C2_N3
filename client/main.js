@@ -3771,8 +3771,8 @@ function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
             <i class="bi ${iconClass} eq-card-icon"></i>
           </div>
           <div class="eq-card-text-group">
-            <span class="eq-card-name">${escapeHTML(eq.name || eq.equipmentName)}</span>
-            <span class="eq-card-sub text-muted">${escapeHTML(eq.type || 'Thiết bị hội nghị')}</span>
+            <span class="eq-card-name" title="${escapeHTML(eq.name || eq.equipmentName)}">${escapeHTML(eq.name || eq.equipmentName)}</span>
+            <span class="eq-card-sub text-muted" title="${escapeHTML(eq.type || 'Thiết bị hội nghị')}">${escapeHTML(eq.type || 'Thiết bị hội nghị')}</span>
           </div>
           <div class="eq-card-right ms-auto d-flex align-items-center gap-2">
             ${badgeHTML}
