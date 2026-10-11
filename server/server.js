@@ -6,6 +6,7 @@ const cors = require('cors');
 const meetingRoutes = require('./routes/meetingRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const healthRoutes = require('./routes/healthRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -20,9 +21,11 @@ app.use('/client', express.static(clientPath));
 app.use('/api', meetingRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', healthRoutes);
+app.use('/api', userRoutes);
 
-// Hỗ trợ trực tiếp các đường dẫn /rooms song song với /api/rooms
+// Hỗ trợ trực tiếp các đường dẫn /rooms và /users song song với /api/...
 app.use('/', roomRoutes);
+app.use('/', userRoutes);
 
 // Xử lý Route 404 (Không tìm thấy endpoint)
 app.use((req, res) => {

@@ -73,7 +73,7 @@ let ROOMS = [
   }
 ];
 
-const USERS = [
+let USERS = [
   { id: 1, name: "Nguyễn Văn An", email: "an.nguyen@company.com", role: "Employee", department: "Kỹ thuật", avatar: "NA", color: "#2563eb" },
   { id: 2, name: "Trần Thu Hà", email: "ha.tran@company.com", role: "Manager", department: "Quản trị", avatar: "TH", color: "#7c3aed" },
   { id: 3, name: "Lê Minh Tuấn", email: "tuan.le@company.com", role: "Employee", department: "Kỹ thuật", avatar: "MT", color: "#0891b2" },
@@ -2258,6 +2258,22 @@ const MeetingAPI = {
       return await res.json();
     } catch (err) {
       return { success: false, message: err.message };
+    }
+  },
+
+  async getUsers(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (filters.search) params.append("search", filters.search);
+      if (filters.role) params.append("role", filters.role);
+      const queryStr = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetch(`http://localhost:3000/api/users${queryStr}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json;
+    } catch (err) {
+      console.warn("Lỗi fetch danh sách users từ API, sử dụng USERS fallback:", err);
+      return { success: false, data: USERS, message: err.message };
     }
   }
 };
@@ -6451,5 +6467,20 @@ RoomAPI.checkHealth().then(async (connected) => {
   }
 });
 MeetingAPI.checkHealth();
+// Đồng bộ danh sách nhân viên từ Backend API phục vụ mời họp và phân công
+MeetingAPI.getUsers().then((res) => {
+  if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+    USERS = res.data.map(u => ({
+      id: u.userId || u.id,
+      name: u.fullName || u.name,
+      email: u.email,
+      role: u.role || 'Employee',
+      department: u.department || (u.role === 'Admin' || u.role === 'Manager' ? 'Quản trị' : 'Kỹ thuật'),
+      avatar: getInitials(u.fullName || u.name),
+      color: getHostColor(u.fullName || u.name)
+    }));
+    initParticipantSelector([1], 1);
+  }
+});
 syncMeetingRoomOptions();
 router();
