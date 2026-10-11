@@ -2275,6 +2275,23 @@ const MeetingAPI = {
       console.warn("Lỗi fetch danh sách users từ API, sử dụng USERS fallback:", err);
       return { success: false, data: USERS, message: err.message };
     }
+  },
+
+  async getAvailableEquipments(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (filters.date) params.append("date", filters.date);
+      if (filters.startTime) params.append("startTime", filters.startTime);
+      if (filters.endTime) params.append("endTime", filters.endTime);
+      if (filters.type) params.append("type", filters.type);
+      if (filters.excludeMeetingId) params.append("excludeMeetingId", filters.excludeMeetingId);
+      const res = await fetch(`http://localhost:3000/api/equipments/available?${params.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.warn("Lỗi kiểm tra thiết bị khả dụng từ API, sử dụng fallback:", err);
+      return { success: false, data: EQUIPMENTS.filter(e => e.status.toLowerCase() === 'available'), message: err.message };
+    }
   }
 };
 
@@ -2673,6 +2690,45 @@ function setupMeetingFormValidationEvents() {
 
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
+
+    // Tự động rà soát thiết bị khả dụng theo thời gian thực (Luồng 2.3)
+    if (date && start && end && start < end) {
+      MeetingAPI.getAvailableEquipments({ date, startTime: start, endTime: end, excludeMeetingId: editId }).then(res => {
+        if (res && res.success && Array.isArray(res.data)) {
+          const availIds = new Set(res.data.map(e => e.id || e.equipmentId));
+          document.querySelectorAll(".eq-checkbox").forEach(cb => {
+            const eqId = Number(cb.value);
+            const label = document.querySelector(`label[for="${cb.id}"]`);
+            if (label && !label.dataset.origText) {
+              label.dataset.origText = label.innerText;
+            }
+            if (!availIds.has(eqId)) {
+              cb.disabled = true;
+              if (cb.checked) cb.checked = false;
+              if (label) {
+                label.innerText = `${label.dataset.origText} (Bận/Bảo trì)`;
+                label.classList.add("text-muted");
+              }
+            } else {
+              cb.disabled = false;
+              if (label && label.dataset.origText) {
+                label.innerText = label.dataset.origText;
+                label.classList.remove("text-muted");
+              }
+            }
+          });
+        }
+      });
+    } else {
+      document.querySelectorAll(".eq-checkbox").forEach(cb => {
+        cb.disabled = false;
+        const label = document.querySelector(`label[for="${cb.id}"]`);
+        if (label && label.dataset.origText) {
+          label.innerText = label.dataset.origText;
+          label.classList.remove("text-muted");
+        }
+      });
+    }
 
     if (roomId && date && start && end && start < end) {
       const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
