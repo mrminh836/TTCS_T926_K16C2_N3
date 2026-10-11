@@ -99,11 +99,8 @@
             <h3 id="modal-title" class="stitch-modal-title">
               Tạo cuộc họp mới
             </h3>
-            <span class="stitch-badge">
-              Form Modal
-            </span>
-            <span id="meeting-api-status-badge" class="stitch-badge-api" title="Trạng thái kết nối API Backend">
-              <span class="api-dot-status"></span> <span id="meeting-api-status-text">Client Ready</span>
+            <span id="meeting-api-status-badge" class="stitch-badge-api" title="Trạng thái hệ thống">
+              <span class="api-dot-status"></span> <span id="meeting-api-status-text">Trực tuyến</span>
             </span>
           </div>
           <p id="modal-subtitle" class="stitch-modal-subtitle">
@@ -183,7 +180,7 @@
             <label for="meeting-title" class="stitch-label">
               Tiêu đề cuộc họp <span class="text-danger">*</span>
             </label>
-            <span class="stitch-hint">Tối đa 200 ký tự (Chuẩn DB)</span>
+            <span class="stitch-hint">Tối đa 200 ký tự</span>
           </div>
 
           <div class="stitch-input-relative">
@@ -487,7 +484,7 @@
 
             <div class="mb-3" id="group-organizer">
               <label for="meeting-organizer" class="stitch-label">
-                <i class="bi bi-person-badge text-primary me-1"></i> Người tổ chức (Users / Organizer)
+                <i class="bi bi-person-badge text-primary me-1"></i> Người chủ trì cuộc họp
               </label>
               <select id="meeting-organizer" name="organizerId" class="form-select stitch-input" aria-label="Người tổ chức">
                 <option value="1">Nguyễn Văn An (ID: 1 - Kỹ thuật)</option>
@@ -514,7 +511,7 @@
             <div class="mb-3 stitch-form-group" id="group-participants">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <label for="participant-search-input" class="stitch-label m-0">
-                  <i class="bi bi-people-fill text-primary me-1"></i> Đồng nghiệp tham gia (Participants)
+                  <i class="bi bi-people-fill text-primary me-1"></i> Thành viên tham gia
                 </label>
                 <div class="d-flex align-items-center gap-2">
                   <span class="stitch-hint" id="participants-count-badge">
@@ -704,30 +701,33 @@
               </div>
             </div>
 
-            <!-- THIẾT BỊ PHÒNG HỌP (Equipments & Booking_Equipments Tables) -->
-            <div class="mb-2" id="group-equipments">
-              <span class="stitch-label d-block mb-1">
-                <i class="bi bi-laptop text-primary me-1"></i> Thiết bị yêu cầu (Equipments)
-              </span>
-              <div class="d-flex flex-wrap gap-3 pt-1" id="equipment-checkbox-group">
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="1" id="eq-1" aria-label="Máy chiếu Full HD">
-                  <label class="form-check-label small" for="eq-1">Máy chiếu Full HD</label>
+            <!-- THIẾT BỊ PHÒNG HỌP -->
+            <div class="mb-3" id="group-equipments">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <div>
+                  <span class="stitch-label d-block mb-0">
+                    <i class="bi bi-laptop text-primary me-1"></i> Thiết bị phòng họp yêu cầu
+                  </span>
+                  <span class="stitch-hint">Tự động kiểm tra trạng thái khả dụng theo ngày &amp; khung giờ họp</span>
                 </div>
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="2" id="eq-2" aria-label="Màn hình TV 75 inch">
-                  <label class="form-check-label small" for="eq-2">Màn hình TV 75"</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="3" id="eq-3" aria-label="Micro và Loa họp">
-                  <label class="form-check-label small" for="eq-3">Micro & Loa họp</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input eq-checkbox" type="checkbox" value="4" id="eq-4" aria-label="Bảng trắng viết">
-                  <label class="form-check-label small" for="eq-4">Bảng trắng viết</label>
+                <div class="equipment-legend d-flex gap-2 align-items-center small">
+                  <span class="eq-legend-pill pill-avail"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>
+                  <span class="eq-legend-pill pill-busy"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>
+                  <span class="eq-legend-pill pill-maint"><i class="bi bi-tools me-1"></i>Bảo trì</span>
                 </div>
               </div>
-              <small class="stitch-field-help">Thiết bị sẽ được điều phối và ghi nhận vào bảng Booking_Equipments</small>
+
+              <!-- Lưới các thẻ thiết bị có Badge & Checkbox -->
+              <div class="room-equipment-checkbox-grid" id="equipment-checkbox-group">
+                <!-- Sẽ được khởi tạo và render động từ main.js -->
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mt-2 pt-1 border-top" style="border-color: var(--slate-100) !important;">
+                <small class="stitch-field-help mb-0">
+                  <i class="bi bi-info-circle me-1"></i>Thiết bị được bộ phận kỹ thuật hỗ trợ chuẩn bị trước giờ họp
+                </small>
+                <div id="equipment-avail-summary" class="small fw-semibold text-primary"></div>
+              </div>
             </div>
           </div>
         </details>
@@ -812,8 +812,8 @@
               Thêm phòng họp mới
             </h3>
             <span class="stitch-badge">Admin Room Form</span>
-            <span id="room-api-status-badge" class="stitch-badge-api" title="Trạng thái kết nối API Backend">
-              <span class="api-dot-status"></span> <span id="room-api-status-text">Client Ready</span>
+            <span id="room-api-status-badge" class="stitch-badge-api" title="Trạng thái hệ thống">
+              <span class="api-dot-status"></span> <span id="room-api-status-text">Trực tuyến</span>
             </span>
           </div>
           <p id="room-modal-subtitle" class="stitch-modal-subtitle">

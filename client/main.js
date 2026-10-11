@@ -93,11 +93,15 @@ let USERS = [
   { id: 17, name: "Đỗ Quang Minh", email: "minh.do@company.com", role: "Scrum Master", department: "Quản trị", avatar: "QM", color: "#475569" }
 ];
 
-const EQUIPMENTS = [
-  { id: 1, name: "Máy chiếu Full HD", type: "Visual", status: "Available" },
-  { id: 2, name: "Màn hình TV 75\"", type: "Display", status: "Available" },
-  { id: 3, name: "Micro & Loa họp", type: "Audio", status: "Available" },
-  { id: 4, name: "Bảng trắng viết", type: "Stationery", status: "Available" }
+let EQUIPMENTS = [
+  { id: 1, name: "Máy chiếu Laser Sony 4K", type: "Máy chiếu", status: "Available", icon: "bi-projector-fill" },
+  { id: 2, name: "Màn hình tương tác Samsung Flip Pro 75\"", type: "Màn hình tương tác", status: "Available", icon: "bi-tv-fill" },
+  { id: 3, name: "Camera hội nghị Logitech Rally Plus", type: "Camera hội nghị", status: "Available", icon: "bi-camera-video-fill" },
+  { id: 4, name: "Bộ Micro cổ ngỗng Shure MXW6 (4 mic)", type: "Micro hội nghị", status: "Available", icon: "bi-mic-fill" },
+  { id: 5, name: "Loa hội nghị chuyên dụng Jabra Speak 810", type: "Loa hội nghị", status: "Available", icon: "bi-speaker-fill" },
+  { id: 6, name: "Bảng kính thảo luận di động 1.8m", type: "Bảng thảo luận", status: "Available", icon: "bi-easel-fill" },
+  { id: 7, name: "Máy chiếu di động Epson EB-2250U", type: "Máy chiếu", status: "Maintenance", icon: "bi-tools" },
+  { id: 8, name: "Bộ chia sẻ không dây Barco ClickShare CX-30", type: "Trình chiếu", status: "Available", icon: "bi-laptop-fill" }
 ];
 
 let meetings = [
@@ -276,21 +280,21 @@ function calcDurationString(start, end) {
 
 function exportToCSV() {
   const headers = [
-    "Mã cuộc họp (MeetingID)",
-    "Tiêu đề (Title)",
-    "Nhãn phân loại (Tag)",
+    "Mã cuộc họp",
+    "Tiêu đề cuộc họp",
+    "Phân loại",
     "Ngày họp",
-    "Thời gian (StartTime - EndTime)",
-    "Phòng họp (RoomName)",
-    "Sức chứa (Capacity)",
-    "Mã phòng (RoomID)",
-    "Người tổ chức (Host)",
-    "Mã người tổ chức (OrganizerID)",
-    "Người tham gia (Participants)",
-    "Trạng thái đặt phòng (BookingStatus)",
-    "Lặp lại định kỳ (IsRecurring)",
-    "Thiết bị yêu cầu (Equipments)",
-    "Mô tả / Ghi chú (Description)"
+    "Thời gian",
+    "Phòng họp",
+    "Sức chứa",
+    "Mã phòng",
+    "Người chủ trì",
+    "Mã người chủ trì",
+    "Người tham gia",
+    "Trạng thái",
+    "Lặp lại định kỳ",
+    "Thiết bị phòng họp",
+    "Nội dung / Ghi chú"
   ];
   const rows = meetings.map(m => [
     m.id,
@@ -624,8 +628,8 @@ function renderMeetingsPage() {
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">
-          <span id="meeting-page-api-badge" class="stitch-badge-api me-1 d-none d-sm-inline-flex" title="Trạng thái kết nối API Backend">
-            <span class="api-dot-status"></span> <span id="meeting-page-api-text">API Live</span>
+          <span id="meeting-page-api-badge" class="stitch-badge-api me-1 d-none d-sm-inline-flex" title="Trạng thái hệ thống">
+            <span class="api-dot-status"></span> <span id="meeting-page-api-text">Trực tuyến</span>
           </span>
 
           <button type="button" id="btn-export-excel" class="btn-stitch-export" title="Xuất danh sách ra file CSV">
@@ -1817,12 +1821,12 @@ const RoomAPI = {
     if (!badge || !text) return;
     if (this.isBackendConnected) {
       badge.classList.remove("offline");
-      badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật";
-      text.textContent = "API Live (Port 3000)";
+      badge.title = "Hệ thống kết nối trực tuyến";
+      text.textContent = "Trực tuyến";
     } else {
       badge.classList.add("offline");
-      badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
-      text.textContent = "Client Fallback";
+      badge.title = "Hệ thống đang hoạt động ở chế độ cục bộ";
+      text.textContent = "Chế độ ngoại tuyến";
     }
   },
 
@@ -2130,12 +2134,12 @@ const MeetingAPI = {
       if (!badge || !text) return;
       if (this.isBackendConnected) {
         badge.classList.remove("offline");
-        badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật (Port 3000)";
-        text.textContent = "API Live (Port 3000)";
+        badge.title = "Hệ thống kết nối trực tuyến";
+        text.textContent = "Trực tuyến";
       } else {
         badge.classList.add("offline");
-        badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
-        text.textContent = "Client Fallback";
+        badge.title = "Hệ thống đang hoạt động ở chế độ cục bộ";
+        text.textContent = "Chế độ ngoại tuyến";
       }
     });
   },
@@ -2291,6 +2295,18 @@ const MeetingAPI = {
     } catch (err) {
       console.warn("Lỗi kiểm tra thiết bị khả dụng từ API, sử dụng fallback:", err);
       return { success: false, data: EQUIPMENTS.filter(e => e.status.toLowerCase() === 'available'), message: err.message };
+    }
+  },
+
+  async getAllEquipments() {
+    try {
+      const res = await fetch("http://localhost:3000/api/equipments");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json;
+    } catch (err) {
+      console.warn("Lỗi fetch danh mục thiết bị từ API, sử dụng EQUIPMENTS fallback:", err);
+      return { success: false, data: EQUIPMENTS, message: err.message };
     }
   }
 };
@@ -2655,6 +2671,134 @@ function validateMeetingForm(editId = null) {
   };
 }
 
+// =====================================================
+// 6H. KHỐI HIỂN THỊ TRẠNG THÁI THIẾT BỊ VÀ BADGE (STITCH SPEC)
+// =====================================================
+
+function getEquipmentIconClass(eq) {
+  if (eq.icon) return eq.icon;
+  const name = (eq.name || eq.equipmentName || "").toLowerCase();
+  const type = (eq.type || "").toLowerCase();
+  if (name.includes("máy chiếu") || type.includes("máy chiếu") || type.includes("visual")) return "bi-projector-fill";
+  if (name.includes("màn hình") || name.includes("tv") || type.includes("màn hình") || type.includes("display")) return "bi-tv-fill";
+  if (name.includes("camera") || name.includes("webcam") || type.includes("camera")) return "bi-camera-video-fill";
+  if (name.includes("micro") || name.includes("mic") || type.includes("micro")) return "bi-mic-fill";
+  if (name.includes("loa") || type.includes("loa") || type.includes("audio")) return "bi-speaker-fill";
+  if (name.includes("bảng") || type.includes("bảng") || type.includes("stationery")) return "bi-easel-fill";
+  if (name.includes("chia sẻ") || name.includes("trình chiếu")) return "bi-laptop-fill";
+  return "bi-laptop";
+}
+
+function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
+  const container = document.getElementById("equipment-checkbox-group");
+  if (!container) return;
+
+  const summaryEl = document.getElementById("equipment-avail-summary");
+  let availableCount = 0;
+  const totalCount = EQUIPMENTS.length;
+
+  const html = EQUIPMENTS.map(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    const isMaintenance = (eq.status || "").toLowerCase() === "maintenance";
+    const isAvailable = !isMaintenance && (availabilityMap === null || availabilityMap.has(eqId));
+    const isBusy = !isMaintenance && availabilityMap !== null && !availabilityMap.has(eqId);
+
+    if (isAvailable) availableCount++;
+
+    let badgeHTML = "";
+    let cardClass = "";
+    let isDisabled = false;
+    let tooltip = "";
+
+    if (isMaintenance) {
+      badgeHTML = `<span class="badge badge-eq-status badge-eq-maint" title="Thiết bị đang bảo dưỡng kỹ thuật"><i class="bi bi-tools me-1"></i>Bảo trì</span>`;
+      cardClass = "is-maint";
+      isDisabled = true;
+      tooltip = "Thiết bị đang trong quá trình bảo dưỡng kỹ thuật (Không khả dụng)";
+    } else if (isBusy) {
+      badgeHTML = `<span class="badge badge-eq-status badge-eq-busy" title="Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>`;
+      cardClass = "is-busy";
+      isDisabled = true;
+      tooltip = "Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ (Không thể chọn)";
+    } else {
+      badgeHTML = `<span class="badge badge-eq-status badge-eq-avail" title="Thiết bị sẵn sàng để sử dụng"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>`;
+      cardClass = "";
+      isDisabled = false;
+      tooltip = "Thiết bị sẵn sàng phục vụ cuộc họp";
+    }
+
+    const isChecked = !isDisabled && selectedIds.includes(eqId);
+    const iconClass = getEquipmentIconClass(eq);
+
+    return `
+      <label class="eq-check-card ${cardClass}" for="eq-${eqId}" id="eq-card-${eqId}" data-id="${eqId}" title="${escapeHTML(tooltip)}">
+        <input
+          type="checkbox"
+          class="form-check-input eq-checkbox"
+          value="${eqId}"
+          id="eq-${eqId}"
+          ${isDisabled ? "disabled" : ""}
+          ${isChecked ? "checked" : ""}
+          aria-label="${escapeHTML(eq.name || eq.equipmentName)}"
+        />
+        <div class="eq-card-content">
+          <div class="eq-icon-box">
+            <i class="bi ${iconClass} eq-card-icon"></i>
+          </div>
+          <div class="eq-card-text-group">
+            <span class="eq-card-name">${escapeHTML(eq.name || eq.equipmentName)}</span>
+            <span class="eq-card-sub text-muted">${escapeHTML(eq.type || 'Thiết bị hội nghị')}</span>
+          </div>
+          <div class="eq-card-right ms-auto d-flex align-items-center gap-2">
+            ${badgeHTML}
+            <div class="eq-check-indicator">
+              <i class="bi bi-check-lg"></i>
+            </div>
+          </div>
+        </div>
+      </label>
+    `;
+  }).join("");
+
+  container.innerHTML = html;
+
+  if (summaryEl) {
+    if (availabilityMap !== null) {
+      summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị sẵn sàng`;
+    } else {
+      summaryEl.innerHTML = `<i class="bi bi-info-circle me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị hoạt động`;
+    }
+  }
+}
+
+function updateEquipmentCardsAvailability(editId = null) {
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const date = dateInput ? dateInput.value : "";
+  const start = startInput ? startInput.value : "";
+  const end = endInput ? endInput.value : "";
+
+  // Thu thập các ID hiện đang được người dùng tick chọn
+  const currentCheckedIds = Array.from(document.querySelectorAll(".eq-checkbox:checked")).map(cb => Number(cb.value));
+
+  if (date && start && end && start < end) {
+    MeetingAPI.getAvailableEquipments({ date, startTime: start, endTime: end, excludeMeetingId: editId }).then(res => {
+      if (res && res.success && Array.isArray(res.data)) {
+        const availIds = new Set(res.data.map(e => Number(e.id || e.equipmentId)));
+        renderEquipmentCheckboxGrid(currentCheckedIds, availIds);
+      } else {
+        renderEquipmentCheckboxGrid(currentCheckedIds, null);
+      }
+    }).catch(err => {
+      console.warn("Lỗi kiểm tra thiết bị khả dụng từ server:", err);
+      renderEquipmentCheckboxGrid(currentCheckedIds, null);
+    });
+  } else {
+    renderEquipmentCheckboxGrid(currentCheckedIds, null);
+  }
+}
+
 function setupMeetingFormValidationEvents() {
   const titleInput = document.getElementById("meeting-title");
   const dateInput = document.getElementById("meeting-date");
@@ -2691,44 +2835,8 @@ function setupMeetingFormValidationEvents() {
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
 
-    // Tự động rà soát thiết bị khả dụng theo thời gian thực (Luồng 2.3)
-    if (date && start && end && start < end) {
-      MeetingAPI.getAvailableEquipments({ date, startTime: start, endTime: end, excludeMeetingId: editId }).then(res => {
-        if (res && res.success && Array.isArray(res.data)) {
-          const availIds = new Set(res.data.map(e => e.id || e.equipmentId));
-          document.querySelectorAll(".eq-checkbox").forEach(cb => {
-            const eqId = Number(cb.value);
-            const label = document.querySelector(`label[for="${cb.id}"]`);
-            if (label && !label.dataset.origText) {
-              label.dataset.origText = label.innerText;
-            }
-            if (!availIds.has(eqId)) {
-              cb.disabled = true;
-              if (cb.checked) cb.checked = false;
-              if (label) {
-                label.innerText = `${label.dataset.origText} (Bận/Bảo trì)`;
-                label.classList.add("text-muted");
-              }
-            } else {
-              cb.disabled = false;
-              if (label && label.dataset.origText) {
-                label.innerText = label.dataset.origText;
-                label.classList.remove("text-muted");
-              }
-            }
-          });
-        }
-      });
-    } else {
-      document.querySelectorAll(".eq-checkbox").forEach(cb => {
-        cb.disabled = false;
-        const label = document.querySelector(`label[for="${cb.id}"]`);
-        if (label && label.dataset.origText) {
-          label.innerText = label.dataset.origText;
-          label.classList.remove("text-muted");
-        }
-      });
-    }
+    // Tự động rà soát và cập nhật Badge trạng thái thiết bị thời gian thực (Luồng 2.3)
+    updateEquipmentCardsAvailability(editId);
 
     if (roomId && date && start && end && start < end) {
       const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
@@ -4768,11 +4876,11 @@ function confirmDeleteRoom(roomId) {
           <div>
             <h5 class="text-danger fw-bold mb-1">Ràng buộc nghiệp vụ: Không thể xóa phòng họp</h5>
             <p class="text-secondary small mb-2">
-              Phòng họp <strong>"${escapeHTML(room.name)}"</strong> hiện đang có <strong>${activeMeetings.length} cuộc họp</strong> đã xác nhận sắp diễn ra hoặc đang diễn ra. Theo quy chuẩn bảo đảm toàn vẹn dữ liệu hệ thống (Luồng 1.3), bạn không được phép xóa phòng này.
+              Phòng họp <strong>"${escapeHTML(room.name)}"</strong> hiện đang có <strong>${activeMeetings.length} cuộc họp</strong> đã xác nhận sắp diễn ra hoặc đang diễn ra. Để bảo đảm tính liên tục của lịch làm việc, bạn không thể xóa phòng này.
             </p>
             <div class="alert alert-warning py-2 px-3 small mb-0">
               <i class="bi bi-lightbulb-fill text-warning me-1"></i>
-              <strong>Khuyến nghị:</strong> Bạn có thể chuyển trạng thái phòng sang <strong>"Bảo trì" (Maintenance)</strong> để tạm dừng nhận lịch mới mà không làm gián đoạn các cuộc họp đã lên lịch.
+              <strong>Khuyến nghị:</strong> Bạn có thể chuyển trạng thái phòng sang <strong>"Bảo trì"</strong> để tạm dừng tiếp nhận lịch đặt mới.
             </div>
           </div>
         </div>
@@ -5462,6 +5570,8 @@ function openAddModal() {
 
   calcDuration();
   renderRealtimeRoomCards(null);
+  renderEquipmentCheckboxGrid([]);
+  updateEquipmentCardsAvailability(null);
 
   modalOverlay.classList.remove("hidden");
   if (titleInput) {
@@ -5595,9 +5705,8 @@ function openEditModal(id) {
   }
 
   const eqIds = meeting.equipmentIds || [];
-  document.querySelectorAll(".eq-checkbox").forEach(cb => {
-    cb.checked = eqIds.includes(Number(cb.value));
-  });
+  renderEquipmentCheckboxGrid(eqIds);
+  updateEquipmentCardsAvailability(meeting.id);
 
   calcDuration();
   renderRealtimeRoomCards(meeting.id);
@@ -5723,8 +5832,8 @@ async function saveMeeting(event) {
           const globalErrorTitle = document.getElementById("global-error-title");
           const globalErrorDesc = document.getElementById("global-error-desc");
           if (globalError && globalErrorTitle && globalErrorDesc) {
-            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch họp định kỳ (409 Conflict)" : "Máy chủ từ chối yêu cầu";
-            globalErrorDesc.innerText = apiResult.message || "Không thể tạo chuỗi lịch họp định kỳ do xung đột phòng.";
+            globalErrorTitle.innerText = apiResult.isConflict ? "Phát hiện trùng lịch phòng họp" : "Không thể tạo chuỗi lịch họp";
+            globalErrorDesc.innerText = apiResult.message || "Không thể tạo chuỗi lịch họp định kỳ do xung đột thời gian.";
             globalError.classList.remove("hidden");
           }
 
@@ -5740,10 +5849,7 @@ async function saveMeeting(event) {
         // Tạo thành công chuỗi recurring!
         isFallback = apiResult.isFallback;
         const createdMeetings = apiResult.data?.meetings || [];
-        const patternId = apiResult.data?.pattern?.patternId || getNextId();
-        syncMsg = !isFallback
-          ? `Đã tạo chuỗi ${createdMeetings.length} buổi họp định kỳ vào CSDL MySQL (Mã chuỗi: #${patternId})`
-          : `Đã lưu chuỗi ${createdMeetings.length} buổi họp định kỳ vào bộ nhớ cục bộ (Local Fallback)`;
+        syncMsg = `Đã tạo thành công chuỗi ${createdMeetings.length} cuộc họp định kỳ.`;
 
         const statusSelect = document.getElementById("meeting-status");
         const status = statusSelect ? statusSelect.value : "scheduled";
@@ -5813,7 +5919,7 @@ async function saveMeeting(event) {
           const globalErrorTitle = document.getElementById("global-error-title");
           const globalErrorDesc = document.getElementById("global-error-desc");
           if (globalError && globalErrorTitle && globalErrorDesc) {
-            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch đặt phòng (409 Conflict)" : "Máy chủ từ chối yêu cầu";
+            globalErrorTitle.innerText = apiResult.isConflict ? "Phát hiện trùng lịch phòng họp" : "Không thể đặt lịch họp";
             globalErrorDesc.innerText = apiResult.message;
             globalError.classList.remove("hidden");
           }
@@ -5829,7 +5935,7 @@ async function saveMeeting(event) {
             const roomConflictAlert = document.getElementById("room-conflict-alert");
             const roomConflictText = document.getElementById("room-conflict-text");
             if (roomConflictAlert && roomConflictText) {
-              roomConflictText.innerHTML = `<strong>Máy chủ thông báo:</strong> ${escapeHTML(apiResult.message)}`;
+              roomConflictText.innerHTML = `<strong>Thông báo:</strong> ${escapeHTML(apiResult.message)}`;
               roomConflictAlert.classList.remove("hidden");
             }
             const roomSelect = document.getElementById("meeting-room");
@@ -5841,10 +5947,10 @@ async function saveMeeting(event) {
         isFallback = apiResult.isFallback;
         if (!isFallback && apiResult.data?.meetingId) {
           finalMeetingId = apiResult.data.meetingId;
-          syncMsg = `Đã đồng bộ trực tiếp vào CSDL MySQL (Mã cuộc họp: #${finalMeetingId})`;
+          syncMsg = `Thông tin cuộc họp đã được lưu thành công.`;
         } else {
           finalMeetingId = getNextId();
-          syncMsg = "Đã lưu vào bộ nhớ cục bộ (Local Store Fallback - Tự động đồng bộ CSDL)";
+          syncMsg = "Thông tin cuộc họp đã được lưu vào hệ thống.";
         }
 
         const statusSelect = document.getElementById("meeting-status");
@@ -6067,7 +6173,7 @@ function openDetailModal(id) {
   content.innerHTML = `
     <div class="mb-3 pb-2 border-bottom">
       <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small fw-medium">MÃ CUỘC HỌP (MeetingID)</span>
+        <span class="text-muted small fw-medium">MÃ CUỘC HỌP</span>
         <span class="badge bg-light text-dark border">#${meeting.id}</span>
       </div>
       <h5 class="fw-bold text-dark m-0 d-flex align-items-center flex-wrap">
@@ -6080,7 +6186,7 @@ function openDetailModal(id) {
       <div class="col-12 col-md-6">
         <div class="p-2 rounded border bg-light">
           <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP (Rooms)
+            <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP
           </span>
           <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
             <div class="fw-semibold text-primary cursor-pointer" onclick="closeDetailModal(); openRoomQRModal(${roomId});" title="Nhấp để xem chi tiết phòng &amp; mã QR" style="cursor: pointer;">
@@ -6095,7 +6201,7 @@ function openDetailModal(id) {
       <div class="col-12 col-md-6">
         <div class="p-2 rounded border bg-light">
           <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-clock-history text-primary me-1"></i> THỜI GIAN (Meetings)
+            <i class="bi bi-clock-history text-primary me-1"></i> THỜI GIAN HỌP
           </span>
           <div class="fw-semibold text-dark">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
           <div class="small text-muted">Ngày: ${formatDate(meeting.date)} (${calcDurationString(meeting.startTime, meeting.endTime)})</div>
@@ -6106,14 +6212,14 @@ function openDetailModal(id) {
     <div class="row g-2 mb-3">
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-person-badge text-primary me-1"></i> NGƯỜI TỔ CHỨC (Users / OrganizerID)
+          <i class="bi bi-person-badge text-primary me-1"></i> NGƯỜI CHỦ TRÌ
         </span>
         <div class="fw-medium text-dark">${escapeHTML(organizerName)} <span class="text-muted small">(ID: ${organizerId})</span></div>
       </div>
 
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-shield-check text-success me-1"></i> TRẠNG THÁI ĐẶT PHÒNG (Bookings)
+          <i class="bi bi-shield-check text-success me-1"></i> TRẠNG THÁI
         </span>
         <span class="${getStatusClass(meeting.status)}">
           ${getStatusText(meeting.status)}
@@ -6124,7 +6230,7 @@ function openDetailModal(id) {
     <div class="mb-3">
       <div class="d-flex align-items-center justify-content-between mb-1">
         <span class="text-muted small">
-          <i class="bi bi-people text-primary me-1"></i> NGƯỜI THAM GIA & PHẢN HỒI (Meeting_Participants)
+          <i class="bi bi-people text-primary me-1"></i> THÀNH VIÊN THAM GIA
         </span>
         <span id="detail-participant-summary-badges" class="small"></span>
       </div>
@@ -6136,7 +6242,7 @@ function openDetailModal(id) {
     <div class="row g-2 mb-3">
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-arrow-repeat text-primary me-1"></i> CUỘC HỌP ĐỊNH KỲ (Meetings.IsRecurring)
+          <i class="bi bi-arrow-repeat text-primary me-1"></i> LỊCH HỌP ĐỊNH KỲ
         </span>
         <div>
           ${meeting.isRecurring 
@@ -6147,7 +6253,7 @@ function openDetailModal(id) {
 
       <div class="col-12 col-md-6">
         <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-laptop text-primary me-1"></i> THIẾT BỊ PHÒNG HỌP (Booking_Equipments)
+          <i class="bi bi-laptop text-primary me-1"></i> THIẾT BỊ PHÒNG HỌP
         </span>
         <div class="text-dark small">
           ${(meeting.equipmentNames && meeting.equipmentNames.length) 
@@ -6161,7 +6267,7 @@ function openDetailModal(id) {
 
     <div>
       <span class="text-muted small d-block mb-0.5">
-        <i class="bi bi-card-text text-primary me-1"></i> MÔ TẢ (Meetings.Description)
+        <i class="bi bi-card-text text-primary me-1"></i> NỘI DUNG CUỘC HỌP
       </span>
       <div class="p-2 rounded bg-light border small text-dark">${escapeHTML(meeting.notes || "Không có ghi chú")}</div>
     </div>
@@ -6538,5 +6644,19 @@ MeetingAPI.getUsers().then((res) => {
     initParticipantSelector([1], 1);
   }
 });
+
+// Đồng bộ danh mục thiết bị từ Backend API
+MeetingAPI.getAllEquipments().then((res) => {
+  if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+    EQUIPMENTS = res.data.map(eq => ({
+      id: Number(eq.id || eq.equipmentId),
+      name: eq.name || eq.equipmentName,
+      type: eq.type || 'Thiết bị',
+      status: eq.status || 'Available',
+      icon: getEquipmentIconClass(eq)
+    }));
+  }
+});
+
 syncMeetingRoomOptions();
 router();
