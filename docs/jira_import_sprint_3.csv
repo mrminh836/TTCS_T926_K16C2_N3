@@ -1,0 +1,20 @@
+Issue Type,Summary,Description,Story Points,Priority,Assignee,Sprint,Status
+Task,"[BE - Đoàn Ngọc Mạnh] Xây dựng API POST /api/meetings/recurring sinh chuỗi lịch họp (tuần/tháng) & validate toàn chuỗi",Thuộc User Story: US 3.0: Đặt lịch họp định kỳ,2.0,High,Đoàn Ngọc Mạnh,SCRUM Sprint 3,Done
+Task,"[FE - Hoàng Minh Khánh] Bổ sung form tùy chọn lặp định kỳ (chu kỳ Tuần/Tháng, số lần lặp) & ghép API",Thuộc User Story: US 3.0: Đặt lịch họp định kỳ,1.5,High,Hoàng Minh Khánh,SCRUM Sprint 3,Done
+Task,"[QA - Hoàng Văn Khuyến] Kiểm thử sinh chuỗi cuộc họp lặp định kỳ và xử lý ca xung đột giữa chuỗi",Thuộc User Story: US 3.0: Đặt lịch họp định kỳ,1.5,High,Hoàng Văn Khuyến,SCRUM Sprint 3,Done
+Task,"[BE - Đào Đức Mạnh] Lưu danh sách người tham gia vào bảng Meeting_Participants và truy vấn trạng thái phản hồi",Thuộc User Story: US 4.0: Mời người tham dự,1.5,High,Đào Đức Mạnh,SCRUM Sprint 3,Done
+Task,"[FE - Hoàng Minh Khánh] Tích hợp multi-select chọn danh sách đồng nghiệp tham gia cuộc họp",Thuộc User Story: US 4.0: Mời người tham dự,1.5,High,Hoàng Minh Khánh,SCRUM Sprint 3,Done
+Task,"[QA - Triệu Quốc Khánh] Kiểm thử luồng Mời người tham gia và kiểm tra hiển thị danh sách người dự",Thuộc User Story: US 4.0: Mời người tham dự,1.5,High,Triệu Quốc Khánh,SCRUM Sprint 3,Done
+Task,"[BE - Đào Đức Mạnh] Viết API GET /api/users trả danh sách nhân viên phục vụ chọn người mời và phân công",Thuộc User Story: US 19.0: Tra cứu người dùng,1.0,Medium,Đào Đức Mạnh,SCRUM Sprint 3,Done
+Task,"[BE - Đào Đức Mạnh] Lưu thông tin thiết bị mượn vào bảng Booking_Equipments trong Transaction",Thuộc User Story: US 12.0: Đặt kèm thiết bị,1.5,High,Đào Đức Mạnh,SCRUM Sprint 3,Done
+Task,"[FE - Vũ Thị Thanh Ngân] Tích hợp khối chọn thiết bị kèm theo (máy chiếu, TV, bảng, micro) trên modal đặt phòng",Thuộc User Story: US 12.0: Đặt kèm thiết bị,1.5,High,Vũ Thị Thanh Ngân,SCRUM Sprint 3,Done
+Task,"[QA - Ngô Đức Khải] Kiểm thử luồng Đặt kèm thiết bị và kiểm tra tính toàn vẹn dữ liệu Booking - Thiết bị",Thuộc User Story: US 12.0: Đặt kèm thiết bị,1.5,High,Ngô Đức Khải,SCRUM Sprint 3,Done
+Task,"[BE - Đào Đức Mạnh] Viết API GET /api/equipments/available?date=...&startTime=...&endTime=... lọc thiết bị khả dụng",Thuộc User Story: US 13.0: Trạng thái thiết bị,1.5,High,Đào Đức Mạnh,SCRUM Sprint 3,Done
+Task,"[FE - Vũ Thị Thanh Ngân] Hiển thị badge trạng thái Có sẵn / Đang bận / Bảo trì và disable thiết bị bận",Thuộc User Story: US 13.0: Trạng thái thiết bị,1.0,Medium,Vũ Thị Thanh Ngân,SCRUM Sprint 3,Done
+Task,"[QA - Ngô Đức Khải] Kiểm thử chặn mượn thiết bị đang bảo trì hoặc đã có người mượn trùng giờ",Thuộc User Story: US 13.0: Trạng thái thiết bị,1.5,High,Ngô Đức Khải,SCRUM Sprint 3,Done
+Task,"[BE - Đào Đức Mạnh] Xây dựng trọn bộ API CRUD danh mục thiết bị (GET, POST, PUT, DELETE, PATCH status)",Thuộc User Story: US 14.0: Quản trị thiết bị Admin,2.0,High,Đào Đức Mạnh,SCRUM Sprint 3,Done
+Task,"[FE - Vũ Thị Thanh Ngân] Dựng giao diện Quản trị danh mục thiết bị phía Admin (bảng thiết bị, modal thêm/sửa, nút bảo trì)",Thuộc User Story: US 14.0: Quản trị thiết bị Admin,1.5,High,Vũ Thị Thanh Ngân,SCRUM Sprint 3,Done
+Task,"[QA - Ngô Đức Khải] Thiết kế Test Cases & kiểm thử CRUD thiết bị Admin, kiểm tra ca biên",Thuộc User Story: US 14.0: Quản trị thiết bị Admin,1.5,High,Ngô Đức Khải,SCRUM Sprint 3,Done
+Task,"[FE - Hoàng Minh Khánh] Xây dựng thuật toán tự động gợi ý phòng có sức chứa phù hợp nhất với số lượng người tham gia",Thuộc User Story: US 26.0: Gợi ý phòng theo quy mô,1.5,Medium,Hoàng Minh Khánh,SCRUM Sprint 3,Done
+Task,"[QA - Triệu Quốc Khánh] Kiểm thử các kịch bản gợi ý phòng (số lượng ít -> phòng nhỏ, số lượng đông -> hội trường)",Thuộc User Story: US 26.0: Gợi ý phòng theo quy mô,1.0,Medium,Triệu Quốc Khánh,SCRUM Sprint 3,Done
+Task,"[SM - Đỗ Quang Minh] Rà soát Sprint Goal 3, cập nhật Jira Board, kiểm thử tích hợp E3E và chuẩn bị Sprint 3 Review",Thuộc User Story: Nghiệm thu Sprint 3,2.0,High,Đỗ Quang Minh,SCRUM Sprint 3,Done
