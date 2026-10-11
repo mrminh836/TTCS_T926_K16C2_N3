@@ -733,10 +733,10 @@ function renderMeetingsPage() {
             </div>
             <div class="d-flex align-items-center gap-1">
               <label for="finder-start" class="visually-hidden">Giờ bắt đầu</label>
-              <input type="time" id="finder-start" class="form-control stitch-input stitch-input-sm" value="09:00" style="width: 95px; font-size: 0.78rem;" aria-label="Giờ bắt đầu tra cứu" />
+              <input type="time" id="finder-start" class="form-control stitch-input stitch-input-sm" value="09:00" style="width: 126px; font-size: 0.8rem; padding: 4px 6px;" aria-label="Giờ bắt đầu tra cứu" />
               <span class="text-muted small">➔</span>
               <label for="finder-end" class="visually-hidden">Giờ kết thúc</label>
-              <input type="time" id="finder-end" class="form-control stitch-input stitch-input-sm" value="10:30" style="width: 95px; font-size: 0.78rem;" aria-label="Giờ kết thúc tra cứu" />
+              <input type="time" id="finder-end" class="form-control stitch-input stitch-input-sm" value="10:30" style="width: 126px; font-size: 0.8rem; padding: 4px 6px;" aria-label="Giờ kết thúc tra cứu" />
             </div>
             <button type="button" class="btn btn-sm btn-primary px-3" id="btn-finder-book-room" style="font-size: 0.78rem; font-weight: 600;" onclick="openAddModalWithSelection()">
               <i class="bi bi-plus-lg me-1"></i> Đặt lịch ngay
