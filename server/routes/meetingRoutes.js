@@ -3,6 +3,7 @@ const router = express.Router();
 const meetingController = require('../controllers/meetingController');
 const recurringController = require('../controllers/recurringController');
 const participantController = require('../controllers/participantController');
+const icsController = require('../controllers/icsController');
 const { validateMeetingMiddleware } = require('../validators/meetingValidator');
 const { validateRecurringMiddleware } = require('../validators/recurringValidator');
 
@@ -16,7 +17,10 @@ router.put('/meetings/:id/participants/:userId/status', participantController.up
 router.post('/meetings/:id/participants', participantController.addParticipants);
 router.delete('/meetings/:id/participants/:userId', participantController.removeParticipant);
 
-// 3. Meeting CRUD routes
+// 3. Export iCalendar (.ics) — đồng bộ Google Calendar & Outlook
+router.get('/meetings/:id/export-ics', icsController.exportMeetingICS);
+
+// 4. Meeting CRUD routes
 router.post('/meetings', validateMeetingMiddleware, meetingController.createMeeting);
 router.get('/meetings', meetingController.getMeetings);
 router.get('/meetings/:id', meetingController.getMeetingById);
