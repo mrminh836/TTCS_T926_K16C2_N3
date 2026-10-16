@@ -75,8 +75,7 @@ function foldLine(line) {
  * @returns {string} UID duy nhất
  */
 function generateUID(meetingId, domain = 'meeting-management.enterprise.vn') {
-    const timestamp = Date.now();
-    return `meeting-${meetingId}-${timestamp}@${domain}`;
+    return `meeting-${meetingId}@${domain}`;
 }
 
 /**
@@ -118,9 +117,9 @@ function generateICSContent(meeting) {
     if (equipments.length > 0) {
         const eqList = equipments
             .map(eq => `• ${eq.equipmentName || eq.EquipmentName}`)
-            .join('\\n');
-        fullDescription += (fullDescription ? '\\n\\n' : '') +
-            `--- Thiết bị sử dụng ---\\n${eqList}`;
+            .join('\n');
+        fullDescription += (fullDescription ? '\n\n' : '') +
+            `--- Thiết bị sử dụng ---\n${eqList}`;
     }
 
     // ── Xây dựng nội dung VEVENT ──
@@ -165,7 +164,7 @@ function generateICSContent(meeting) {
 
     // Người tổ chức (ORGANIZER) - Tuân thủ RFC 5545 Section 3.8.4.3
     if (organizerEmail) {
-        const cnParam = organizerName ? `;CN=${escapeICSText(organizerName)}` : '';
+        const cnParam = organizerName ? `;CN="${organizerName.replace(/"/g, "'")}"`  : '';
         lines.push(foldLine(`ORGANIZER${cnParam}:mailto:${organizerEmail}`));
     }
 
@@ -186,7 +185,8 @@ function generateICSContent(meeting) {
             const partStat = partStatMap[status] || 'NEEDS-ACTION';
 
             if (email) {
-                const attendeeLine = `ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=${partStat};CN=${escapeICSText(name || email)}:mailto:${email}`;
+                const cnValue = (name || email).replace(/"/g, "'");
+                const attendeeLine = `ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=${partStat};CN="${cnValue}":mailto:${email}`;
                 lines.push(foldLine(attendeeLine));
             }
         }

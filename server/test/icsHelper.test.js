@@ -136,12 +136,16 @@ describe('generateUID()', () => {
         assert.ok(uid.endsWith('@example.com'), 'UID should end with domain');
     });
 
-    it('should generate unique UIDs for same meeting ID (different timestamps)', async () => {
+    it('should generate stable/deterministic UIDs for same meeting ID', () => {
         const uid1 = generateUID(1);
-        // Đợi 1ms để đảm bảo timestamp khác nhau
-        await new Promise(r => setTimeout(r, 2));
         const uid2 = generateUID(1);
-        assert.notEqual(uid1, uid2, 'UIDs should be unique');
+        assert.equal(uid1, uid2, 'UIDs for same meeting should be identical (stable)');
+    });
+
+    it('should generate different UIDs for different meeting IDs', () => {
+        const uid1 = generateUID(1);
+        const uid2 = generateUID(2);
+        assert.notEqual(uid1, uid2, 'UIDs for different meetings should differ');
     });
 });
 
@@ -264,10 +268,13 @@ describe('generateICSContent()', () => {
         assert.ok(ics.includes('LOCATION:Boardroom'), 'Should contain LOCATION');
     });
 
-    it('should contain ORGANIZER with email', () => {
+    it('should contain ORGANIZER with quoted CN and email', () => {
         const ics = generateICSContent(baseMeeting);
-        assert.ok(ics.includes('ORGANIZER'), 'Should contain ORGANIZER');
-        assert.ok(ics.includes('mailto:admin@enterprise.vn'), 'Should contain organizer email');
+        const unfolded = ics.replace(/\r\n /g, '');
+        assert.ok(unfolded.includes('ORGANIZER'), 'Should contain ORGANIZER');
+        assert.ok(unfolded.includes('mailto:admin@enterprise.vn'), 'Should contain organizer email');
+        // CN should be double-quoted for RFC 5545 compliance
+        assert.ok(unfolded.includes('CN="'), 'ORGANIZER CN should be double-quoted');
     });
 
     it('should contain ATTENDEE entries for each participant', () => {
@@ -280,8 +287,11 @@ describe('generateICSContent()', () => {
 
     it('should map response statuses to correct PARTSTAT values', () => {
         const ics = generateICSContent(baseMeeting);
-        assert.ok(ics.includes('PARTSTAT=ACCEPTED'), 'Should map Accepted to ACCEPTED');
-        assert.ok(ics.includes('PARTSTAT=NEEDS-ACTION'), 'Should map Pending to NEEDS-ACTION');
+        const unfolded = ics.replace(/\r\n /g, '');
+        assert.ok(unfolded.includes('PARTSTAT=ACCEPTED'), 'Should map Accepted to ACCEPTED');
+        assert.ok(unfolded.includes('PARTSTAT=NEEDS-ACTION'), 'Should map Pending to NEEDS-ACTION');
+        // CN should be double-quoted
+        assert.ok(unfolded.includes('CN="'), 'ATTENDEE CN should be double-quoted');
     });
 
     it('should contain VALARM reminder (15 minutes before)', () => {
