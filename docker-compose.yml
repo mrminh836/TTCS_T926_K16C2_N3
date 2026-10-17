@@ -20,7 +20,7 @@ services:
       DB_USER: ${DB_USER:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root123}
       DB_NAME: ${DB_NAME:-meeting_management}
-      JWT_SECRET: ${JWT_SECRET:-super_secret_jwt_key_ictu_meeting_management_2026}
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
     volumes:
       # Mount mã nguồn để hot-reload khi dev (không cần rebuild image)
