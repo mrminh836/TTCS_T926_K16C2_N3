@@ -1108,17 +1108,45 @@
 
       <div id="detail-content" class="stitch-detail-body"></div>
 
-      <div class="stitch-modal-footer">
+      <div class="stitch-modal-footer" id="detail-modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+        <div class="d-flex align-items-center gap-2" id="detail-permission-actions">
+          <!-- Các nút theo quyền (Chỉnh sửa, Hủy cuộc họp) sẽ được hiển thị bằng JavaScript -->
+        </div>
         <button
           type="button"
           id="btn-close-detail-bottom"
-          class="btn btn-outline-secondary stitch-btn-cancel">
+          class="btn btn-secondary">
           Đóng
         </button>
       </div>
 
     </div>
 
+  </div>
+
+  <!-- ================= MODAL XÁC NHẬN CHUYÊN NGHIỆP (ENTERPRISE CONFIRM DIALOG) ================= -->
+  <div id="confirm-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="confirm-dialog-card">
+      <div class="confirm-dialog-header">
+        <div class="confirm-dialog-icon danger" id="confirm-modal-icon">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div>
+          <h4 id="confirm-modal-title" class="confirm-dialog-title">Hủy cuộc họp này?</h4>
+          <p id="confirm-modal-desc" class="confirm-dialog-desc">
+            Bạn có chắc chắn muốn hủy cuộc họp này không? Hành động này có thể ảnh hưởng đến những người tham gia.
+          </p>
+        </div>
+      </div>
+      <div class="confirm-dialog-actions">
+        <button type="button" class="btn btn-secondary" id="btn-confirm-cancel">
+          Giữ cuộc họp
+        </button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-submit">
+          Xác nhận hủy
+        </button>
+      </div>
+    </div>
   </div>
 
 

@@ -7382,44 +7382,81 @@ function getNextId() {
 
 
 // =====================================================
-// 14. XÓA
+// =====================================================
+// 14. HỘP THOẠI XÁC NHẬN CHUYÊN NGHIỆP & HỦY/XÓA CUỘC HỌP (PHẦN V & VII SPEC)
 // =====================================================
 
+function showConfirmDialog({ title, desc, cancelText = 'Giữ cuộc họp', confirmText = 'Xác nhận hủy', isDanger = true, onConfirm }) {
+  const overlay = document.getElementById('confirm-modal-overlay');
+  if (!overlay) return;
+
+  const titleEl = document.getElementById('confirm-modal-title');
+  const descEl = document.getElementById('confirm-modal-desc');
+  const btnCancel = document.getElementById('btn-confirm-cancel');
+  const btnSubmit = document.getElementById('btn-confirm-submit');
+  const iconEl = document.getElementById('confirm-modal-icon');
+
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = desc;
+  if (btnCancel) btnCancel.textContent = cancelText;
+  if (btnSubmit) {
+    btnSubmit.textContent = confirmText;
+    btnSubmit.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
+  }
+  if (iconEl) {
+    iconEl.className = isDanger ? 'confirm-dialog-icon danger' : 'confirm-dialog-icon warning';
+  }
+
+  const closeDialog = () => {
+    overlay.classList.add('hidden');
+    btnCancel?.removeEventListener('click', onCancelClick);
+    btnSubmit?.removeEventListener('click', onSubmitClick);
+    document.removeEventListener('keydown', onEsc);
+  };
+
+  const onCancelClick = () => closeDialog();
+  const onSubmitClick = () => {
+    closeDialog();
+    if (typeof onConfirm === 'function') onConfirm();
+  };
+  const onEsc = (e) => {
+    if (e.key === 'Escape') closeDialog();
+  };
+
+  btnCancel?.addEventListener('click', onCancelClick);
+  btnSubmit?.addEventListener('click', onSubmitClick);
+  document.addEventListener('keydown', onEsc);
+
+  overlay.classList.remove('hidden');
+}
+
+function confirmCancelMeeting(id) {
+  const meeting = meetings.find(item => item.id === id);
+  if (!meeting) return;
+
+  showConfirmDialog({
+    title: 'Hủy cuộc họp này?',
+    desc: `Bạn có chắc chắn muốn hủy cuộc họp "${meeting.title}" không? Hành động này có thể ảnh hưởng đến những người tham gia.`,
+    cancelText: 'Giữ cuộc họp',
+    confirmText: 'Xác nhận hủy',
+    isDanger: true,
+    onConfirm: () => {
+      meetings = meetings.filter(item => item.id !== id);
+      persistMeetingsToStorage();
+      renderMeetingTable();
+      updateDashboardStats();
+      if (typeof closeDetailModal === 'function') {
+        closeDetailModal();
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast(`Đã hủy cuộc họp "${meeting.title}" thành công.`, 'success');
+      }
+    }
+  });
+}
+
 function deleteMeeting(id) {
-
-  const meeting =
-    meetings.find(
-      item => item.id === id
-    );
-
-
-  if (!meeting) {
-    return;
-  }
-
-
-  const confirmed =
-    window.confirm(
-      `Bạn có chắc muốn xóa cuộc họp "${meeting.title}" không?`
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  meetings =
-    meetings.filter(
-      item => item.id !== id
-    );
-
-  persistMeetingsToStorage();
-  renderMeetingTable();
-  updateDashboardStats();
-  if (typeof window.showToast === 'function') {
-    window.showToast(`Đã xóa cuộc họp "${meeting.title}" thành công.`, 'info');
-  }
+  confirmCancelMeeting(id);
 }
 
 
@@ -7560,6 +7597,32 @@ function openDetailModal(id) {
       <div class="p-2 rounded bg-light border small text-dark">${escapeHTML(meeting.notes || "Không có ghi chú")}</div>
     </div>
   `;
+
+  // Kiểm tra quyền người dùng để hiển thị nút Chỉnh sửa / Hủy (Phần VII. 28)
+  const currentUser = (window.AuthState && typeof window.AuthState.getCurrentUser === 'function') ? window.AuthState.getCurrentUser() : null;
+  const isAdmin = window.AuthState && typeof window.AuthState.isAdmin === 'function' ? window.AuthState.isAdmin() : false;
+  const isOrganizer = currentUser && (
+    Number(currentUser.id) === Number(organizerId) ||
+    currentUser.username === meeting.host ||
+    currentUser.fullName === meeting.host
+  );
+  const canModify = isAdmin || isOrganizer;
+
+  const actionsEl = document.getElementById("detail-permission-actions");
+  if (actionsEl) {
+    if (canModify) {
+      actionsEl.innerHTML = `
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="if (typeof closeDetailModal === 'function') closeDetailModal(); openEditModal(${meeting.id});">
+          <i class="bi bi-pencil-square"></i> Chỉnh sửa
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="confirmCancelMeeting(${meeting.id});">
+          <i class="bi bi-trash3"></i> Hủy cuộc họp
+        </button>
+      `;
+    } else {
+      actionsEl.innerHTML = '';
+    }
+  }
 
   detailOverlay.classList.remove("hidden");
 
@@ -8023,6 +8086,8 @@ window.openAddModalWithSelection = openAddModalWithSelection;
 window.exportToCSV = exportToCSV;
 window.getInitials = getInitials;
 window.getHostColor = getHostColor;
+window.confirmCancelMeeting = confirmCancelMeeting;
+window.showConfirmDialog = showConfirmDialog;
 window.RoomAPI = RoomAPI;
 window.MeetingAPI = MeetingAPI;
 window.EquipmentAPI = EquipmentAPI;
