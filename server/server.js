@@ -8,6 +8,7 @@ const roomRoutes = require('./routes/roomRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const userRoutes = require('./routes/userRoutes');
 const equipmentRoutes = require('./routes/equipmentRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -19,13 +20,15 @@ app.use(express.static(clientPath));
 app.use('/client', express.static(clientPath));
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api', meetingRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', healthRoutes);
 app.use('/api', userRoutes);
 app.use('/api', equipmentRoutes);
 
-// Hỗ trợ trực tiếp các đường dẫn /rooms, /users, /equipments song song với /api/...
+// Hỗ trợ trực tiếp các đường dẫn song song với /api/...
+app.use('/auth', authRoutes);
 app.use('/', roomRoutes);
 app.use('/', userRoutes);
 app.use('/', equipmentRoutes);
