@@ -18,6 +18,35 @@ let USERS = [];
 let EQUIPMENTS = [];
 let meetings = [];
 
+// Đồng bộ 2 chiều với window scope để các module trang truy cập dữ liệu mới nhất
+try {
+  Object.defineProperty(window, 'ROOMS', {
+    get() { return ROOMS; },
+    set(v) { ROOMS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'USERS', {
+    get() { return USERS; },
+    set(v) { USERS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'EQUIPMENTS', {
+    get() { return EQUIPMENTS; },
+    set(v) { EQUIPMENTS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'meetings', {
+    get() { return meetings; },
+    set(v) { meetings = v; },
+    configurable: true
+  });
+} catch (e) {
+  window.ROOMS = ROOMS;
+  window.USERS = USERS;
+  window.EQUIPMENTS = EQUIPMENTS;
+  window.meetings = meetings;
+}
+
 let currentStatusFilter = "";
 let currentRoomFilter = "";
 
@@ -220,46 +249,125 @@ const roomDeleteOverlay = document.getElementById("room-delete-overlay");
 
 
 // =====================================================
-// 3. ROUTER
+// 3. ROUTER & ĐIỀU HƯỚNG TRANG NÂNG CAO (SPA ROUTER)
 // =====================================================
+
+// Xuất các hàm render sang window để router.js và các page modules sử dụng
+window.renderHome = renderHome;
+window.renderMeetingsPage = renderMeetingsPage;
+window.renderAdminRoomsPage = renderAdminRoomsPage;
+window.renderAdminEquipmentsPage = renderAdminEquipmentsPage;
+window.render404 = render404;
+
+function registerAppRoutes() {
+  if (!window.AppRouter) return;
+
+  // 1. Routes dành cho Người dùng & Khách
+  AppRouter.add('/', renderHome, { title: 'Trang chủ - Dashboard' });
+  AppRouter.add('/home', renderHome, { title: 'Trang chủ - Dashboard' });
+  AppRouter.add('/meetings', () => {
+    if (window.handleMeetingsRoute) window.handleMeetingsRoute();
+    else renderMeetingsPage();
+  }, { title: 'Danh sách Cuộc họp' });
+
+  AppRouter.add('/meetings/create', () => {
+    if (window.handleMeetingCreateRoute) window.handleMeetingCreateRoute();
+    else {
+      renderMeetingsPage();
+      setTimeout(() => { if (typeof openAddModal === 'function') openAddModal(); }, 100);
+    }
+  }, { title: 'Tạo Cuộc họp Mới' });
+
+  AppRouter.add('/meetings/:id', (params) => {
+    if (window.handleMeetingDetailRoute) window.handleMeetingDetailRoute(params);
+    else {
+      renderMeetingsPage();
+      setTimeout(() => { if (typeof openDetailModal === 'function') openDetailModal(Number(params.id)); }, 100);
+    }
+  }, { title: 'Chi tiết Cuộc họp' });
+
+  AppRouter.add('/calendar', () => {
+    if (window.renderCalendarPage) window.renderCalendarPage();
+    else renderMeetingsPage();
+  }, { title: 'Lịch họp Doanh nghiệp' });
+
+  AppRouter.add('/rooms', () => {
+    if (window.renderRoomsUserPage) window.renderRoomsUserPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Tra cứu Phòng họp' });
+
+  AppRouter.add('/equipment', () => {
+    if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
+    else renderAdminEquipmentsPage();
+  }, { title: 'Danh mục Trang thiết bị' });
+
+  AppRouter.add('/equipments', () => {
+    if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
+    else renderAdminEquipmentsPage();
+  }, { title: 'Danh mục Trang thiết bị' });
+
+  AppRouter.add('/profile', () => {
+    if (window.renderProfilePage) window.renderProfilePage();
+    else renderHome();
+  }, { title: 'Hồ sơ cá nhân', requireAuth: true });
+
+  // 2. Routes dành riêng cho Quản trị viên (Admin)
+  AppRouter.add('/admin', () => {
+    if (window.renderAdminDashboardPage) window.renderAdminDashboardPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Tổng quan Quản trị', requireAdmin: true });
+
+  AppRouter.add('/admin/rooms', renderAdminRoomsPage, { title: 'Quản lý Phòng họp (Admin)', requireAdmin: true });
+  AppRouter.add('/admin/equipment', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAdmin: true });
+  AppRouter.add('/admin/equipments', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAdmin: true });
+
+  AppRouter.add('/admin/users', () => {
+    if (window.renderAdminUsersPage) window.renderAdminUsersPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Quản lý Người dùng (Admin)', requireAdmin: true });
+
+  AppRouter.add('/admin/reports', () => {
+    if (window.renderAdminReportsPage) window.renderAdminReportsPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Báo cáo & Thống kê (Admin)', requireAdmin: true });
+
+  AppRouter.add('/404', render404, { title: '404 - Không tìm thấy' });
+}
+
+// Khởi chạy đăng ký routes
+registerAppRoutes();
 
 const routes = {
   "/": renderHome,
   "/home": renderHome,
   "/meetings": renderMeetingsPage,
-  "/admin": renderAdminRoomsPage,
+  "/calendar": () => (window.renderCalendarPage ? window.renderCalendarPage() : renderMeetingsPage()),
+  "/rooms": () => (window.renderRoomsUserPage ? window.renderRoomsUserPage() : renderAdminRoomsPage()),
+  "/equipment": () => (window.renderEquipmentUserPage ? window.renderEquipmentUserPage() : renderAdminEquipmentsPage()),
+  "/equipments": () => (window.renderEquipmentUserPage ? window.renderEquipmentUserPage() : renderAdminEquipmentsPage()),
+  "/profile": () => (window.renderProfilePage ? window.renderProfilePage() : renderHome()),
+  "/admin": () => (window.renderAdminDashboardPage ? window.renderAdminDashboardPage() : renderAdminRoomsPage()),
   "/admin/rooms": renderAdminRoomsPage,
-  "/rooms": renderAdminRoomsPage,
+  "/admin/equipment": renderAdminEquipmentsPage,
   "/admin/equipments": renderAdminEquipmentsPage,
-  "/equipments": renderAdminEquipmentsPage,
+  "/admin/users": () => (window.renderAdminUsersPage ? window.renderAdminUsersPage() : renderAdminRoomsPage()),
+  "/admin/reports": () => (window.renderAdminReportsPage ? window.renderAdminReportsPage() : renderAdminRoomsPage()),
   "/404": render404
 };
 
-
 function getCurrentRoute() {
   const hash = window.location.hash;
-
-  if (!hash || hash === "#") {
-    return "/";
-  }
-
+  if (!hash || hash === "#") return "/";
   return hash.substring(1);
 }
 
-
 function updateActiveNav(route) {
   const navLinks = document.querySelectorAll(".nav-link-custom");
-
   navLinks.forEach((link) => {
     const href = link.getAttribute("href");
     const linkRoute = href ? href.replace("#", "") : "";
-
-    const isHome =
-      (route === "/" || route === "/home") &&
-      (linkRoute === "/" || linkRoute === "/home");
-    const isAdmin =
-      (route.startsWith("/admin") || route === "/rooms" || route === "/equipments") &&
-      linkRoute === "/admin";
+    const isHome = (route === "/" || route === "/home") && (linkRoute === "/" || linkRoute === "/home");
+    const isAdmin = route.startsWith("/admin") && linkRoute === "/admin";
     const isMatch = route === linkRoute;
 
     if (isHome || isAdmin || isMatch) {
@@ -270,16 +378,16 @@ function updateActiveNav(route) {
   });
 }
 
-
 function router() {
+  if (window.AppRouter) {
+    window.AppRouter.handleRouteChange();
+    return;
+  }
   const route = getCurrentRoute();
-
   const page = routes[route] || render404;
-
   page();
   updateActiveNav(route);
 }
-
 
 window.addEventListener("hashchange", router);
 document.addEventListener("DOMContentLoaded", router);
@@ -7813,6 +7921,25 @@ async function initializeEnterpriseData() {
   // Render lại route hiện tại với dữ liệu thực tế từ Database
   router();
 }
+
+// Xuất toàn bộ modal triggers và APIs ra window scope cho các trang con
+window.openAddModal = openAddModal;
+window.openDetailModal = openDetailModal;
+window.openEditModal = openEditModal;
+window.openRoomQRModal = openRoomQRModal;
+window.openEditRoomModal = openEditRoomModal;
+window.openAddRoomModal = openAddRoomModal;
+window.confirmDeleteRoom = confirmDeleteRoom;
+window.openAddEquipmentModal = openAddEquipmentModal;
+window.openEditEquipmentModal = openEditEquipmentModal;
+window.openEquipmentDeleteModal = openEquipmentDeleteModal;
+window.openAddModalWithSelection = openAddModalWithSelection;
+window.exportToCSV = exportToCSV;
+window.getInitials = getInitials;
+window.getHostColor = getHostColor;
+window.RoomAPI = RoomAPI;
+window.MeetingAPI = MeetingAPI;
+window.EquipmentAPI = EquipmentAPI;
 
 setupRoomFormValidationEvents();
 setupMeetingFormValidationEvents();

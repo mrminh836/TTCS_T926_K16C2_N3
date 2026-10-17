@@ -89,6 +89,63 @@
       });
     },
 
+    /**
+     * Route Guard: Yêu cầu bắt buộc phải đăng nhập
+     */
+    requireAuth(redirectTo = 'login.html') {
+      if (!this.isAuthenticated()) {
+        window.location.replace(redirectTo);
+        return false;
+      }
+      return true;
+    },
+
+    /**
+     * Route Guard: Yêu cầu quyền Quản trị viên (Admin)
+     */
+    requireAdmin(userRedirect = 'user.html', unauthRedirect = 'login.html') {
+      if (!this.isAuthenticated()) {
+        window.location.replace(unauthRedirect);
+        return false;
+      }
+      if (!this.isAdmin()) {
+        alert('Tài khoản của bạn không có quyền Quản trị (Admin). Đang chuyển hướng về cổng Người dùng.');
+        window.location.replace(userRedirect);
+        return false;
+      }
+      return true;
+    },
+
+    /**
+     * Dùng cho trang login.html: Nếu đã đăng nhập, tự động chuyển sang trang tương ứng
+     */
+    redirectIfAuthenticated() {
+      if (this.isAuthenticated()) {
+        this.redirectAfterLogin();
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * Điều hướng người dùng sau khi đăng nhập thành công dựa vào quyền (Role)
+     */
+    redirectAfterLogin() {
+      if (this.isAdmin()) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'user.html';
+      }
+    },
+
+    /**
+     * Đăng xuất người dùng và chuyển hướng
+     */
+    logout(redirectTo = 'login.html') {
+      this.clearSession('manual');
+      window.location.href = redirectTo;
+    },
+
     async init() {
       updateHeaderAuthUI();
 
@@ -394,6 +451,9 @@
           if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?')) {
             AuthState.clearSession('manual');
             showToast('Đã đăng xuất tài khoản thành công.', 'info');
+            if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('user.html')) {
+              window.location.href = 'login.html';
+            }
           }
         });
       }
@@ -595,8 +655,10 @@
             this.setLoading(false, 'btn-submit-login', 'Đăng nhập');
             this.close();
 
-            // Nếu người dùng đang ở trang có thể làm mới dữ liệu
-            if (typeof window.initializeEnterpriseData === 'function') {
+            // Nếu đang ở trang login.html -> điều hướng theo role
+            if (window.location.pathname.endsWith('login.html')) {
+              AuthState.redirectAfterLogin();
+            } else if (typeof window.initializeEnterpriseData === 'function') {
               window.initializeEnterpriseData();
             }
           }, 500);
