@@ -352,9 +352,17 @@
     const avatarEl = document.getElementById('header-user-avatar');
     const nameEl = document.getElementById('header-user-name');
     const roleEl = document.getElementById('header-user-role');
+    const sidebarAvatarEl = document.getElementById('sidebar-user-avatar');
+    const sidebarNameEl = document.getElementById('sidebar-user-name');
+    const sidebarRoleEl = document.getElementById('sidebar-user-role');
+    const dropdownNameEl = document.getElementById('dropdown-full-name');
+    const dropdownEmailEl = document.getElementById('dropdown-email');
+    const adminSectionTitle = document.getElementById('nav-section-admin-title');
+    const adminNavLink = document.getElementById('nav-admin-link');
 
     const isAuthed = AuthState.isAuthenticated();
     const user = AuthState.getUser();
+    const isAdmin = AuthState.isAdmin();
 
     if (isAuthed && user) {
       if (unloggedSec) unloggedSec.classList.add('d-none');
@@ -364,7 +372,13 @@
       }
 
       const displayName = user.fullName || user.name || user.username || 'Người dùng';
+      const initials = getInitials(displayName);
+      const hostColor = getHostColor(displayName);
+
       if (nameEl) nameEl.textContent = displayName;
+      if (sidebarNameEl) sidebarNameEl.textContent = displayName;
+      if (dropdownNameEl) dropdownNameEl.textContent = displayName;
+      if (dropdownEmailEl) dropdownEmailEl.textContent = user.email || `${user.username || 'user'}@company.com`;
 
       let roleText = 'Thành viên (USER)';
       let roleClass = 'badge-user';
@@ -386,17 +400,35 @@
         roleEl.textContent = roleText;
         roleEl.className = `user-role ${roleClass}`;
       }
+      if (sidebarRoleEl) {
+        sidebarRoleEl.textContent = user.role ? user.role.toUpperCase() : 'USER';
+        sidebarRoleEl.className = `sidebar-role-badge ${isAdmin ? 'badge-admin' : 'badge-user'}`;
+      }
 
       if (avatarEl) {
-        avatarEl.textContent = getInitials(displayName);
-        avatarEl.style.backgroundColor = getHostColor(displayName);
+        avatarEl.textContent = initials;
+        avatarEl.style.backgroundColor = hostColor;
       }
+      if (sidebarAvatarEl) {
+        sidebarAvatarEl.textContent = initials;
+      }
+
+      if (adminSectionTitle) adminSectionTitle.style.display = isAdmin ? 'block' : 'none';
+      if (adminNavLink) adminNavLink.style.display = isAdmin ? 'flex' : 'none';
     } else {
       if (unloggedSec) unloggedSec.classList.remove('d-none');
       if (loggedSec) {
         loggedSec.classList.add('d-none');
         loggedSec.classList.remove('d-flex');
       }
+      if (sidebarNameEl) sidebarNameEl.textContent = 'Khách (Chưa đăng nhập)';
+      if (sidebarAvatarEl) sidebarAvatarEl.textContent = 'G';
+      if (sidebarRoleEl) {
+        sidebarRoleEl.textContent = 'GUEST';
+        sidebarRoleEl.className = 'sidebar-role-badge badge-user';
+      }
+      if (adminSectionTitle) adminSectionTitle.style.display = 'none';
+      if (adminNavLink) adminNavLink.style.display = 'none';
     }
   }
 

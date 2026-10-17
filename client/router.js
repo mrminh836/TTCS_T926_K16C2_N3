@@ -195,7 +195,7 @@
      * Cập nhật CSS class active trên các liên kết điều hướng
      */
     updateActiveNavigation(path) {
-      const navLinks = document.querySelectorAll('.nav-link-custom, .admin-subnav-link');
+      const navLinks = document.querySelectorAll('.nav-link-custom, .nav-item, .admin-subnav-link');
       navLinks.forEach(link => {
         const href = link.getAttribute('href');
         if (!href) return;
@@ -217,6 +217,12 @@
           link.classList.remove('active');
         }
       });
+
+      // Đóng sidebar trên mobile nếu đang mở
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar) sidebar.classList.remove('mobile-open');
+      if (backdrop) backdrop.classList.remove('show');
     },
 
     /**
