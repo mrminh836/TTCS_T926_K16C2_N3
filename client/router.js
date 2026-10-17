@@ -122,30 +122,16 @@
 
       const { route, params } = matched;
 
-      // 3. Kiểm tra Route Guards (Xác thực & Phân quyền)
+      // 3. Kiểm tra Route Guards (Xác thực & Phân quyền theo chuẩn QLNS_QLTKPM)
       if (route.options.requireAuth && window.AuthState && !window.AuthState.isAuthenticated()) {
-        if (window.showToast) {
-          window.showToast('Vui lòng đăng nhập để truy cập tính năng này.', 'warning');
-        }
-        if (window.AuthModal) {
-          window.AuthModal.open('login');
-        } else {
-          window.location.href = 'login.html';
-        }
+        window.location.href = 'login.html';
         isNavigating = false;
         return;
       }
 
       if (route.options.requireAdmin && window.AuthState) {
         if (!window.AuthState.isAuthenticated()) {
-          if (window.showToast) {
-            window.showToast('Vui lòng đăng nhập với tài khoản Quản trị viên.', 'warning');
-          }
-          if (window.AuthModal) {
-            window.AuthModal.open('login');
-          } else {
-            window.location.href = 'login.html';
-          }
+          window.location.href = 'login.html';
           isNavigating = false;
           return;
         }

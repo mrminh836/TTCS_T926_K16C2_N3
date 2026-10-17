@@ -262,13 +262,13 @@ window.render404 = render404;
 function registerAppRoutes() {
   if (!window.AppRouter) return;
 
-  // 1. Routes dành cho Người dùng & Khách
-  AppRouter.add('/', renderHome, { title: 'Trang chủ - Dashboard' });
-  AppRouter.add('/home', renderHome, { title: 'Trang chủ - Dashboard' });
+  // 1. Routes dành cho Người dùng (Bắt buộc xác thực requireAuth theo chuẩn QLNS_QLTKPM)
+  AppRouter.add('/', renderHome, { title: 'Trang chủ - Dashboard', requireAuth: true });
+  AppRouter.add('/home', renderHome, { title: 'Trang chủ - Dashboard', requireAuth: true });
   AppRouter.add('/meetings', () => {
     if (window.handleMeetingsRoute) window.handleMeetingsRoute();
     else renderMeetingsPage();
-  }, { title: 'Danh sách Cuộc họp' });
+  }, { title: 'Danh sách Cuộc họp', requireAuth: true });
 
   AppRouter.add('/meetings/create', () => {
     if (window.handleMeetingCreateRoute) window.handleMeetingCreateRoute();
@@ -276,7 +276,7 @@ function registerAppRoutes() {
       renderMeetingsPage();
       setTimeout(() => { if (typeof openAddModal === 'function') openAddModal(); }, 100);
     }
-  }, { title: 'Tạo Cuộc họp Mới' });
+  }, { title: 'Tạo Cuộc họp Mới', requireAuth: true });
 
   AppRouter.add('/meetings/:id', (params) => {
     if (window.handleMeetingDetailRoute) window.handleMeetingDetailRoute(params);
@@ -284,52 +284,57 @@ function registerAppRoutes() {
       renderMeetingsPage();
       setTimeout(() => { if (typeof openDetailModal === 'function') openDetailModal(Number(params.id)); }, 100);
     }
-  }, { title: 'Chi tiết Cuộc họp' });
+  }, { title: 'Chi tiết Cuộc họp', requireAuth: true });
 
   AppRouter.add('/calendar', () => {
     if (window.renderCalendarPage) window.renderCalendarPage();
     else renderMeetingsPage();
-  }, { title: 'Lịch họp Doanh nghiệp' });
+  }, { title: 'Lịch họp Doanh nghiệp', requireAuth: true });
 
   AppRouter.add('/rooms', () => {
     if (window.renderRoomsUserPage) window.renderRoomsUserPage();
     else renderAdminRoomsPage();
-  }, { title: 'Tra cứu Phòng họp' });
+  }, { title: 'Tra cứu Phòng họp', requireAuth: true });
 
   AppRouter.add('/equipment', () => {
     if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
     else renderAdminEquipmentsPage();
-  }, { title: 'Danh mục Trang thiết bị' });
+  }, { title: 'Danh mục Trang thiết bị', requireAuth: true });
 
   AppRouter.add('/equipments', () => {
     if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
     else renderAdminEquipmentsPage();
-  }, { title: 'Danh mục Trang thiết bị' });
+  }, { title: 'Danh mục Trang thiết bị', requireAuth: true });
 
   AppRouter.add('/profile', () => {
     if (window.renderProfilePage) window.renderProfilePage();
     else renderHome();
   }, { title: 'Hồ sơ cá nhân', requireAuth: true });
 
+  // Route Đăng nhập chuyên dụng
+  AppRouter.add('/login', () => {
+    window.location.href = 'login.html';
+  }, { title: 'Đăng nhập hệ thống' });
+
   // 2. Routes dành riêng cho Quản trị viên (Admin)
   AppRouter.add('/admin', () => {
     if (window.renderAdminDashboardPage) window.renderAdminDashboardPage();
     else renderAdminRoomsPage();
-  }, { title: 'Tổng quan Quản trị', requireAdmin: true });
+  }, { title: 'Tổng quan Quản trị', requireAuth: true, requireAdmin: true });
 
-  AppRouter.add('/admin/rooms', renderAdminRoomsPage, { title: 'Quản lý Phòng họp (Admin)', requireAdmin: true });
-  AppRouter.add('/admin/equipment', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAdmin: true });
-  AppRouter.add('/admin/equipments', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAdmin: true });
+  AppRouter.add('/admin/rooms', renderAdminRoomsPage, { title: 'Quản lý Phòng họp (Admin)', requireAuth: true, requireAdmin: true });
+  AppRouter.add('/admin/equipment', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAuth: true, requireAdmin: true });
+  AppRouter.add('/admin/equipments', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAuth: true, requireAdmin: true });
 
   AppRouter.add('/admin/users', () => {
     if (window.renderAdminUsersPage) window.renderAdminUsersPage();
     else renderAdminRoomsPage();
-  }, { title: 'Quản lý Người dùng (Admin)', requireAdmin: true });
+  }, { title: 'Quản lý Người dùng (Admin)', requireAuth: true, requireAdmin: true });
 
   AppRouter.add('/admin/reports', () => {
     if (window.renderAdminReportsPage) window.renderAdminReportsPage();
     else renderAdminRoomsPage();
-  }, { title: 'Báo cáo & Thống kê (Admin)', requireAdmin: true });
+  }, { title: 'Báo cáo & Thống kê (Admin)', requireAuth: true, requireAdmin: true });
 
   AppRouter.add('/404', render404, { title: '404 - Không tìm thấy' });
 }

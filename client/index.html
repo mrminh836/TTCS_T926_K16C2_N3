@@ -26,7 +26,25 @@
   />
 
   <!-- CSS riêng của project -->
-  <link rel="stylesheet" href="style.css?v=1.12" />
+  <link rel="stylesheet" href="style.css?v=1.13" />
+
+  <!-- Auth Guard: Bắt buộc đăng nhập qua trang login.html riêng biệt (chuẩn kiến trúc QLNS_QLTKPM) -->
+  <script>
+    (function () {
+      try {
+        var token = localStorage.getItem('accessToken');
+        if (!token || token.trim().length === 0) {
+          var currentHash = window.location.hash || '';
+          if (currentHash && currentHash !== '#/' && currentHash !== '#/home') {
+            sessionStorage.setItem('auth_redirect_hash', currentHash);
+          }
+          window.location.replace('login.html');
+        }
+      } catch (e) {
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
 </head>
 
 <body>
@@ -123,28 +141,19 @@
             <span class="badge-dot"></span>
           </button>
 
-          <!-- Chế độ chưa đăng nhập -->
-          <div id="auth-unlogged-section" class="d-flex align-items-center gap-2">
+          <!-- Chế độ chưa đăng nhập (mặc định ẩn vì Auth Guard bắt buộc qua login.html) -->
+          <div id="auth-unlogged-section" class="d-none align-items-center gap-2">
             <a
               href="login.html"
               class="btn btn-secondary btn-sm"
-              title="Mở trang Đăng nhập / Đăng ký chuyên dụng">
-              <i class="bi bi-box-arrow-up-right me-1"></i>
-              <span>Cổng Auth</span>
-            </a>
-
-            <button
-              type="button"
-              id="btn-open-auth-modal"
-              class="btn btn-primary btn-sm"
-              aria-label="Mở cửa sổ đăng nhập hoặc đăng ký">
+              title="Đăng nhập lại qua trang chuyên dụng">
               <i class="bi bi-box-arrow-in-right me-1"></i>
               <span>Đăng nhập</span>
-            </button>
+            </a>
           </div>
 
-          <!-- Chế độ đã đăng nhập -->
-          <div id="auth-logged-section" class="d-none align-items-center">
+          <!-- Chế độ đã đăng nhập (chuẩn SaaS App Shell QLNS_QLTKPM) -->
+          <div id="auth-logged-section" class="d-flex align-items-center">
             <div class="user-menu" id="user-menu-wrapper">
               <button class="user-profile-btn" id="user-profile-btn" type="button" aria-expanded="false" aria-haspopup="true">
                 <div class="user-avatar" id="header-user-avatar">AD</div>
@@ -164,10 +173,6 @@
                 <a href="#/profile" class="dropdown-item">
                   <i class="bi bi-person me-2"></i>
                   <span>Hồ sơ cá nhân</span>
-                </a>
-                <a href="login.html" class="dropdown-item">
-                  <i class="bi bi-box-arrow-up-right me-2"></i>
-                  <span>Cổng xác thực (Auth)</span>
                 </a>
                 <div class="dropdown-divider"></div>
                 <button type="button" class="dropdown-item text-danger" id="btn-header-logout" style="width: 100%; border: none; background: transparent; cursor: pointer; text-align: left;">

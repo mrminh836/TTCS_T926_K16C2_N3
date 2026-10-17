@@ -52,7 +52,10 @@
     setSession(token, user) {
       try {
         if (token) localStorage.setItem(STORAGE_TOKEN_KEY, token);
-        if (user) localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
+        if (user) {
+          localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
+          localStorage.setItem('user', JSON.stringify(user));
+        }
       } catch (err) {
         console.warn('[AuthState] Không thể ghi vào localStorage:', err);
       }
@@ -64,6 +67,7 @@
       try {
         localStorage.removeItem(STORAGE_TOKEN_KEY);
         localStorage.removeItem(STORAGE_USER_KEY);
+        localStorage.removeItem('user');
       } catch (err) {
         console.warn('[AuthState] Lỗi khi xóa localStorage:', err);
       }
@@ -132,9 +136,9 @@
      */
     redirectAfterLogin() {
       if (this.isAdmin()) {
-        window.location.href = 'admin.html';
+        window.location.href = 'index.html#/admin';
       } else {
-        window.location.href = 'user.html';
+        window.location.href = 'index.html#/';
       }
     },
 
@@ -458,8 +462,6 @@
 
     init() {
       this.overlay = document.getElementById('auth-modal-overlay');
-      if (!this.overlay) return;
-
       this.bindEvents();
     },
 
@@ -476,16 +478,13 @@
         closeBtn.addEventListener('click', () => this.close());
       }
 
-      // Nút đăng xuất trên header
+      // Nút đăng xuất trên header hoặc dropdown
       const logoutBtn = document.getElementById('btn-header-logout');
       if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
+        logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
           if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?')) {
-            AuthState.clearSession('manual');
-            showToast('Đã đăng xuất tài khoản thành công.', 'info');
-            if (window.location.pathname.endsWith('admin.html') || window.location.pathname.endsWith('user.html')) {
-              window.location.href = 'login.html';
-            }
+            AuthState.logout('login.html');
           }
         });
       }
@@ -501,12 +500,14 @@
       if (linkToReg) linkToReg.addEventListener('click', () => this.switchTab('register'));
       if (linkToLog) linkToLog.addEventListener('click', () => this.switchTab('login'));
 
-      // Đóng khi click ngoài overlay (chỉ khi không đang gửi request)
-      this.overlay.addEventListener('click', (e) => {
-        if (e.target === this.overlay && !this.isLoading) {
-          this.close();
-        }
-      });
+      // Đóng khi click ngoài overlay (chỉ khi có overlay và không đang gửi request)
+      if (this.overlay) {
+        this.overlay.addEventListener('click', (e) => {
+          if (e.target === this.overlay && !this.isLoading) {
+            this.close();
+          }
+        });
+      }
 
       // Submit Form Đăng nhập
       const formLogin = document.getElementById('form-auth-login');
@@ -687,9 +688,15 @@
             this.setLoading(false, 'btn-submit-login', 'Đăng nhập');
             this.close();
 
-            // Nếu đang ở trang login.html -> điều hướng theo role
+            // Nếu đang ở trang login.html -> điều hướng theo role hoặc redirect hash
             if (window.location.pathname.endsWith('login.html')) {
-              AuthState.redirectAfterLogin();
+              const redirectHash = sessionStorage.getItem('auth_redirect_hash');
+              if (redirectHash) {
+                sessionStorage.removeItem('auth_redirect_hash');
+                window.location.href = `index.html${redirectHash}`;
+              } else {
+                AuthState.redirectAfterLogin();
+              }
             } else if (typeof window.initializeEnterpriseData === 'function') {
               window.initializeEnterpriseData();
             }
