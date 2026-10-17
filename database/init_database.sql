@@ -7,10 +7,11 @@ DROP TABLE IF EXISTS Rooms;
 DROP TABLE IF EXISTS Users;
 CREATE TABLE Users (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
+    Username VARCHAR(50) UNIQUE NOT NULL,
     FullName VARCHAR(100) NOT NULL,
     Email VARCHAR(100) UNIQUE NOT NULL,
     PasswordHash VARCHAR(255) NOT NULL,
-    Role VARCHAR(50) DEFAULT 'Employee',
+    Role VARCHAR(50) DEFAULT 'USER',
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE Rooms (
@@ -83,22 +84,22 @@ DELETE FROM Equipments;
 DELETE FROM Rooms;
 DELETE FROM Users;
 
--- 1. Danh sách người dùng / nhân viên các phòng ban
-INSERT INTO Users (UserID, FullName, Email, PasswordHash, Role) VALUES
-    (1, 'Nguyễn Văn Quản Trị', 'admin@enterprise.vn', 'hash_admin_123', 'Admin'),
-    (2, 'Trần Thị Thư Ký', 'secretary@enterprise.vn', 'hash_sec_123', 'Secretary'),
-    (3, 'Lê Văn Trưởng Phòng', 'manager@enterprise.vn', 'hash_mgr_123', 'Manager'),
-    (4, 'Phạm Hoàng Nhân Viên', 'employee@enterprise.vn', 'hash_emp_123', 'Employee'),
-    (5, 'Đỗ Quang Minh', 'minh.dq@enterprise.vn', 'hash_pass_123', 'Manager'),
-    (6, 'Đoàn Ngọc Mạnh', 'manh.dn@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (7, 'Đào Đức Mạnh', 'manh.dd@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (8, 'Hoàng Minh Khánh', 'khanh.hm@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (9, 'Nguyễn Minh Lượng', 'luong.nm@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (10, 'Hoàng Văn Khuyến', 'khuyen.hv@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (11, 'Triệu Quốc Khánh', 'khanh.tq@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (12, 'Vũ Thị Thanh Ngân', 'ngan.vt@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (13, 'Ngô Đức Khải', 'khai.nd@enterprise.vn', 'hash_pass_123', 'Employee'),
-    (14, 'Hà Sỹ Nguyên', 'nguyen.hs@enterprise.vn', 'hash_pass_123', 'Employee');
+-- 1. Danh sách người dùng / nhân viên các phòng ban (Mật khẩu mặc định: Password123)
+INSERT INTO Users (UserID, Username, FullName, Email, PasswordHash, Role) VALUES
+    (1, 'admin', 'Nguyễn Văn Quản Trị', 'admin@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Admin'),
+    (2, 'secretary', 'Trần Thị Thư Ký', 'secretary@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Secretary'),
+    (3, 'manager', 'Lê Văn Trưởng Phòng', 'manager@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Manager'),
+    (4, 'employee', 'Phạm Hoàng Nhân Viên', 'employee@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (5, 'minh.dq', 'Đỗ Quang Minh', 'minh.dq@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Manager'),
+    (6, 'manh.dn', 'Đoàn Ngọc Mạnh', 'manh.dn@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (7, 'manh.dd', 'Đào Đức Mạnh', 'manh.dd@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (8, 'khanh.hm', 'Hoàng Minh Khánh', 'khanh.hm@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (9, 'luong.nm', 'Nguyễn Minh Lượng', 'luong.nm@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (10, 'khuyen.hv', 'Hoàng Văn Khuyến', 'khuyen.hv@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (11, 'khanh.tq', 'Triệu Quốc Khánh', 'khanh.tq@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (12, 'ngan.vt', 'Vũ Thị Thanh Ngân', 'ngan.vt@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (13, 'khai.nd', 'Ngô Đức Khải', 'khai.nd@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
+    (14, 'nguyen.hs', 'Hà Sỹ Nguyên', 'nguyen.hs@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee');
 
 -- 2. Danh mục phòng họp chuẩn doanh nghiệp công nghệ tại Việt Nam
 INSERT INTO Rooms (RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description) VALUES
