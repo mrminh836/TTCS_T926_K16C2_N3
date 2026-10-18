@@ -159,9 +159,6 @@
     const pageSubtitle = isAdmin
       ? 'Tổng quan lịch phân bổ phòng họp và thời gian biểu toàn cơ quan'
       : 'Danh sách các cuộc họp do bạn tổ chức hoặc được mời tham gia';
-    const roleBadgeHtml = isAdmin
-      ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-shield-lock me-1"></i>Toàn doanh nghiệp</span>`
-      : `<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"><i class="bi bi-person-check me-1"></i>Lịch cá nhân (${escapeHtml(currentUser?.fullName || currentUser?.username || 'Nhân viên')})</span>`;
 
     // 3. Render khung giao diện Calendar với trạng thái Loading
     container.innerHTML = `
@@ -172,7 +169,6 @@
             <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
               <h2 class="fw-bold fs-3 text-slate-900 m-0">${escapeHtml(pageTitle)}</h2>
               <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">Tuần ${weekRangeStr}</span>
-              ${roleBadgeHtml}
             </div>
             <p class="text-secondary small m-0">${escapeHtml(pageSubtitle)}</p>
           </div>
