@@ -142,9 +142,9 @@
                       <span class="text-muted small">Mã: <code>EQ-00${eq.id}</code></span>
                       <button
                         type="button"
-                        class="btn btn-outline-primary btn-sm"
-                        onclick="if (typeof openAddModal === 'function') openAddModal();"
-                        title="Đặt phòng có thiết bị này">
+                        class="btn btn-outline-primary btn-sm btn-quick-book-eq"
+                        onclick="if (typeof openAddModalWithEquipment === 'function') openAddModalWithEquipment(${eq.id}); else if (typeof openAddModal === 'function') openAddModal([${eq.id}]);"
+                        title="Đặt phòng kèm thiết bị này">
                         <i class="bi bi-calendar-plus me-1"></i> Đặt lịch dùng
                       </button>
                     </div>
