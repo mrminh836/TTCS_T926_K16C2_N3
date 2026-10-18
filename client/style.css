@@ -292,7 +292,7 @@ body {
   font-weight: 600;
 }
 
-.nav-item {
+.sidebar .nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -306,19 +306,19 @@ body {
   white-space: nowrap;
 }
 
-.nav-item i, .nav-item svg {
+.sidebar .nav-item i, .sidebar .nav-item svg {
   width: 20px;
   font-size: 18px;
   text-align: center;
   flex-shrink: 0;
 }
 
-.nav-item:hover {
+.sidebar .nav-item:hover {
   color: var(--sidebar-text-active);
   background-color: var(--sidebar-item-hover);
 }
 
-.nav-item.active {
+.sidebar .nav-item.active {
   color: #ffffff;
   background-color: var(--sidebar-item-active);
   font-weight: 600;
@@ -8210,6 +8210,82 @@ input[type="password"].is-invalid:focus,
   background: #f8fafc;
   border-color: #cbd5e1;
   color: #0f172a;
+}
+
+/* ========================================================
+   TABS CHUYỂN ĐỔI LỊCH HỌP TRANG HỒ SƠ (STITCH PILL TABS)
+   Loại bỏ hoàn toàn viền đen, nền đen hoặc border thô
+   ======================================================== */
+.profile-tabs-wrapper {
+  margin-bottom: 1.25rem;
+}
+
+.profile-tabs-pill,
+#profile-meeting-tabs {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background: #f1f5f9 !important;
+  padding: 4px !important;
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  list-style: none !important;
+  margin: 0 !important;
+}
+
+.profile-tabs-pill .nav-item,
+#profile-meeting-tabs .nav-item {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+}
+
+.profile-tabs-pill .nav-item:hover,
+#profile-meeting-tabs .nav-item:hover,
+.profile-tabs-pill .nav-item.active,
+#profile-meeting-tabs .nav-item.active {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.profile-tab-btn,
+#profile-meeting-tabs .nav-link {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #64748b !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  padding: 6px 16px !important;
+  border-radius: 7px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  user-select: none !important;
+}
+
+.profile-tab-btn:hover,
+#profile-meeting-tabs .nav-link:hover {
+  color: #0f172a !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  background-color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.profile-tab-btn.active,
+#profile-meeting-tabs .nav-link.active {
+  background: #2563eb !important;
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25) !important;
 }
 
 /* =====================================================

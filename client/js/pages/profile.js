@@ -201,18 +201,20 @@
               </div>
 
               <!-- Tabs chuyển đổi giữa Cuộc họp chủ trì và Cuộc họp được mời -->
-              <ul class="nav nav-pills mb-3 border-bottom pb-2" id="profile-meeting-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active btn-sm" id="tab-hosted-btn" data-bs-toggle="pill" data-bs-target="#tab-hosted-content" type="button" role="tab">
-                    <i class="bi bi-person-workspace me-1"></i> Tôi chủ trì (${myHostedMeetings.length})
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link btn-sm" id="tab-invited-btn" data-bs-toggle="pill" data-bs-target="#tab-invited-content" type="button" role="tab">
-                    <i class="bi bi-envelope-open me-1"></i> Được mời tham gia (${myInvitedMeetings.length})
-                  </button>
-                </li>
-              </ul>
+              <div class="profile-tabs-wrapper mb-3">
+                <ul class="nav nav-pills profile-tabs-pill p-1 m-0" id="profile-meeting-tabs" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link profile-tab-btn active" id="tab-hosted-btn" data-bs-toggle="pill" data-bs-target="#tab-hosted-content" type="button" role="tab">
+                      <i class="bi bi-person-workspace me-1.5"></i> Tôi chủ trì (${myHostedMeetings.length})
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link profile-tab-btn" id="tab-invited-btn" data-bs-toggle="pill" data-bs-target="#tab-invited-content" type="button" role="tab">
+                      <i class="bi bi-envelope-open me-1.5"></i> Được mời tham gia (${myInvitedMeetings.length})
+                    </button>
+                  </li>
+                </ul>
+              </div>
 
               <div class="tab-content" id="profile-meeting-tab-content">
                 <!-- Tab 1: Tôi chủ trì -->
