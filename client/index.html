@@ -26,7 +26,7 @@
   />
 
   <!-- CSS riêng của project -->
-  <link rel="stylesheet" href="style.css?v=1.15" />
+  <link rel="stylesheet" href="style.css?v=1.16" />
 
   <!-- Auth Guard: Bắt buộc đăng nhập qua trang login.html riêng biệt (chuẩn kiến trúc QLNS_QLTKPM) -->
   <script>
@@ -584,7 +584,7 @@
       </div>
 
       <!-- 2. Form Body (Chứa 3 Business sections trọng tâm) -->
-      <form id="meeting-form" class="stitch-form-body" novalidate>
+      <form id="meeting-form" class="stitch-form-body" novalidate onsubmit="event.preventDefault(); if (typeof window.saveMeeting === 'function') window.saveMeeting(event);">
 
         <input
           type="hidden"

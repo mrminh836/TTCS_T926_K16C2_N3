@@ -3945,6 +3945,45 @@ function setupMeetingFormValidationEvents() {
   setupParticipantSelectorEvents();
   // Khởi tạo tính năng tùy chọn cuộc họp lặp định kỳ (Sprint 3)
   setupRecurringOptionsEvents();
+
+  // Đảm bảo Form submit và các nút Hủy/Đóng modal luôn được gắn sự kiện trên mọi trang
+  const form = document.getElementById("meeting-form");
+  if (form && !form._hasGlobalSubmitListener) {
+    form._hasGlobalSubmitListener = true;
+    form.addEventListener("submit", saveMeeting);
+  }
+
+  const cancelButton = document.getElementById("btn-cancel");
+  if (cancelButton && !cancelButton._hasGlobalCancelListener) {
+    cancelButton._hasGlobalCancelListener = true;
+    cancelButton.addEventListener("click", closeMeetingModal);
+  }
+
+  const closeModalButton = document.getElementById("btn-close-modal");
+  if (closeModalButton && !closeModalButton._hasGlobalCloseListener) {
+    closeModalButton._hasGlobalCloseListener = true;
+    closeModalButton.addEventListener("click", closeMeetingModal);
+  }
+
+  const btnSuccessClose = document.getElementById("btn-success-close");
+  if (btnSuccessClose && !btnSuccessClose._hasGlobalSuccessCloseListener) {
+    btnSuccessClose._hasGlobalSuccessCloseListener = true;
+    btnSuccessClose.addEventListener("click", closeMeetingModal);
+  }
+
+  const btnSuccessNew = document.getElementById("btn-success-new");
+  if (btnSuccessNew && !btnSuccessNew._hasGlobalSuccessNewListener) {
+    btnSuccessNew._hasGlobalSuccessNewListener = true;
+    btnSuccessNew.addEventListener("click", openAddModal);
+  }
+
+  // Tự động làm sạch query params vô tình do reload GET form
+  if (window.location.search && window.location.search.includes("meeting_title")) {
+    try {
+      const cleanUrl = window.location.pathname + (window.location.hash || "#/");
+      window.history.replaceState({}, document.title, cleanUrl);
+    } catch (e) {}
+  }
 }
 
 // =====================================================
@@ -8088,6 +8127,8 @@ window.getInitials = getInitials;
 window.getHostColor = getHostColor;
 window.confirmCancelMeeting = confirmCancelMeeting;
 window.showConfirmDialog = showConfirmDialog;
+window.saveMeeting = saveMeeting;
+window.closeMeetingModal = closeMeetingModal;
 window.RoomAPI = RoomAPI;
 window.MeetingAPI = MeetingAPI;
 window.EquipmentAPI = EquipmentAPI;
