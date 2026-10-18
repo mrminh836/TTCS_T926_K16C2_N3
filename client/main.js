@@ -4671,7 +4671,7 @@ function setupRecurringOptionsEvents() {
 // =====================================================
 
 let currentRoomCapFilter = "all";
-let currentOnlyAvailFilter = false;
+let currentOnlyAvailFilter = true;
 let isDropdownRoomView = false;
 
 function calculateRoomAvailability(date, startTime, endTime, editId = null) {
@@ -5160,12 +5160,12 @@ function selectRealtimeRoom(roomId) {
 
 function resetRoomFilters() {
   currentRoomCapFilter = "all";
-  currentOnlyAvailFilter = false;
+  currentOnlyAvailFilter = true;
   document.querySelectorAll("[data-cap-filter]").forEach(b => {
     b.classList.toggle("active", b.getAttribute("data-cap-filter") === "all");
   });
   const btnToggleOnlyAvail = document.getElementById("btn-toggle-only-avail");
-  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.remove("active");
+  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.add("active");
   const idInput = document.getElementById("meeting-id");
   const editId = idInput && idInput.value ? Number(idInput.value) : null;
   renderRealtimeRoomCards(editId);
@@ -6324,19 +6324,20 @@ function syncMeetingRoomOptions() {
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
     const currentVal = roomSelect.value;
-    if (ROOMS.length === 0) {
-      roomSelect.innerHTML = `<option value="">-- Chọn phòng họp --</option>`;
+    const activeRooms = ROOMS.filter(r => r.status === "Active");
+    if (activeRooms.length === 0) {
+      roomSelect.innerHTML = `<option value="">-- Hiện không có phòng họp khả dụng --</option>`;
     } else {
       roomSelect.innerHTML = `
         <option value="">-- Chọn phòng họp --</option>
-        ${ROOMS.map(r => `
-          <option value="${r.id}" ${r.status !== 'Active' ? 'disabled' : ''}>
-            ${escapeHTML(r.name)} (${r.capacity} chỗ)${r.status !== 'Active' ? ' - [' + (r.status === 'Maintenance' ? 'Bảo trì' : 'Tạm ngừng') + ']' : ''}
+        ${activeRooms.map(r => `
+          <option value="${r.id}">
+            ${escapeHTML(r.name)} (${r.capacity} chỗ - ${escapeHTML(r.floor || 'Tầng 1')})
           </option>
         `).join("")}
       `;
 
-      if (currentVal && ROOMS.some(r => r.id === parseInt(currentVal, 10))) {
+      if (currentVal && activeRooms.some(r => r.id === parseInt(currentVal, 10))) {
         roomSelect.value = currentVal;
       }
     }
@@ -6344,15 +6345,16 @@ function syncMeetingRoomOptions() {
 
   const filterRoom = document.getElementById("filter-room");
   if (filterRoom) {
-    const currFilter = filterRoom.value;
-    if (ROOMS.length === 0) {
-      filterRoom.innerHTML = `<option value="">Tất cả phòng họp</option>`;
-    } else {
-      filterRoom.innerHTML = `
-        <option value="">Tất cả phòng họp</option>
-        ${ROOMS.map(r => `<option value="${r.id}">${escapeHTML(r.name)}</option>`).join("")}
-      `;
-      if (currFilter) filterRoom.value = currFilter;
+    const currentFilter = filterRoom.value;
+    const activeRooms = ROOMS.filter(r => r.status === "Active");
+    filterRoom.innerHTML = `
+      <option value="">Tất cả phòng họp</option>
+      ${activeRooms.map(r => `
+        <option value="${r.id}">${escapeHTML(r.name)}</option>
+      `).join("")}
+    `;
+    if (currentFilter && activeRooms.some(r => String(r.id) === currentFilter)) {
+      filterRoom.value = currentFilter;
     }
   }
 }
@@ -6862,14 +6864,14 @@ function openAddModal() {
   const descCount = document.getElementById("desc-char-count");
   if (descCount) descCount.textContent = "0/2000 ký tự";
 
-  // Reset các bộ lọc phòng & view mode về mặc định
+  // Reset các bộ lọc phòng & view mode về mặc định (chỉ phòng còn trống)
   currentRoomCapFilter = "all";
-  currentOnlyAvailFilter = false;
+  currentOnlyAvailFilter = true;
   document.querySelectorAll("[data-cap-filter]").forEach(b => {
     b.classList.toggle("active", b.getAttribute("data-cap-filter") === "all");
   });
   const btnToggleOnlyAvail = document.getElementById("btn-toggle-only-avail");
-  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.remove("active");
+  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.add("active");
 
   // Reset trạng thái nút chọn nhanh ngày (active: today)
   document.querySelectorAll("[data-date-preset]").forEach(b => {
