@@ -113,6 +113,9 @@
         .filter(res => res.status === 'available'); // CHỈ HIỂN THỊ PHÒNG CÒN TRỐNG
     }
 
+    // Danh sách phòng hiển thị ở bảng: nếu đã tìm kiếm thì lấy phòng khả dụng theo khung giờ, ngược lại lấy phòng trống hiện tại
+    const displayedRooms = hasSearched ? availabilityResults.map(res => res.room) : availableRooms;
+
     container.innerHTML = `
       <div class="user-rooms-page">
         <!-- Header -->
@@ -158,70 +161,10 @@
                 </button>
               </div>
             </div>
-
-            ${hasSearched ? `
-              <!-- Kết quả kiểm tra phòng trống -->
-              <div class="mt-4 pt-3 border-top">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="fw-bold text-slate-900">
-                    Phòng còn trống ngày <strong>${searchDate}</strong> (${searchStart} - ${searchEnd}):
-                  </span>
-                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                    <i class="bi bi-check-circle-fill me-1"></i> ${availabilityResults.length} phòng sẵn sàng đặt
-                  </span>
-                </div>
-
-                ${availabilityResults.length === 0 ? `
-                  <div class="alert alert-warning d-flex align-items-center gap-2 mb-0 py-3 rounded-3">
-                    <i class="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0"></i>
-                    <div>
-                      <div class="fw-bold text-slate-900">Không có phòng họp nào còn trống trong khung giờ này</div>
-                      <div class="small text-secondary">Toàn bộ phòng đều đã kín lịch họp hoặc đang trong thời gian bảo trì vào khung giờ ${searchStart} - ${searchEnd} ngày ${searchDate}. Bạn vui lòng chọn khung giờ hoặc ngày khác.</div>
-                    </div>
-                  </div>
-                ` : `
-                  <div class="row g-3">
-                    ${availabilityResults.map(res => {
-                      const r = res.room;
-                      return `
-                        <div class="col-md-6 col-lg-4">
-                          <div class="stitch-card p-3 h-100 d-flex flex-column border-success shadow-sm">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                              <h6 class="fw-bold text-slate-900 m-0">${escapeHtml(r.name)}</h6>
-                              <span class="badge bg-success text-white">
-                                <i class="bi bi-check-circle me-1"></i>Còn trống
-                              </span>
-                            </div>
-
-                            <div class="text-secondary small mb-2">
-                              <span><i class="bi bi-geo-alt me-1 text-primary"></i>${escapeHtml(r.floor || 'Tầng 1')}</span> • 
-                              <span><i class="bi bi-people me-1 text-primary"></i>${r.capacity} chỗ ngồi</span>
-                            </div>
-
-                            <div class="small text-success fw-medium mb-3 flex-grow-1">
-                              ${res.desc}
-                            </div>
-
-                            <div class="mt-auto">
-                              <button
-                                type="button"
-                                class="btn btn-success btn-sm w-100 fw-semibold"
-                                onclick="if (typeof openAddModalWithSelection === 'function') openAddModalWithSelection(${r.id}, '${searchDate}', '${searchStart}', '${searchEnd}'); else if (typeof openAddModal === 'function') openAddModal();">
-                                <i class="bi bi-check-lg me-1"></i> Đặt phòng này ngay
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      `;
-                    }).join('')}
-                  </div>
-                `}
-              </div>
-            ` : ''}
           </div>
         ` : ''}
 
-        <!-- Danh sách tất cả các phòng họp còn trống (Chỉ hiển thị phòng khả dụng) -->
+        <!-- Danh sách phòng họp còn trống -->
         <div class="stitch-card p-4">
           <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
             <div>
@@ -231,9 +174,20 @@
                   <i class="bi bi-shield-check me-1"></i>Sẵn sàng đặt
                 </span>
               </h5>
-              <p class="text-secondary small m-0 mt-1">Chỉ hiển thị các phòng khả dụng (đã tự động ẩn phòng đang bận, phòng bảo trì và ngừng hoạt động)</p>
+              <p class="text-secondary small m-0 mt-1">
+                ${hasSearched 
+                  ? `Khung giờ đang kiểm tra: <strong>${searchDate}</strong> (${searchStart} - ${searchEnd})` 
+                  : `Chỉ hiển thị các phòng khả dụng (đã tự động ẩn phòng đang bận, phòng bảo trì và ngừng hoạt động)`}
+              </p>
             </div>
-            <span class="text-secondary small">Còn trống: <strong>${availableRooms.length}</strong> / ${allRooms.length} phòng</span>
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-secondary small">Còn trống: <strong>${displayedRooms.length}</strong> / ${allRooms.length} phòng</span>
+              ${hasSearched ? `
+                <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2" id="btn-reset-room-filter" title="Xem tất cả phòng">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Đặt lại
+                </button>
+              ` : ''}
+            </div>
           </div>
 
           <div class="table-responsive">
@@ -248,15 +202,21 @@
                 </tr>
               </thead>
               <tbody>
-                ${availableRooms.length === 0 ? `
+                ${displayedRooms.length === 0 ? `
                   <tr>
                     <td colspan="5" class="text-center py-5 text-muted">
                       <i class="bi bi-door-closed text-secondary fs-1 d-block mb-2"></i>
-                      <div class="fw-semibold text-slate-800">Hiện tại không có phòng họp nào còn trống</div>
-                      <div class="small text-secondary mt-1">Tất cả các phòng đều đang có cuộc họp diễn ra, đang bảo trì hoặc tạm ngừng hoạt động.</div>
+                      <div class="fw-semibold text-slate-800">
+                        ${hasSearched ? 'Không có phòng họp nào còn trống trong khung giờ này' : 'Hiện tại không có phòng họp nào còn trống'}
+                      </div>
+                      <div class="small text-secondary mt-1">
+                        ${hasSearched 
+                          ? `Toàn bộ phòng đều đã kín lịch họp hoặc đang bảo trì vào khung giờ ${searchStart} - ${searchEnd} ngày ${searchDate}. Bạn vui lòng chọn khung giờ khác.`
+                          : `Tất cả các phòng đều đang có cuộc họp diễn ra, đang bảo trì hoặc tạm ngừng hoạt động.`}
+                      </div>
                     </td>
                   </tr>
-                ` : availableRooms.map(r => `
+                ` : displayedRooms.map(r => `
                   <tr>
                     <td>
                       <div class="fw-bold text-slate-900">${escapeHtml(r.name)}</div>
@@ -287,7 +247,7 @@
                         <button
                           type="button"
                           class="btn btn-primary stitch-btn-primary btn-sm py-1 px-3 fw-medium"
-                          onclick="if (typeof openAddModalWithSelection === 'function') openAddModalWithSelection(${r.id}); else if (typeof openAddModal === 'function') openAddModal();"
+                          onclick="if (typeof openAddModalWithSelection === 'function') openAddModalWithSelection(${r.id}${hasSearched ? `, '${searchDate}', '${searchStart}', '${searchEnd}'` : ''}); else if (typeof openAddModal === 'function') openAddModal();"
                           title="Đặt lịch phòng này">
                           <i class="bi bi-calendar-plus me-1"></i>Đặt phòng
                         </button>
@@ -303,9 +263,18 @@
       </div>
     `;
 
+    // Gắn sự kiện reset bộ lọc
+    document.getElementById('btn-reset-room-filter')?.addEventListener('click', () => {
+      hasSearched = false;
+      renderRoomsUserPage();
+    });
+
     // Gắn sự kiện bật/tắt widget kiểm tra phòng trống
     document.getElementById('btn-toggle-availability')?.addEventListener('click', () => {
       isCheckingAvailability = !isCheckingAvailability;
+      if (!isCheckingAvailability) {
+        hasSearched = false;
+      }
       renderRoomsUserPage();
     });
 
