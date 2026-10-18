@@ -50,6 +50,19 @@ try {
 let currentStatusFilter = "";
 let currentRoomFilter = "";
 
+function getActiveAuthUser() {
+  if (window.AuthState && typeof window.AuthState.getUser === 'function') {
+    return window.AuthState.getUser();
+  }
+  try {
+    const raw = localStorage.getItem('currentUser') || localStorage.getItem('user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+window.getCurrentUser = getActiveAuthUser;
+
 function getInitials(name) {
   if (!name) return "MP";
   const parts = name.trim().split(" ");
@@ -3684,8 +3697,28 @@ function validateMeetingForm(editId = null) {
   }
 
   // 6. Kiểm tra Người tổ chức (Organizer)
-  const organizerObj = USERS.find(u => u.id === organizerId);
-  if (!organizerId || !organizerObj) {
+  const authUser = getActiveAuthUser();
+  const isAdmin = (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+    ? window.AuthState.isAdmin()
+    : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin');
+
+  let activeOrgId = organizerId;
+  // Nếu là Nhân viên (hoặc không phải Admin), người tổ chức bắt buộc là chính tài khoản đang đăng nhập
+  if (!isAdmin && authUser) {
+    activeOrgId = Number(authUser.userId || authUser.id || activeOrgId);
+  }
+
+  let organizerObj = USERS.find(u => u.id === activeOrgId);
+  if (!organizerObj && authUser) {
+    organizerObj = {
+      id: activeOrgId,
+      name: authUser.fullName || authUser.username || "Thành viên",
+      email: authUser.email || "",
+      department: authUser.department || "Nhân viên"
+    };
+  }
+
+  if (!activeOrgId || !organizerObj) {
     isValid = false;
     if (organizerSelect) organizerSelect.classList.add("has-error", "is-invalid");
   }
@@ -3712,8 +3745,8 @@ function validateMeetingForm(editId = null) {
   }
 
   // Luôn đảm bảo Người tổ chức (Host) có mặt trong danh sách
-  if (organizerId && !participantIds.includes(organizerId)) {
-    participantIds.unshift(organizerId);
+  if (activeOrgId && !participantIds.includes(activeOrgId)) {
+    participantIds.unshift(activeOrgId);
   }
   if (organizerObj && !participants.includes(organizerObj.name)) {
     participants.unshift(organizerObj.name);
@@ -3793,7 +3826,7 @@ function validateMeetingForm(editId = null) {
       timeDisplay: `${startTime} - ${endTime}`,
       roomId,
       roomObj,
-      organizerId,
+      organizerId: activeOrgId,
       organizerObj,
       participants,
       participantIds,
@@ -7069,15 +7102,21 @@ function openAddModal(initialEquipmentIds = []) {
   }
 
   const organizerSelect = document.getElementById("meeting-organizer");
-  const currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
-  const currentUserId = currentUser ? (currentUser.id || currentUser.userId || 1) : 1;
+  const authUser = getActiveAuthUser();
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id || 1) : 1;
+  const isUserAdmin = Boolean(authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin');
+
   if (organizerSelect) {
     organizerSelect.value = String(currentUserId);
     if (!organizerSelect.value && organizerSelect.options.length > 0) {
       organizerSelect.selectedIndex = 0;
     }
+    const groupOrg = document.getElementById("group-organizer");
+    if (groupOrg) {
+      groupOrg.style.display = isUserAdmin ? "" : "none";
+    }
   }
-  const defaultOrgId = Number(organizerSelect && organizerSelect.value ? organizerSelect.value : currentUserId);
+  const defaultOrgId = Number(isUserAdmin ? (organizerSelect && organizerSelect.value ? organizerSelect.value : currentUserId) : currentUserId);
   initParticipantSelector([defaultOrgId], defaultOrgId);
 
   const tagInput = document.getElementById("meeting-tag");

@@ -18,6 +18,20 @@ const createMeeting = async (req, res, next) => {
 
         const meetingData = validation.data;
 
+        // ── Bảo vệ danh tính Người tổ chức (RBAC Organizer Enforcement) ──
+        // Nếu người dùng không phải Admin, người tổ chức (organizerId) BẮT BUỘC là chính người dùng đã đăng nhập (req.user)
+        const userRole = (req.user && req.user.role) ? String(req.user.role).trim().toLowerCase() : '';
+        const tokenUserId = (req.user && (req.user.userId || req.user.id)) ? Number(req.user.userId || req.user.id) : null;
+
+        if (userRole !== 'admin' && tokenUserId) {
+            meetingData.organizerId = tokenUserId;
+            if (!Array.isArray(meetingData.participantIds)) {
+                meetingData.participantIds = [tokenUserId];
+            } else if (!meetingData.participantIds.includes(tokenUserId)) {
+                meetingData.participantIds.push(tokenUserId);
+            }
+        }
+
         // 2. Thực hiện tạo cuộc họp với transaction an toàn
         const result = await Meeting.create(meetingData);
 

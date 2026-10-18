@@ -59,6 +59,14 @@
       } catch (err) {
         console.warn('[AuthState] Không thể ghi vào localStorage:', err);
       }
+      // Dọn sạch mảng meetings cũ trong bộ nhớ để tránh lưu vết dữ liệu của tài khoản trước
+      try {
+        if (typeof window !== 'undefined') {
+          window.meetings = [];
+          if (typeof meetings !== 'undefined') meetings = [];
+        }
+      } catch (e) {}
+
       this.notify('login', user);
       updateHeaderAuthUI();
     },
@@ -71,6 +79,14 @@
       } catch (err) {
         console.warn('[AuthState] Lỗi khi xóa localStorage:', err);
       }
+      // Dọn sạch mảng meetings cũ trong bộ nhớ khi đăng xuất
+      try {
+        if (typeof window !== 'undefined') {
+          window.meetings = [];
+          if (typeof meetings !== 'undefined') meetings = [];
+        }
+      } catch (e) {}
+
       this.notify('logout', { reason });
       updateHeaderAuthUI();
     },
