@@ -497,14 +497,9 @@
       <div class="admin-users-page">
         ${renderAdminSubnav('users')}
         <div class="stitch-card p-4">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h4 class="fw-bold text-slate-900 m-0">Danh sách Tài khoản & Phân quyền Người dùng</h4>
-              <p class="text-secondary small m-0">Đồng bộ từ CSDL MySQL và hệ thống tài khoản nhân viên</p>
-            </div>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
-              <i class="bi bi-shield-check me-1"></i> Quyền Quản trị viên
-            </span>
+          <div class="mb-4">
+            <h4 class="fw-bold text-slate-900 m-0">Danh sách Tài khoản & Phân quyền Người dùng</h4>
+            <p class="text-secondary small m-0 mt-1">Đồng bộ từ CSDL MySQL và hệ thống tài khoản nhân viên</p>
           </div>
 
           <div id="admin-users-table-container">

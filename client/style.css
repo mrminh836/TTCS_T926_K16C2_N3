@@ -7321,20 +7321,7 @@ textarea.form-control {
 }
 
 .admin-view-member-btn {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  padding: 0.45rem 0.85rem;
-  border-radius: 8px;
-  color: var(--slate-700, #334155);
-  border-color: var(--slate-300, #cbd5e1);
-  background-color: #ffffff;
-  transition: all 0.15s ease;
-}
-
-.admin-view-member-btn:hover {
-  background-color: var(--slate-50, #f8fafc);
-  border-color: var(--slate-400, #94a3b8);
-  color: var(--slate-900, #0f172a);
+  display: none !important;
 }
 
 /* 2. KPI Cards đồng nhất, nền trắng, viền nhẹ */
