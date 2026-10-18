@@ -26,7 +26,7 @@
   />
 
   <!-- CSS riêng của project -->
-  <link rel="stylesheet" href="style.css?v=1.12" />
+  <link rel="stylesheet" href="style.css?v=2.0" />
 </head>
 
 <body>
@@ -67,11 +67,31 @@
       </nav>
 
       <div class="header-right d-none d-md-flex align-items-center gap-3">
-        <div class="user-profile-badge">
+        <!-- [AUTH] Nút đăng nhập (hiện khi chưa login) -->
+        <button type="button" id="auth-login-trigger" class="auth-login-btn">
+          <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
+        </button>
+
+        <!-- [AUTH] Badge user (hiện khi đã login) -->
+        <div class="user-profile-badge hidden" tabindex="0" role="button" aria-haspopup="true" aria-label="Menu tài khoản">
           <div class="user-avatar-sm">NA</div>
           <div class="user-info-text">
             <span class="user-name">Nguyễn Văn An</span>
             <span class="user-role">Quản trị viên (Admin)</span>
+          </div>
+          <i class="bi bi-chevron-down auth-badge-chevron"></i>
+
+          <!-- [AUTH] Dropdown menu -->
+          <div id="auth-user-dropdown" class="auth-user-dropdown hidden">
+            <a href="#/profile" id="auth-menu-profile" class="auth-dropdown-item">
+              <i class="bi bi-person-circle"></i>
+              <span>Hồ sơ cá nhân</span>
+            </a>
+            <div class="auth-dropdown-divider"></div>
+            <button type="button" id="auth-menu-logout" class="auth-dropdown-item auth-dropdown-logout">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Đăng xuất</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1428,6 +1448,150 @@
 
     </div>
   </div>
+  <!-- ================= [AUTH] TOAST CONTAINER ================= -->
+  <div id="auth-toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ================= [AUTH] MODAL ĐĂNG NHẬP / ĐĂNG KÝ ================= -->
+  <div id="auth-overlay" class="modal-overlay hidden">
+    <div class="modal auth-modal-card">
+
+      <!-- Header -->
+      <div class="auth-modal-header">
+        <div class="auth-modal-logo">
+          <div class="auth-modal-logo-icon">
+            <i class="bi bi-calendar2-week-fill"></i>
+          </div>
+          <span class="auth-modal-brand">Enterprise Sync</span>
+        </div>
+        <p class="auth-modal-subtitle">Đăng nhập để quản lý cuộc họp doanh nghiệp</p>
+        <button type="button" id="auth-close-btn" class="auth-close-btn" aria-label="Đóng">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tab-group" role="tablist">
+        <button type="button" id="auth-tab-login" class="auth-tab-btn active" role="tab" aria-selected="true">Đăng nhập</button>
+        <button type="button" id="auth-tab-register" class="auth-tab-btn" role="tab" aria-selected="false">Đăng ký</button>
+      </div>
+
+      <!-- Form Body -->
+      <div class="auth-modal-body">
+
+        <!-- Server Error -->
+        <div id="auth-server-error" class="auth-server-error hidden" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span id="auth-server-error-msg">Đã xảy ra lỗi.</span>
+        </div>
+
+        <!-- === LOGIN FORM === -->
+        <form id="auth-login-form" novalidate>
+          <div class="stitch-form-group mb-3">
+            <label for="auth-login-email" class="stitch-label">Email</label>
+            <input type="email" id="auth-login-email" class="form-control stitch-input"
+              placeholder="email@enterprise.vn" autocomplete="email" aria-label="Email" required />
+            <p id="auth-login-email-error" class="auth-field-error hidden"></p>
+          </div>
+
+          <div class="stitch-form-group mb-3">
+            <label for="auth-login-password" class="stitch-label">Mật khẩu</label>
+            <div class="auth-password-wrapper">
+              <input type="password" id="auth-login-password" class="form-control stitch-input"
+                placeholder="Nhập mật khẩu" autocomplete="current-password" aria-label="Mật khẩu" required />
+              <button type="button" class="auth-pw-toggle" data-auth-toggle-pw="auth-login-password" aria-label="Hiện mật khẩu">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <p id="auth-login-password-error" class="auth-field-error hidden"></p>
+          </div>
+
+          <button type="submit" id="auth-login-submit" class="auth-submit-btn">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
+          </button>
+
+          <span class="auth-forgot-link" title="Tính năng sắp ra mắt">Quên mật khẩu?</span>
+        </form>
+
+        <!-- === REGISTER FORM === -->
+        <form id="auth-register-form" class="hidden" novalidate>
+          <div class="stitch-form-group mb-3">
+            <label for="auth-register-name" class="stitch-label">Họ và tên <span class="text-danger">*</span></label>
+            <input type="text" id="auth-register-name" class="form-control stitch-input"
+              placeholder="Nguyễn Văn A" autocomplete="name" aria-label="Họ và tên" maxlength="100" required />
+            <p id="auth-register-name-error" class="auth-field-error hidden"></p>
+          </div>
+
+          <div class="stitch-form-group mb-3">
+            <label for="auth-register-email" class="stitch-label">Email <span class="text-danger">*</span></label>
+            <input type="email" id="auth-register-email" class="form-control stitch-input"
+              placeholder="email@enterprise.vn" autocomplete="email" aria-label="Email" required />
+            <p id="auth-register-email-error" class="auth-field-error hidden"></p>
+          </div>
+
+          <div class="stitch-form-group mb-3">
+            <label for="auth-register-department" class="stitch-label">Phòng ban</label>
+            <select id="auth-register-department" class="form-select stitch-input" aria-label="Phòng ban">
+              <option value="">— Chọn phòng ban —</option>
+              <option value="Quản trị">Quản trị</option>
+              <option value="Kỹ thuật">Kỹ thuật</option>
+              <option value="Thiết kế">Thiết kế</option>
+              <option value="Kiểm thử">Kiểm thử</option>
+              <option value="Quản trị / Manager">Quản trị / Manager</option>
+            </select>
+          </div>
+
+          <div class="stitch-form-group mb-3">
+            <label for="auth-register-password" class="stitch-label">Mật khẩu <span class="text-danger">*</span></label>
+            <div class="auth-password-wrapper">
+              <input type="password" id="auth-register-password" class="form-control stitch-input"
+                placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" aria-label="Mật khẩu" required />
+              <button type="button" class="auth-pw-toggle" data-auth-toggle-pw="auth-register-password" aria-label="Hiện mật khẩu">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <div id="auth-register-strength" class="auth-password-strength"></div>
+            <p id="auth-register-password-error" class="auth-field-error hidden"></p>
+          </div>
+
+          <div class="stitch-form-group mb-3">
+            <label for="auth-register-password2" class="stitch-label">Nhập lại mật khẩu <span class="text-danger">*</span></label>
+            <div class="auth-password-wrapper">
+              <input type="password" id="auth-register-password2" class="form-control stitch-input"
+                placeholder="Nhập lại mật khẩu" autocomplete="new-password" aria-label="Nhập lại mật khẩu" required />
+              <button type="button" class="auth-pw-toggle" data-auth-toggle-pw="auth-register-password2" aria-label="Hiện mật khẩu">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <p id="auth-register-password2-error" class="auth-field-error hidden"></p>
+          </div>
+
+          <button type="submit" id="auth-register-submit" class="auth-submit-btn">
+            <i class="bi bi-person-plus me-1"></i>Tạo tài khoản
+          </button>
+        </form>
+
+        <!-- Mock Info (chỉ hiện khi USE_MOCK = true) -->
+        <div class="auth-mock-info">
+          <div class="auth-mock-info-title">🔑 Tài khoản Demo</div>
+          <div class="auth-mock-account">
+            <span class="auth-mock-email">admin@enterprise.vn</span>
+            <span class="auth-mock-role role-admin">Admin</span>
+          </div>
+          <div class="auth-mock-account">
+            <span class="auth-mock-email">manager@enterprise.vn</span>
+            <span class="auth-mock-role role-manager">Manager</span>
+          </div>
+          <div class="auth-mock-account">
+            <span class="auth-mock-email">employee@enterprise.vn</span>
+            <span class="auth-mock-role role-employee">Employee</span>
+          </div>
+          <div style="font-size:10.5px; color:#64748b; margin-top:6px;">Mật khẩu: <strong>[Role]@123</strong> (ví dụ: Admin@123)</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <div id="print-room-placard-area" class="print-placard-container" aria-hidden="true"></div>
 
 
@@ -1436,8 +1600,17 @@
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
   </script>
 
-  <!-- JavaScript của project -->
-  <script src="main.js?v=1.12"></script>
+  <!-- [AUTH] Fetch wrapper + JWT — PHẢI NẠP TRƯỚC main.js -->
+  <script src="auth.js?v=2.0"></script>
+
+  <!-- JavaScript chính của project -->
+  <script src="main.js?v=2.0"></script>
+
+  <!-- [RBAC] Phân quyền giao diện — nạp SAU main.js -->
+  <script src="rbac.js?v=2.0"></script>
+
+  <!-- [PROFILE] Trang hồ sơ cá nhân — nạp SAU main.js -->
+  <script src="profile.js?v=2.0"></script>
 
 
 </body>

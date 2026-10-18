@@ -232,6 +232,7 @@ const routes = {
   "/rooms": renderAdminRoomsPage,
   "/admin/equipments": renderAdminEquipmentsPage,
   "/equipments": renderAdminEquipmentsPage,
+  "/profile": function() { if (typeof renderProfile === 'function') renderProfile(); else render404(); },
   "/404": render404
 };
 
@@ -274,10 +275,16 @@ function updateActiveNav(route) {
 function router() {
   const route = getCurrentRoute();
 
+  // [AUTH+RBAC] Route guard — Sprint 3
+  if (typeof window.__esRouteGuard === 'function' && !window.__esRouteGuard(route)) return;
+
   const page = routes[route] || render404;
 
   page();
   updateActiveNav(route);
+
+  // [RBAC] Áp dụng phân quyền giao diện sau render — Sprint 3
+  if (typeof window.__esApplyRoleUI === 'function') window.__esApplyRoleUI();
 }
 
 
@@ -6604,8 +6611,11 @@ function openAddModal() {
   }
 
   const organizerSelect = document.getElementById("meeting-organizer");
-  if (organizerSelect) organizerSelect.value = "1";
-  const defaultOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  // [AUTH] Gán organizer mặc định theo user đăng nhập — Sprint 3
+  const _authUser = (typeof AuthManager !== 'undefined') ? AuthManager.getCurrentUser() : null;
+  const _defaultOrgId = _authUser ? String(_authUser.userId) : "1";
+  if (organizerSelect) organizerSelect.value = _defaultOrgId;
+  const defaultOrgId = Number(organizerSelect ? organizerSelect.value : _defaultOrgId);
   initParticipantSelector([defaultOrgId], defaultOrgId);
 
   const tagInput = document.getElementById("meeting-tag");
