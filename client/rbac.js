@@ -448,13 +448,13 @@
         if (room && isRestrictedRoom(room)) {
           if (!can('book_restricted_room')) {
             opt.disabled = true;
-            if (!opt.text.includes('[Khóa')) {
-              opt.text = `🔒 [Khóa - Chỉ Quản trị viên / Trưởng phòng] ${room.name} (${room.capacity} chỗ)`;
+            if (!opt.text.includes('[VIP - Khóa]') && !opt.text.includes('[Khóa')) {
+              opt.text = `[VIP - Khóa] ${room.name} (${room.capacity} chỗ)`;
             }
           } else {
             opt.disabled = false;
             if (!opt.text.includes('[VIP')) {
-              opt.text = `⭐ [VIP / Giới hạn] ${room.name} (${room.capacity} chỗ)`;
+              opt.text = `[VIP] ${room.name} (${room.capacity} chỗ)`;
             }
           }
         }
