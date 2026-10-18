@@ -103,6 +103,59 @@
   box-sizing: border-box;
 }
 
+/* =====================================================
+   ẨN HOÀN TOÀN THANH CUỘN (SCROLLBAR / THANH SLIDE)
+   Ẩn toàn bộ thanh cuộn thô trên tất cả trình duyệt nhưng
+   vẫn giữ 100% khả năng cuộn mượt mà bằng con lăn chuột,
+   touchpad, cảm ứng và phím mũi tên.
+   ===================================================== */
+html,
+body,
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE & Edge cũ */
+}
+
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+div::-webkit-scrollbar,
+nav::-webkit-scrollbar,
+main::-webkit-scrollbar,
+aside::-webkit-scrollbar,
+section::-webkit-scrollbar,
+table::-webkit-scrollbar {
+  display: none !important; /* Chrome, Edge Chromium, Safari, Opera */
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Đảm bảo các container cụ thể như sidebar, main-wrapper, table-responsive cũng ẩn triệt để */
+.sidebar,
+.sidebar-nav,
+.main-wrapper,
+.main-content,
+#page-container,
+.table-responsive,
+.modal-body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.sidebar::-webkit-scrollbar,
+.sidebar-nav::-webkit-scrollbar,
+.main-wrapper::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+#page-container::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+
 body {
   margin: 0;
   font-family: var(--font-family);
