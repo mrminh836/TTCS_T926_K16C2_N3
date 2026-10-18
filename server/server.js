@@ -6,6 +6,7 @@ const cors = require('cors');
 const meetingRoutes = require('./routes/meetingRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const healthRoutes = require('./routes/healthRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/client', express.static(clientPath));
 app.use('/api', meetingRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', healthRoutes);
+app.use('/api', reportRoutes);
 
 // Hỗ trợ trực tiếp các đường dẫn /rooms song song với /api/rooms
 app.use('/', roomRoutes);
