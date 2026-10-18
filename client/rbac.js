@@ -89,18 +89,18 @@
     Attendee: {
       view_home:           true,
       view_meetings:       true,
-      create_meeting:      false, // Nhân viên thường chỉ tham dự và xem lịch
-      edit_own_meeting:    false,
-      edit_any_meeting:    false,
-      cancel_own_meeting:  false,
-      cancel_any_meeting:  false,
-      recurring_meeting:   false,
-      select_equipment:    false,
-      view_admin:          false, // Chặn hoàn toàn khỏi trang quản trị
-      crud_rooms:          false,
-      crud_equipments:     false,
+      create_meeting:      true,  // Nhân viên được phép đặt các phòng họp thông thường (TC_RBAC_VIP_004)
+      edit_own_meeting:    true,  // Được chỉnh sửa cuộc họp do chính mình tạo
+      edit_any_meeting:    false, // Không được sửa cuộc họp của người khác
+      cancel_own_meeting:  true,  // Được hủy cuộc họp do chính mình tạo
+      cancel_any_meeting:  false, // Không được hủy cuộc họp của người khác
+      recurring_meeting:   true,  // Đặt lịch định kỳ phòng thông thường
+      select_equipment:    true,  // Chọn thiết bị cho phòng thông thường
+      view_admin:          false, // Chặn hoàn toàn khỏi trang quản trị hệ thống
+      crud_rooms:          false, // Không được thêm/sửa/xóa phòng
+      crud_equipments:     false, // Không được thêm/sửa/xóa thiết bị
       print_qr:            false,
-      book_restricted_room: false, // Bị chặn đặt phòng VIP
+      book_restricted_room: false, // BỊ KHÓA & CẢNH BÁO: Không có quyền đặt phòng VIP/Giới hạn
       view_profile:        true,
       export_csv:          true
     }
