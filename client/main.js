@@ -440,6 +440,60 @@ function initAppShellEvents() {
       }
     });
   }
+
+  // 6. Global Modal Close Handlers (Hoạt động thống nhất trên tất cả các trang Admin, Meeting, Calendar...)
+  const closeDetailBtn = document.getElementById("btn-close-detail");
+  const closeDetailBottom = document.getElementById("btn-close-detail-bottom");
+  const detailOverlay = document.getElementById("detail-overlay");
+  const closeModalBtn = document.getElementById("btn-close-modal");
+  const cancelBtn = document.getElementById("btn-cancel");
+  const meetingOverlay = document.getElementById("modal-overlay");
+
+  if (closeDetailBtn) {
+    closeDetailBtn.addEventListener("click", () => {
+      if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+    });
+  }
+  if (closeDetailBottom) {
+    closeDetailBottom.addEventListener("click", () => {
+      if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+    });
+  }
+  if (detailOverlay) {
+    detailOverlay.addEventListener("click", (e) => {
+      if (e.target === detailOverlay && typeof window.closeDetailModal === "function") {
+        window.closeDetailModal();
+      }
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+      if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+    });
+  }
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+    });
+  }
+  if (meetingOverlay) {
+    meetingOverlay.addEventListener("click", (e) => {
+      if (e.target === meetingOverlay && typeof window.closeMeetingModal === "function") {
+        window.closeMeetingModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (detailOverlay && !detailOverlay.classList.contains("hidden")) {
+        if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+      } else if (meetingOverlay && !meetingOverlay.classList.contains("hidden")) {
+        if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+      }
+    }
+  });
 }
 
 function router() {
@@ -7405,21 +7459,101 @@ function deleteMeeting(id) {
 // 15. XEM CHI TIẾT
 // =====================================================
 
+// =====================================================
+// 15. XEM CHI TIẾT CUỘC HỌP (ENTERPRISE STITCH SPEC)
+// =====================================================
+
+function formatDetailedDate(dateStr) {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr + "T00:00:00");
+    if (!isNaN(d.getTime())) {
+      const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+      const dayName = days[d.getDay()];
+      const parts = dateStr.split("-");
+      if (parts.length === 3) {
+        return `${dayName}, ${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
+  } catch (e) {}
+  return formatDate(dateStr);
+}
+
+function renderDetailEquipments(meeting) {
+  const eqNames = (meeting.equipmentNames && meeting.equipmentNames.length)
+    ? meeting.equipmentNames
+    : ((meeting.equipmentIds && meeting.equipmentIds.length)
+        ? meeting.equipmentIds.map(eid => {
+            const found = Array.isArray(EQUIPMENTS) ? EQUIPMENTS.find(e => Number(e.id) === Number(eid)) : null;
+            return found ? (found.name || `Thiết bị #${eid}`) : `Thiết bị #${eid}`;
+          })
+        : []);
+
+  if (!eqNames || eqNames.length === 0) {
+    return `<div class="detail-empty-equipment"><i class="bi bi-info-circle me-1.5 text-slate-400"></i>Không yêu cầu thiết bị bổ sung cho cuộc họp này.</div>`;
+  }
+
+  return eqNames.map(name => {
+    const eqObj = (Array.isArray(EQUIPMENTS) ? EQUIPMENTS.find(e => e.name === name) : null) || { name, type: "" };
+    const iconClass = typeof getEquipmentIconClass === "function" ? getEquipmentIconClass(eqObj) : "bi-laptop";
+    return `
+      <div class="detail-equipment-chip">
+        <i class="bi ${iconClass} text-primary"></i>
+        <span>${escapeHTML(name)}</span>
+      </div>
+    `;
+  }).join("");
+}
+
 function openDetailModal(id) {
-
-  const meeting =
-    meetings.find(
-      item => item.id === id
-    );
-
+  const meetingId = Number(id);
+  let meeting = Array.isArray(meetings) ? meetings.find(item => Number(item.id) === meetingId) : null;
+  if (!meeting && window.meetings && Array.isArray(window.meetings)) {
+    meeting = window.meetings.find(item => Number(item.id) === meetingId);
+  }
 
   if (!meeting) {
+    if (typeof MeetingAPI !== "undefined" && typeof fetch === "function") {
+      fetch(`${MEETING_API_URL}/${meetingId}`)
+        .then(r => r.json())
+        .then(json => {
+          if (json && json.data) {
+            const m = json.data;
+            const startD = new Date(m.startTime);
+            const endD = new Date(m.endTime);
+            const dateStr = !isNaN(startD.getTime()) ? startD.toISOString().slice(0, 10) : "";
+            const startHHMM = !isNaN(startD.getTime()) ? startD.toTimeString().slice(0, 5) : "";
+            const endHHMM = !isNaN(endD.getTime()) ? endD.toTimeString().slice(0, 5) : "";
+            const parsed = {
+              id: m.meetingId || m.id,
+              title: m.title || "Cuộc họp",
+              tag: m.isRecurring ? "Định kỳ" : "Thường kỳ",
+              date: dateStr,
+              startTime: startHHMM,
+              endTime: endHHMM,
+              time: `${startHHMM} - ${endHHMM}`,
+              roomId: m.roomId,
+              roomName: m.roomName || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.name) || "Phòng họp",
+              capacity: m.roomCapacity || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.capacity) || 20,
+              organizerId: m.organizerId,
+              host: m.organizerName || "Admin",
+              participants: [m.organizerName || "Admin"],
+              participantIds: [m.organizerId],
+              status: m.bookingStatus ? m.bookingStatus.toLowerCase() : "scheduled",
+              notes: m.description || "",
+              isRecurring: !!m.isRecurring
+            };
+            meetings.push(parsed);
+            openDetailModal(meetingId);
+          }
+        })
+        .catch(() => {});
+    }
     return;
   }
 
-
-  const roomName = meeting.roomName || (meeting.roomId ? (ROOMS.find(r => r.id === meeting.roomId)?.name) : (meeting.location || "Phòng Tokyo (Tầng 4)"));
-  const roomCapacity = meeting.capacity || (meeting.roomId ? (ROOMS.find(r => r.id === meeting.roomId)?.capacity) : 20);
+  const roomName = meeting.roomName || (meeting.roomId ? (ROOMS.find(r => Number(r.id) === Number(meeting.roomId))?.name) : (meeting.location || "Phòng Tokyo (Tầng 4)"));
+  const roomCapacity = meeting.capacity || (meeting.roomId ? (ROOMS.find(r => Number(r.id) === Number(meeting.roomId))?.capacity) : 20);
   const roomId = meeting.roomId || 1;
   const organizerId = meeting.organizerId || 1;
   const organizerName = meeting.host || "Nguyễn Văn An";
@@ -7430,112 +7564,129 @@ function openDetailModal(id) {
     if (meeting.tag === "Quan trọng") tagClass = "tag-danger";
     else if (meeting.tag === "Sprint 24" || meeting.tag === "Dự án mới") tagClass = "tag-primary";
     else if (meeting.tag === "Thiết kế" || meeting.tag === "Tuyển dụng") tagClass = "tag-sky";
-    tagHtml = `<span class="stitch-tag-chip ${tagClass} ms-2">${escapeHTML(meeting.tag)}</span>`;
+    tagHtml = `<span class="stitch-tag-chip ${tagClass}">${escapeHTML(meeting.tag)}</span>`;
   }
 
   const content = document.getElementById("detail-content");
   if (!content) return;
 
   content.innerHTML = `
-    <div class="mb-3 pb-2 border-bottom">
-      <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small fw-medium">MÃ CUỘC HỌP</span>
-        <span class="badge bg-light text-dark border">#${meeting.id}</span>
+    <!-- 1. Hero Title & Metadata Banner -->
+    <div class="detail-hero-banner">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="detail-id-pill">#${meeting.id}</span>
+          <span class="detail-type-badge">
+            <i class="bi ${meeting.isRecurring ? 'bi-repeat text-primary' : 'bi-calendar-check text-muted'} me-1"></i>
+            ${meeting.isRecurring ? 'Lịch họp định kỳ' : 'Cuộc họp thường'}
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          ${tagHtml}
+          <span class="${getStatusClass(meeting.status)}">
+            <span class="status-indicator-dot"></span>
+            <span>${getStatusText(meeting.status)}</span>
+          </span>
+        </div>
       </div>
-      <h5 class="fw-bold text-dark m-0 d-flex align-items-center flex-wrap">
-        ${escapeHTML(meeting.title)}
-        ${tagHtml}
-      </h5>
+      <h4 class="detail-meeting-title">${escapeHTML(meeting.title)}</h4>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <div class="p-2 rounded border bg-light">
-          <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP
-          </span>
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
-            <div class="fw-semibold text-primary cursor-pointer" onclick="closeDetailModal(); openRoomQRModal(${roomId});" title="Nhấp để xem chi tiết phòng &amp; mã QR" style="cursor: pointer;">
-              ${escapeHTML(roomName)} <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
-            </div>
-            ${renderCapacityBadge(roomCapacity, { isPill: true })}
+    <!-- 2. Core 2-Column Metrics Grid: Thời gian & Phòng họp -->
+    <div class="detail-metrics-grid">
+      <!-- Card Thời gian -->
+      <div class="detail-metric-card">
+        <div class="metric-icon-box bg-blue-50">
+          <i class="bi bi-calendar3"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-label">THỜI GIAN HỌP</div>
+          <div class="metric-value-primary">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
+          <div class="metric-subtext">
+            <span class="fw-semibold text-slate-800">${formatDetailedDate(meeting.date)}</span>
+            <span class="metric-duration-pill">${calcDurationString(meeting.startTime, meeting.endTime)}</span>
           </div>
-          <div class="small text-muted mt-1">Định danh: <code>RM-00${roomId}</code></div>
+          ${meeting.isRecurring ? `
+            <div class="metric-recurring-badge mt-2">
+              <i class="bi bi-arrow-repeat me-1"></i>${meeting.occurrenceIndex ? `Phiên họp #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp định kỳ'}
+            </div>
+          ` : ''}
         </div>
       </div>
 
-      <div class="col-12 col-md-6">
-        <div class="p-2 rounded border bg-light">
-          <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-clock-history text-primary me-1"></i> THỜI GIAN HỌP
-          </span>
-          <div class="fw-semibold text-dark">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
-          <div class="small text-muted">Ngày: ${formatDate(meeting.date)} (${calcDurationString(meeting.startTime, meeting.endTime)})</div>
+      <!-- Card Phòng họp -->
+      <div class="detail-metric-card">
+        <div class="metric-icon-box bg-indigo-50">
+          <i class="bi bi-door-open-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-label">PHÒNG HỌP &amp; ĐỊA ĐIỂM</div>
+          <div class="metric-value-primary text-truncate" title="${escapeHTML(roomName)}">${escapeHTML(roomName)}</div>
+          <div class="metric-subtext">
+            <span class="detail-cap-badge"><i class="bi bi-people-fill me-1"></i>${roomCapacity} chỗ</span>
+            <span class="detail-room-code">Định danh: <code>RM-00${roomId}</code></span>
+          </div>
+          <div class="mt-2">
+            <button type="button" class="btn-detail-room-link" onclick="closeDetailModal(); openRoomQRModal(${roomId});">
+              <i class="bi bi-qr-code me-1"></i>Chi tiết phòng &amp; QR <i class="bi bi-box-arrow-up-right ms-0.5"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-person-badge text-primary me-1"></i> NGƯỜI CHỦ TRÌ
-        </span>
-        <div class="fw-medium text-dark">${escapeHTML(organizerName)} <span class="text-muted small">(ID: ${organizerId})</span></div>
+    <!-- 3. Người chủ trì -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-person-badge text-primary me-1.5"></i>
+        <span>NGƯỜI CHỦ TRÌ</span>
       </div>
-
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-shield-check text-success me-1"></i> TRẠNG THÁI
-        </span>
-        <span class="${getStatusClass(meeting.status)}">
-          ${getStatusText(meeting.status)}
-        </span>
+      <div class="detail-host-row">
+        <div class="detail-avatar-circle" style="background: ${getHostColor(organizerName)};">
+          ${getInitials(organizerName)}
+        </div>
+        <div class="detail-host-info">
+          <div class="detail-host-name">${escapeHTML(organizerName)}</div>
+          <div class="detail-host-role">Chủ trì phiên họp • Mã tài khoản ID: ${organizerId}</div>
+        </div>
       </div>
     </div>
 
-    <div class="mb-3">
-      <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small">
-          <i class="bi bi-people text-primary me-1"></i> THÀNH VIÊN THAM GIA
-        </span>
-        <span id="detail-participant-summary-badges" class="small"></span>
+    <!-- 4. Thành viên tham gia -->
+    <div class="detail-section-card">
+      <div class="detail-section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <i class="bi bi-people text-primary me-1.5"></i>
+          <span>THÀNH VIÊN THAM GIA</span>
+        </div>
+        <div id="detail-participant-summary-badges" class="detail-summary-pills"></div>
       </div>
-      <div id="detail-participants-list" class="text-dark small d-flex flex-wrap gap-1">
+      <div id="detail-participants-list" class="detail-participants-grid mt-2">
         ${renderDetailParticipantsHtml(meeting)}
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-arrow-repeat text-primary me-1"></i> LỊCH HỌP ĐỊNH KỲ
-        </span>
-        <div>
-          ${meeting.isRecurring 
-            ? `<span class="badge bg-primary-subtle text-primary border border-primary"><i class="bi bi-arrow-repeat me-1"></i>Có (${meeting.occurrenceIndex ? `Buổi #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp lại định kỳ'})</span>` 
-            : '<span class="badge bg-light text-muted border">Không (Cuộc họp một lần)</span>'}
-        </div>
+    <!-- 5. Thiết bị phòng họp yêu cầu -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-laptop text-primary me-1.5"></i>
+        <span>THIẾT BỊ PHÒNG HỌP YÊU CẦU</span>
       </div>
-
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-laptop text-primary me-1"></i> THIẾT BỊ PHÒNG HỌP
-        </span>
-        <div class="text-dark small">
-          ${(meeting.equipmentNames && meeting.equipmentNames.length) 
-            ? meeting.equipmentNames.map(eq => `<span class="badge bg-light text-dark border me-1">${escapeHTML(eq)}</span>`).join("")
-            : (meeting.equipmentIds && meeting.equipmentIds.length)
-              ? meeting.equipmentIds.map(eid => `<span class="badge bg-light text-dark border me-1">${escapeHTML(EQUIPMENTS.find(e => e.id === eid)?.name || `Thiết bị #${eid}`)}</span>`).join("")
-              : '<span class="text-muted">Không yêu cầu thiết bị bổ sung</span>'}
-        </div>
+      <div class="detail-equipments-wrap mt-2">
+        ${renderDetailEquipments(meeting)}
       </div>
     </div>
 
-    <div>
-      <span class="text-muted small d-block mb-0.5">
-        <i class="bi bi-card-text text-primary me-1"></i> NỘI DUNG CUỘC HỌP
-      </span>
-      <div class="p-2 rounded bg-light border small text-dark">${escapeHTML(meeting.notes || "Không có ghi chú")}</div>
+    <!-- 6. Nội dung cuộc họp -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-card-text text-primary me-1.5"></i>
+        <span>NỘI DUNG CUỘC HỌP</span>
+      </div>
+      <div class="detail-notes-card mt-2">
+        <i class="bi bi-quote detail-quote-icon"></i>
+        <div class="detail-notes-text">${escapeHTML(meeting.notes || "Không có ghi chú bổ sung cho cuộc họp này.")}</div>
+      </div>
     </div>
   `;
 
@@ -7553,11 +7704,11 @@ function openDetailModal(id) {
   if (actionsEl) {
     if (canModify) {
       actionsEl.innerHTML = `
-        <button type="button" class="btn btn-outline-primary btn-sm" onclick="if (typeof closeDetailModal === 'function') closeDetailModal(); openEditModal(${meeting.id});">
-          <i class="bi bi-pencil-square"></i> Chỉnh sửa
+        <button type="button" class="btn btn-outline-primary btn-sm stitch-detail-action-btn" onclick="closeDetailModal(); openEditModal(${meeting.id});">
+          <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
         </button>
-        <button type="button" class="btn btn-danger btn-sm" onclick="confirmCancelMeeting(${meeting.id});">
-          <i class="bi bi-trash3"></i> Hủy cuộc họp
+        <button type="button" class="btn btn-outline-danger btn-sm stitch-detail-action-btn" onclick="confirmCancelMeeting(${meeting.id});">
+          <i class="bi bi-trash3 me-1"></i> Hủy cuộc họp
         </button>
       `;
     } else {
@@ -7565,63 +7716,72 @@ function openDetailModal(id) {
     }
   }
 
-  detailOverlay.classList.remove("hidden");
+  const detailOverlay = document.getElementById("detail-overlay");
+  if (detailOverlay) {
+    detailOverlay.classList.remove("hidden");
+  }
 
   // Truy vấn trực tiếp trạng thái phản hồi của người tham gia từ Backend API
-  MeetingAPI.getParticipants(meeting.id).then(res => {
-    if (res.success && res.data && res.data.participants) {
-      const pListEl = document.getElementById("detail-participants-list");
-      const summaryEl = document.getElementById("detail-participant-summary-badges");
-      if (pListEl && res.data.participants.length > 0) {
-        pListEl.innerHTML = res.data.participants.map(p => {
-          let badgeClass = "bg-warning-subtle text-warning border-warning-subtle";
-          let icon = "bi-clock";
-          let label = "Chờ phản hồi";
-          if (p.responseStatus === "Accepted") {
-            badgeClass = "bg-success-subtle text-success border-success-subtle";
-            icon = "bi-check-circle-fill";
-            label = "Đồng ý";
-          } else if (p.responseStatus === "Declined") {
-            badgeClass = "bg-danger-subtle text-danger border-danger-subtle";
-            icon = "bi-x-circle-fill";
-            label = "Từ chối";
-          } else if (p.responseStatus === "Tentative") {
-            badgeClass = "bg-info-subtle text-info border-info-subtle";
-            icon = "bi-question-circle-fill";
-            label = "Cân nhắc";
-          }
+  if (typeof MeetingAPI !== "undefined" && typeof MeetingAPI.getParticipants === "function") {
+    MeetingAPI.getParticipants(meeting.id).then(res => {
+      if (res.success && res.data && res.data.participants) {
+        const pListEl = document.getElementById("detail-participants-list");
+        const summaryEl = document.getElementById("detail-participant-summary-badges");
+        if (pListEl && res.data.participants.length > 0) {
+          pListEl.innerHTML = res.data.participants.map(p => {
+            let statusBadge = '';
+            if (p.responseStatus === "Accepted") {
+              statusBadge = '<span class="part-status-badge status-accepted"><i class="bi bi-check-circle-fill me-1"></i>Đồng ý</span>';
+            } else if (p.responseStatus === "Declined") {
+              statusBadge = '<span class="part-status-badge status-declined"><i class="bi bi-x-circle-fill me-1"></i>Từ chối</span>';
+            } else if (p.responseStatus === "Tentative") {
+              statusBadge = '<span class="part-status-badge status-tentative"><i class="bi bi-question-circle-fill me-1"></i>Cân nhắc</span>';
+            } else {
+              statusBadge = '<span class="part-status-badge status-pending"><i class="bi bi-clock me-1"></i>Chờ phản hồi</span>';
+            }
 
-          return `
-            <div class="d-inline-flex align-items-center gap-1 border rounded-pill px-2 py-0.5 bg-white small mb-1 shadow-sm">
-              <span class="fw-semibold text-dark">${escapeHTML(p.fullName)}</span>
-              <span class="badge ${badgeClass} border rounded-pill" style="font-size: 10px;">
-                <i class="bi ${icon} me-1"></i>${label}
-              </span>
-            </div>
+            const pInitials = getInitials(p.fullName);
+            const pColor = getHostColor(p.fullName);
+
+            return `
+              <div class="detail-participant-pill">
+                <div class="part-avatar" style="background: ${pColor};">${pInitials}</div>
+                <div class="part-info">
+                  <span class="part-name" title="${escapeHTML(p.fullName)}">${escapeHTML(p.fullName)}</span>
+                  ${statusBadge}
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+        if (summaryEl && res.data.summary) {
+          const s = res.data.summary;
+          summaryEl.innerHTML = `
+            <span class="part-counter-chip chip-accepted"><i class="bi bi-check-circle-fill me-1"></i>${s.accepted} đồng ý</span>
+            <span class="part-counter-chip chip-pending"><i class="bi bi-clock-fill me-1"></i>${s.pending} chờ</span>
+            <span class="part-counter-chip chip-declined"><i class="bi bi-x-circle-fill me-1"></i>${s.declined} từ chối</span>
           `;
-        }).join("");
+        }
       }
-      if (summaryEl && res.data.summary) {
-        const s = res.data.summary;
-        summaryEl.innerHTML = `
-          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill me-1">${s.accepted} đồng ý</span>
-          <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill me-1">${s.declined} từ chối</span>
-          <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">${s.pending} chờ</span>
-        `;
-      }
-    }
-  });
+    }).catch(() => {});
+  }
 }
 
+window.openDetailModal = openDetailModal;
 
 // =====================================================
 // 16. ĐÓNG MODAL
 // =====================================================
 
 function closeMeetingModal() {
-  modalOverlay.classList.add("hidden");
+  const overlay = document.getElementById("modal-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
   clearMeetingFormErrors();
-  closeParticipantDropdown();
+  if (typeof closeParticipantDropdown === "function") {
+    closeParticipantDropdown();
+  }
 
   const form = document.getElementById("meeting-form");
   const successView = document.getElementById("success-view");
@@ -7642,12 +7802,15 @@ function closeMeetingModal() {
   if (recurringInput) recurringInput.checked = false;
   document.querySelectorAll(".eq-checkbox").forEach(cb => { cb.checked = false; });
 }
-
+window.closeMeetingModal = closeMeetingModal;
 
 function closeDetailModal() {
-
-  detailOverlay.classList.add("hidden");
+  const overlay = document.getElementById("detail-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
 }
+window.closeDetailModal = closeDetailModal;
 
 
 // =====================================================
@@ -7655,21 +7818,9 @@ function closeDetailModal() {
 // =====================================================
 
 function formatDate(date) {
-
-  if (!date) {
-    return "";
-  }
-
-
-  const parts =
-    date.split("-");
-
-
-  if (parts.length !== 3) {
-    return date;
-  }
-
-
+  if (!date) return "";
+  const parts = date.split("-");
+  if (parts.length !== 3) return date;
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
@@ -7679,29 +7830,30 @@ function formatDate(date) {
 // =====================================================
 
 function getStatusText(status) {
-
+  if (!status) return "Sắp diễn ra";
+  const s = String(status).trim().toLowerCase();
   const statusMap = {
-
     scheduled: "Sắp diễn ra",
-
+    confirmed: "Sắp diễn ra",
+    active: "Sắp diễn ra",
     "in-progress": "Đang diễn ra",
-
+    inprogress: "Đang diễn ra",
+    ongoing: "Đang diễn ra",
     completed: "Đã hoàn thành",
-
-    cancelled: "Đã hủy"
-
+    cancelled: "Đã hủy",
+    canceled: "Đã hủy",
+    pending: "Chờ xác nhận"
   };
-
-
-  return (
-    statusMap[status] ||
-    "Không xác định"
-  );
+  return statusMap[s] || "Sắp diễn ra";
 }
 
-
 function getStatusClass(status) {
-  return `stitch-status-pill status-${status}`;
+  const s = String(status || "scheduled").trim().toLowerCase();
+  if (s === "confirmed" || s === "scheduled" || s === "active") return "stitch-status-pill status-scheduled";
+  if (s === "in-progress" || s === "inprogress" || s === "ongoing") return "stitch-status-pill status-in-progress";
+  if (s === "completed") return "stitch-status-pill status-completed";
+  if (s === "cancelled" || s === "canceled") return "stitch-status-pill status-cancelled";
+  return `stitch-status-pill status-${s}`;
 }
 
 
@@ -8031,6 +8183,7 @@ window.confirmCancelMeeting = confirmCancelMeeting;
 window.showConfirmDialog = showConfirmDialog;
 window.saveMeeting = saveMeeting;
 window.closeMeetingModal = closeMeetingModal;
+window.closeDetailModal = closeDetailModal;
 window.RoomAPI = RoomAPI;
 window.MeetingAPI = MeetingAPI;
 window.EquipmentAPI = EquipmentAPI;

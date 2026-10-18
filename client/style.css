@@ -3755,40 +3755,493 @@ textarea.form-control {
   }
 }
 
-/* Detail Modal Styles (Giữ nguyên tương thích) */
-.modal-header-custom {
+/* =====================================================
+   MEETING DETAIL MODAL (ENTERPRISE STITCH SPEC)
+   ===================================================== */
+#detail-overlay .meeting-detail-card {
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.6);
+  overflow: hidden !important;
+  padding: 0 !important;
+  animation: cardScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#detail-overlay .stitch-modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  flex-shrink: 0;
 }
 
-.modal h3 {
-  margin: 0;
-  color: #5b6ee1;
-  font-size: 1.25rem;
-}
-
-.modal-actions {
+#detail-overlay .stitch-detail-body {
+  overflow-y: auto !important;
+  flex: 1 1 auto;
+  padding: 22px 24px;
+  background: #f8fafc;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 22px;
+  flex-direction: column;
+  gap: 14px;
 }
 
+#detail-overlay .stitch-detail-body::-webkit-scrollbar {
+  width: 6px;
+}
+#detail-overlay .stitch-detail-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+#detail-overlay .stitch-detail-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+#detail-overlay .stitch-detail-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
 
-/* ==========================================
-   DETAIL
-========================================== */
+/* Hero Title Card */
+.detail-hero-banner {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
 
-#detail-content p {
+.detail-id-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1e293b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.detail-type-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+}
+
+.detail-meeting-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.35;
+  margin: 8px 0 0 0;
+  word-break: break-word;
+}
+
+/* 2-Column Metrics Highlight Grid */
+.detail-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.detail-metric-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.detail-metric-card .metric-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.metric-icon-box.bg-blue-50 {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.metric-icon-box.bg-indigo-50 {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.detail-metric-card .metric-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.metric-label {
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.metric-value-primary {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.metric-subtext {
+  font-size: 0.82rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.metric-duration-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.metric-recurring-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: #0369a1;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.detail-cap-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.detail-room-code {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.detail-room-code code {
+  color: #e11d48;
+  background: #fff1f2;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.btn-detail-room-link {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-detail-room-link:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+/* Sections */
+.detail-section-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.detail-section-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   margin-bottom: 10px;
-
-  line-height: 1.5;
 }
 
-#detail-content strong {
-  color: #5b6ee1;
+/* Host Row */
+.detail-host-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-host-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.detail-host-role {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* Participants Grid & Pills */
+.detail-summary-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.part-counter-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.part-counter-chip.chip-accepted {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.part-counter-chip.chip-pending {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.part-counter-chip.chip-declined {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.detail-participants-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-participant-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.detail-participant-pill .part-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detail-participant-pill .part-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-participant-pill .part-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.part-status-badge {
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 1.5px 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.part-status-badge.status-accepted {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.part-status-badge.status-pending {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.part-status-badge.status-declined {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.part-status-badge.status-tentative {
+  background: #f0f9ff;
+  color: #0284c7;
+}
+
+/* Equipments Grid */
+.detail-equipments-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-equipment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.80rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.detail-empty-equipment {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* Notes Card */
+.detail-notes-card {
+  position: relative;
+  background: #f8fafc;
+  border-left: 3px solid #3b82f6;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+}
+
+.detail-quote-icon {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  opacity: 0.4;
+}
+
+.detail-notes-text {
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Footer Buttons */
+#detail-overlay .stitch-modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.stitch-detail-action-btn {
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+
+.stitch-btn-close-detail {
+  padding: 6px 18px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+  #detail-overlay .meeting-detail-card {
+    max-width: 95%;
+    max-height: 94vh !important;
+  }
+  .detail-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  #detail-overlay .stitch-detail-body {
+    padding: 16px;
+    gap: 12px;
+  }
+  #detail-overlay .stitch-modal-footer {
+    padding: 12px 16px;
+    flex-direction: column-reverse;
+  }
+  #detail-overlay .stitch-modal-footer button,
+  #detail-overlay #detail-permission-actions {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 

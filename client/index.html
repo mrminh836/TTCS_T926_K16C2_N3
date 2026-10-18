@@ -530,6 +530,7 @@
           type="button"
           id="btn-close-modal"
           class="stitch-close-btn"
+          onclick="closeMeetingModal()"
           aria-label="Đóng modal">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -1106,7 +1107,8 @@
           <button
             type="button"
             id="btn-cancel"
-            class="btn btn-outline-secondary stitch-btn-cancel">
+            class="btn btn-outline-secondary stitch-btn-cancel"
+            onclick="closeMeetingModal()">
             Hủy
           </button>
 
@@ -1148,6 +1150,7 @@
           type="button"
           id="btn-close-detail"
           class="stitch-close-btn"
+          onclick="closeDetailModal()"
           aria-label="Đóng">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -1155,14 +1158,15 @@
 
       <div id="detail-content" class="stitch-detail-body"></div>
 
-      <div class="stitch-modal-footer" id="detail-modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+      <div class="stitch-modal-footer" id="detail-modal-footer">
         <div class="d-flex align-items-center gap-2" id="detail-permission-actions">
           <!-- Các nút theo quyền (Chỉnh sửa, Hủy cuộc họp) sẽ được hiển thị bằng JavaScript -->
         </div>
         <button
           type="button"
           id="btn-close-detail-bottom"
-          class="btn btn-secondary">
+          class="btn btn-secondary stitch-btn-close-detail"
+          onclick="closeDetailModal()">
           Đóng
         </button>
       </div>
