@@ -96,12 +96,30 @@
           <span>Thiết bị</span>
         </a>
 
-        <div class="nav-section-title" id="nav-section-admin-title">HỆ THỐNG</div>
-        <a href="#/admin" class="nav-item" id="nav-admin-link" data-nav-path="/admin">
-          <i class="bi bi-shield-lock-fill"></i>
-          <span>Quản trị</span>
-          <span class="nav-item-badge badge-admin">Admin</span>
-        </a>
+        <div class="nav-section-title" id="nav-section-admin-title">QUẢN TRỊ HỆ THỐNG</div>
+        <div id="admin-nav-group" class="admin-nav-group">
+          <a href="#/admin" class="nav-item nav-admin-item" id="nav-admin-link" data-nav-path="/admin" title="Tổng quan chỉ số và điều hành">
+            <i class="bi bi-speedometer2"></i>
+            <span>Tổng quan Admin</span>
+            <span class="nav-item-badge badge-admin">Admin</span>
+          </a>
+          <a href="#/admin/rooms" class="nav-item nav-admin-item" id="nav-admin-rooms" data-nav-path="/admin/rooms" title="Cấu hình phòng họp, sức chứa & QR check-in">
+            <i class="bi bi-door-open-fill"></i>
+            <span>Quản lý Phòng họp</span>
+          </a>
+          <a href="#/admin/equipment" class="nav-item nav-admin-item" id="nav-admin-equipment" data-nav-path="/admin/equipment" title="Quản lý trang thiết bị kỹ thuật & bảo trì">
+            <i class="bi bi-tools"></i>
+            <span>Quản lý Thiết bị</span>
+          </a>
+          <a href="#/admin/users" class="nav-item nav-admin-item" id="nav-admin-users" data-nav-path="/admin/users" title="Quản lý tài khoản nhân viên & phân quyền">
+            <i class="bi bi-people-fill"></i>
+            <span>Quản lý Người dùng</span>
+          </a>
+          <a href="#/admin/reports" class="nav-item nav-admin-item" id="nav-admin-reports" data-nav-path="/admin/reports" title="Báo cáo mật độ sử dụng & xuất dữ liệu">
+            <i class="bi bi-pie-chart-fill"></i>
+            <span>Báo cáo &amp; Thống kê</span>
+          </a>
+        </div>
       </nav>
 
       <div class="sidebar-footer">

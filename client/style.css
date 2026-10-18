@@ -7184,6 +7184,334 @@ textarea.form-control {
   border-color: #cbd5e1;
 }
 
+/* =====================================================
+   ENTERPRISE SAAS ADMIN DASHBOARD STYLES (REFACTORED)
+   Scope: .admin-dashboard-page & .admin-*
+   ===================================================== */
+.admin-dashboard-page {
+  animation: adminFadeIn 0.2s ease-in-out;
+}
+
+@keyframes adminFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 1. Header tinh gọn, chuẩn SaaS */
+.admin-page-header {
+  padding-bottom: 0.25rem;
+}
+
+.admin-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-900, #0f172a);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.admin-page-subtitle {
+  font-size: 0.875rem;
+  color: var(--slate-500, #64748b);
+  margin-top: 0.25rem;
+}
+
+.admin-view-member-btn {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  color: var(--slate-700, #334155);
+  border-color: var(--slate-300, #cbd5e1);
+  background-color: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.admin-view-member-btn:hover {
+  background-color: var(--slate-50, #f8fafc);
+  border-color: var(--slate-400, #94a3b8);
+  color: var(--slate-900, #0f172a);
+}
+
+/* 2. KPI Cards đồng nhất, nền trắng, viền nhẹ */
+.admin-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200, #e2e8f0);
+  border-radius: 12px;
+  padding: 1.125rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.admin-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -2px rgba(15, 23, 42, 0.08);
+  border-color: var(--slate-300, #cbd5e1);
+}
+
+.admin-kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.admin-kpi-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--slate-500, #64748b);
+  letter-spacing: 0.01em;
+}
+
+.admin-kpi-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--slate-50, #f8fafc);
+  border: 1px solid var(--slate-100, #f1f5f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.admin-kpi-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--slate-900, #0f172a);
+  line-height: 1.2;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-kpi-subtext {
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  line-height: 1.3;
+}
+
+/* 3. Panel Cards */
+.admin-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.admin-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--slate-100, #f1f5f9);
+  background: #ffffff;
+}
+
+.admin-card-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--slate-900, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.admin-card-action-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary, #2563eb);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: gap 0.15s ease, color 0.15s ease;
+}
+
+.admin-card-action-link:hover {
+  color: #1d4ed8;
+  gap: 0.4rem;
+}
+
+.admin-card-body {
+  padding: 1.25rem;
+}
+
+/* 4. Table Lịch họp gần đây chuẩn SaaS */
+.admin-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.admin-table thead th {
+  background-color: var(--slate-50, #f8fafc) !important;
+  color: var(--slate-500, #64748b) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 0.65rem 0.65rem !important;
+  border-bottom: 1px solid var(--slate-200, #e2e8f0) !important;
+  border-top: none !important;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 0.65rem 0.65rem !important;
+  font-size: 0.8125rem !important;
+  border-bottom: 1px solid var(--slate-100, #f1f5f9) !important;
+  color: var(--slate-700, #334155);
+  background-color: #ffffff;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover td {
+  background-color: var(--slate-50, #f8fafc) !important;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.admin-user-avatar-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.admin-room-icon-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #eff6ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.admin-btn-action {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--slate-600, #475569);
+  border-color: var(--slate-200, #e2e8f0);
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.admin-btn-action:hover {
+  background: var(--slate-100, #f1f5f9);
+  color: var(--slate-900, #0f172a);
+  border-color: var(--slate-300, #cbd5e1);
+}
+
+/* 5. Quick Links Item */
+.admin-quick-link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.875rem;
+  border-radius: 8px;
+  border: 1px solid var(--slate-100, #f1f5f9);
+  background: #ffffff;
+  text-decoration: none;
+  color: var(--slate-800, #1e293b);
+  transition: all 0.15s ease;
+}
+
+.admin-quick-link-item:hover {
+  background: var(--slate-50, #f8fafc);
+  border-color: var(--slate-200, #e2e8f0);
+  color: var(--slate-900, #0f172a);
+  transform: translateX(2px);
+}
+
+.admin-quick-link-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* 6. Status Breakdown Grid & Alerts */
+.admin-status-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.admin-status-breakdown-item {
+  padding: 0.625rem 0.5rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.admin-progress-bar {
+  height: 6px;
+  background-color: var(--slate-100, #f1f5f9);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.admin-alert-banner {
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.alert-warning-soft {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  color: #92400e;
+}
+
+.alert-success-soft {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  color: #166534;
+}
+
+/* 7. Mini Room List in Sidebar Card */
+.admin-mini-room-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--slate-100, #f1f5f9);
+}
+
+.admin-mini-room-item:last-child {
+  border-bottom: none;
+}
+
+
 
 
 
