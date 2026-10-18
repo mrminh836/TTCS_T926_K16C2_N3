@@ -18,6 +18,35 @@ let USERS = [];
 let EQUIPMENTS = [];
 let meetings = [];
 
+// Đồng bộ 2 chiều với window scope để các module trang truy cập dữ liệu mới nhất
+try {
+  Object.defineProperty(window, 'ROOMS', {
+    get() { return ROOMS; },
+    set(v) { ROOMS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'USERS', {
+    get() { return USERS; },
+    set(v) { USERS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'EQUIPMENTS', {
+    get() { return EQUIPMENTS; },
+    set(v) { EQUIPMENTS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'meetings', {
+    get() { return meetings; },
+    set(v) { meetings = v; },
+    configurable: true
+  });
+} catch (e) {
+  window.ROOMS = ROOMS;
+  window.USERS = USERS;
+  window.EQUIPMENTS = EQUIPMENTS;
+  window.meetings = meetings;
+}
+
 let currentStatusFilter = "";
 let currentRoomFilter = "";
 
@@ -220,46 +249,130 @@ const roomDeleteOverlay = document.getElementById("room-delete-overlay");
 
 
 // =====================================================
-// 3. ROUTER
+// 3. ROUTER & ĐIỀU HƯỚNG TRANG NÂNG CAO (SPA ROUTER)
 // =====================================================
+
+// Xuất các hàm render sang window để router.js và các page modules sử dụng
+window.renderHome = renderHome;
+window.renderMeetingsPage = renderMeetingsPage;
+window.renderAdminRoomsPage = renderAdminRoomsPage;
+window.renderAdminEquipmentsPage = renderAdminEquipmentsPage;
+window.render404 = render404;
+
+function registerAppRoutes() {
+  if (!window.AppRouter) return;
+
+  // 1. Routes dành cho Người dùng (Bắt buộc xác thực requireAuth theo chuẩn QLNS_QLTKPM)
+  AppRouter.add('/', renderHome, { title: 'Trang chủ - Dashboard', requireAuth: true });
+  AppRouter.add('/home', renderHome, { title: 'Trang chủ - Dashboard', requireAuth: true });
+  AppRouter.add('/meetings', () => {
+    if (window.handleMeetingsRoute) window.handleMeetingsRoute();
+    else renderMeetingsPage();
+  }, { title: 'Danh sách Cuộc họp', requireAuth: true });
+
+  AppRouter.add('/meetings/create', () => {
+    if (window.handleMeetingCreateRoute) window.handleMeetingCreateRoute();
+    else {
+      renderMeetingsPage();
+      setTimeout(() => { if (typeof openAddModal === 'function') openAddModal(); }, 100);
+    }
+  }, { title: 'Tạo Cuộc họp Mới', requireAuth: true });
+
+  AppRouter.add('/meetings/:id', (params) => {
+    if (window.handleMeetingDetailRoute) window.handleMeetingDetailRoute(params);
+    else {
+      renderMeetingsPage();
+      setTimeout(() => { if (typeof openDetailModal === 'function') openDetailModal(Number(params.id)); }, 100);
+    }
+  }, { title: 'Chi tiết Cuộc họp', requireAuth: true });
+
+  AppRouter.add('/calendar', () => {
+    if (window.renderCalendarPage) window.renderCalendarPage();
+    else renderMeetingsPage();
+  }, { title: 'Lịch họp Doanh nghiệp', requireAuth: true });
+
+  AppRouter.add('/rooms', () => {
+    if (window.renderRoomsUserPage) window.renderRoomsUserPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Tra cứu Phòng họp', requireAuth: true });
+
+  AppRouter.add('/equipment', () => {
+    if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
+    else renderAdminEquipmentsPage();
+  }, { title: 'Danh mục Trang thiết bị', requireAuth: true });
+
+  AppRouter.add('/equipments', () => {
+    if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
+    else renderAdminEquipmentsPage();
+  }, { title: 'Danh mục Trang thiết bị', requireAuth: true });
+
+  AppRouter.add('/profile', () => {
+    if (window.renderProfilePage) window.renderProfilePage();
+    else renderHome();
+  }, { title: 'Hồ sơ cá nhân', requireAuth: true });
+
+  // Route Đăng nhập chuyên dụng
+  AppRouter.add('/login', () => {
+    window.location.href = 'login.html';
+  }, { title: 'Đăng nhập hệ thống' });
+
+  // 2. Routes dành riêng cho Quản trị viên (Admin)
+  AppRouter.add('/admin', () => {
+    if (window.renderAdminDashboardPage) window.renderAdminDashboardPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Tổng quan Quản trị', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/admin/rooms', renderAdminRoomsPage, { title: 'Quản lý Phòng họp (Admin)', requireAuth: true, requireAdmin: true });
+  AppRouter.add('/admin/equipment', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAuth: true, requireAdmin: true });
+  AppRouter.add('/admin/equipments', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/admin/users', () => {
+    if (window.renderAdminUsersPage) window.renderAdminUsersPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Quản lý Người dùng (Admin)', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/admin/reports', () => {
+    if (window.renderAdminReportsPage) window.renderAdminReportsPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Báo cáo & Thống kê (Admin)', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/404', render404, { title: '404 - Không tìm thấy' });
+}
+
+// Khởi chạy đăng ký routes
+registerAppRoutes();
 
 const routes = {
   "/": renderHome,
   "/home": renderHome,
   "/meetings": renderMeetingsPage,
-  "/admin": renderAdminRoomsPage,
+  "/calendar": () => (window.renderCalendarPage ? window.renderCalendarPage() : renderMeetingsPage()),
+  "/rooms": () => (window.renderRoomsUserPage ? window.renderRoomsUserPage() : renderAdminRoomsPage()),
+  "/equipment": () => (window.renderEquipmentUserPage ? window.renderEquipmentUserPage() : renderAdminEquipmentsPage()),
+  "/equipments": () => (window.renderEquipmentUserPage ? window.renderEquipmentUserPage() : renderAdminEquipmentsPage()),
+  "/profile": () => (window.renderProfilePage ? window.renderProfilePage() : renderHome()),
+  "/admin": () => (window.renderAdminDashboardPage ? window.renderAdminDashboardPage() : renderAdminRoomsPage()),
   "/admin/rooms": renderAdminRoomsPage,
-  "/rooms": renderAdminRoomsPage,
+  "/admin/equipment": renderAdminEquipmentsPage,
   "/admin/equipments": renderAdminEquipmentsPage,
-  "/equipments": renderAdminEquipmentsPage,
+  "/admin/users": () => (window.renderAdminUsersPage ? window.renderAdminUsersPage() : renderAdminRoomsPage()),
+  "/admin/reports": () => (window.renderAdminReportsPage ? window.renderAdminReportsPage() : renderAdminRoomsPage()),
   "/404": render404
 };
 
-
 function getCurrentRoute() {
   const hash = window.location.hash;
-
-  if (!hash || hash === "#") {
-    return "/";
-  }
-
+  if (!hash || hash === "#") return "/";
   return hash.substring(1);
 }
 
-
 function updateActiveNav(route) {
   const navLinks = document.querySelectorAll(".nav-link-custom");
-
   navLinks.forEach((link) => {
     const href = link.getAttribute("href");
     const linkRoute = href ? href.replace("#", "") : "";
-
-    const isHome =
-      (route === "/" || route === "/home") &&
-      (linkRoute === "/" || linkRoute === "/home");
-    const isAdmin =
-      (route.startsWith("/admin") || route === "/rooms" || route === "/equipments") &&
-      linkRoute === "/admin";
+    const isHome = (route === "/" || route === "/home") && (linkRoute === "/" || linkRoute === "/home");
+    const isAdmin = route.startsWith("/admin") && linkRoute === "/admin";
     const isMatch = route === linkRoute;
 
     if (isHome || isAdmin || isMatch) {
@@ -270,115 +383,259 @@ function updateActiveNav(route) {
   });
 }
 
+function initAppShellEvents() {
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = document.getElementById("sidebar-toggle-btn");
+  const toggleIcon = document.getElementById("sidebar-toggle-icon");
+  const mobileBtn = document.getElementById("mobile-menu-btn");
+  const backdrop = document.getElementById("sidebar-backdrop");
+  const userProfileBtn = document.getElementById("user-profile-btn");
+  const userDropdown = document.getElementById("user-dropdown");
+  const notificationsBtn = document.getElementById("notifications-btn");
+  const quickSearch = document.getElementById("header-quick-search");
+
+  // 1. Thu gọn / mở rộng Sidebar trên Desktop
+  if (toggleBtn && sidebar) {
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      const isCollapsed = sidebar.classList.contains("collapsed");
+      if (toggleIcon) {
+        toggleIcon.className = isCollapsed ? "bi bi-chevron-right" : "bi bi-chevron-left";
+      }
+    });
+  }
+
+  // 2. Mở / đóng Sidebar trên Mobile
+  if (mobileBtn && sidebar && backdrop) {
+    mobileBtn.addEventListener("click", () => {
+      sidebar.classList.add("mobile-open");
+      backdrop.classList.add("show");
+    });
+
+    backdrop.addEventListener("click", () => {
+      sidebar.classList.remove("mobile-open");
+      backdrop.classList.remove("show");
+    });
+  }
+
+  // 3. Dropdown người dùng
+  if (userProfileBtn && userDropdown) {
+    userProfileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
+        userDropdown.classList.remove("show");
+      }
+    });
+  }
+
+  // 4. Notifications
+  if (notificationsBtn) {
+    notificationsBtn.addEventListener("click", () => {
+      if (typeof window.showToast === "function") {
+        window.showToast("Trung tâm thông báo: Bạn không có thông báo mới.", "info");
+      }
+    });
+  }
+
+  // 5. Quick search in header
+  if (quickSearch) {
+    quickSearch.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const q = quickSearch.value.trim();
+        if (q) {
+          window.location.hash = `#/meetings?q=${encodeURIComponent(q)}`;
+        }
+      }
+    });
+  }
+}
 
 function router() {
+  if (window.AppRouter) {
+    window.AppRouter.handleRouteChange();
+    return;
+  }
   const route = getCurrentRoute();
-
   const page = routes[route] || render404;
-
   page();
   updateActiveNav(route);
 }
 
-
 window.addEventListener("hashchange", router);
-document.addEventListener("DOMContentLoaded", router);
-
-
-// =====================================================
-// 4. HOME
-// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+  initAppShellEvents();
+  router();
+});
 
 // =====================================================
 // 4. HOME (ENTERPRISE HERO LANDING)
 // =====================================================
 
 function renderHome() {
-
   const totalCount = meetings.length;
   const scheduledCount = meetings.filter(m => m.status === "scheduled").length;
+  const inProgressCount = meetings.filter(m => m.status === "in-progress").length;
+  const user = window.AuthState ? window.AuthState.getUser() : null;
+  const userName = user ? (user.fullName || user.username) : "bạn";
+
+  // Lấy các cuộc họp sắp tới gần nhất (tối đa 5 cuộc họp)
+  const upcomingMeetings = meetings
+    .filter(m => m.status === "scheduled" || m.status === "in-progress")
+    .slice(0, 5);
 
   app.innerHTML = `
-    <section class="page home-page-enterprise">
+    <div class="page home-dashboard-page">
 
-      <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        <span>Enterprise Sync • Meeting Suite SaaS</span>
-      </div>
-
-      <h1 class="hero-title">
-        Tối ưu hóa Lịch họp & Phân bổ Tài nguyên Thông minh
-      </h1>
-
-      <p class="hero-subtitle">
-        Giải pháp doanh nghiệp điều phối phòng họp, trang thiết bị và thời gian tự động, loại bỏ 100% tình trạng đặt trùng phòng với cơ chế Row-Lock độc quyền.
-      </p>
-
-      <div class="hero-actions">
-        <a href="#/meetings" class="btn btn-primary stitch-btn-submit hero-btn-main">
-          <i class="bi bi-calendar3 me-2"></i> Vào Quản lý cuộc họp
-        </a>
-
-        <a href="#/admin" class="btn btn-outline-primary stitch-btn-export hero-btn-sub">
-          <i class="bi bi-shield-lock-fill me-1"></i> Quản trị hệ thống (Admin)
-        </a>
-      </div>
-
-      <div class="hero-metrics-strip mt-5">
-        <div class="hero-metric-item">
-          <div class="hero-metric-number">${totalCount}</div>
-          <div class="hero-metric-label">Cuộc họp trong hệ thống</div>
+      <!-- Page Header Chuẩn QLNS_QLTKPM -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <nav class="breadcrumb">
+            <span class="breadcrumb-item"><a href="#/">Trang chủ</a></span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Tổng quan</span>
+          </nav>
+          <h1 class="page-header-title">Xin chào, ${escapeHTML(userName)}! 👋</h1>
+          <p class="page-header-subtitle">Tổng quan lịch làm việc và các cuộc họp sắp diễn ra của bạn</p>
         </div>
-        <div class="hero-metric-divider"></div>
-        <div class="hero-metric-item">
-          <div class="hero-metric-number text-primary">${scheduledCount}</div>
-          <div class="hero-metric-label">Sắp diễn ra tuần này</div>
-        </div>
-        <div class="hero-metric-divider"></div>
-        <div class="hero-metric-item">
-          <div class="hero-metric-number text-success">100%</div>
-          <div class="hero-metric-label">Chống xung đột lịch trùng</div>
+
+        <div class="page-header-actions">
+          <a href="#/rooms" class="btn btn-secondary btn-sm">
+            <i class="bi bi-door-closed"></i>
+            <span>Tra cứu phòng</span>
+          </a>
+
+          <button type="button" class="btn btn-primary btn-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
+            <i class="bi bi-plus-lg"></i>
+            <span>+ Tạo cuộc họp mới</span>
+          </button>
         </div>
       </div>
 
-      <div class="features-grid mt-5">
-        <div class="feature-card">
-          <div class="feature-icon feature-blue">
-            <i class="bi bi-shield-check"></i>
+      <!-- Stats Grid: 3 Thẻ Chỉ số Chuẩn QLNS_QLTKPM -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Cuộc họp sắp tới</span>
+            <span class="stat-value text-primary">${scheduledCount}</span>
+            <span class="stat-meta"><i class="bi bi-clock-history text-primary"></i> Phiên họp cần chuẩn bị</span>
           </div>
-          <h3 class="feature-title">Chống Đặt Trùng Lịch</h3>
-          <p class="feature-desc">Cơ chế Khóa dòng (FOR UPDATE) chống xung đột Race Condition, bảo đảm an toàn dữ liệu 100%.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon feature-sky">
-            <i class="bi bi-cpu"></i>
-          </div>
-          <h3 class="feature-title">Quản Lý Phòng &amp; Thiết Bị</h3>
-          <p class="feature-desc">Theo dõi trực quan trạng thái sức chứa phòng họp, máy chiếu, màn hình TV và thiết bị kèm theo.</p>
-          <div class="mt-2 d-flex align-items-center gap-3">
-            <a href="#/admin" class="text-primary fw-semibold small text-decoration-none">
-              Trung tâm Quản trị Admin &rarr;
-            </a>
+          <div class="stat-icon icon-blue">
+            <i class="bi bi-calendar-check"></i>
           </div>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon feature-emerald">
-            <i class="bi bi-arrow-repeat"></i>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Phòng họp khả dụng</span>
+            <span class="stat-value text-success">${(window.ROOMS || []).length} phòng</span>
+            <span class="stat-meta"><i class="bi bi-check-circle text-success"></i> Sẵn sàng đặt lịch</span>
           </div>
-          <h3 class="feature-title">Đồng Bộ & Báo Cáo</h3>
-          <p class="feature-desc">Tích hợp chuẩn hóa Google Calendar, Microsoft 365, thống kê tần suất và xuất báo cáo trực quan.</p>
+          <div class="stat-icon icon-green">
+            <i class="bi bi-door-open"></i>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Tổng số cuộc họp</span>
+            <span class="stat-value text-dark">${totalCount}</span>
+            <span class="stat-meta"><i class="bi bi-layers text-secondary"></i> Toàn bộ hệ thống</span>
+          </div>
+          <div class="stat-icon icon-purple">
+            <i class="bi bi-calendar3"></i>
+          </div>
         </div>
       </div>
 
-    </section>
+      <!-- Danh sách Cuộc họp sắp diễn ra gần nhất trong Card chuẩn -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h5 class="card-title m-0">Cuộc họp sắp tới</h5>
+            <span class="text-secondary small">Các phiên họp gần nhất cần bạn chuẩn bị</span>
+          </div>
+          <a href="#/meetings" class="btn btn-secondary btn-sm text-decoration-none">
+            Xem tất cả (${totalCount}) &rarr;
+          </a>
+        </div>
+
+        <div class="card-body p-0">
+          ${upcomingMeetings.length === 0 ? `
+            <div class="empty-state py-5">
+              <div class="empty-state-icon mx-auto mb-3" style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                <i class="bi bi-calendar-smile"></i>
+              </div>
+              <h6 class="empty-state-title fw-bold text-slate-800 mb-1">Hiện tại bạn không có cuộc họp nào sắp tới</h6>
+              <p class="empty-state-desc text-secondary small mb-3">Lịch làm việc của bạn đang trống. Bạn có thể thư thả làm việc hoặc tạo cuộc họp mới.</p>
+              <button type="button" class="btn btn-primary btn-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
+                <i class="bi bi-plus-lg me-1"></i> + Tạo cuộc họp mới
+              </button>
+            </div>
+          ` : `
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="small fw-semibold ps-4">TIÊU ĐỀ CUỘC HỌP</th>
+                    <th class="small fw-semibold">THỜI GIAN</th>
+                    <th class="small fw-semibold">PHÒNG HỌP</th>
+                    <th class="small fw-semibold">NGƯỜI TỔ CHỨC</th>
+                    <th class="small fw-semibold text-end pe-4">THAO TÁC</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${upcomingMeetings.map(m => {
+                    const roomName = m.roomName || (m.roomId ? ((window.ROOMS || []).find(r => r.id === m.roomId)?.name) : "Phòng họp");
+                    const hostName = m.host || "Thành viên";
+                    const initials = typeof getInitials === 'function' ? getInitials(hostName) : 'U';
+                    const color = typeof getHostColor === 'function' ? getHostColor(hostName) : '#2563eb';
+                    const timeStr = m.time || (m.startTime ? `${m.startTime} - ${m.endTime}` : '--');
+
+                    return `
+                      <tr>
+                        <td class="ps-4">
+                          <div class="fw-bold text-slate-900">${escapeHTML(m.title)}</div>
+                          ${m.tag ? `<span class="badge bg-light text-secondary border small">${escapeHTML(m.tag)}</span>` : ''}
+                        </td>
+                        <td>
+                          <div class="small fw-medium text-slate-800">${m.date || '--'}</div>
+                          <div class="text-muted small">${timeStr}</div>
+                        </td>
+                        <td>
+                          <div class="small fw-medium text-slate-800"><i class="bi bi-door-closed me-1 text-primary"></i>${escapeHTML(roomName)}</div>
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="user-avatar-tiny" style="background-color: ${color}">${initials}</span>
+                            <span class="small text-slate-800">${escapeHTML(hostName)}</span>
+                          </div>
+                        </td>
+                        <td class="text-end pe-4">
+                          <button type="button" class="btn btn-secondary btn-sm py-1 px-3 fw-medium" onclick="if (typeof openDetailModal === 'function') openDetailModal(${m.id})">
+                            <i class="bi bi-eye me-1"></i>Chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          `}
+        </div>
+      </div>
+
+    </div>
   `;
 }
 
 
 // =====================================================
-// 5. TRANG QUẢN LÝ CUỘC HỌP (ENTERPRISE STITCH SPEC)
+// 5. TRANG QUẢN LÝ CUỘC HỌP (ENTERPRISE QLNS_QLTKPM SPEC)
 // =====================================================
 
 function renderMeetingsPage() {
@@ -391,199 +648,130 @@ function renderMeetingsPage() {
   app.innerHTML = `
     <div id="meetings-section" class="meetings-view-wrapper">
 
-      <!-- Breadcrumbs & Page Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
-        <div>
-          <div class="breadcrumb-nav mb-1">
-            <span>Không gian cá nhân</span>
-            <i class="bi bi-chevron-right breadcrumb-separator"></i>
-            <span class="breadcrumb-active">Lịch làm việc</span>
-          </div>
-          <h1 class="page-title m-0">Lịch họp của tôi / Đặt phòng họp</h1>
-          <p class="page-subtitle m-0">Quản lý lịch họp cá nhân, đặt phòng họp và theo dõi các phiên họp tham gia.</p>
+      <!-- Page Header Chuẩn QLNS_QLTKPM -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <nav class="breadcrumb">
+            <span class="breadcrumb-item"><a href="#/">Trang chủ</a></span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item"><a href="#/meetings">Quản lý</a></span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Cuộc họp</span>
+          </nav>
+          <h1 class="page-header-title">Cuộc họp của tôi</h1>
+          <p class="page-header-subtitle">Xem, tìm kiếm và quản lý lịch họp doanh nghiệp</p>
         </div>
 
-        <div class="header-action-buttons d-flex align-items-center gap-2">
-          <span id="meeting-page-api-badge" class="stitch-badge-api me-1 d-none d-sm-inline-flex" title="Trạng thái hệ thống">
-            <span class="api-dot-status"></span> <span id="meeting-page-api-text">Trực tuyến</span>
-          </span>
-
-          <button type="button" id="btn-export-excel" class="btn-stitch-export" title="Xuất danh sách ra file CSV">
-            <i class="bi bi-file-earmark-arrow-down"></i>
-            <span>Xuất báo cáo / Excel</span>
+        <div class="page-header-actions">
+          <button type="button" id="btn-export-excel" class="btn btn-secondary btn-sm" title="Xuất danh sách ra file CSV">
+            <i class="bi bi-download"></i>
+            <span>Xuất Excel</span>
           </button>
 
-          <button type="button" id="btn-add-meeting" class="btn-stitch-create">
-            <i class="bi bi-plus-circle-fill"></i>
-            <span>Tạo cuộc họp mới</span>
+          <button type="button" id="btn-add-meeting" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg"></i>
+            <span>+ Tạo cuộc họp</span>
           </button>
         </div>
       </div>
 
-      <!-- KPI Overview Cards (3 Metrics) -->
-      <div class="kpi-metrics-grid mb-4">
-        <!-- KPI 1 -->
-        <div class="kpi-card">
-          <div class="kpi-card-body">
-            <div class="kpi-card-content">
-              <span class="kpi-label">Tổng cuộc họp của tôi</span>
-              <div class="kpi-value" id="kpi-total">${totalCount}</div>
-            </div>
-            <div class="kpi-icon-box kpi-blue">
-              <i class="bi bi-calendar-week"></i>
-            </div>
+      <!-- Stats Grid: 3 Thẻ KPI Đồng bộ QLNS_QLTKPM -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Tổng số cuộc họp</span>
+            <span class="stat-value text-dark" id="kpi-total">${totalCount}</span>
+            <span class="stat-meta"><i class="bi bi-calendar-event text-primary"></i> Toàn bộ phiên họp</span>
           </div>
-          <div class="kpi-delta-row">
-            <span class="kpi-chip-positive">
-              <i class="bi bi-graph-up-arrow"></i> +12%
-            </span>
-            <span class="kpi-delta-text">so với tuần trước</span>
+          <div class="stat-icon icon-blue">
+            <i class="bi bi-calendar-event"></i>
           </div>
-          <div class="kpi-bottom-bar bar-blue"></div>
         </div>
 
-        <!-- KPI 2 -->
-        <div class="kpi-card">
-          <div class="kpi-card-body">
-            <div class="kpi-card-content">
-              <span class="kpi-label">Sắp diễn ra hôm nay</span>
-              <div class="kpi-value d-flex align-items-baseline gap-1">
-                <span id="kpi-scheduled">${scheduledCount}</span>
-                <span class="kpi-value-unit">cuộc họp</span>
-              </div>
-            </div>
-            <div class="kpi-icon-box kpi-sky">
-              <i class="bi bi-clock-history"></i>
-            </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Sắp diễn ra</span>
+            <span class="stat-value text-primary" id="kpi-scheduled">${scheduledCount}</span>
+            <span class="stat-meta"><i class="bi bi-clock-history text-success"></i> Cần chuẩn bị</span>
           </div>
-          <div class="kpi-delta-row">
-            <span class="kpi-chip-neutral">
-              <span class="pulse-dot-primary"></span> 09:00 AM
-            </span>
-            <span class="kpi-delta-text truncate">Gần nhất: Sprint Review</span>
+          <div class="stat-icon icon-green">
+            <i class="bi bi-clock-history"></i>
           </div>
-          <div class="kpi-bottom-bar bar-sky"></div>
         </div>
 
-        <!-- KPI 3 -->
-        <div class="kpi-card">
-          <div class="kpi-card-body">
-            <div class="kpi-card-content">
-              <span class="kpi-label">Đang diễn ra</span>
-              <div class="kpi-value d-flex align-items-baseline gap-1">
-                <span id="kpi-inprogress">${inProgressCount}</span>
-                <span class="kpi-value-unit">phòng live</span>
-              </div>
-            </div>
-            <div class="kpi-icon-box kpi-amber">
-              <i class="bi bi-broadcast"></i>
-            </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Đang diễn ra</span>
+            <span class="stat-value text-warning" id="kpi-inprogress">${inProgressCount}</span>
+            <span class="stat-meta"><i class="bi bi-broadcast text-warning"></i> Trực tiếp trong phòng</span>
           </div>
-          <div class="kpi-delta-row">
-            <span class="kpi-chip-live">
-              <span class="ping-dot-live"></span> Đang diễn ra
-            </span>
-            <span class="kpi-delta-text truncate">Phòng họp trực tiếp</span>
+          <div class="stat-icon icon-orange">
+            <i class="bi bi-broadcast"></i>
           </div>
-          <div class="kpi-bottom-bar bar-amber"></div>
         </div>
       </div>
 
-      <!-- Real-Time Room Quick Availability Finder Widget -->
-      <div class="room-quick-finder-widget mb-4" id="room-quick-finder-section">
-        <div class="room-finder-header">
-          <div>
-            <div class="room-finder-title">
-              <i class="bi bi-broadcast text-primary"></i> Tra cứu phòng trống theo thời gian thực
+      <!-- Toolbar Tìm kiếm & Tab Lọc trạng thái trong Card -->
+      <div class="card mb-4">
+        <div class="card-body p-3">
+          <div class="toolbar">
+            <div class="toolbar-search">
+              <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input
+                  type="text"
+                  id="search-meeting"
+                  placeholder="Tìm theo tên cuộc họp, người tổ chức hoặc nội dung..."
+                  aria-label="Tìm kiếm cuộc họp"
+                />
+              </div>
             </div>
-            <div class="stitch-hint mt-0.5">Kiểm tra ngay tình trạng phòng họp trong toàn bộ tòa nhà theo khung giờ</div>
-          </div>
-          <div class="room-finder-controls">
-            <div class="d-flex align-items-center gap-1">
-              <label for="finder-date" class="visually-hidden">Ngày tra cứu</label>
-              <input type="date" id="finder-date" class="form-control stitch-input stitch-input-sm" style="width: 140px; font-size: 0.78rem;" aria-label="Ngày tra cứu" />
-            </div>
-            <div class="d-flex align-items-center gap-1">
-              <label for="finder-start" class="visually-hidden">Giờ bắt đầu</label>
-              <input type="time" id="finder-start" class="form-control stitch-input stitch-input-sm" value="09:00" style="width: 126px; font-size: 0.8rem; padding: 4px 6px;" aria-label="Giờ bắt đầu tra cứu" />
-              <span class="text-muted small">➔</span>
-              <label for="finder-end" class="visually-hidden">Giờ kết thúc</label>
-              <input type="time" id="finder-end" class="form-control stitch-input stitch-input-sm" value="10:30" style="width: 126px; font-size: 0.8rem; padding: 4px 6px;" aria-label="Giờ kết thúc tra cứu" />
-            </div>
-            <button type="button" class="btn btn-sm btn-primary px-3" id="btn-finder-book-room" style="font-size: 0.78rem; font-weight: 600;" onclick="openAddModalWithSelection()">
-              <i class="bi bi-plus-lg me-1"></i> Đặt lịch ngay
-            </button>
-          </div>
-        </div>
-        <div id="finder-room-cards" class="realtime-room-grid">
-          <!-- Populated by renderFinderRoomCards() -->
-        </div>
-      </div>
 
-      <!-- Toolbar & Multi-Filter Section -->
-      <div class="filter-panel-card mb-4">
-        <!-- Top row: Search + Status Tabs -->
-        <div class="filter-top-row">
-          <div class="search-input-wrapper">
-            <label for="search-meeting" class="visually-hidden">Tìm kiếm cuộc họp</label>
-            <i class="bi bi-search search-icon-left"></i>
-            <input
-              type="text"
-              id="search-meeting"
-              class="stitch-search-field"
-              placeholder="Tìm theo tiêu đề, người tổ chức hoặc nội dung cuộc họp..."
-              aria-label="Tìm kiếm cuộc họp"
-            />
+            <!-- Bộ lọc trạng thái dạng Tab pills -->
+            <div class="toolbar-actions">
+              <div class="status-tab-group" id="status-tab-group">
+                <button type="button" class="status-tab-item active" data-status="">
+                  Tất cả (${totalCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="scheduled">
+                  Sắp tới (${scheduledCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="in-progress">
+                  Đang diễn ra (${inProgressCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="completed">
+                  Đã kết thúc (${completedCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="cancelled">
+                  Đã hủy (${cancelledCount})
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div class="status-tab-group" id="status-tab-group">
-            <button type="button" class="status-tab-item active" data-status="">
-              Tất cả (${totalCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="scheduled">
-              Sắp tới (${scheduledCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="in-progress">
-              <span class="tab-pulse-dot"></span>
-              Đang diễn ra (${inProgressCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="completed">
-              Đã kết thúc (${completedCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="cancelled">
-              Đã hủy (${cancelledCount})
-            </button>
-          </div>
-        </div>
-
-        <!-- Secondary Filter Row -->
-        <div class="filter-bottom-row">
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <div class="filter-select-wrapper">
+          <!-- Bộ lọc phòng họp phụ (gọn nhẹ) -->
+          <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-secondary small">
+            <div class="d-flex align-items-center gap-2">
               <label for="filter-room" class="visually-hidden">Lọc theo phòng họp</label>
-              <i class="bi bi-door-open filter-icon-left"></i>
-              <select id="filter-room" class="stitch-select-compact" aria-label="Lọc theo phòng họp">
-                <option value="">Tất cả phòng họp</option>
+              <select id="filter-room" class="form-select form-select-sm border-0 bg-transparent text-secondary p-0 pe-4" style="width: auto; cursor: pointer;" aria-label="Lọc theo phòng họp">
+                <option value="">Lọc theo phòng: Tất cả</option>
                 ${ROOMS.map(r => `<option value="${r.id}" ${currentRoomFilter === String(r.id) ? "selected" : ""}>${escapeHTML(r.name)}</option>`).join("")}
               </select>
+              <button type="button" id="btn-reset-filters" class="btn btn-link btn-sm text-secondary p-0 text-decoration-none">
+                <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+              </button>
             </div>
-
-            <button type="button" id="btn-reset-filters" class="btn-reset-link">
-              <i class="bi bi-arrow-counterclockwise"></i>
-              <span>Đặt lại bộ lọc</span>
-            </button>
-          </div>
-
-          <div class="filter-stats-text">
-            Hiển thị <span id="filtered-count" class="fw-bold text-dark">${totalCount}</span> cuộc họp
+            <div>
+              Hiển thị <span id="filtered-count" class="fw-bold text-dark">${totalCount}</span> cuộc họp
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Enterprise Data Table Container -->
-      <div class="table-card-container mb-4">
+      <!-- Data Table Card Container -->
+      <div class="card mb-4">
         <div class="table-responsive">
-          <table id="meetings-table" class="stitch-data-table">
+          <table id="meetings-table" class="stitch-data-table data-table w-100 mb-0">
             <thead>
               <tr>
                 <th class="th-title">TIÊU ĐỀ CUỘC HỌP</th>
@@ -598,13 +786,16 @@ function renderMeetingsPage() {
           </table>
         </div>
 
-        <!-- Empty State -->
-        <div id="empty-state" class="table-empty-state hidden">
-          <div class="empty-icon-circle">
-            <i class="bi bi-calendar-x"></i>
+        <!-- Empty State có hướng dẫn rõ ràng cho người dùng mới -->
+        <div id="empty-state" class="empty-state hidden py-5 text-center">
+          <div class="empty-state-icon mx-auto mb-3" style="width: 64px; height: 64px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 28px;">
+            <i class="bi bi-calendar-plus"></i>
           </div>
-          <h5 class="empty-state-title">Không tìm thấy cuộc họp nào</h5>
-          <p class="empty-state-text">Thử thay đổi từ khóa tìm kiếm hoặc chọn bộ lọc trạng thái khác.</p>
+          <h5 class="empty-state-title fw-bold text-slate-800 mb-1" id="empty-state-title">Bạn chưa có cuộc họp nào</h5>
+          <p class="empty-state-desc text-secondary small mb-3" id="empty-state-desc">Hãy tạo cuộc họp đầu tiên để bắt đầu phân bổ thời gian và làm việc cùng đồng nghiệp.</p>
+          <button type="button" class="btn btn-primary btn-sm px-3 py-2 fw-semibold" onclick="if (typeof openAddModal === 'function') openAddModal()">
+            <i class="bi bi-plus-lg me-1"></i> + Tạo cuộc họp đầu tiên
+          </button>
         </div>
 
         <!-- Pagination Footer -->
@@ -6481,16 +6672,16 @@ function renderMeetingTable() {
       </td>
 
       <td class="td-actions text-end">
-        <div class="stitch-actions-wrapper">
-          <button type="button" class="btn-stitch-icon" data-action="detail" data-id="${meeting.id}" title="Xem chi tiết">
-            <i class="bi bi-eye"></i>
+        <div class="d-inline-flex align-items-center gap-1">
+          <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2 fw-medium" data-action="detail" data-id="${meeting.id}" title="Xem chi tiết cuộc họp">
+            <i class="bi bi-eye me-1"></i>Chi tiết
           </button>
 
-          <button type="button" class="btn-stitch-icon" data-action="edit" data-id="${meeting.id}" title="Chỉnh sửa">
+          <button type="button" class="btn btn-light btn-sm py-1 px-2 text-secondary" data-action="edit" data-id="${meeting.id}" title="Chỉnh sửa cuộc họp">
             <i class="bi bi-pencil"></i>
           </button>
 
-          <button type="button" class="btn-stitch-icon btn-stitch-delete" data-action="delete" data-id="${meeting.id}" title="Xóa cuộc họp">
+          <button type="button" class="btn btn-light btn-sm py-1 px-2 text-danger" data-action="delete" data-id="${meeting.id}" title="Hủy cuộc họp này">
             <i class="bi bi-trash3"></i>
           </button>
         </div>
@@ -7191,41 +7382,81 @@ function getNextId() {
 
 
 // =====================================================
-// 14. XÓA
+// =====================================================
+// 14. HỘP THOẠI XÁC NHẬN CHUYÊN NGHIỆP & HỦY/XÓA CUỘC HỌP (PHẦN V & VII SPEC)
 // =====================================================
 
+function showConfirmDialog({ title, desc, cancelText = 'Giữ cuộc họp', confirmText = 'Xác nhận hủy', isDanger = true, onConfirm }) {
+  const overlay = document.getElementById('confirm-modal-overlay');
+  if (!overlay) return;
+
+  const titleEl = document.getElementById('confirm-modal-title');
+  const descEl = document.getElementById('confirm-modal-desc');
+  const btnCancel = document.getElementById('btn-confirm-cancel');
+  const btnSubmit = document.getElementById('btn-confirm-submit');
+  const iconEl = document.getElementById('confirm-modal-icon');
+
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = desc;
+  if (btnCancel) btnCancel.textContent = cancelText;
+  if (btnSubmit) {
+    btnSubmit.textContent = confirmText;
+    btnSubmit.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
+  }
+  if (iconEl) {
+    iconEl.className = isDanger ? 'confirm-dialog-icon danger' : 'confirm-dialog-icon warning';
+  }
+
+  const closeDialog = () => {
+    overlay.classList.add('hidden');
+    btnCancel?.removeEventListener('click', onCancelClick);
+    btnSubmit?.removeEventListener('click', onSubmitClick);
+    document.removeEventListener('keydown', onEsc);
+  };
+
+  const onCancelClick = () => closeDialog();
+  const onSubmitClick = () => {
+    closeDialog();
+    if (typeof onConfirm === 'function') onConfirm();
+  };
+  const onEsc = (e) => {
+    if (e.key === 'Escape') closeDialog();
+  };
+
+  btnCancel?.addEventListener('click', onCancelClick);
+  btnSubmit?.addEventListener('click', onSubmitClick);
+  document.addEventListener('keydown', onEsc);
+
+  overlay.classList.remove('hidden');
+}
+
+function confirmCancelMeeting(id) {
+  const meeting = meetings.find(item => item.id === id);
+  if (!meeting) return;
+
+  showConfirmDialog({
+    title: 'Hủy cuộc họp này?',
+    desc: `Bạn có chắc chắn muốn hủy cuộc họp "${meeting.title}" không? Hành động này có thể ảnh hưởng đến những người tham gia.`,
+    cancelText: 'Giữ cuộc họp',
+    confirmText: 'Xác nhận hủy',
+    isDanger: true,
+    onConfirm: () => {
+      meetings = meetings.filter(item => item.id !== id);
+      persistMeetingsToStorage();
+      renderMeetingTable();
+      updateDashboardStats();
+      if (typeof closeDetailModal === 'function') {
+        closeDetailModal();
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast(`Đã hủy cuộc họp "${meeting.title}" thành công.`, 'success');
+      }
+    }
+  });
+}
+
 function deleteMeeting(id) {
-
-  const meeting =
-    meetings.find(
-      item => item.id === id
-    );
-
-
-  if (!meeting) {
-    return;
-  }
-
-
-  const confirmed =
-    window.confirm(
-      `Bạn có chắc muốn xóa cuộc họp "${meeting.title}" không?`
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  meetings =
-    meetings.filter(
-      item => item.id !== id
-    );
-
-  persistMeetingsToStorage();
-  renderMeetingTable();
-  updateDashboardStats();
+  confirmCancelMeeting(id);
 }
 
 
@@ -7366,6 +7597,32 @@ function openDetailModal(id) {
       <div class="p-2 rounded bg-light border small text-dark">${escapeHTML(meeting.notes || "Không có ghi chú")}</div>
     </div>
   `;
+
+  // Kiểm tra quyền người dùng để hiển thị nút Chỉnh sửa / Hủy (Phần VII. 28)
+  const currentUser = (window.AuthState && typeof window.AuthState.getCurrentUser === 'function') ? window.AuthState.getCurrentUser() : null;
+  const isAdmin = window.AuthState && typeof window.AuthState.isAdmin === 'function' ? window.AuthState.isAdmin() : false;
+  const isOrganizer = currentUser && (
+    Number(currentUser.id) === Number(organizerId) ||
+    currentUser.username === meeting.host ||
+    currentUser.fullName === meeting.host
+  );
+  const canModify = isAdmin || isOrganizer;
+
+  const actionsEl = document.getElementById("detail-permission-actions");
+  if (actionsEl) {
+    if (canModify) {
+      actionsEl.innerHTML = `
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="if (typeof closeDetailModal === 'function') closeDetailModal(); openEditModal(${meeting.id});">
+          <i class="bi bi-pencil-square"></i> Chỉnh sửa
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="confirmCancelMeeting(${meeting.id});">
+          <i class="bi bi-trash3"></i> Hủy cuộc họp
+        </button>
+      `;
+    } else {
+      actionsEl.innerHTML = '';
+    }
+  }
 
   detailOverlay.classList.remove("hidden");
 
@@ -7813,6 +8070,27 @@ async function initializeEnterpriseData() {
   // Render lại route hiện tại với dữ liệu thực tế từ Database
   router();
 }
+
+// Xuất toàn bộ modal triggers và APIs ra window scope cho các trang con
+window.openAddModal = openAddModal;
+window.openDetailModal = openDetailModal;
+window.openEditModal = openEditModal;
+window.openRoomQRModal = openRoomQRModal;
+window.openEditRoomModal = openEditRoomModal;
+window.openAddRoomModal = openAddRoomModal;
+window.confirmDeleteRoom = confirmDeleteRoom;
+window.openAddEquipmentModal = openAddEquipmentModal;
+window.openEditEquipmentModal = openEditEquipmentModal;
+window.openEquipmentDeleteModal = openEquipmentDeleteModal;
+window.openAddModalWithSelection = openAddModalWithSelection;
+window.exportToCSV = exportToCSV;
+window.getInitials = getInitials;
+window.getHostColor = getHostColor;
+window.confirmCancelMeeting = confirmCancelMeeting;
+window.showConfirmDialog = showConfirmDialog;
+window.RoomAPI = RoomAPI;
+window.MeetingAPI = MeetingAPI;
+window.EquipmentAPI = EquipmentAPI;
 
 setupRoomFormValidationEvents();
 setupMeetingFormValidationEvents();
