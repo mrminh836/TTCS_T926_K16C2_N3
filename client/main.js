@@ -3711,14 +3711,19 @@ function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
   if (!container) return;
 
   const summaryEl = document.getElementById("equipment-avail-summary");
-  let availableCount = 0;
-  const totalCount = EQUIPMENTS.length;
+  // Chỉ hiển thị các thiết bị còn dùng được (ẩn thiết bị bảo trì, hỏng hóc)
+  const usableEquipments = EQUIPMENTS.filter(eq => {
+    const status = (eq.status || "").toLowerCase();
+    return status !== "maintenance" && status !== "broken" && status !== "inactive";
+  });
 
-  const html = EQUIPMENTS.map(eq => {
+  let availableCount = 0;
+  const totalCount = usableEquipments.length;
+
+  const html = usableEquipments.map(eq => {
     const eqId = Number(eq.id || eq.equipmentId);
-    const isMaintenance = (eq.status || "").toLowerCase() === "maintenance";
-    const isAvailable = !isMaintenance && (availabilityMap === null || availabilityMap.has(eqId));
-    const isBusy = !isMaintenance && availabilityMap !== null && !availabilityMap.has(eqId);
+    const isAvailable = (availabilityMap === null || availabilityMap.has(eqId));
+    const isBusy = availabilityMap !== null && !availabilityMap.has(eqId);
 
     if (isAvailable) availableCount++;
 
@@ -3727,12 +3732,7 @@ function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
     let isDisabled = false;
     let tooltip = "";
 
-    if (isMaintenance) {
-      badgeHTML = `<span class="badge badge-eq-status badge-eq-maint" title="Thiết bị đang bảo dưỡng kỹ thuật"><i class="bi bi-tools me-1"></i>Bảo trì</span>`;
-      cardClass = "is-maint";
-      isDisabled = true;
-      tooltip = "Thiết bị đang trong quá trình bảo dưỡng kỹ thuật (Không khả dụng)";
-    } else if (isBusy) {
+    if (isBusy) {
       badgeHTML = `<span class="badge badge-eq-status badge-eq-busy" title="Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>`;
       cardClass = "is-busy";
       isDisabled = true;
