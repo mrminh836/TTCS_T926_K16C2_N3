@@ -1062,23 +1062,6 @@ function getFilteredRooms() {
 }
 
 // =====================================================
-// HELPER: RENDER ADMIN PAGE HEADER
-// Tiêu đề trang chuẩn Enterprise SaaS cho các phân hệ Admin
-// =====================================================
-function renderAdminNavigationTabs(activeTab = 'rooms') {
-  const title = activeTab === 'rooms' ? 'Quản lý Phòng họp' : 'Quản lý Trang thiết bị';
-  const subtitle = activeTab === 'rooms'
-    ? 'Cấu hình danh mục phòng họp, sức chứa và mã QR check-in cửa'
-    : 'Kiểm soát số lượng, chủng loại và tình trạng kỹ thuật thiết bị';
-
-  return `
-    <div class="admin-page-header mb-4">
-      <h1 class="admin-page-title m-0">${title}</h1>
-      <p class="admin-page-subtitle text-secondary small m-0 mt-1">${subtitle}</p>
-    </div>
-  `;
-}
-
 function renderAdminRoomsPage() {
   const totalRooms = ROOMS.length;
   const activeRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "active").length;
@@ -1092,13 +1075,11 @@ function renderAdminRoomsPage() {
   app.innerHTML = `
     <div id="admin-rooms-section" class="admin-rooms-view-wrapper">
 
-      ${renderAdminNavigationTabs('rooms')}
-
-      <!-- Action Bar của Tab Phòng họp -->
-      <div class="admin-action-bar d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
-        <div class="admin-tab-section-title">
-          <i class="bi bi-door-open text-primary fs-5"></i>
-          <span class="fw-bold text-dark">Danh sách Phòng họp Doanh nghiệp</span>
+      <!-- Header chuẩn Enterprise SaaS -->
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+        <div>
+          <h1 class="admin-page-title m-0">Quản lý Phòng họp</h1>
+          <p class="admin-page-subtitle text-secondary small m-0 mt-1">Cấu hình danh mục phòng họp, sức chứa và mã QR check-in cửa</p>
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">
@@ -2260,13 +2241,11 @@ function renderAdminEquipmentsPage() {
   app.innerHTML = `
     <div id="admin-equipments-section" class="admin-equipments-view-wrapper">
 
-      ${renderAdminNavigationTabs('equipments')}
-
-      <!-- Action Bar của Tab Thiết bị -->
-      <div class="admin-action-bar d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
-        <div class="admin-tab-section-title">
-          <i class="bi bi-tools text-primary fs-5"></i>
-          <span class="fw-bold text-dark">Danh mục Trang thiết bị Kỹ thuật</span>
+      <!-- Header chuẩn Enterprise SaaS -->
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+        <div>
+          <h1 class="admin-page-title m-0">Quản lý Trang thiết bị</h1>
+          <p class="admin-page-subtitle text-secondary small m-0 mt-1">Kiểm soát số lượng, chủng loại và tình trạng kỹ thuật thiết bị</p>
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">

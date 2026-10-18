@@ -6345,24 +6345,9 @@ textarea.form-control {
   margin-bottom: 24px;
 }
 
-.admin-feature-tabs-container {
-  background: var(--slate-100);
-  border: 1px solid var(--slate-200);
-  border-radius: 14px;
-  padding: 6px;
-  margin-top: 18px;
-}
-
+.admin-feature-tabs-container,
 .admin-feature-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-@media (max-width: 768px) {
-  .admin-feature-tabs {
-    grid-template-columns: 1fr;
-  }
+  display: none !important;
 }
 
 .admin-feature-tab {
