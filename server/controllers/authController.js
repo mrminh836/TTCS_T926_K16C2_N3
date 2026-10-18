@@ -123,6 +123,43 @@ const authController = {
                 user: req.user
             });
         }
+    },
+
+    /**
+     * POST /api/auth/change-password
+     * Đổi mật khẩu tài khoản người dùng
+     */
+    changePassword: async (req, res, next) => {
+        try {
+            const userId = req.user && (req.user.userId || req.user.id);
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Yêu cầu đăng nhập để thực hiện đổi mật khẩu.'
+                });
+            }
+
+            const validation = authValidator.validateChangePassword(req.body);
+            if (!validation.isValid) {
+                return res.status(400).json({
+                    success: false,
+                    message: validation.errors[0] || 'Dữ liệu đổi mật khẩu không hợp lệ.',
+                    errors: validation.errors
+                });
+            }
+
+            const result = await authService.changePassword(userId, validation.value);
+            return res.status(200).json(result);
+        } catch (error) {
+            if (error.status) {
+                return res.status(error.status).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+            console.error('[Auth Controller] Lỗi đổi mật khẩu:', error);
+            next(error);
+        }
     }
 };
 

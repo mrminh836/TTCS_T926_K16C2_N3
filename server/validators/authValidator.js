@@ -111,7 +111,60 @@ function validateLogin(data) {
     };
 }
 
+/**
+ * Xác thực dữ liệu đổi mật khẩu (POST /api/auth/change-password)
+ * @param {Object} data - req.body
+ * @returns {{ isValid: boolean, errors: string[], value?: Object }}
+ */
+function validateChangePassword(data) {
+    const errors = [];
+
+    if (!data || typeof data !== 'object') {
+        return {
+            isValid: false,
+            errors: ['Dữ liệu đổi mật khẩu không hợp lệ.'],
+            value: null
+        };
+    }
+
+    const currentPassword = data.currentPassword !== undefined ? String(data.currentPassword) : '';
+    const newPassword = data.newPassword !== undefined ? String(data.newPassword) : '';
+    const confirmPassword = data.confirmPassword !== undefined ? String(data.confirmPassword) : '';
+
+    if (!currentPassword) {
+        errors.push('Vui lòng nhập mật khẩu hiện tại.');
+    }
+
+    if (!newPassword) {
+        errors.push('Vui lòng nhập mật khẩu mới.');
+    } else if (newPassword.length < 6) {
+        errors.push('Mật khẩu mới phải có độ dài tối thiểu 6 ký tự.');
+    } else if (newPassword.length > 100) {
+        errors.push('Mật khẩu mới không được vượt quá 100 ký tự.');
+    }
+
+    if (currentPassword && newPassword && currentPassword === newPassword) {
+        errors.push('Mật khẩu mới không được trùng với mật khẩu hiện tại.');
+    }
+
+    if (!confirmPassword) {
+        errors.push('Vui lòng xác nhận lại mật khẩu mới.');
+    } else if (newPassword !== confirmPassword) {
+        errors.push('Xác nhận mật khẩu mới không khớp.');
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        value: errors.length === 0 ? {
+            currentPassword,
+            newPassword
+        } : null
+    };
+}
+
 module.exports = {
     validateRegister,
-    validateLogin
+    validateLogin,
+    validateChangePassword
 };

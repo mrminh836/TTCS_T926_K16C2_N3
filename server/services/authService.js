@@ -117,6 +117,51 @@ const authService = {
             expiresIn: authConfig.jwtExpiresIn,
             user: safeUser
         };
+    },
+
+    /**
+     * Đổi mật khẩu người dùng
+     * @param {number} userId - ID người dùng
+     * @param {Object} passwordData
+     * @param {string} passwordData.currentPassword - Mật khẩu cũ
+     * @param {string} passwordData.newPassword - Mật khẩu mới
+     * @returns {Promise<Object>}
+     */
+    changePassword: async (userId, passwordData) => {
+        const { currentPassword, newPassword } = passwordData;
+        const id = Number(userId);
+
+        // 1. Tìm thông tin người dùng kèm PasswordHash
+        const user = await User.findById(id, { includePassword: true });
+        if (!user || !user.PasswordHash) {
+            const err = new Error('Tài khoản không tồn tại trên hệ thống.');
+            err.status = 404;
+            throw err;
+        }
+
+        // 2. Đối soát mật khẩu cũ bằng BCrypt
+        const isMatch = await bcrypt.compare(currentPassword, user.PasswordHash);
+        if (!isMatch) {
+            const err = new Error('Mật khẩu hiện tại không chính xác.');
+            err.status = 400;
+            throw err;
+        }
+
+        // 3. Mã hóa mật khẩu mới bằng BCrypt
+        const newPasswordHash = await bcrypt.hash(newPassword, authConfig.bcryptSaltRounds || 10);
+
+        // 4. Cập nhật vào CSDL / Fallback
+        const updated = await User.updatePassword(id, newPasswordHash);
+        if (!updated) {
+            const err = new Error('Không thể cập nhật mật khẩu vào hệ thống.');
+            err.status = 500;
+            throw err;
+        }
+
+        return {
+            success: true,
+            message: 'Đổi mật khẩu thành công. Vui lòng ghi nhớ mật khẩu mới của bạn.'
+        };
     }
 };
 

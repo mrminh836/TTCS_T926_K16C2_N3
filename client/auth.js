@@ -317,6 +317,27 @@
       } catch {
         return { ok: false, status: 0, user: null };
       }
+    },
+
+    async changePassword({ currentPassword, newPassword, confirmPassword }) {
+      try {
+        const res = await apiFetch('/api/auth/change-password', {
+          method: 'POST',
+          body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+        });
+        const data = await res.json().catch(() => ({}));
+        return {
+          ok: res.ok,
+          status: res.status,
+          data
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          status: 0,
+          data: { success: false, message: 'Không thể kết nối máy chủ backend. Vui lòng kiểm tra mạng.' }
+        };
+      }
     }
   };
 

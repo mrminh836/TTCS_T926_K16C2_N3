@@ -20,4 +20,7 @@ router.post('/login', authController.login);
 // 3. Lấy thông tin tài khoản đang đăng nhập (Yêu cầu Bearer Token)
 router.get('/me', verifyJWT, authController.getProfile);
 
+// 4. Đổi mật khẩu tài khoản (Yêu cầu Bearer Token)
+router.post('/change-password', verifyJWT, authController.changePassword);
+
 module.exports = router;
