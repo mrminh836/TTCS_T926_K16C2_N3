@@ -16,41 +16,87 @@
   /**
    * Render thanh Subnav chuẩn Stitch cho các trang quản trị
    */
-  function renderAdminSubnav(activeTab = 'dashboard') {
+  /**
+   * Helper: Render Status Pill chuẩn Enterprise SaaS cho cuộc họp
+   */
+  function renderMeetingStatusPill(status) {
+    const s = String(status || '').toLowerCase().trim();
+    let text = 'Sắp diễn ra';
+    let cls = 'status-scheduled';
+    let dotColor = '#2563eb';
+
+    if (s === 'in-progress' || s === 'inprogress') {
+      text = 'Đang diễn ra';
+      cls = 'status-in-progress';
+      dotColor = '#d97706';
+    } else if (s === 'completed') {
+      text = 'Đã hoàn thành';
+      cls = 'status-completed';
+      dotColor = '#059669';
+    } else if (s === 'cancelled' || s === 'canceled') {
+      text = 'Đã hủy';
+      cls = 'status-cancelled';
+      dotColor = '#dc2626';
+    }
+
     return `
-      <div class="admin-navigation-header mb-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <span class="badge bg-danger text-white px-2 py-1 small fw-bold">ADMIN PORTAL</span>
-              <h2 class="fw-bold fs-3 text-slate-900 m-0">Trung tâm Điều hành Quản trị</h2>
-            </div>
-            <p class="text-secondary small m-0">Quản trị toàn diện hạ tầng phòng họp, thiết bị kỹ thuật, tài khoản và báo cáo</p>
-          </div>
+      <span class="stitch-status-pill ${cls}">
+        <span class="status-indicator-dot" style="background-color: ${dotColor};"></span>
+        <span>${text}</span>
+      </span>
+    `;
+  }
 
-          <div class="d-flex align-items-center gap-2">
-            <a href="#/meetings" class="btn btn-outline-secondary btn-sm py-2 px-3">
-              <i class="bi bi-box-arrow-up-right me-1"></i> Xem góc nhìn Thành viên
-            </a>
-          </div>
-        </div>
+  /**
+   * Helper: Định dạng ngày và giờ họp trực quan
+   */
+  function formatMeetingDateTime(m) {
+    const timeStr = m.time || (m.startTime && m.endTime ? `${m.startTime} - ${m.endTime}` : (m.startTime || 'Trong ngày'));
+    let dateStr = m.date || '';
+    if (dateStr && dateStr.includes('-')) {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        dateStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
+    return `
+      <div class="d-flex flex-column">
+        <span class="fw-semibold text-slate-800">${dateStr || 'Hôm nay'}</span>
+        <span class="text-secondary small d-flex align-items-center gap-1 mt-0.5">
+          <i class="bi bi-clock opacity-75"></i>
+          <span>${timeStr}</span>
+        </span>
+      </div>
+    `;
+  }
 
-        <div class="auth-tabs-nav admin-subnav" role="tablist">
-          <a href="#/admin" class="auth-tab-btn ${activeTab === 'dashboard' ? 'active' : ''}">
-            <i class="bi bi-speedometer2 me-1"></i> Tổng quan (Dashboard)
-          </a>
-          <a href="#/admin/rooms" class="auth-tab-btn ${activeTab === 'rooms' ? 'active' : ''}">
-            <i class="bi bi-door-open me-1"></i> Quản lý Phòng họp
-          </a>
-          <a href="#/admin/equipment" class="auth-tab-btn ${activeTab === 'equipment' ? 'active' : ''}">
-            <i class="bi bi-cpu me-1"></i> Quản lý Thiết bị
-          </a>
-          <a href="#/admin/users" class="auth-tab-btn ${activeTab === 'users' ? 'active' : ''}">
-            <i class="bi bi-people me-1"></i> Quản lý Người dùng
-          </a>
-          <a href="#/admin/reports" class="auth-tab-btn ${activeTab === 'reports' ? 'active' : ''}">
-            <i class="bi bi-pie-chart me-1"></i> Báo cáo & Thống kê
-          </a>
+  /**
+   * Render thanh Header chuẩn Enterprise SaaS cho các trang quản trị
+   * (Đã loại bỏ hoàn toàn thanh 5 tab admin-subnav theo Yêu cầu 2)
+   */
+  function renderAdminSubnav(activeTab = 'dashboard') {
+    let title = 'Tổng quan quản trị';
+    let subtitle = 'Theo dõi tình hình vận hành phòng họp, trang thiết bị và lịch họp toàn hệ thống';
+
+    if (activeTab === 'rooms') {
+      title = 'Quản lý Phòng họp';
+      subtitle = 'Cấu hình danh mục phòng họp, sức chứa và mã QR check-in cửa';
+    } else if (activeTab === 'equipment') {
+      title = 'Quản lý Trang thiết bị';
+      subtitle = 'Kiểm soát số lượng, chủng loại và tình trạng kỹ thuật thiết bị';
+    } else if (activeTab === 'users') {
+      title = 'Quản lý Người dùng & Phân quyền';
+      subtitle = 'Danh sách tài khoản nhân viên, phòng ban và phân quyền truy cập';
+    } else if (activeTab === 'reports') {
+      title = 'Báo cáo & Thống kê';
+      subtitle = 'Phân tích mật độ sử dụng phòng, tỷ lệ cuộc họp và xuất dữ liệu CSV';
+    }
+
+    return `
+      <div class="admin-page-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+        <div>
+          <h1 class="admin-page-title m-0">${title}</h1>
+          <p class="admin-page-subtitle text-secondary small m-0 mt-1">${subtitle}</p>
         </div>
       </div>
     `;
@@ -68,149 +114,372 @@
     const allMeetings = window.meetings || [];
     const allUsers = window.USERS || [];
 
-    const activeRooms = allRooms.filter(r => !r.status || r.status.toLowerCase() === 'active').length;
+    // Tính toán số liệu KPI phòng họp
+    const activeRooms = allRooms.filter(r => (r.status || '').toLowerCase() === 'active').length;
+    const maintenanceRooms = allRooms.filter(r => (r.status || '').toLowerCase() === 'maintenance').length;
+    const inactiveRooms = Math.max(0, allRooms.length - activeRooms - maintenanceRooms);
+    const roomOccupancyRate = allRooms.length > 0 ? Math.round((activeRooms / allRooms.length) * 100) : 0;
+
+    // Tính toán số liệu KPI thiết bị
     const availEquipments = allEquipments.filter(e => !e.status || e.status.toLowerCase() === 'available').length;
-    const scheduledMeetings = allMeetings.filter(m => m.status === 'scheduled').length;
+    const maintenanceEquipments = allEquipments.filter(e => {
+      const s = (e.status || '').toLowerCase();
+      return s === 'maintenance' || s === 'broken';
+    }).length;
+
+    // Tính toán số liệu KPI cuộc họp
+    const scheduledMeetings = allMeetings.filter(m => (m.status || '').toLowerCase() === 'scheduled' || (m.status || '').toLowerCase() === 'confirmed').length;
+    const inProgressMeetings = allMeetings.filter(m => (m.status || '').toLowerCase() === 'in-progress' || (m.status || '').toLowerCase() === 'inprogress').length;
+    const usersCount = allUsers.length > 0 ? allUsers.length : 14;
+
+    // Tự động tải danh sách người dùng nếu window.USERS chưa được nạp
+    if ((!window.USERS || window.USERS.length === 0) && window.MeetingAPI && typeof window.MeetingAPI.getUsers === 'function') {
+      window.MeetingAPI.getUsers().then(res => {
+        const userKpiEl = document.getElementById('admin-kpi-users-value');
+        if (userKpiEl && window.USERS && window.USERS.length > 0) {
+          userKpiEl.textContent = window.USERS.length;
+        }
+      }).catch(() => {});
+    }
+
+    // Danh sách cuộc họp gần đây (Tối đa 7 cuộc họp hiển thị)
+    const recentMeetings = allMeetings.slice(0, 7);
+
+    // Danh sách 3 phòng họp hiển thị ở card phụ
+    const sampleRooms = allRooms.slice(0, 3);
 
     container.innerHTML = `
       <div class="admin-dashboard-page">
+        <!-- 1. Header tinh gọn, chuyên nghiệp (Yêu cầu 4, 5, 11) -->
         ${renderAdminSubnav('dashboard')}
 
-        <!-- 4 KPI Cards -->
-        <div class="row g-3 mb-4">
-          <!-- KPI 1: Phòng họp -->
-          <div class="col-sm-6 col-xl-3">
-            <div class="stitch-card p-3 border-start border-4 border-primary">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <span class="text-secondary small fw-semibold">Tổng số phòng</span>
-                <span class="badge bg-primary-subtle text-primary"><i class="bi bi-door-open"></i></span>
+        <!-- 2. Bốn KPI Cards đồng nhất, nền trắng, viền nhẹ (Yêu cầu 6) -->
+        <div class="row g-3 mb-4" id="admin-kpi-row">
+          <!-- KPI 1: Tổng số phòng -->
+          <div class="col-6 col-lg-3">
+            <div class="admin-kpi-card">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Tổng số phòng</span>
+                <div class="admin-kpi-icon-wrapper text-primary">
+                  <i class="bi bi-door-open"></i>
+                </div>
               </div>
-              <div class="fw-bold fs-2 text-slate-900">${allRooms.length}</div>
-              <div class="text-success small"><i class="bi bi-check-circle me-1"></i>${activeRooms} phòng đang hoạt động</div>
+              <div class="admin-kpi-value">${allRooms.length}</div>
+              <div class="admin-kpi-subtext text-success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>${activeRooms} phòng đang hoạt động</span>
+              </div>
             </div>
           </div>
 
-          <!-- KPI 2: Thiết bị -->
-          <div class="col-sm-6 col-xl-3">
-            <div class="stitch-card p-3 border-start border-4 border-info">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <span class="text-secondary small fw-semibold">Trang thiết bị</span>
-                <span class="badge bg-info-subtle text-info"><i class="bi bi-cpu"></i></span>
+          <!-- KPI 2: Trang thiết bị -->
+          <div class="col-6 col-lg-3">
+            <div class="admin-kpi-card">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Trang thiết bị</span>
+                <div class="admin-kpi-icon-wrapper text-info">
+                  <i class="bi bi-cpu"></i>
+                </div>
               </div>
-              <div class="fw-bold fs-2 text-slate-900">${allEquipments.length}</div>
-              <div class="text-info small"><i class="bi bi-check2-all me-1"></i>${availEquipments} thiết bị sẵn sàng</div>
+              <div class="admin-kpi-value">${allEquipments.length}</div>
+              <div class="admin-kpi-subtext ${maintenanceEquipments > 0 ? 'text-warning' : 'text-primary'}">
+                <i class="bi bi-check2-circle"></i>
+                <span>${availEquipments} thiết bị sẵn sàng</span>
+              </div>
             </div>
           </div>
 
-          <!-- KPI 3: Lịch họp -->
-          <div class="col-sm-6 col-xl-3">
-            <div class="stitch-card p-3 border-start border-4 border-warning">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <span class="text-secondary small fw-semibold">Lịch họp đã đặt</span>
-                <span class="badge bg-warning-subtle text-warning"><i class="bi bi-calendar3"></i></span>
+          <!-- KPI 3: Lịch họp đã đặt -->
+          <div class="col-6 col-lg-3">
+            <div class="admin-kpi-card">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Lịch họp đã đặt</span>
+                <div class="admin-kpi-icon-wrapper text-warning">
+                  <i class="bi bi-calendar3"></i>
+                </div>
               </div>
-              <div class="fw-bold fs-2 text-slate-900">${allMeetings.length}</div>
-              <div class="text-warning small"><i class="bi bi-clock-history me-1"></i>${scheduledMeetings} cuộc họp sắp tới</div>
+              <div class="admin-kpi-value">${allMeetings.length}</div>
+              <div class="admin-kpi-subtext text-secondary">
+                <i class="bi bi-clock-history text-warning"></i>
+                <span>${scheduledMeetings} cuộc họp sắp tới</span>
+              </div>
             </div>
           </div>
 
-          <!-- KPI 4: Nhân sự -->
-          <div class="col-sm-6 col-xl-3">
-            <div class="stitch-card p-3 border-start border-4 border-success">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <span class="text-secondary small fw-semibold">Nhân sự hệ thống</span>
-                <span class="badge bg-success-subtle text-success"><i class="bi bi-people"></i></span>
+          <!-- KPI 4: Nhân sự hệ thống -->
+          <div class="col-6 col-lg-3">
+            <div class="admin-kpi-card">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Nhân sự hệ thống</span>
+                <div class="admin-kpi-icon-wrapper text-secondary">
+                  <i class="bi bi-people"></i>
+                </div>
               </div>
-              <div class="fw-bold fs-2 text-slate-900">${allUsers.length || '12+'}</div>
-              <div class="text-secondary small"><i class="bi bi-building me-1"></i>Đồng bộ toàn cơ sở</div>
+              <div class="admin-kpi-value" id="admin-kpi-users-value">${usersCount}</div>
+              <div class="admin-kpi-subtext text-secondary">
+                <i class="bi bi-shield-check text-primary"></i>
+                <span>Đồng bộ toàn cơ sở</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Quick Access Modules -->
-        <h4 class="fw-bold text-slate-900 mb-3">Lối tắt quản lý trực tiếp</h4>
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="stitch-card p-4 h-100 hover-shadow transition">
-              <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="p-3 bg-primary-subtle text-primary rounded-3 fs-4"><i class="bi bi-door-open-fill"></i></div>
-                <div>
-                  <h5 class="fw-bold m-0">Quản lý Phòng họp</h5>
-                  <span class="text-muted small">Cấu hình phòng & mã QR</span>
+        <!-- 3. Bố cục chính: Ưu tiên Bảng Lịch họp ngay sau KPI + Cột thống kê & thao tác nhanh (Yêu cầu 7, 8, 9, 10, 12) -->
+        <div class="row g-4 mb-4">
+          <!-- Cột chính (8/12): Bảng Lịch họp toàn hệ thống gần đây (Yêu cầu 8) -->
+          <div class="col-12 col-xl-8">
+            <div class="admin-card h-100 d-flex flex-column">
+              <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-calendar-event text-primary fs-5"></i>
+                  <h2 class="admin-card-title m-0">Lịch họp toàn hệ thống gần đây</h2>
+                  <span class="badge bg-light text-secondary border px-2 py-0.5 small fw-semibold">${allMeetings.length}</span>
+                </div>
+                <a href="#/meetings" class="admin-card-action-link" title="Xem danh sách tất cả các cuộc họp">
+                  <span>Xem tất cả</span>
+                  <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+
+              <div class="admin-card-body p-0 flex-grow-1">
+                <div class="table-responsive">
+                  <table class="table admin-table mb-0 align-middle">
+                    <thead>
+                      <tr>
+                        <th style="min-width: 170px;">Cuộc họp</th>
+                        <th style="min-width: 110px;">Chủ trì</th>
+                        <th style="min-width: 115px;">Phòng họp</th>
+                        <th style="min-width: 95px;">Thời gian</th>
+                        <th style="min-width: 105px;">Trạng thái</th>
+                        <th class="text-end" style="width: 44px;"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${recentMeetings.length === 0 ? `
+                        <tr>
+                          <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x fs-1 opacity-50 mb-2 d-block"></i>
+                            <span class="fw-medium">Chưa có dữ liệu cuộc họp nào trong hệ thống.</span>
+                          </td>
+                        </tr>
+                      ` : recentMeetings.map(m => {
+                        const hostName = m.host || 'Thành viên';
+                        const initials = typeof window.getInitials === 'function' ? window.getInitials(hostName) : 'U';
+                        const color = typeof window.getHostColor === 'function' ? window.getHostColor(hostName) : '#2563eb';
+
+                        return `
+                          <tr>
+                            <!-- Tiêu đề cuộc họp -->
+                            <td>
+                              <div class="d-flex flex-column" style="max-width: 190px;">
+                                <div class="fw-semibold text-slate-900 text-truncate" title="${escapeHtml(m.title)}">
+                                  ${escapeHtml(m.title)}
+                                </div>
+                                <div class="d-flex align-items-center gap-1 mt-0.5">
+                                  ${m.tag ? `<span class="badge bg-light text-secondary border px-1.5 py-0.5" style="font-size: 0.68rem;">${escapeHtml(m.tag)}</span>` : ''}
+                                  ${m.isRecurring ? `<span class="badge bg-info-subtle text-info border border-info-subtle px-1.5 py-0.5" style="font-size: 0.68rem;" title="Lịch họp định kỳ"><i class="bi bi-repeat me-0.5"></i>Định kỳ</span>` : ''}
+                                </div>
+                              </div>
+                            </td>
+
+                            <!-- Người chủ trì -->
+                            <td>
+                              <div class="d-flex align-items-center gap-1.5">
+                                <span class="admin-user-avatar-sm" style="background-color: ${color}; color: #ffffff;">${initials}</span>
+                                <span class="fw-medium text-slate-800 text-truncate" style="max-width: 100px;" title="${escapeHtml(hostName)}">
+                                  ${escapeHtml(hostName)}
+                                </span>
+                              </div>
+                            </td>
+
+                            <!-- Phòng họp -->
+                            <td>
+                              <div class="d-flex align-items-center gap-1.5">
+                                <span class="admin-room-icon-box text-primary"><i class="bi bi-door-closed"></i></span>
+                                <span class="text-slate-800 fw-medium text-truncate" style="max-width: 105px;" title="${escapeHtml(m.roomName || 'Chưa xếp phòng')}">
+                                  ${escapeHtml(m.roomName || 'Chưa xếp phòng')}
+                                </span>
+                              </div>
+                            </td>
+
+                            <!-- Ngày giờ -->
+                            <td>
+                              ${formatMeetingDateTime(m)}
+                            </td>
+
+                            <!-- Trạng thái -->
+                            <td>
+                              ${renderMeetingStatusPill(m.status)}
+                            </td>
+
+                            <!-- Thao tác chi tiết -->
+                            <td class="text-end">
+                              <button type="button" class="admin-btn-action" onclick="if (typeof openDetailModal === 'function') openDetailModal(${m.id})" title="Xem thông tin chi tiết cuộc họp">
+                                <i class="bi bi-eye"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <p class="text-secondary small mb-3">Thêm mới phòng, điều chỉnh sức chứa, thiết bị và quét mã QR dán cửa.</p>
-              <a href="#/admin/rooms" class="btn btn-outline-primary btn-sm w-100">Truy cập quản lý phòng &rarr;</a>
             </div>
           </div>
 
-          <div class="col-md-4">
-            <div class="stitch-card p-4 h-100 hover-shadow transition">
-              <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="p-3 bg-info-subtle text-info rounded-3 fs-4"><i class="bi bi-tools"></i></div>
-                <div>
-                  <h5 class="fw-bold m-0">Quản lý Thiết bị</h5>
-                  <span class="text-muted small">Kiểm soát tình trạng kỹ thuật</span>
+          <!-- Cột phụ (4/12): Thống kê vận hành phòng & Lối tắt quản lý (Yêu cầu 7, 9) -->
+          <div class="col-12 col-xl-4 d-flex flex-column gap-3">
+            <!-- Card Phụ 1: Tình trạng phòng họp & Tài nguyên (Yêu cầu 9) -->
+            <div class="admin-card">
+              <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-pie-chart text-primary fs-5"></i>
+                  <h3 class="admin-card-title m-0">Tình trạng phòng họp</h3>
+                </div>
+                <a href="#/admin/rooms" class="admin-card-action-link" title="Quản lý danh sách phòng họp">
+                  <span>Quản lý</span>
+                  <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+
+              <div class="admin-card-body">
+                <!-- Thanh tỷ lệ sẵn sàng -->
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center small mb-1">
+                    <span class="text-secondary">Tỷ lệ phòng sẵn sàng</span>
+                    <span class="fw-bold text-slate-800">${roomOccupancyRate}%</span>
+                  </div>
+                  <div class="progress admin-progress-bar">
+                    <div class="progress-bar bg-success" style="width: ${roomOccupancyRate}%" role="progressbar" aria-valuenow="${roomOccupancyRate}" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+
+                <!-- 3 ô trạng thái rút gọn -->
+                <div class="admin-status-breakdown-grid mb-3">
+                  <div class="admin-status-breakdown-item bg-success-subtle">
+                    <div class="small text-success fw-medium">Sẵn sàng</div>
+                    <div class="fw-bold text-success fs-5">${activeRooms}</div>
+                  </div>
+                  <div class="admin-status-breakdown-item bg-warning-subtle">
+                    <div class="small text-warning fw-medium">Bảo trì</div>
+                    <div class="fw-bold text-warning fs-5">${maintenanceRooms}</div>
+                  </div>
+                  <div class="admin-status-breakdown-item bg-light">
+                    <div class="small text-secondary fw-medium">Tạm ngưng</div>
+                    <div class="fw-bold text-secondary fs-5">${inactiveRooms}</div>
+                  </div>
+                </div>
+
+                <!-- Cảnh báo vận hành tài nguyên -->
+                ${maintenanceEquipments > 0 ? `
+                  <div class="admin-alert-banner alert-warning-soft mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0"></i>
+                    <div class="small">
+                      Có <strong>${maintenanceEquipments} thiết bị</strong> đang ở trạng thái bảo trì/sửa chữa.
+                    </div>
+                  </div>
+                ` : `
+                  <div class="admin-alert-banner alert-success-soft mb-3">
+                    <i class="bi bi-check-circle-fill text-success flex-shrink-0"></i>
+                    <div class="small">
+                      Toàn bộ hạ tầng thiết bị kỹ thuật đang sẵn sàng.
+                    </div>
+                  </div>
+                `}
+
+                <!-- Danh sách 3 phòng mẫu -->
+                <div class="d-flex flex-column">
+                  ${sampleRooms.map(r => {
+                    const isActive = (r.status || '').toLowerCase() === 'active';
+                    return `
+                      <div class="admin-mini-room-item">
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="admin-room-icon-box ${isActive ? 'text-primary' : 'text-warning'}">
+                            <i class="bi bi-door-closed"></i>
+                          </span>
+                          <div>
+                            <div class="small fw-semibold text-slate-800">${escapeHtml(r.name || r.roomName)}</div>
+                            <div class="text-secondary" style="font-size: 0.7rem;">Sức chứa: ${r.capacity || 10} chỗ</div>
+                          </div>
+                        </div>
+                        <span class="badge ${isActive ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}" style="font-size: 0.7rem;">
+                          ${isActive ? 'Hoạt động' : 'Bảo trì'}
+                        </span>
+                      </div>
+                    `;
+                  }).join('')}
                 </div>
               </div>
-              <p class="text-secondary small mb-3">Thêm máy chiếu, camera, micro; cập nhật trạng thái Bảo trì / Sẵn sàng.</p>
-              <a href="#/admin/equipment" class="btn btn-outline-info btn-sm w-100">Truy cập quản lý thiết bị &rarr;</a>
             </div>
-          </div>
 
-          <div class="col-md-4">
-            <div class="stitch-card p-4 h-100 hover-shadow transition">
-              <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="p-3 bg-success-subtle text-success rounded-3 fs-4"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
-                <div>
-                  <h5 class="fw-bold m-0">Báo cáo & Thống kê</h5>
-                  <span class="text-muted small">Xuất dữ liệu & Phân tích</span>
+            <!-- Card Phụ 2: Thao tác quản lý nhanh (Thay thế 3 card cồng kềnh trước đây - Yêu cầu 7) -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-lightning-charge text-warning fs-5"></i>
+                  <h3 class="admin-card-title m-0">Lối tắt quản trị</h3>
                 </div>
               </div>
-              <p class="text-secondary small mb-3">Thống kê mật độ sử dụng phòng, tỷ lệ hủy họp và xuất file báo cáo CSV.</p>
-              <a href="#/admin/reports" class="btn btn-outline-success btn-sm w-100">Xem thống kê & Báo cáo &rarr;</a>
+
+              <div class="admin-card-body d-flex flex-column gap-2 p-3">
+                <!-- Lối tắt 1: Quản lý phòng -->
+                <a href="#/admin/rooms" class="admin-quick-link-item">
+                  <div class="d-flex align-items-center gap-2.5">
+                    <span class="admin-quick-link-icon bg-primary-subtle text-primary">
+                      <i class="bi bi-door-open-fill"></i>
+                    </span>
+                    <div>
+                      <div class="small fw-semibold text-slate-900">Quản lý Phòng họp</div>
+                      <div class="text-secondary" style="font-size: 0.725rem;">${allRooms.length} phòng • Sức chứa &amp; QR</div>
+                    </div>
+                  </div>
+                  <i class="bi bi-chevron-right text-muted small"></i>
+                </a>
+
+                <!-- Lối tắt 2: Quản lý thiết bị -->
+                <a href="#/admin/equipment" class="admin-quick-link-item">
+                  <div class="d-flex align-items-center gap-2.5">
+                    <span class="admin-quick-link-icon bg-info-subtle text-info">
+                      <i class="bi bi-tools"></i>
+                    </span>
+                    <div>
+                      <div class="small fw-semibold text-slate-900">Quản lý Thiết bị</div>
+                      <div class="text-secondary" style="font-size: 0.725rem;">${allEquipments.length} thiết bị • Tình trạng kỹ thuật</div>
+                    </div>
+                  </div>
+                  <i class="bi bi-chevron-right text-muted small"></i>
+                </a>
+
+                <!-- Lối tắt 3: Quản lý người dùng -->
+                <a href="#/admin/users" class="admin-quick-link-item">
+                  <div class="d-flex align-items-center gap-2.5">
+                    <span class="admin-quick-link-icon bg-success-subtle text-success">
+                      <i class="bi bi-people-fill"></i>
+                    </span>
+                    <div>
+                      <div class="small fw-semibold text-slate-900">Quản lý Người dùng</div>
+                      <div class="text-secondary" style="font-size: 0.725rem;">${usersCount} tài khoản • Phân quyền</div>
+                    </div>
+                  </div>
+                  <i class="bi bi-chevron-right text-muted small"></i>
+                </a>
+
+                <!-- Lối tắt 4: Báo cáo & Thống kê -->
+                <a href="#/admin/reports" class="admin-quick-link-item">
+                  <div class="d-flex align-items-center gap-2.5">
+                    <span class="admin-quick-link-icon bg-warning-subtle text-warning">
+                      <i class="bi bi-pie-chart-fill"></i>
+                    </span>
+                    <div>
+                      <div class="small fw-semibold text-slate-900">Báo cáo &amp; Thống kê</div>
+                      <div class="text-secondary" style="font-size: 0.725rem;">Mật độ sử dụng • Xuất CSV</div>
+                    </div>
+                  </div>
+                  <i class="bi bi-chevron-right text-muted small"></i>
+                </a>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Recent Meetings Table Preview -->
-        <div class="stitch-card p-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold text-slate-900 m-0">Lịch họp toàn hệ thống gần đây</h5>
-            <a href="#/meetings" class="text-primary small fw-semibold text-decoration-none">Xem toàn bộ danh sách &rarr;</a>
-          </div>
-
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th class="small">Tiêu đề cuộc họp</th>
-                  <th class="small">Người chủ trì</th>
-                  <th class="small">Phòng họp</th>
-                  <th class="small">Ngày & Giờ</th>
-                  <th class="small">Trạng thái</th>
-                  <th class="small text-end">Chi tiết</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${allMeetings.slice(0, 5).map(m => `
-                  <tr>
-                    <td>
-                      <div class="fw-bold text-slate-900">${escapeHtml(m.title)}</div>
-                    </td>
-                    <td>${escapeHtml(m.host || 'Thành viên')}</td>
-                    <td><i class="bi bi-door-closed me-1 text-primary"></i>${escapeHtml(m.roomName || 'Phòng')}</td>
-                    <td>${m.date} (${m.time || (m.startTime + ' - ' + m.endTime)})</td>
-                    <td><span class="badge bg-primary-subtle text-primary">${m.status || 'Scheduled'}</span></td>
-                    <td class="text-end">
-                      <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2" onclick="if (typeof openDetailModal === 'function') openDetailModal(${m.id})">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -228,14 +497,9 @@
       <div class="admin-users-page">
         ${renderAdminSubnav('users')}
         <div class="stitch-card p-4">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h4 class="fw-bold text-slate-900 m-0">Danh sách Tài khoản & Phân quyền Người dùng</h4>
-              <p class="text-secondary small m-0">Đồng bộ từ CSDL MySQL và hệ thống tài khoản nhân viên</p>
-            </div>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
-              <i class="bi bi-shield-check me-1"></i> Quyền Quản trị viên
-            </span>
+          <div class="mb-4">
+            <h4 class="fw-bold text-slate-900 m-0">Danh sách Tài khoản & Phân quyền Người dùng</h4>
+            <p class="text-secondary small m-0 mt-1">Đồng bộ từ CSDL MySQL và hệ thống tài khoản nhân viên</p>
           </div>
 
           <div id="admin-users-table-container">

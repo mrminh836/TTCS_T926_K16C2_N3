@@ -19,8 +19,13 @@
     const allRooms = window.ROOMS || [];
     const isAdmin = window.AuthState && window.AuthState.isAdmin();
 
-    // Lọc thiết bị
-    const filteredEquipments = allEquipments.filter(e => {
+    // Lọc thiết bị: Chỉ giữ lại các thiết bị còn sử dụng được, ẩn các thiết bị bảo trì hoặc hỏng hóc
+    const usableEquipments = allEquipments.filter(e => {
+      const status = (e.status || '').toLowerCase();
+      return status !== 'maintenance' && status !== 'broken' && status !== 'inactive';
+    });
+
+    const filteredEquipments = usableEquipments.filter(e => {
       const matchSearch = !eqSearchTerm || 
         (e.name && e.name.toLowerCase().includes(eqSearchTerm.toLowerCase())) ||
         (e.type && e.type.toLowerCase().includes(eqSearchTerm.toLowerCase()));
@@ -29,8 +34,8 @@
       return matchSearch && matchType;
     });
 
-    // Lấy danh sách các loại thiết bị độc nhất để làm dropdown
-    const availableTypes = Array.from(new Set(allEquipments.map(e => e.type).filter(Boolean)));
+    // Lấy danh sách các loại thiết bị độc nhất từ các thiết bị khả dụng
+    const availableTypes = Array.from(new Set(usableEquipments.map(e => e.type).filter(Boolean)));
 
     container.innerHTML = `
       <div class="user-equipment-page">
@@ -40,21 +45,10 @@
             <div class="d-flex align-items-center gap-2 mb-1">
               <h2 class="fw-bold fs-3 text-slate-900 m-0">Danh mục Trang thiết bị</h2>
               <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
-                ${allEquipments.length} thiết bị kỹ thuật
+                ${usableEquipments.length} thiết bị sẵn sàng sử dụng
               </span>
             </div>
             <p class="text-secondary small m-0">Hạ tầng công nghệ và trang thiết bị hỗ trợ hội nghị trực tuyến & làm việc nhóm</p>
-          </div>
-
-          <div class="d-flex align-items-center gap-2">
-            ${isAdmin ? `
-              <a href="#/admin/equipment" class="btn btn-outline-danger btn-sm py-2 px-3">
-                <i class="bi bi-shield-lock me-1"></i> Quản trị thiết bị (Admin)
-              </a>
-            ` : ''}
-            <button type="button" class="btn btn-primary stitch-btn-submit btn-sm py-2 px-3" onclick="if (typeof openAddModal === 'function') openAddModal()">
-              <i class="bi bi-calendar-plus me-1"></i> Đặt lịch mượn thiết bị
-            </button>
           </div>
         </div>
 
@@ -99,16 +93,7 @@
               </div>
             </div>
           ` : filteredEquipments.map(eq => {
-            const isAvail = !eq.status || eq.status.toLowerCase() === 'available';
-            const isMaint = eq.status && eq.status.toLowerCase() === 'maintenance';
-            const isBroken = eq.status && eq.status.toLowerCase() === 'broken';
-
-            let statusBadge = '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>';
-            if (isMaint) {
-              statusBadge = '<span class="badge bg-warning-subtle text-warning border border-warning-subtle"><i class="bi bi-tools me-1"></i>Bảo trì</span>';
-            } else if (isBroken) {
-              statusBadge = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-x-circle-fill me-1"></i>Hỏng hóc</span>';
-            }
+            const statusBadge = '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>';
 
             // Tìm xem thiết bị đang nằm ở phòng nào
             const equippedRooms = allRooms.filter(r => (r.equipmentNames || []).includes(eq.name));

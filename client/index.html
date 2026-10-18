@@ -26,7 +26,7 @@
   />
 
   <!-- CSS riêng của project -->
-  <link rel="stylesheet" href="style.css?v=1.13" />
+  <link rel="stylesheet" href="style.css?v=1.19" />
 
   <!-- Auth Guard: Bắt buộc đăng nhập qua trang login.html riêng biệt (chuẩn kiến trúc QLNS_QLTKPM) -->
   <script>
@@ -96,12 +96,30 @@
           <span>Thiết bị</span>
         </a>
 
-        <div class="nav-section-title" id="nav-section-admin-title">HỆ THỐNG</div>
-        <a href="#/admin" class="nav-item" id="nav-admin-link" data-nav-path="/admin">
-          <i class="bi bi-shield-lock-fill"></i>
-          <span>Quản trị</span>
-          <span class="nav-item-badge badge-admin">Admin</span>
-        </a>
+        <div class="nav-section-title" id="nav-section-admin-title">QUẢN TRỊ HỆ THỐNG</div>
+        <div id="admin-nav-group" class="admin-nav-group">
+          <a href="#/admin" class="nav-item nav-admin-item" id="nav-admin-link" data-nav-path="/admin" title="Tổng quan chỉ số và điều hành">
+            <i class="bi bi-speedometer2"></i>
+            <span>Tổng quan Admin</span>
+            <span class="nav-item-badge badge-admin">Admin</span>
+          </a>
+          <a href="#/admin/rooms" class="nav-item nav-admin-item" id="nav-admin-rooms" data-nav-path="/admin/rooms" title="Cấu hình phòng họp, sức chứa & QR check-in">
+            <i class="bi bi-door-open-fill"></i>
+            <span>Quản lý Phòng họp</span>
+          </a>
+          <a href="#/admin/equipment" class="nav-item nav-admin-item" id="nav-admin-equipment" data-nav-path="/admin/equipment" title="Quản lý trang thiết bị kỹ thuật & bảo trì">
+            <i class="bi bi-tools"></i>
+            <span>Quản lý Thiết bị</span>
+          </a>
+          <a href="#/admin/users" class="nav-item nav-admin-item" id="nav-admin-users" data-nav-path="/admin/users" title="Quản lý tài khoản nhân viên & phân quyền">
+            <i class="bi bi-people-fill"></i>
+            <span>Quản lý Người dùng</span>
+          </a>
+          <a href="#/admin/reports" class="nav-item nav-admin-item" id="nav-admin-reports" data-nav-path="/admin/reports" title="Báo cáo mật độ sử dụng & xuất dữ liệu">
+            <i class="bi bi-pie-chart-fill"></i>
+            <span>Báo cáo &amp; Thống kê</span>
+          </a>
+        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -127,11 +145,6 @@
           <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open mobile menu">
             <i class="bi bi-list fs-4"></i>
           </button>
-
-          <div class="header-search d-none d-md-flex">
-            <i class="bi bi-search header-search-icon"></i>
-            <input type="text" id="header-quick-search" placeholder="Tìm nhanh cuộc họp, phòng họp..." aria-label="Tìm kiếm nhanh" />
-          </div>
         </div>
 
         <div class="header-right">
@@ -268,7 +281,7 @@
                   id="login-identifier"
                   name="identifier"
                   class="form-control stitch-input has-icon"
-                  placeholder="Ví dụ: minh123 hoặc minh@example.com"
+                  placeholder="Ví dụ: employee hoặc admin"
                   autocomplete="username"
                   aria-label="Tên đăng nhập hoặc email"
                   required
@@ -326,13 +339,10 @@
             </span>
             <div class="auth-demo-chips">
               <button type="button" class="btn-demo-chip" data-user="admin" data-pwd="Password123" title="Quyền Quản trị viên cao nhất">
-                <span class="badge bg-danger-subtle text-danger border border-danger-subtle me-1">Admin</span> admin
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle me-1">Quản trị viên</span> admin
               </button>
-              <button type="button" class="btn-demo-chip" data-user="minh123" data-pwd="Password123" title="Tài khoản thành viên tiêu chuẩn">
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1">USER</span> minh123
-              </button>
-              <button type="button" class="btn-demo-chip" data-user="employee" data-pwd="Password123" title="Tài khoản nhân viên phòng ban">
-                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle me-1">Employee</span> employee
+              <button type="button" class="btn-demo-chip" data-user="employee" data-pwd="Password123" title="Tài khoản Nhân viên (User Portal)">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1">Nhân viên</span> employee
               </button>
             </div>
           </div>
@@ -566,7 +576,7 @@
       </div>
 
       <!-- 2. Form Body (Chứa 3 Business sections trọng tâm) -->
-      <form id="meeting-form" class="stitch-form-body" novalidate>
+      <form id="meeting-form" class="stitch-form-body" novalidate onsubmit="event.preventDefault(); if (typeof window.saveMeeting === 'function') window.saveMeeting(event);">
 
         <input
           type="hidden"
@@ -1791,15 +1801,15 @@
   <script src="router.js?v=1.0"></script>
 
   <!-- Các Pages Components Chuyên biệt -->
-  <script src="js/pages/meetings.js?v=1.0"></script>
-  <script src="js/pages/calendar.js?v=1.0"></script>
-  <script src="js/pages/rooms.js?v=1.0"></script>
-  <script src="js/pages/equipment.js?v=1.0"></script>
-  <script src="js/pages/profile.js?v=1.0"></script>
-  <script src="js/pages/admin.js?v=1.0"></script>
+  <script src="js/pages/meetings.js?v=1.1"></script>
+  <script src="js/pages/calendar.js?v=1.1"></script>
+  <script src="js/pages/rooms.js?v=1.3"></script>
+  <script src="js/pages/equipment.js?v=1.1"></script>
+  <script src="js/pages/profile.js?v=1.1"></script>
+  <script src="js/pages/admin.js?v=1.2"></script>
 
   <!-- JavaScript nghiệp vụ chính & Khởi tạo CSDL -->
-  <script src="main.js?v=1.13"></script>
+  <script src="main.js?v=1.17"></script>
 
 </body>
 </html>

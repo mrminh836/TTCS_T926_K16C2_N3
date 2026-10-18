@@ -363,6 +363,7 @@
     const dropdownEmailEl = document.getElementById('dropdown-email');
     const adminSectionTitle = document.getElementById('nav-section-admin-title');
     const adminNavLink = document.getElementById('nav-admin-link');
+    const adminNavGroup = document.getElementById('admin-nav-group');
 
     const isAuthed = AuthState.isAuthenticated();
     const user = AuthState.getUser();
@@ -418,6 +419,7 @@
       }
 
       if (adminSectionTitle) adminSectionTitle.style.display = isAdmin ? 'block' : 'none';
+      if (adminNavGroup) adminNavGroup.style.display = isAdmin ? 'block' : 'none';
       if (adminNavLink) adminNavLink.style.display = isAdmin ? 'flex' : 'none';
     } else {
       if (unloggedSec) unloggedSec.classList.remove('d-none');
@@ -432,6 +434,7 @@
         sidebarRoleEl.className = 'sidebar-role-badge badge-user';
       }
       if (adminSectionTitle) adminSectionTitle.style.display = 'none';
+      if (adminNavGroup) adminNavGroup.style.display = 'none';
       if (adminNavLink) adminNavLink.style.display = 'none';
     }
   }

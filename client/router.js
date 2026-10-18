@@ -187,12 +187,18 @@
         if (!href) return;
         const linkPath = href.startsWith('#') ? href.slice(1) : href;
 
-        // So khớp path
+        // So khớp path chính xác cho từng mục điều hướng
         let isActive = false;
         if (linkPath === '/' || linkPath === '/home') {
           isActive = (path === '/' || path === '/home');
-        } else if (linkPath.startsWith('/admin')) {
-          isActive = path.startsWith('/admin');
+        } else if (linkPath === '/admin') {
+          isActive = (path === '/admin');
+        } else if (linkPath === '/admin/equipment' || linkPath === '/admin/equipments') {
+          isActive = (path === '/admin/equipment' || path === '/admin/equipments');
+        } else if (linkPath.startsWith('/admin/')) {
+          isActive = path.startsWith(linkPath);
+        } else if (linkPath === '/equipment' || linkPath === '/equipments') {
+          isActive = (path === '/equipment' || path === '/equipments');
         } else {
           isActive = path.startsWith(linkPath);
         }

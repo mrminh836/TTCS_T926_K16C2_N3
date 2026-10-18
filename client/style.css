@@ -103,6 +103,66 @@
   box-sizing: border-box;
 }
 
+/* =====================================================
+   ẨN HOÀN TOÀN THANH CUỘN (SCROLLBAR / THANH SLIDE)
+   Ẩn toàn bộ thanh cuộn thô trên tất cả trình duyệt nhưng
+   vẫn giữ 100% khả năng cuộn mượt mà bằng con lăn chuột,
+   touchpad, cảm ứng và phím mũi tên.
+   ===================================================== */
+html,
+body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+html,
+body,
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE & Edge cũ */
+}
+
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+div::-webkit-scrollbar,
+nav::-webkit-scrollbar,
+main::-webkit-scrollbar,
+aside::-webkit-scrollbar,
+section::-webkit-scrollbar,
+table::-webkit-scrollbar {
+  display: none !important; /* Chrome, Edge Chromium, Safari, Opera */
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Đảm bảo các container cụ thể như sidebar, main-wrapper, table-responsive cũng ẩn triệt để */
+.sidebar,
+.sidebar-nav,
+.main-wrapper,
+.main-content,
+#page-container,
+.table-responsive,
+.modal-body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.sidebar::-webkit-scrollbar,
+.sidebar-nav::-webkit-scrollbar,
+.main-wrapper::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+#page-container::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+
 body {
   margin: 0;
   font-family: var(--font-family);
@@ -145,6 +205,8 @@ body {
   display: flex;
   min-height: 100vh;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   background-color: var(--slate-50);
   position: relative;
 }
@@ -412,12 +474,16 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  transition: margin-left 0.25s ease;
+  min-width: 0;
+  max-width: calc(100% - var(--sidebar-width));
   width: calc(100% - var(--sidebar-width));
+  overflow-x: hidden;
+  transition: margin-left 0.25s ease, max-width 0.25s ease, width 0.25s ease;
 }
 
 .sidebar.collapsed ~ .main-wrapper {
   margin-left: var(--sidebar-width-collapsed);
+  max-width: calc(100% - var(--sidebar-width-collapsed));
   width: calc(100% - var(--sidebar-width-collapsed));
 }
 
@@ -637,6 +703,9 @@ body {
   flex: 1;
   padding: 24px 32px;
   background-color: var(--slate-50);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Responsive Mobile Rules */
@@ -6276,24 +6345,9 @@ textarea.form-control {
   margin-bottom: 24px;
 }
 
-.admin-feature-tabs-container {
-  background: var(--slate-100);
-  border: 1px solid var(--slate-200);
-  border-radius: 14px;
-  padding: 6px;
-  margin-top: 18px;
-}
-
+.admin-feature-tabs-container,
 .admin-feature-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-@media (max-width: 768px) {
-  .admin-feature-tabs {
-    grid-template-columns: 1fr;
-  }
+  display: none !important;
 }
 
 .admin-feature-tab {
@@ -6965,6 +7019,8 @@ textarea.form-control {
   top: 0;
   left: 0;
   width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
   height: 3px;
   background: transparent;
   z-index: 9999;
@@ -7011,11 +7067,20 @@ textarea.form-control {
 /* =====================================================
    CALENDAR PAGE STYLES (STITCH SPEC)
    ===================================================== */
+.calendar-page-wrapper {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .calendar-week-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 12px;
   min-height: 520px;
+  min-width: 0;
+  width: 100%;
 }
 
 @media (max-width: 1100px) {
@@ -7037,6 +7102,8 @@ textarea.form-control {
   padding: 12px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
   transition: all 0.15s ease;
 }
 
@@ -7097,6 +7164,9 @@ textarea.form-control {
   padding: 8px 10px;
   transition: all 0.15s ease;
   font-size: 0.82rem;
+  min-width: 0;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .calendar-event-card:hover {
@@ -7115,11 +7185,39 @@ textarea.form-control {
   font-weight: 600;
   color: #0f172a;
   margin-bottom: 2px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .calendar-event-card .event-room {
   font-size: 0.75rem;
   color: #64748b;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-event-card .event-footer {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.calendar-event-card .event-host-group {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.calendar-event-card .event-host {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
 }
 
 .user-avatar-tiny {
@@ -7183,6 +7281,321 @@ textarea.form-control {
   box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08);
   border-color: #cbd5e1;
 }
+
+/* =====================================================
+   ENTERPRISE SAAS ADMIN DASHBOARD STYLES (REFACTORED)
+   Scope: .admin-dashboard-page & .admin-*
+   ===================================================== */
+.admin-dashboard-page {
+  animation: adminFadeIn 0.2s ease-in-out;
+}
+
+@keyframes adminFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 1. Header tinh gọn, chuẩn SaaS */
+.admin-page-header {
+  padding-bottom: 0.25rem;
+}
+
+.admin-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-900, #0f172a);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.admin-page-subtitle {
+  font-size: 0.875rem;
+  color: var(--slate-500, #64748b);
+  margin-top: 0.25rem;
+}
+
+.admin-view-member-btn {
+  display: none !important;
+}
+
+/* 2. KPI Cards đồng nhất, nền trắng, viền nhẹ */
+.admin-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200, #e2e8f0);
+  border-radius: 12px;
+  padding: 1.125rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.admin-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px -2px rgba(15, 23, 42, 0.08);
+  border-color: var(--slate-300, #cbd5e1);
+}
+
+.admin-kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.admin-kpi-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--slate-500, #64748b);
+  letter-spacing: 0.01em;
+}
+
+.admin-kpi-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--slate-50, #f8fafc);
+  border: 1px solid var(--slate-100, #f1f5f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.admin-kpi-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--slate-900, #0f172a);
+  line-height: 1.2;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-kpi-subtext {
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  line-height: 1.3;
+}
+
+/* 3. Panel Cards */
+.admin-card {
+  background: #ffffff;
+  border: 1px solid var(--slate-200, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.admin-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--slate-100, #f1f5f9);
+  background: #ffffff;
+}
+
+.admin-card-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--slate-900, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.admin-card-action-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary, #2563eb);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: gap 0.15s ease, color 0.15s ease;
+}
+
+.admin-card-action-link:hover {
+  color: #1d4ed8;
+  gap: 0.4rem;
+}
+
+.admin-card-body {
+  padding: 1.25rem;
+}
+
+/* 4. Table Lịch họp gần đây chuẩn SaaS */
+.admin-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.admin-table thead th {
+  background-color: var(--slate-50, #f8fafc) !important;
+  color: var(--slate-500, #64748b) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 0.65rem 0.65rem !important;
+  border-bottom: 1px solid var(--slate-200, #e2e8f0) !important;
+  border-top: none !important;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 0.65rem 0.65rem !important;
+  font-size: 0.8125rem !important;
+  border-bottom: 1px solid var(--slate-100, #f1f5f9) !important;
+  color: var(--slate-700, #334155);
+  background-color: #ffffff;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover td {
+  background-color: var(--slate-50, #f8fafc) !important;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.admin-user-avatar-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.admin-room-icon-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #eff6ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.admin-btn-action {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--slate-600, #475569);
+  border-color: var(--slate-200, #e2e8f0);
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.admin-btn-action:hover {
+  background: var(--slate-100, #f1f5f9);
+  color: var(--slate-900, #0f172a);
+  border-color: var(--slate-300, #cbd5e1);
+}
+
+/* 5. Quick Links Item */
+.admin-quick-link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.875rem;
+  border-radius: 8px;
+  border: 1px solid var(--slate-100, #f1f5f9);
+  background: #ffffff;
+  text-decoration: none;
+  color: var(--slate-800, #1e293b);
+  transition: all 0.15s ease;
+}
+
+.admin-quick-link-item:hover {
+  background: var(--slate-50, #f8fafc);
+  border-color: var(--slate-200, #e2e8f0);
+  color: var(--slate-900, #0f172a);
+  transform: translateX(2px);
+}
+
+.admin-quick-link-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* 6. Status Breakdown Grid & Alerts */
+.admin-status-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.admin-status-breakdown-item {
+  padding: 0.625rem 0.5rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.admin-progress-bar {
+  height: 6px;
+  background-color: var(--slate-100, #f1f5f9);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.admin-alert-banner {
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.alert-warning-soft {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  color: #92400e;
+}
+
+.alert-success-soft {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  color: #166534;
+}
+
+/* 7. Mini Room List in Sidebar Card */
+.admin-mini-room-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--slate-100, #f1f5f9);
+}
+
+.admin-mini-room-item:last-child {
+  border-bottom: none;
+}
+
 
 
 
