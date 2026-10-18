@@ -573,8 +573,29 @@
       </div>
     `;
 
+    // Bẫy lỗi ngoại tuyến (Offline) ngay lập tức
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      const tableContainer = document.getElementById('admin-users-table-container');
+      if (tableContainer) {
+        tableContainer.innerHTML = `
+          <div class="text-center py-5">
+            <div class="mb-3 text-danger"><i class="bi bi-wifi-off fs-1"></i></div>
+            <h5 class="fw-bold text-slate-800">Không có kết nối mạng</h5>
+            <p class="text-secondary small mb-3">Bạn đang ở chế độ ngoại tuyến. Không thể tải danh sách tài khoản từ máy chủ.</p>
+            <button type="button" class="btn btn-primary stitch-btn-primary" onclick="window.renderAdminUsersPage()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Thử lại
+            </button>
+          </div>
+        `;
+      }
+      return;
+    }
+
     try {
       const res = await (window.apiFetch || fetch)('/api/users');
+      if (!res.ok) {
+        throw new Error(`Máy chủ phản hồi mã lỗi HTTP ${res.status}`);
+      }
       const data = await res.json().catch(() => ({}));
       const usersList = data.data || data || [];
 
@@ -646,8 +667,13 @@
       const tableContainer = document.getElementById('admin-users-table-container');
       if (tableContainer) {
         tableContainer.innerHTML = `
-          <div class="alert alert-warning">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>Không thể nạp danh sách tài khoản: ${err.message}
+          <div class="text-center py-5">
+            <div class="mb-3 text-warning"><i class="bi bi-exclamation-triangle-fill fs-1"></i></div>
+            <h5 class="fw-bold text-slate-800">Không thể tải danh sách tài khoản</h5>
+            <p class="text-secondary small mb-3">${escapeHtml(err.message || 'Mất kết nối tới máy chủ API.')}</p>
+            <button type="button" class="btn btn-outline-primary" onclick="window.renderAdminUsersPage()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Thử lại
+            </button>
           </div>
         `;
       }

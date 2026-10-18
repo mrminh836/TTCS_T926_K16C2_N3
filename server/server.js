@@ -36,22 +36,13 @@ app.use('/', userRoutes);
 app.use('/', equipmentRoutes);
 app.use('/', reportRoutes);
 
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+
 // Xử lý Route 404 (Không tìm thấy endpoint)
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: `Tuyến đường không tồn tại: ${req.method} ${req.originalUrl}`
-    });
-});
+app.use(notFoundHandler);
 
 // Middleware xử lý lỗi toàn cục (Global Error Handler)
-app.use((err, req, res, next) => {
-    console.error('Lỗi máy chủ:', err);
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message || 'Lỗi server nội bộ.'
-    });
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
