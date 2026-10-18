@@ -8138,6 +8138,22 @@ function openDetailModal(id) {
               <i class="bi bi-arrow-repeat me-1"></i>${meeting.occurrenceIndex ? `Phiên họp #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp định kỳ'}
             </div>
           ` : ''}
+          <div class="mt-2 pt-1 border-top border-slate-100 d-flex align-items-center justify-content-between flex-wrap gap-1">
+            <span class="small text-muted" style="font-size: 0.75rem;">
+              <i class="bi bi-calendar2-check text-primary me-1"></i>Đồng bộ lịch:
+            </span>
+            <div class="d-inline-flex align-items-center gap-1">
+              <a href="/api/meetings/${meeting.id}/export-ics" class="badge bg-success-subtle text-success border border-success-subtle text-decoration-none py-1 px-2" download onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.downloadICS(${meeting.id}, '${escapeHTML(meeting.title)}');" title="Tải tệp iCalendar (.ics)">
+                <i class="bi bi-calendar2-plus me-1"></i>.ics
+              </a>
+              <button type="button" class="badge bg-light text-secondary border border-slate-200 py-1 px-1.5" onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.addToGoogleCalendar(meetings.find(m => m.id === ${meeting.id}) || { id: ${meeting.id}, title: '${escapeHTML(meeting.title)}', date: '${meeting.date}', startTime: '${meeting.startTime}', endTime: '${meeting.endTime}', roomName: '${escapeHTML(roomName)}' });" title="Thêm vào Google Calendar">
+                <i class="bi bi-google text-danger"></i>
+              </button>
+              <button type="button" class="badge bg-light text-secondary border border-slate-200 py-1 px-1.5" onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.addToOutlook(meetings.find(m => m.id === ${meeting.id}) || { id: ${meeting.id}, title: '${escapeHTML(meeting.title)}', date: '${meeting.date}', startTime: '${meeting.startTime}', endTime: '${meeting.endTime}', roomName: '${escapeHTML(roomName)}' });" title="Thêm vào Outlook 365">
+                <i class="bi bi-microsoft text-primary"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -8230,9 +8246,18 @@ function openDetailModal(id) {
   const actionsEl = document.getElementById("detail-permission-actions");
   if (actionsEl) {
     const exportIcsBtn = `
-      <a href="/api/meetings/${meeting.id}/export-ics" class="btn btn-outline-success btn-sm stitch-detail-action-btn" download title="Xuất tệp iCalendar (.ics) đồng bộ Google Calendar & Outlook">
-        <i class="bi bi-calendar2-plus me-1"></i> Xuất Lịch (.ics)
-      </a>
+      <div class="d-inline-flex align-items-center gap-1">
+        <a href="/api/meetings/${meeting.id}/export-ics" class="detail-export-ics-btn" download onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.downloadICS(${meeting.id}, '${escapeHTML(meeting.title)}');" title="Tải tệp iCalendar (.ics) đồng bộ Google Calendar & Outlook">
+          <i class="bi bi-calendar2-plus"></i>
+          <span>Xuất Lịch (.ics)</span>
+        </a>
+        <button type="button" class="detail-export-cal-btn" onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.addToGoogleCalendar(meetings.find(m => m.id === ${meeting.id}) || { id: ${meeting.id}, title: '${escapeHTML(meeting.title)}', date: '${meeting.date}', startTime: '${meeting.startTime}', endTime: '${meeting.endTime}', roomName: '${escapeHTML(roomName)}' });" title="Thêm vào Google Calendar">
+          <i class="bi bi-google text-danger"></i>
+        </button>
+        <button type="button" class="detail-export-cal-btn" onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.addToOutlook(meetings.find(m => m.id === ${meeting.id}) || { id: ${meeting.id}, title: '${escapeHTML(meeting.title)}', date: '${meeting.date}', startTime: '${meeting.startTime}', endTime: '${meeting.endTime}', roomName: '${escapeHTML(roomName)}' });" title="Thêm vào Microsoft Outlook 365">
+          <i class="bi bi-microsoft text-primary"></i>
+        </button>
+      </div>
     `;
 
     if (canModify) {
