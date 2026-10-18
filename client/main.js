@@ -192,19 +192,7 @@ function calcDuration() {
     return false;
   }
 
-  // Chống đặt trong quá khứ nếu là tạo mới
-  if (!isEdit && date) {
-    const selectedStart = new Date(`${date}T${start}:00`);
-    if (selectedStart.getTime() < Date.now() - 60000) {
-      if (timeErrorText) timeErrorText.textContent = "Thời gian bắt đầu không thể diễn ra trong quá khứ.";
-      timeErrorMsg.classList.remove("hidden");
-      durationBadge.className = "stitch-duration-badge error";
-      durationText.innerText = "Thời gian trong quá khứ";
-      startInput.classList.add("has-error", "is-invalid");
-      durationBadge.classList.remove("hidden");
-      return false;
-    }
-  }
+  // (Kiểm tra thời gian quá khứ được thực hiện khi người dùng bấm nút Tạo cuộc họp trong validateMeetingForm)
 
   // Hợp lệ
   timeErrorMsg.classList.add("hidden");
@@ -3547,12 +3535,7 @@ function validateMeetingForm(editId = null) {
       globalError.classList.remove("hidden");
     }
 
-    const modalCard = document.querySelector(".meeting-modal-card");
-    if (modalCard) {
-      modalCard.classList.remove("stitch-shake");
-      void modalCard.offsetWidth;
-      modalCard.classList.add("stitch-shake");
-    }
+    // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
 
     if (firstErrorField) {
       firstErrorField.focus();
@@ -3609,50 +3592,51 @@ function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
   if (!container) return;
 
   const summaryEl = document.getElementById("equipment-avail-summary");
-  // Chỉ hiển thị các thiết bị còn dùng được (ẩn thiết bị bảo trì, hỏng hóc)
+  // Chỉ hiển thị các thiết bị đang hoạt động (loại bỏ bảo trì, hỏng hóc, ngừng hoạt động)
   const usableEquipments = EQUIPMENTS.filter(eq => {
     const status = (eq.status || "").toLowerCase();
     return status !== "maintenance" && status !== "broken" && status !== "inactive";
   });
 
-  let availableCount = 0;
+  // CHỈ HIỂN THỊ CÁC THIẾT BỊ CÒN TRỐNG (sẵn sàng) HOẶC ĐÃ ĐƯỢC CHỌN CHO PHIÊN HỌP NÀY
+  const displayEquipments = usableEquipments.filter(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    if (availabilityMap !== null) {
+      return availabilityMap.has(eqId) || selectedIds.includes(eqId);
+    }
+    return true;
+  });
+
+  const availableCount = displayEquipments.length;
   const totalCount = usableEquipments.length;
 
-  const html = usableEquipments.map(eq => {
-    const eqId = Number(eq.id || eq.equipmentId);
-    const isAvailable = (availabilityMap === null || availabilityMap.has(eqId));
-    const isBusy = availabilityMap !== null && !availabilityMap.has(eqId);
-
-    if (isAvailable) availableCount++;
-
-    let badgeHTML = "";
-    let cardClass = "";
-    let isDisabled = false;
-    let tooltip = "";
-
-    if (isBusy) {
-      badgeHTML = `<span class="badge badge-eq-status badge-eq-busy" title="Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>`;
-      cardClass = "is-busy";
-      isDisabled = true;
-      tooltip = "Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ (Không thể chọn)";
-    } else {
-      badgeHTML = `<span class="badge badge-eq-status badge-eq-avail" title="Thiết bị sẵn sàng để sử dụng"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>`;
-      cardClass = "";
-      isDisabled = false;
-      tooltip = "Thiết bị sẵn sàng phục vụ cuộc họp";
+  if (displayEquipments.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 py-3 text-center text-muted small" style="grid-column: 1 / -1;">
+        <i class="bi bi-info-circle me-1 text-slate-400"></i>
+        Không có thiết bị khả dụng trong khung giờ này.
+      </div>
+    `;
+    if (summaryEl) {
+      summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>0/${totalCount}</strong> thiết bị sẵn sàng`;
     }
+    return;
+  }
 
-    const isChecked = !isDisabled && selectedIds.includes(eqId);
+  const html = displayEquipments.map(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    const badgeHTML = `<span class="badge badge-eq-status badge-eq-avail" title="Thiết bị sẵn sàng để sử dụng"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>`;
+    const isChecked = selectedIds.includes(eqId);
     const iconClass = getEquipmentIconClass(eq);
+    const tooltip = "Thiết bị sẵn sàng phục vụ cuộc họp";
 
     return `
-      <label class="eq-check-card ${cardClass}" for="eq-${eqId}" id="eq-card-${eqId}" data-id="${eqId}" title="${escapeHTML(tooltip)}">
+      <label class="eq-check-card" for="eq-${eqId}" id="eq-card-${eqId}" data-id="${eqId}" title="${escapeHTML(tooltip)}">
         <input
           type="checkbox"
           class="form-check-input eq-checkbox"
           value="${eqId}"
           id="eq-${eqId}"
-          ${isDisabled ? "disabled" : ""}
           ${isChecked ? "checked" : ""}
           aria-label="${escapeHTML(eq.name || eq.equipmentName)}"
         />
@@ -3678,11 +3662,7 @@ function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
   container.innerHTML = html;
 
   if (summaryEl) {
-    if (availabilityMap !== null) {
-      summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị sẵn sàng`;
-    } else {
-      summaryEl.innerHTML = `<i class="bi bi-info-circle me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị hoạt động`;
-    }
+    summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị sẵn sàng`;
   }
 }
 
@@ -3749,6 +3729,9 @@ function setupMeetingFormValidationEvents() {
 
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
+
+    // Đồng bộ dropdown phòng họp: chỉ hiển thị phòng còn trống và đang hoạt động
+    syncMeetingRoomOptions();
 
     // Tự động rà soát và cập nhật Badge trạng thái thiết bị thời gian thực (Luồng 2.3)
     updateEquipmentCardsAvailability(editId);
@@ -6222,21 +6205,50 @@ function syncMeetingRoomOptions() {
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
     const currentVal = roomSelect.value;
-    const activeRooms = ROOMS.filter(r => r.status === "Active");
-    if (activeRooms.length === 0) {
-      roomSelect.innerHTML = `<option value="">-- Hiện không có phòng họp khả dụng --</option>`;
+    const dateInput = document.getElementById("meeting-date");
+    const startInput = document.getElementById("meeting-start");
+    const endInput = document.getElementById("meeting-end");
+    const idInput = document.getElementById("meeting-id");
+    const editId = idInput && idInput.value ? Number(idInput.value) : null;
+    const date = dateInput ? dateInput.value : "";
+    const start = startInput ? startInput.value : "";
+    const end = endInput ? endInput.value : "";
+
+    // 1. Chỉ lấy các phòng đang hoạt động (Active), loại bỏ hoàn toàn phòng bảo trì (Maintenance) và Inactive
+    let roomsToShow = ROOMS.filter(r => r.status === "Active");
+
+    // 2. Nếu đã chọn ngày và khung giờ hợp lệ, chỉ hiển thị các phòng còn trống (không trùng lịch)
+    if (date && start && end && start < end) {
+      roomsToShow = roomsToShow.filter(r => {
+        // Nếu là phòng đang được chọn trong cuộc họp đang sửa thì giữ lại
+        if (editId && currentVal && Number(currentVal) === r.id) return true;
+        const conflict = checkMeetingRoomConflict(r.id, date, start, end, editId);
+        return !conflict;
+      });
+    }
+
+    if (roomsToShow.length === 0) {
+      roomSelect.innerHTML = `<option value="">-- Không có phòng trống trong khung giờ này --</option>`;
+      const roomHint = document.getElementById("room-capacity-hint");
+      if (roomHint) roomHint.textContent = "Không còn phòng trống";
     } else {
       roomSelect.innerHTML = `
-        <option value="">-- Chọn phòng họp --</option>
-        ${activeRooms.map(r => `
+        <option value="">-- Chọn phòng họp (${roomsToShow.length} phòng khả dụng) --</option>
+        ${roomsToShow.map(r => `
           <option value="${r.id}">
             ${escapeHTML(r.name)} (${r.capacity} chỗ - ${escapeHTML(r.floor || 'Tầng 1')})
           </option>
         `).join("")}
       `;
 
-      if (currentVal && activeRooms.some(r => r.id === parseInt(currentVal, 10))) {
+      if (currentVal && roomsToShow.some(r => r.id === parseInt(currentVal, 10))) {
         roomSelect.value = currentVal;
+      } else if (roomsToShow.length > 0) {
+        roomSelect.value = String(roomsToShow[0].id);
+        const roomHint = document.getElementById("room-capacity-hint");
+        if (roomHint) {
+          roomHint.textContent = `Sức chứa: ${roomsToShow[0].capacity} chỗ • ${roomsToShow[0].floor || 'Tầng 1'}`;
+        }
       }
     }
   }
@@ -7061,12 +7073,7 @@ async function saveMeeting(event) {
             globalError.classList.remove("hidden");
           }
 
-          const modalCard = document.querySelector(".meeting-modal-card");
-          if (modalCard) {
-            modalCard.classList.remove("stitch-shake");
-            void modalCard.offsetWidth;
-            modalCard.classList.add("stitch-shake");
-          }
+          // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
           return;
         }
 
@@ -7148,12 +7155,7 @@ async function saveMeeting(event) {
             globalError.classList.remove("hidden");
           }
 
-          const modalCard = document.querySelector(".meeting-modal-card");
-          if (modalCard) {
-            modalCard.classList.remove("stitch-shake");
-            void modalCard.offsetWidth;
-            modalCard.classList.add("stitch-shake");
-          }
+          // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
 
           if (apiResult.isConflict) {
             const roomConflictAlert = document.getElementById("room-conflict-alert");
