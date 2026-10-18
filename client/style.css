@@ -9348,4 +9348,263 @@ a[data-rbac-disabled="true"] {
   color: #991b1b;
   border: 1px solid #fecaca;
 }
+
+/* ==========================================================================
+   7. DASHBOARD BÁO CÁO & THỐNG KÊ HIỆU SUẤT PHÒNG HỌP (STITCH ENTERPRISE)
+   ========================================================================== */
+
+.admin-reports-dashboard {
+  animation: fadeInReports 0.25s ease-out;
+}
+
+@keyframes fadeInReports {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header & Actions */
+.reports-header-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.stitch-btn-export-excel {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 1.1rem;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+  transition: all 0.2s ease;
+}
+
+.stitch-btn-export-excel:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+/* Filter Bar */
+.reports-filter-bar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.report-period-chips {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.report-period-chip {
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.report-period-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.report-period-chip.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.reports-filter-select {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.reports-filter-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background-color: #ffffff;
+}
+
+/* KPI Cards */
+.reports-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.reports-kpi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reports-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.reports-kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.reports-kpi-card.kpi-blue::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.reports-kpi-card.kpi-emerald::before { background: linear-gradient(90deg, #059669, #34d399); }
+.reports-kpi-card.kpi-amber::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.reports-kpi-card.kpi-rose::before { background: linear-gradient(90deg, #e11d48, #f43f5e); }
+
+.reports-kpi-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.kpi-blue .reports-kpi-icon-wrap { background: #eff6ff; color: #2563eb; }
+.kpi-emerald .reports-kpi-icon-wrap { background: #ecfdf5; color: #059669; }
+.kpi-amber .reports-kpi-icon-wrap { background: #fffbeb; color: #d97706; }
+.kpi-rose .reports-kpi-icon-wrap { background: #fff1f2; color: #e11d48; }
+
+.reports-kpi-val {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.reports-kpi-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+}
+
+/* Room Utilization List */
+.room-util-item {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.15s ease;
+}
+
+.room-util-item:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.room-rank-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.rank-1 { background: #fef3c7; color: #b45309; }
+.rank-2 { background: #e2e8f0; color: #475569; }
+.rank-3 { background: #fed7aa; color: #9a3412; }
+.rank-other { background: #f1f5f9; color: #64748b; }
+
+/* Timeline SVG Bar Chart */
+.report-timeline-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  height: 160px;
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-x: auto;
+}
+
+.timeline-bar-column {
+  flex: 1;
+  min-width: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.timeline-bar-track {
+  width: 24px;
+  height: 110px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  overflow: hidden;
+}
+
+.timeline-bar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.4s ease;
+}
+
+.timeline-bar-date {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Status Segmented Bar */
+.status-segmented-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.status-segment-confirmed { background: #3b82f6; }
+.status-segment-completed { background: #10b981; }
+.status-segment-cancelled { background: #ef4444; }
+
+.status-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
 
