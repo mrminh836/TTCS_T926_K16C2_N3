@@ -124,14 +124,6 @@
             <h2 class="fw-bold fs-3 text-slate-900 m-0">Hồ sơ cá nhân</h2>
             <p class="text-secondary small m-0">Thông tin tài khoản và nhật ký lịch họp doanh nghiệp</p>
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-outline-primary btn-sm" id="btn-top-change-pwd">
-              <i class="bi bi-key me-1"></i> Đổi mật khẩu
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-sm" id="btn-profile-logout">
-              <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
-            </button>
-          </div>
         </div>
 
         <div class="row g-4">
@@ -164,9 +156,12 @@
                 </div>
               </div>
 
-              <!-- Nút đổi mật khẩu trong Thẻ thông tin cá nhân -->
+              <!-- Nút đổi mật khẩu & Đăng xuất trong Thẻ thông tin cá nhân -->
               <button type="button" class="btn btn-outline-primary btn-sm w-100 mt-4 fw-medium py-2" id="btn-card-change-pwd">
                 <i class="bi bi-shield-lock me-1"></i> Đổi mật khẩu tài khoản
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-medium py-2" id="btn-profile-logout">
+                <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
               </button>
             </div>
 
