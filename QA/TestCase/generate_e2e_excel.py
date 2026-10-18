@@ -1,0 +1,770 @@
+# -*- coding: utf-8 -*-
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+
+def build_test_cases_excel():
+    wb = openpyxl.Workbook()
+    
+    # -------------------------------------------------------------
+    # SHEET 1: TEST CASES E2E
+    # -------------------------------------------------------------
+    ws1 = wb.active
+    ws1.title = "E2E Staging Test Cases"
+    ws1.views.sheetView[0].showGridLines = True
+    
+    # Title Block
+    ws1.merge_cells("A1:J1")
+    title_cell = ws1["A1"]
+    title_cell.value = "BẢNG KỊCH BẢN KIỂM THỬ TOÀN TRÌNH E2E TRÊN MÔI TRƯỜNG STAGING"
+    title_cell.font = Font(name="Segoe UI", size=16, bold=True, color="FFFFFF")
+    title_cell.fill = PatternFill(start_color="1E3A8A", end_color="1E3A8A", fill_type="solid") # Dark Blue
+    title_cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws1.row_dimensions[1].height = 42
+
+    ws1.merge_cells("A2:J2")
+    sub_cell = ws1["A2"]
+    sub_cell.value = "Luồng kiểm thử: Đăng nhập -> Đặt phòng -> Mượn thiết bị -> Báo cáo | Dự án: Hệ Thống Quản Lý Lịch Họp Doanh Nghiệp (TTCS K16C2)"
+    sub_cell.font = Font(name="Segoe UI", size=10, italic=True, color="FFFFFF")
+    sub_cell.fill = PatternFill(start_color="2563EB", end_color="2563EB", fill_type="solid")
+    sub_cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws1.row_dimensions[2].height = 24
+
+    # Meta Info Row
+    ws1.merge_cells("A3:J3")
+    info_cell = ws1["A3"]
+    info_cell.value = "Môi trường: STAGING (http://staging.meeting.enterprise.vn) | CSDL: MySQL 8.0 Staging Cluster | Người thực hiện: QA Team / Triệu Quốc Khánh"
+    info_cell.font = Font(name="Segoe UI", size=9, bold=True, color="334155")
+    info_cell.fill = PatternFill(start_color="F1F5F9", end_color="F1F5F9", fill_type="solid")
+    info_cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws1.row_dimensions[3].height = 20
+
+    # Header Row
+    headers = [
+        "Test Case ID",
+        "Module / Feature",
+        "Tiêu đề kịch bản",
+        "Pre-conditions (Điều kiện tiên quyết)",
+        "Test Steps (Các bước thực hiện)",
+        "Test Data (Dữ liệu thử nghiệm)",
+        "Expected Result (Kết quả mong đợi)",
+        "Actual Result (Kết quả thực tế)",
+        "Status (Pass/Fail/Blocked)",
+        "Ghi chú / Bug ID liên kết"
+    ]
+    
+    header_fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid") # Slate 900
+    header_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+    header_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    
+    thin_border_side = Side(style='thin', color='CBD5E1')
+    table_border = Border(left=thin_border_side, right=thin_border_side, top=thin_border_side, bottom=thin_border_side)
+    
+    for col_idx, h in enumerate(headers, 1):
+        c = ws1.cell(row=4, column=col_idx, value=h)
+        c.font = header_font
+        c.fill = header_fill
+        c.alignment = header_align
+        c.border = table_border
+    ws1.row_dimensions[4].height = 32
+
+    # Test cases data list (38 comprehensive test cases)
+    test_cases = [
+        # --- MODULE 1: AUTHENTICATION / LOGIN & RBAC ---
+        (
+            "TC_E2E_AUTH_001",
+            "Đăng nhập / Authentication",
+            "Đăng nhập thành công với tài khoản Quản trị viên (Admin) trên Staging",
+            "1. Môi trường Staging hoạt động bình thường.\n2. Tài khoản Admin đã được kích hoạt trong CSDL.\n3. Người dùng đang ở trang /login.html.",
+            "1. Truy cập đường dẫn Staging: /login.html.\n2. Nhập Email và Mật khẩu của tài khoản Admin.\n3. Bấm nút 'Đăng nhập'.",
+            "Email: admin@enterprise.vn\nPassword: Password123\nRole: Admin",
+            "1. Hệ thống xác thực hợp lệ, BE trả mã HTTP 200 OK kèm JWT Access Token.\n2. Frontend lưu token vào localStorage/sessionStorage.\n3. Tự động điều hướng vào trang Dashboard quản trị (/index.html).\n4. Hiển thị đúng Avatar, tên 'Nguyễn Văn Quản Trị' và đầy đủ menu quản trị (Quản lý phòng, Thiết bị, Báo cáo).",
+            "Đăng nhập thành công, nhận JWT token, chuyển trang mượt mà, hiển thị đầy đủ menu Admin.",
+            "Pass",
+            "Kiểm thử chức năng Happy Path cho quyền Admin."
+        ),
+        (
+            "TC_E2E_AUTH_002",
+            "Đăng nhập / Authentication",
+            "Đăng nhập thành công với tài khoản Nhân viên (Employee / Organizer)",
+            "1. Tài khoản nhân viên 'employee@enterprise.vn' đã có trong DB.\n2. Người dùng đang ở màn hình Đăng nhập.",
+            "1. Nhập Email nhân viên và Mật khẩu chính xác.\n2. Bấm 'Đăng nhập'.\n3. Quan sát giao diện sau khi chuyển hướng.",
+            "Email: employee@enterprise.vn\nPassword: Password123\nRole: Employee",
+            "1. BE trả HTTP 200 OK kèm JWT token chứa role='Employee'.\n2. Chuyển hướng vào trang Lịch họp nhân viên.\n3. Menu chỉ hiển thị: Xem lịch, Đặt phòng họp, Lịch cá nhân; ẩn các menu quản trị Admin.",
+            "Đăng nhập thành công, menu được ẩn đúng theo ma trận phân quyền RBAC.",
+            "Pass",
+            "Kiểm thử RBAC hiển thị phía Frontend."
+        ),
+        (
+            "TC_E2E_AUTH_003",
+            "Đăng nhập / Authentication",
+            "Đăng nhập thất bại khi nhập sai Mật khẩu",
+            "1. Tài khoản email tồn tại trong DB.\n2. Người dùng đang ở trang đăng nhập.",
+            "1. Nhập Email hợp lệ: employee@enterprise.vn.\n2. Nhập sai Mật khẩu: WrongPass999.\n3. Bấm 'Đăng nhập'.",
+            "Email: employee@enterprise.vn\nPassword: WrongPass999",
+            "1. BE kiểm tra bcrypt.compare trả về false, trả mã HTTP 401 Unauthorized.\n2. Phản hồi JSON: { success: false, message: 'Email hoặc mật khẩu không chính xác' }.\n3. Frontend hiển thị Toast/Alert cảnh báo màu đỏ, giữ nguyên trang, không sinh token.",
+            "Hệ thống trả mã HTTP 401, hiển thị thông báo lỗi màu đỏ rõ ràng.",
+            "Pass",
+            "Kiểm thử Negative Path xác thực mật khẩu."
+        ),
+        (
+            "TC_E2E_AUTH_004",
+            "Đăng nhập / Authentication",
+            "Đăng nhập thất bại với Email chưa từng đăng ký trên hệ thống",
+            "1. Email chưa tồn tại trong bảng Users.",
+            "1. Nhập Email không tồn tại: khongtontai@enterprise.vn.\n2. Nhập Mật khẩu bất kỳ: Password123.\n3. Bấm 'Đăng nhập'.",
+            "Email: khongtontai@enterprise.vn\nPassword: Password123",
+            "1. BE trả HTTP 401 Unauthorized kèm thông điệp bảo mật 'Email hoặc mật khẩu không chính xác' (tránh User Enumeration attack).\n2. Frontend báo lỗi tương ứng, không tiết lộ email có tồn tại hay không.",
+            "Trả về HTTP 401 đúng chuẩn bảo mật OWASP, không bị lộ thông tin user.",
+            "Pass",
+            "Bảo mật tài khoản chống dò quét User Enumeration."
+        ),
+        (
+            "TC_E2E_AUTH_005",
+            "Đăng nhập / Validation UI",
+            "Kiểm tra kiểm thực rỗng (Required validation) trên Form Đăng nhập",
+            "1. Đang ở màn hình đăng nhập.",
+            "1. Để trống cả 2 ô Email và Mật khẩu.\n2. Bấm nút 'Đăng nhập'.\n3. Nhập Email hợp lệ nhưng để trống Mật khẩu -> Bấm 'Đăng nhập'.",
+            "Trường hợp 1: Email='', Pass=''\nTrường hợp 2: Email='admin@enterprise.vn', Pass=''",
+            "1. Frontend ngăn chặn submit form (HTML5 required hoặc JS validator).\n2. Viền ô nhập liệu chuyển màu đỏ kèm dòng chữ cảnh báo 'Vui lòng nhập Email / Mật khẩu'.\n3. Không có request HTTP nào gửi lên Backend.",
+            "Frontend chặn submit ngay lập tức, hiển thị tooltip cảnh báo chuẩn.",
+            "Pass",
+            "Kiểm thử trải nghiệm người dùng (UX) và tiết kiệm tài nguyên mạng."
+        ),
+        (
+            "TC_E2E_AUTH_006",
+            "Đăng nhập / Validation UI",
+            "Kiểm tra định dạng Email không hợp lệ (Format Validation)",
+            "1. Đang ở form đăng nhập.",
+            "1. Nhập email sai định dạng (thiếu @, thiếu domain).\n2. Nhập mật khẩu hợp lệ.\n3. Bấm 'Đăng nhập'.",
+            "Email: 'admin_enterprise' hoặc 'admin@.com'\nPassword: Password123",
+            "1. Frontend hiển thị thông báo 'Email không đúng định dạng hợp lệ'.\n2. Backend validator (express-validator) nếu nhận request sẽ từ chối với HTTP 400 Bad Request.",
+            "Frontend chặn submit với regex email, Backend có lớp bảo vệ thứ 2.",
+            "Pass",
+            "Kiểm thử 2 lớp bảo vệ (Client-side & Server-side validation)."
+        ),
+        (
+            "TC_E2E_AUTH_007",
+            "Đăng nhập / Security",
+            "Phòng chống tấn công SQL Injection tại trường đăng nhập",
+            "1. Đang ở trang đăng nhập.",
+            "1. Nhập chuỗi SQL Injection vào ô Email.\n2. Bấm 'Đăng nhập'.\n3. Kiểm tra log BE và CSDL.",
+            "Email: ' OR '1'='1' -- \nPassword: ' OR '1'='1'",
+            "1. Hệ thống xử lý an toàn nhờ Parameterized Queries / MySQL Prepared Statements.\n2. Không xảy ra lỗi SQL syntax (500 Error).\n3. Backend trả về HTTP 401 Unauthorized từ chối đăng nhập.",
+            "Backend xử lý an toàn qua prepared statement, không bị bypass xác thực.",
+            "Pass",
+            "Security Test: SQL Injection OWASP Top 10."
+        ),
+        (
+            "TC_E2E_AUTH_008",
+            "Đăng nhập / Session & Security",
+            "Kiểm tra xử lý khi Access Token JWT hết hạn hoặc bị giả mạo Signature",
+            "1. Đã đăng nhập và có token trong localStorage.\n2. Cố tình sửa đổi 1 ký tự trong JWT token hoặc chỉnh expire time về quá khứ.",
+            "1. Mở DevTools -> Application -> localStorage.\n2. Sửa JWT token thành 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid.signature'.\n3. Refresh trang hoặc gọi API GET /api/meetings.",
+            "Token: Chuỗi JWT đã bị chỉnh sửa chữ ký số",
+            "1. Backend middleware verifyToken phát hiện Token Invalid / Expired.\n2. Backend trả về HTTP 401 Unauthorized hoặc 403 Forbidden: 'Token không hợp lệ hoặc đã hết hạn'.\n3. Frontend xóa token hỏng và tự động redirect về trang /login.html.",
+            "Hệ thống phát hiện chữ ký sai, xóa token hỏng và điều hướng về login.",
+            "Pass",
+            "Kiểm thử tính toàn vẹn và bảo mật của cơ chế JWT."
+        ),
+        (
+            "TC_E2E_AUTH_009",
+            "Đăng nhập / Session",
+            "Kiểm tra chức năng Đăng xuất và ngăn chặn nút Back trình duyệt truy cập lại",
+            "1. Đang đăng nhập tài khoản hợp lệ trên Dashboard.",
+            "1. Bấm vào Avatar -> Chọn 'Đăng xuất'.\n2. Kiểm tra token trong storage đã bị xóa.\n3. Bấm nút Back trên trình duyệt để quay lại trang trước.",
+            "Thao tác click Đăng xuất",
+            "1. Token bị xóa sạch khỏi localStorage/sessionStorage.\n2. Điều hướng về /login.html.\n3. Khi bấm nút Back, router guard kiểm tra không có token nên tự động đá về trang /login.html, không hiển thị dữ liệu cũ.",
+            "Đăng xuất triệt để, bấm Back không xem được dữ liệu bảo mật.",
+            "Pass",
+            "Kiểm thử bảo mật Session & Browser History Cache."
+        ),
+
+        # --- MODULE 2: ĐẶT PHÒNG HỌP (ROOM BOOKING) ---
+        (
+            "TC_E2E_MEET_010",
+            "Đặt phòng / Tra cứu & Bộ lọc",
+            "Tra cứu và lọc danh sách phòng họp còn trống theo ngày, khung giờ và sức chứa",
+            "1. Đã đăng nhập tài khoản nhân viên.\n2. Đang ở màn hình Quản lý đặt phòng.",
+            "1. Chọn ngày họp: Ngày mai.\n2. Chọn khung giờ: 09:00 - 11:00.\n3. Nhập sức chứa tối thiểu: 15 người.\n4. Chọn loại phòng: 'Hội nghị'.\n5. Bấm nút 'Tìm kiếm phòng'.",
+            "Date: 2026-10-20\nStartTime: 09:00\nEndTime: 11:00\nCapacity: >= 15\nType: Hội nghị",
+            "1. Frontend gửi GET /api/rooms/available kèm query params.\n2. Backend trả về danh sách phòng thỏa mãn: Phòng A3.02 (Sức chứa 35), không trả về phòng đã có lịch hoặc phòng dưới 15 người.\n3. Giao diện hiển thị danh sách phòng dưới dạng Card trực quan kèm badge 'Còn trống'.",
+            "Lọc phòng chính xác theo thời gian thực và sức chứa, không có phòng bận.",
+            "Pass",
+            "Kiểm thử bộ lọc phòng họp thông minh."
+        ),
+        (
+            "TC_E2E_MEET_011",
+            "Đặt phòng / Tạo cuộc họp",
+            "Tạo cuộc họp và đặt phòng họp thường thành công (Happy Path)",
+            "1. Đã đăng nhập tài khoản 'employee@enterprise.vn'.\n2. Phòng B2.01 ('Phòng Agile Sprint') trống hoàn toàn ngày mai 09:00 - 10:30.",
+            "1. Bấm nút '+ Tạo cuộc họp mới'.\n2. Điền Tiêu đề: 'Sprint 4 Planning & Architecture Sync'.\n3. Nhập Mô tả cuộc họp.\n4. Chọn ngày mai, giờ: 09:00 đến 10:30.\n5. Chọn phòng: B2.01 (ID: 2).\n6. Bấm nút 'Lưu cuộc họp'.",
+            "Title: 'Sprint 4 Planning & Architecture Sync'\nRoomID: 2\nStartTime: 2026-10-20 09:00:00\nEndTime: 2026-10-20 10:30:00\nOrganizerID: 4",
+            "1. BE bắt đầu DB Transaction, khóa phòng FOR UPDATE, kiểm tra không overlap.\n2. Ghi bản ghi vào bảng Meetings và Bookings với BookingStatus='Confirmed'.\n3. Trả về mã HTTP 201 Created kèm MeetingID.\n4. Frontend hiển thị Toast 'Đặt phòng thành công', đóng modal và cập nhật lịch họp.",
+            "Cuộc họp tạo thành công, dữ liệu ghi vào DB chính xác, lịch họp cập nhật ngay.",
+            "Pass",
+            "Kiểm thử luồng chuẩn Đặt phòng họp Core Booking."
+        ),
+        (
+            "TC_E2E_MEET_012",
+            "Đặt phòng / Validation Thời gian",
+            "Chặn tạo cuộc họp có thời gian bắt đầu trong quá khứ",
+            "1. Đang mở modal Tạo cuộc họp.",
+            "1. Nhập tiêu đề cuộc họp.\n2. Chọn ngày họp là ngày hôm qua (hoặc giờ trước thời điểm hiện tại 2 tiếng).\n3. Bấm nút 'Lưu cuộc họp'.",
+            "StartTime: Thời điểm trong quá khứ so với NOW()",
+            "1. Frontend datepicker vô hiệu hóa việc chọn ngày quá khứ.\n2. Nếu cố tình gửi request qua Postman/API, BE validateMeetingMiddleware trả về HTTP 400 Bad Request: 'Không thể đặt cuộc họp trong quá khứ'.\n3. CSDL không ghi nhận bản ghi mới.",
+            "Hệ thống chặn cả trên UI lẫn Backend API với mã 400.",
+            "Pass",
+            "Kiểm thử nghiệp vụ tính toàn vẹn thời gian."
+        ),
+        (
+            "TC_E2E_MEET_013",
+            "Đặt phòng / Validation Thời gian",
+            "Chặn tạo cuộc họp có Giờ kết thúc nhỏ hơn hoặc bằng Giờ bắt đầu (EndTime <= StartTime)",
+            "1. Đang ở form đặt phòng họp.",
+            "1. Chọn StartTime: 10:00:00.\n2. Chọn EndTime: 09:30:00 (hoặc 10:00:00).\n3. Bấm 'Lưu cuộc họp'.",
+            "Date: 2026-10-20\nStartTime: 10:00\nEndTime: 09:30",
+            "1. Frontend Live Duration Calculator hiển thị cảnh báo đỏ 'Giờ kết thúc phải sau giờ bắt đầu' và disable nút Lưu.\n2. Backend trả về HTTP 400 Bad Request: 'Giờ kết thúc phải lớn hơn giờ bắt đầu ít nhất 5 phút'.",
+            "Nút Lưu bị khóa, thông báo lỗi đỏ rõ ràng, API chặn trả 400.",
+            "Pass",
+            "Kiểm thử logic kiểm tra khoảng thời gian hợp lệ."
+        ),
+        (
+            "TC_E2E_MEET_014",
+            "Đặt phòng / Boundary Test",
+            "Kiểm tra giới hạn thời lượng cuộc họp tối thiểu (5 phút) và tối đa (24 giờ)",
+            "1. Mở modal Đặt phòng họp.",
+            "1. Test Case 14a: Đặt thời lượng 3 phút (09:00 - 09:03).\n2. Test Case 14b: Đặt thời lượng vượt quá 24 tiếng (09:00 hôm nay đến 10:00 ngày hôm sau).\n3. Bấm 'Lưu cuộc họp'.",
+            "Case A: Duration = 3 mins\nCase B: Duration = 25 hours",
+            "1. Backend từ chối với HTTP 400 Bad Request.\n2. Thông báo lỗi: 'Thời lượng cuộc họp tối thiểu là 5 phút và tối đa không quá 24 giờ'.",
+            "Hệ thống từ chối thời lượng không hợp lệ đúng theo đặc tả nghiệp vụ.",
+            "Pass",
+            "Kiểm thử giá trị biên (Boundary Value Analysis)."
+        ),
+        (
+            "TC_E2E_MEET_015",
+            "Đặt phòng / Business Status",
+            "Chặn đặt phòng đang ở trạng thái Bảo trì (Maintenance) hoặc Ngừng hoạt động (Inactive)",
+            "1. Phòng TH.01 (ID: 4) có Status = 'Maintenance' trong CSDL.\n2. Phòng B3.01 (ID: 7) có Status = 'Inactive'.",
+            "1. Mở form Đặt phòng họp.\n2. Quan sát dropdown phòng họp.\n3. Thử gửi POST /api/meetings chọn RoomID=4 hoặc RoomID=7.",
+            "RoomID: 4 (Status='Maintenance')\nStartTime: 2026-10-21 14:00\nEndTime: 2026-10-21 15:00",
+            "1. Trên UI, phòng ID=4 hiển thị badge màu vàng 'Bảo trì' và bị vô hiệu hóa (disabled) không cho chọn.\n2. Backend kiểm tra trạng thái phòng, trả về HTTP 400 Bad Request: 'Phòng họp đang trong quá trình bảo trì hoặc ngừng hoạt động'.",
+            "UI hiển thị disabled, Backend kiểm tra status phòng chặt chẽ.",
+            "Pass",
+            "Kiểm thử ràng buộc trạng thái phòng họp."
+        ),
+        (
+            "TC_E2E_MEET_016",
+            "Đặt phòng / Concurrency",
+            "Chặn đặt phòng khi khung giờ bị trùng lặp (Overlap Conflict - 409 Conflict)",
+            "1. Phòng ID=2 đã có cuộc họp xác nhận từ 09:00 đến 10:30 ngày 2026-10-20.",
+            "1. Mở form tạo cuộc họp mới.\n2. Chọn cùng phòng ID=2.\n3. Chọn khung giờ giao thoa: 10:00 đến 11:30 ngày 2026-10-20.\n4. Bấm nút 'Lưu cuộc họp'.",
+            "RoomID: 2\nStartTime: 2026-10-20 10:00:00\nEndTime: 2026-10-20 11:30:00",
+            "1. Backend quét Overlap query phát hiện xung đột: (StartTime < '11:30') AND (EndTime > '10:00') AND BookingStatus='Confirmed'.\n2. Backend rollback transaction và trả về HTTP 409 Conflict.\n3. Phản hồi lỗi: 'Phòng họp đã được đặt trong khoảng thời gian này'.\n4. Frontend hiển thị cảnh báo đỏ và gợi ý đổi phòng hoặc giờ khác.",
+            "Trả về HTTP 409 Conflict chính xác, không cho phép đặt đè lịch.",
+            "Pass",
+            "Kiểm thử thuật toán chống trùng lịch họp (Overlap Query)."
+        ),
+        (
+            "TC_E2E_MEET_017",
+            "Đặt phòng / Race Condition",
+            "Kiểm tra tính năng chống Race Condition khi 2 người dùng đồng thời bấm đặt cùng 1 phòng tại cùng 1 giây",
+            "1. Phòng ID=3 ('Phòng Hội Nghị Đà Nẵng') đang trống khung giờ 15:00 - 16:00 ngày 2026-10-22.\n2. Hai phiên làm việc của User A và User B cùng mở form chọn đúng phòng này.",
+            "1. User A và User B cùng bấm 'Lưu cuộc họp' gần như đồng thời (khoảng cách mili-giây).\n2. Backend tiếp nhận 2 request song song.",
+            "Payload giống hệt nhau:\nRoomID: 3\nTime: 15:00 - 16:00 ngày 2026-10-22\nUser A: khanh.tq, User B: minh.dq",
+            "1. Cơ chế SELECT ... FOR UPDATE khóa hàng độc quyền trên MySQL.\n2. Request tới trước hoàn tất transaction -> HTTP 201 Created.\n3. Request thứ 2 phải chờ khóa giải phóng, sau đó quét thấy phòng đã bị chiếm -> HTTP 409 Conflict.\n4. CSDL tuyệt đối không bị bản ghi trùng (Zero double booking).",
+            "1 request thành công 201, 1 request báo lỗi 409 Conflict, dữ liệu toàn vẹn 100%.",
+            "Pass",
+            "Kiểm thử áp lực tranh chấp tài nguyên (Concurrency & Locking)."
+        ),
+        (
+            "TC_E2E_MEET_018",
+            "Đặt phòng / RBAC Chính sách",
+            "Chặn nhân viên thông thường (Employee) tự ý đặt phòng họp cấp cao (VIP / Boardroom)",
+            "1. Đăng nhập tài khoản Employee ('employee@enterprise.vn').\n2. Phòng A4.01 (ID: 1, Boardroom Thăng Long) có chính sách giới hạn quyền.",
+            "1. Mở modal Đặt phòng họp.\n2. Cố tình chọn phòng VIP (RoomID: 1).\n3. Bấm 'Lưu cuộc họp'.",
+            "RoomID: 1 (Boardroom Thăng Long - VIP)\nUser Role: Employee",
+            "1. Frontend hiển thị cảnh báo 'Phòng họp yêu cầu quyền Quản lý trở lên'.\n2. Backend kiểm tra UserRole != 'Admin' và != 'Manager', trả về HTTP 403 Forbidden: 'Bạn không có thẩm quyền đặt phòng VIP này. Vui lòng liên hệ Quản lý'.\n3. Cuộc họp không được tạo.",
+            "Backend trả về HTTP 403 Forbidden chuẩn xác, bảo vệ phòng VIP.",
+            "Pass",
+            "Kiểm thử chính sách giới hạn quyền đặt phòng (Policy Limit)."
+        ),
+        (
+            "TC_E2E_MEET_019",
+            "Đặt phòng / Security XSS",
+            "Kiểm tra lọc mã độc XSS trong trường Tiêu đề và Mô tả cuộc họp",
+            "1. Đang ở form đặt phòng họp.",
+            "1. Nhập đoạn mã script độc hại vào trường Title và Description: <script>alert('XSS_ATTACK')</script>.<br>2. Lưu cuộc họp.<br>3. Mở lại chi tiết cuộc họp trên danh sách lịch họp.",
+            "Title: <script>alert('XSS_TEST')</script> Họp dự án\nDescription: <img src=x onerror=alert('XSS')>",
+            "1. Backend thực hiện sanitize hoặc Frontend render dữ liệu qua textContent / innerText an toàn (không dùng innerHTML không an toàn).\n2. Không có popup alert nào bị kích hoạt trên trình duyệt.\n3. Chuỗi được escape an toàn hiển thị dưới dạng văn bản thô.",
+            "Mã độc được escape hiển thị text bình thường, không chạy script.",
+            "Pass",
+            "Security Test: Cross-Site Scripting (XSS) phòng chống injection."
+        ),
+        (
+            "TC_E2E_MEET_020",
+            "Đặt phòng / Đặt định kỳ (Recurring)",
+            "Đặt lịch họp định kỳ hàng tuần thành công và kiểm tra sinh chuỗi lịch (IsRecurring=true)",
+            "1. Đã đăng nhập tài khoản Manager.\n2. Khung giờ 14:00 - 15:30 thứ Hai hàng tuần trong 4 tuần tới của phòng B2.01 đều trống.",
+            "1. Bật checkbox 'Cuộc họp lặp lại định kỳ'.\n2. Chọn kiểu lặp: 'Hàng tuần (Weekly)', số lần lặp: 4 tuần.\n3. Bấm 'Lưu cuộc họp định kỳ'.",
+            "RoomID: 2\nIsRecurring: true\nRecurrenceType: Weekly\nOccurrences: 4\nBaseTime: 14:00 - 15:30",
+            "1. Backend tính toán 4 mốc thời gian (Date_1, Date_2, Date_3, Date_4).\n2. Quét kiểm tra cả 4 mốc không có mốc nào xung đột.\n3. Transaction tạo 1 Meeting cha và 4 Bookings con tương ứng.\n4. Trả về HTTP 201 Created kèm danh sách các ngày đã đặt thành công.",
+            "Hệ thống sinh đủ 4 lịch họp con chính xác trên bảng lịch biểu.",
+            "Pass",
+            "Kiểm thử tính năng cuộc họp lặp định kỳ."
+        ),
+
+        # --- MODULE 3: MƯỢN THIẾT BỊ HỘI NGHỊ (EQUIPMENT BORROWING) ---
+        (
+            "TC_E2E_EQUIP_021",
+            "Mượn thiết bị / Tra cứu thời gian thực",
+            "Xem danh sách thiết bị khả dụng theo thời gian thực tương ứng với khung giờ họp đã chọn",
+            "1. Đang mở form đặt phòng họp với ngày và khung giờ cụ thể (2026-10-21 09:00 - 11:00).",
+            "1. Chọn ngày và giờ họp trên modal.\n2. Quan sát danh mục thiết bị mượn kèm được load từ API.\n3. Kiểm tra các thiết bị hiển thị.",
+            "API: GET /api/equipments/available?date=2026-10-21&startTime=09:00:00&endTime=11:00:00",
+            "1. Hệ thống chỉ hiển thị các thiết bị có Status='Available' và chưa có booking trùng giờ.\n2. Thiết bị hỏng (Broken - ID: 10) hoặc đang bảo trì (Maintenance - ID: 7) hiển thị trạng thái không sẵn sàng hoặc bị ẩn.\n3. Danh sách trả về đầy đủ: Tên thiết bị, Loại, Số lượng sẵn sàng.",
+            "Tải danh sách thiết bị khả dụng nhanh chóng, lọc đúng thiết bị rảnh.",
+            "Pass",
+            "Kiểm thử truy vấn tính khả dụng của tài nguyên hội nghị."
+        ),
+        (
+            "TC_E2E_EQUIP_022",
+            "Mượn thiết bị / Mượn kèm thành công",
+            "Mượn kèm thành công 2 thiết bị (Máy chiếu Sony + Micro Shure) khi tạo cuộc họp",
+            "1. Thiết bị ID=1 (Máy chiếu Laser Sony) và ID=4 (Micro Shure MXW6) đang rảnh.\n2. Đang tạo cuộc họp tại phòng A3.02 ngày mai 14:00 - 16:00.",
+            "1. Tích chọn checkbox mượn 'Máy chiếu Laser Sony 4K VPL-PHZ61'.\n2. Tích chọn checkbox mượn 'Bộ Micro cổ ngỗng không dây Shure MXW6'.\n3. Bấm 'Lưu cuộc họp'.",
+            "Equipments: [{ EquipmentID: 1, Quantity: 1 }, { EquipmentID: 4, Quantity: 1 }]\nRoomID: 3\nTime: 14:00 - 16:00",
+            "1. Backend ghi nhận BookingID của cuộc họp.\n2. Ghi 2 bản ghi vào bảng liên kết Booking_Equipments với BookingID và EquipmentID tương ứng.\n3. Trả về HTTP 201 Created.\n4. Xem chi tiết cuộc họp hiển thị đầy đủ danh sách thiết bị đã mượn kèm.",
+            "Mượn thành công 2 thiết bị, bảng Booking_Equipments có dữ liệu chuẩn xác.",
+            "Pass",
+            "Kiểm thử Happy Path mượn thiết bị đi kèm phòng họp."
+        ),
+        (
+            "TC_E2E_EQUIP_023",
+            "Mượn thiết bị / Trạng thái thiết bị",
+            "Chặn chọn và mượn thiết bị đang ở trạng thái Bảo trì (Maintenance) hoặc Hỏng (Broken)",
+            "1. Thiết bị ID=7 ('Máy chiếu di động Epson') có Status='Maintenance'.\n2. Thiết bị ID=10 ('Hệ thống cabin BOSCH') có Status='Broken'.",
+            "1. Mở modal mượn thiết bị.\n2. Kiểm tra hiển thị của thiết bị ID=7 và ID=10.\n3. Cố tình gửi payload mượn thiết bị ID=7 qua request API.",
+            "EquipmentID: 7 (Maintenance)\nEquipmentID: 10 (Broken)",
+            "1. Trên giao diện: Checkbox bị disable mờ, kèm nhãn badge vàng 'Bảo trì' / đỏ 'Hỏng'.\n2. Phía Backend: Kiểm tra trạng thái thiết bị, nếu != 'Available' thì từ chối với HTTP 400 Bad Request: 'Thiết bị đang bảo trì hoặc hỏng hóc, không thể mượn'.",
+            "UI khóa checkbox, Backend chặn HTTP 400 khi nhận ID thiết bị bảo trì.",
+            "Pass",
+            "Kiểm thử bảo vệ tính hợp lệ của tình trạng thiết bị."
+        ),
+        (
+            "TC_E2E_EQUIP_024",
+            "Mượn thiết bị / Concurrency Conflict",
+            "Chặn mượn thiết bị đã bị cuộc họp khác giữ chỗ trong cùng khung giờ (Overlap Conflict)",
+            "1. Thiết bị ID=1 (Máy chiếu Sony) đã được mượn bởi Cuộc họp 1 từ 09:00 đến 11:00 ngày 2026-10-21.",
+            "1. User khác tạo Cuộc họp 2 từ 10:00 đến 12:00 cùng ngày.\n2. Chọn mượn cùng thiết bị ID=1.\n3. Bấm 'Lưu cuộc họp'.",
+            "EquipmentID: 1\nStartTime: 10:00:00\nEndTime: 12:00:00 (Giao nhau 10:00 - 11:00)",
+            "1. Backend quét bảng Booking_Equipments kết hợp Bookings và Meetings.\n2. Phát hiện thiết bị ID=1 đã có lượt mượn Confirmed trong khung giờ này.\n3. Trả về HTTP 409 Conflict: 'Thiết bị [Máy chiếu Sony 4K] đã có người mượn trong khung giờ này'.\n4. Giao diện báo lỗi chi tiết để người dùng chọn thiết bị thay thế.",
+            "Hệ thống trả mã HTTP 409 Conflict chuẩn xác, không cho phép mượn trùng.",
+            "Pass",
+            "Kiểm thử thuật toán kiểm tra xung đột thời gian thiết bị."
+        ),
+        (
+            "TC_E2E_EQUIP_025",
+            "Mượn thiết bị / Vòng đời & Giải phóng",
+            "Hủy cuộc họp và tự động giải phóng phòng họp cùng toàn bộ thiết bị đã mượn",
+            "1. Đã có cuộc họp đã đặt thành công kèm Phòng B2.01 và Thiết bị ID=2 (Màn hình tương tác Samsung).",
+            "1. Người tổ chức mở chi tiết cuộc họp.\n2. Bấm nút 'Hủy cuộc họp'.\n3. Nhập lý do hủy và xác nhận.\n4. Người dùng khác kiểm tra lại tính khả dụng của Phòng B2.01 và Màn hình Samsung tại đúng khung giờ đó.",
+            "Action: Cancel Meeting\nMeetingID: Cuộc họp vừa tạo",
+            "1. Backend cập nhật Bookings.BookingStatus = 'Cancelled'.\n2. Cập nhật giải phóng liên kết trong Booking_Equipments.\n3. Trả về HTTP 200 OK.\n4. Phòng và Màn hình Samsung ngay lập tức quay lại trạng thái 'Available' trong khung giờ đó cho người khác đặt.",
+            "Hủy cuộc họp thành công, giải phóng tài nguyên phòng và thiết bị tức thì.",
+            "Pass",
+            "Kiểm thử vòng đời cuộc họp: Tự động giải phóng tài nguyên."
+        ),
+        (
+            "TC_E2E_EQUIP_026",
+            "Mượn thiết bị / Chỉnh sửa dời giờ",
+            "Chỉnh sửa dời khung giờ cuộc họp và tự động kiểm tra lại tính khả dụng của thiết bị ở giờ mới",
+            "1. Cuộc họp đang đặt từ 08:00 - 09:30 có mượn Camera Logitech (ID: 3).\n2. Khung giờ 10:00 - 11:30 cùng ngày thì Camera Logitech đã bị người khác mượn.",
+            "1. Bấm 'Chỉnh sửa cuộc họp'.\n2. Dời giờ họp sang 10:00 - 11:30.\n3. Giữ nguyên chọn mượn Camera Logitech.\n4. Bấm 'Cập nhật'.",
+            "Action: Update Meeting Time\nNew Time: 10:00 - 11:30\nEquipment: ID 3",
+            "1. Backend kiểm tra khung giờ mới phát hiện Camera Logitech bị xung đột với booking khác.\n2. Trả về HTTP 409 Conflict: 'Thiết bị Camera Logitech không khả dụng trong khung giờ mới'.\n3. Frontend hiển thị thông báo yêu cầu đổi thiết bị khác hoặc giữ nguyên giờ cũ.",
+            "Hệ thống chặn cập nhật và thông báo rõ thiết bị bị kẹt giờ ở slot mới.",
+            "Pass",
+            "Kiểm thử toàn vẹn dữ liệu khi dời lịch họp kèm thiết bị."
+        ),
+        (
+            "TC_E2E_EQUIP_027",
+            "Mượn thiết bị / Validation Số lượng",
+            "Chặn yêu cầu mượn số lượng thiết bị vượt quá số lượng tồn kho khả dụng",
+            "1. Thiết bị ID=4 (Bộ Micro không dây) có số lượng sẵn sàng trong kho là 2 bộ.",
+            "1. Thử gửi request API mượn với số lượng Quantity = 5 bộ.\n2. Quan sát phản hồi từ server.",
+            "EquipmentID: 4\nQuantity: 5 (Vượt quá tồn kho = 2)",
+            "1. Backend kiểm tra số lượng yêu cầu > số lượng khả dụng.\n2. Trả về HTTP 400 Bad Request: 'Số lượng thiết bị yêu cầu mượn (5) vượt quá số lượng khả dụng trong kho (2)'.\n3. Không lưu vào CSDL.",
+            "Backend kiểm tra số lượng tồn kho chặt chẽ, trả lỗi 400 đúng quy định.",
+            "Pass",
+            "Kiểm thử nghiệp vụ quản lý số lượng tồn kho thiết bị."
+        ),
+        (
+            "TC_E2E_EQUIP_028",
+            "Mượn thiết bị / Ràng buộc CSDL (Integrity)",
+            "Chặn xóa danh mục thiết bị từ trang Admin khi thiết bị đang được gán cho cuộc họp trong tương lai",
+            "1. Đăng nhập quyền Admin.\n2. Thiết bị ID=1 đang được mượn bởi cuộc họp sắp diễn ra ngày mai.",
+            "1. Truy cập mục Quản lý thiết bị (/admin/equipments).\n2. Tìm thiết bị ID=1 và bấm nút 'Xóa'.\n3. Xác nhận xóa trên popup.",
+            "Action: DELETE /api/equipments/1",
+            "1. Backend kiểm tra ràng buộc: Thiết bị đang có liên kết trong Booking_Equipments với cuộc họp chưa hoàn thành.\n2. Hệ thống từ chối xóa, trả về HTTP 400 Bad Request hoặc 409 Conflict: 'Không thể xóa thiết bị đang có lịch sử dụng trong tương lai'.\n3. Thiết bị vẫn tồn tại an toàn trong CSDL.",
+            "Hệ thống chặn xóa thiết bị đang hoạt động, bảo vệ toàn vẹn khóa ngoại.",
+            "Pass",
+            "Kiểm thử ràng buộc toàn vẹn cơ sở dữ liệu (Database Integrity)."
+        ),
+
+        # --- MODULE 4: BÁO CÁO & THỐNG KÊ (REPORTING & ANALYTICS) ---
+        (
+            "TC_E2E_REP_029",
+            "Báo cáo / RBAC Phân quyền",
+            "Kiểm tra phân quyền truy cập trang Dashboard Báo cáo KPI (Admin vs Employee)",
+            "1. Tài khoản Admin và tài khoản Employee cùng đăng nhập trên 2 trình duyệt.",
+            "1. Đăng nhập tài khoản Employee và cố tình gõ URL trực tiếp: /reports.html.\n2. Đăng nhập tài khoản Admin và truy cập /reports.html.",
+            "User 1: employee@enterprise.vn\nUser 2: admin@enterprise.vn\nURL: /reports.html",
+            "1. Với Employee: Router guard chặn và hiển thị thông báo 'Bạn không có quyền truy cập trang báo cáo quản trị', tự động redirect về /index.html. Backend API /api/reports từ chối với HTTP 403 Forbidden.\n2. Với Admin: Truy cập thành công, hiển thị đầy đủ biểu đồ KPI toàn công ty.",
+            "Chặn quyền Employee chính xác, Admin xem được toàn bộ báo cáo chuyên sâu.",
+            "Pass",
+            "Kiểm thử phân quyền RBAC trang Báo cáo thống kê."
+        ),
+        (
+            "TC_E2E_REP_030",
+            "Báo cáo / Tỷ lệ lấp đầy phòng",
+            "Tra cứu Báo cáo Tỷ lệ lấp đầy phòng họp (Room Utilization Rate) theo khoảng thời gian",
+            "1. Đã có dữ liệu các cuộc họp đã diễn ra và đã xác nhận trong tháng 10/2026.\n2. Đang ở trang Báo cáo quản trị.",
+            "1. Chọn khoảng thời gian: Từ 01/10/2026 đến 31/10/2026.\n2. Bấm nút 'Xem báo cáo'.\n3. Kiểm tra số liệu hiển thị trên Card thống kê và biểu đồ cột.",
+            "FromDate: 2026-10-01\nToDate: 2026-10-31",
+            "1. Backend tính toán theo công thức chuẩn: (Tổng số giờ họp thực tế / (8h x 22 ngày)) x 100%.\n2. API trả về JSON chứa chi tiết từng phòng: Tên phòng, Số cuộc họp, Tổng giờ họp, Tỷ lệ % lấp đầy.\n3. Frontend render biểu đồ Chart.js trực quan, các chỉ số số học khớp 100% với dữ liệu trong CSDL.",
+            "Báo cáo hiển thị chính xác công thức toán học, biểu đồ tải mượt mà.",
+            "Pass",
+            "Kiểm thử công thức và độ chính xác của báo cáo hiệu suất phòng."
+        ),
+        (
+            "TC_E2E_REP_031",
+            "Báo cáo / Tỷ lệ hủy họp",
+            "Tra cứu Thống kê Tỷ lệ hủy cuộc họp (Cancellation Rate) và danh sách cuộc họp bị hủy",
+            "1. Hệ thống có 5 cuộc họp đã tạo, trong đó có 1 cuộc họp bị hủy (Status='Cancelled').",
+            "1. Chọn tab 'Báo cáo Hủy cuộc họp'.\n2. Chọn thời gian trong tháng hiện tại.\n3. Bấm 'Tra cứu'.",
+            "DateRange: Tháng hiện tại\nCông thức: (Số cuộc họp Cancelled / Tổng cuộc họp) * 100",
+            "1. Backend trả về tỷ lệ hủy chính xác: (1 / 5) * 100 = 20.0%.\n2. Bảng chi tiết liệt kê rõ: Cuộc họp bị hủy, Người hủy, Thời gian hủy, Lý do hủy.\n3. Tỷ lệ hiển thị đúng màu cảnh báo (màu vàng/cam nếu dưới 25%).",
+            "Tỷ lệ hủy tính đúng 20%, danh sách hiển thị đầy đủ thông tin hủy.",
+            "Pass",
+            "Kiểm thử báo cáo phân tích tỷ lệ hủy phòng."
+        ),
+        (
+            "TC_E2E_REP_032",
+            "Báo cáo / Thống kê thiết bị",
+            "Tra cứu Báo cáo tần suất mượn và bảo trì trang thiết bị hội nghị",
+            "1. Có các lượt mượn thiết bị đã ghi nhận trong bảng Booking_Equipments.",
+            "1. Chọn tab 'Thống kê Thiết bị'.\n2. Xem bảng xếp hạng Top thiết bị được mượn nhiều nhất.\n3. Xem danh sách thiết bị đang bảo trì / hỏng.",
+            "Filter: Toàn bộ quý 4/2026",
+            "1. Hiển thị đúng: Thiết bị mượn nhiều nhất (Máy chiếu Sony, Màn hình Samsung).\n2. Liệt kê rõ số giờ phục vụ của từng thiết bị.\n3. Cảnh báo các thiết bị có trạng thái Maintenance (Máy chiếu Epson) để Admin lên lịch bảo dưỡng.",
+            "Thống kê thiết bị chính xác, trực quan, hỗ trợ quản lý tài sản tốt.",
+            "Pass",
+            "Kiểm thử báo cáo quản trị tài sản hội nghị."
+        ),
+        (
+            "TC_E2E_REP_033",
+            "Báo cáo / Validation Ngày",
+            "Kiểm tra bộ lọc khoảng thời gian báo cáo khi chọn Từ ngày lớn hơn Đến ngày",
+            "1. Đang ở bộ lọc ngày trang báo cáo.",
+            "1. Chọn Từ ngày: 31/10/2026.\n2. Chọn Đến ngày: 01/10/2026 (Từ ngày > Đến ngày).\n3. Bấm 'Xem báo cáo'.",
+            "FromDate: 2026-10-31\nToDate: 2026-10-01",
+            "1. Frontend hiển thị thông báo lỗi màu đỏ: 'Từ ngày không được lớn hơn Đến ngày' và vô hiệu hóa nút bấm.\n2. Nếu API nhận được request sẽ trả về HTTP 400 Bad Request: 'Dải ngày tra cứu không hợp lệ'.\n3. Hệ thống không bị treo hoặc crash trang trắng.",
+            "Thông báo lỗi xuất hiện ngay trên giao diện, không phát sinh lỗi 500.",
+            "Pass",
+            "Kiểm thử kiểm thực khoảng thời gian đầu vào báo cáo."
+        ),
+        (
+            "TC_E2E_REP_034",
+            "Báo cáo / Xuất file Excel",
+            "Xuất báo cáo tổng hợp ra file Excel (.xlsx) chuẩn Unicode tiếng Việt UTF-8",
+            "1. Đang xem báo cáo thống kê phòng và thiết bị tháng 10/2026.",
+            "1. Bấm nút 'Xuất Excel' (Export XLSX).\n2. Trình duyệt tải về file: Bao_Cao_Su_Dung_Phong_Thang_10_2026.xlsx.\n3. Mở file bằng Microsoft Excel.",
+            "Action: Click 'Xuất Excel'\nEndpoint: GET /api/reports/export/excel",
+            "1. File được tải về hoàn tất không lỗi.\n2. File mở ra hiển thị chuẩn font, không bị lỗi font tiếng Việt (UTF-8 encoding chuẩn).\n3. Định dạng gồm Header công ty, bảng dữ liệu có viền, số liệu định dạng số/tỷ lệ % chuẩn xác, khớp 100% với màn hình Web.",
+            "Tải file Excel thành công, hiển thị tiếng Việt sắc nét, số liệu chính xác.",
+            "Pass",
+            "Kiểm thử chức năng xuất file dữ liệu phục vụ báo cáo lãnh đạo."
+        ),
+
+        # --- MODULE 5: KỊCH BẢN TOÀN TRÌNH TÍCH HỢP E2E (INTEGRATED E2E FLOWS) ---
+        (
+            "TC_E2E_INT_035",
+            "Toàn trình E2E / Happy Path",
+            "Kịch bản toàn trình E2E 1: Đăng nhập -> Tìm & Đặt phòng -> Mượn kèm thiết bị -> Kiểm tra Báo cáo cập nhật",
+            "1. Môi trường Staging sẵn sàng.\n2. Tài khoản 'employee@enterprise.vn' sẵn sàng.\n3. Phòng A3.02 và Thiết bị ID=2 (Màn hình Samsung) trống ngày 2026-10-23 09:00 - 11:00.",
+            "1. Bước 1 (Đăng nhập): Đăng nhập employee@enterprise.vn vào hệ thống.\n2. Bước 2 (Đặt phòng): Mở form Đặt cuộc họp, chọn Phòng A3.02 ngày 2026-10-23 09:00 - 11:00.\n3. Bước 3 (Mượn thiết bị): Chọn mượn 'Màn hình tương tác Samsung' -> Bấm 'Lưu cuộc họp'.\n4. Bước 4 (Xác nhận): Kiểm tra Toast báo thành công, mở modal chi tiết kiểm tra trạng thái Confirmed và thiết bị kèm theo.\n5. Bước 5 (Đăng nhập Admin kiểm tra Báo cáo): Đăng xuất, đăng nhập Admin -> Mở trang Báo cáo -> Kiểm tra chỉ số giờ sử dụng phòng A3.02 tăng thêm 2.0 giờ và lượt mượn Màn hình Samsung tăng thêm 1.",
+            "User 1: employee@enterprise.vn / Password123\nUser 2: admin@enterprise.vn / Password123\nMeeting: 'Họp Chiến Lược Quý 4'\nRoom: A3.02\nEquipment: Samsung Flip Pro (ID: 2)",
+            "1. Đăng nhập thành công, nhận token.\n2. Đặt phòng và mượn thiết bị thành công trong 1 giao dịch DB trọn vẹn (Transaction Commit).\n3. CSDL ghi nhận: 1 bản ghi Meetings, 1 bản ghi Bookings, 1 bản ghi Booking_Equipments.\n4. Admin xem Báo cáo thấy dữ liệu được cộng dồn theo thời gian thực (Real-time Metric Sync).\n5. Xuất file Excel chứa đúng cuộc họp vừa tạo.",
+            "Toàn trình luồng chính hoạt động trơn tru 100% từ Đăng nhập tới Báo cáo, không lỗi phát sinh.",
+            "Pass",
+            "KỊCH BẢN E2E TRỌNG YẾU (MAIN HAPPY PATH) - Nghiệm thu toàn trình."
+        ),
+        (
+            "TC_E2E_INT_036",
+            "Toàn trình E2E / Exception & Recovery",
+            "Kịch bản toàn trình E2E 2: Đăng nhập -> Đặt phòng + Thiết bị -> Hủy họp -> Người khác đặt lại phòng đó -> Kiểm tra Báo cáo hủy",
+            "1. Phòng B2.02 ('Creative Lab Sa Pa') và Thiết bị ID=8 ('Barco ClickShare') trống ngày 2026-10-24 14:00 - 16:00.",
+            "1. User A (khanh.tq) đăng nhập -> Đặt Phòng B2.02 và mượn Thiết bị ID=8.\n2. User A thực hiện Hủy cuộc họp này với lý do 'Khách hàng dời lịch'.\n3. Kiểm tra Phòng B2.02 và Thiết bị ID=8 được giải phóng ngay lập tức.\n4. User B (minh.dq) đăng nhập -> Vào đặt đúng Phòng B2.02 và Thiết bị ID=8 vào đúng khung giờ 14:00 - 16:00 ngày 2026-10-24.\n5. Admin truy cập Báo cáo -> Xem chỉ số Tỷ lệ hủy tăng lên 1 cuộc họp.",
+            "User A: khanh.tq@enterprise.vn\nUser B: minh.dq@enterprise.vn\nRoom: B2.02\nEquipment: ID 8",
+            "1. User A hủy họp thành công -> Trạng thái đổi sang 'Cancelled', tài nguyên giải phóng tức thì.\n2. User B đặt lại thành công ngay sau đó, không bị báo lỗi trùng lặp.\n3. Dashboard Báo cáo ghi nhận cuộc họp hủy vào chỉ số Cancellation Rate và thống kê phòng mới của User B chính xác.",
+            "Giải phóng tài nguyên hoàn hảo, cho phép tái sử dụng ngay và ghi nhận báo cáo hủy đúng.",
+            "Pass",
+            "Kiểm thử khả năng phục hồi tài nguyên và tính chính xác của chỉ số hủy họp."
+        ),
+        (
+            "TC_E2E_INT_037",
+            "Toàn trình E2E / Stress & Concurrency",
+            "Kịch bản toàn trình E2E 3: Hai người dùng cùng đăng nhập đồng thời trên Staging tranh chấp 1 phòng họp và 1 thiết bị duy nhất",
+            "1. Phòng B2.01 và Thiết bị ID=1 chỉ còn duy nhất 1 suất trống lúc 10:00 - 11:00 ngày 2026-10-25.\n2. Mở 2 cửa sổ trình duyệt ẩn danh (Incognito) độc lập cho 2 tester.",
+            "1. Cả 2 tester cùng đăng nhập thành công vào hệ thống.\n2. Cả 2 cùng mở form, cùng chọn Phòng B2.01 và cùng chọn mượn Thiết bị ID=1.\n3. Cả 2 tester cùng đếm 1-2-3 và bấm nút 'Lưu cuộc họp' đồng thời.\n4. Quan sát kết quả trên cả 2 màn hình và kiểm tra CSDL Staging.",
+            "Tester 1: employee@enterprise.vn\nTester 2: khanh.tq@enterprise.vn\nRoomID: 2\nEquipmentID: 1\nTime: 10:00 - 11:00 ngày 2026-10-25",
+            "1. Đúng 1 người nhận được thông báo 'Đặt phòng thành công' (HTTP 201 Created).\n2. Người còn lại nhận được thông báo lỗi rõ ràng 'Phòng hoặc thiết bị đã có người đặt trong khung giờ này' (HTTP 409 Conflict).\n3. CSDL không bao giờ xảy ra tình trạng Duplicate Record hay Race Condition.\n4. Báo cáo thống kê chỉ ghi nhận đúng 1 cuộc họp.",
+            "Cơ chế khóa hàng FOR UPDATE hoạt động chuẩn xác, xử lý tranh chấp hoàn hảo.",
+            "Pass",
+            "Kiểm thử khả năng chịu tải và chống xung đột tài nguyên song song."
+        ),
+        (
+            "TC_E2E_INT_038",
+            "Toàn trình E2E / RBAC & Boundary",
+            "Kịch bản toàn trình E2E 4: Nhân viên bị từ chối đặt phòng VIP -> Đăng nhập tài khoản Manager phê duyệt/đặt thay -> Báo cáo phân quyền",
+            "1. Phòng A4.01 (Boardroom Thăng Long) yêu cầu quyền tối thiểu là Manager.",
+            "1. Nhân viên thường (Employee) đăng nhập -> Cố tình đặt Phòng A4.01 -> Nhận thông báo bị từ chối (HTTP 403 Forbidden).\n2. Quản lý (Manager: manager@enterprise.vn) đăng nhập -> Mở form đặt đúng phòng A4.01 cho cuộc họp cấp phòng ban -> Bấm lưu thành công (HTTP 201 Created).\n3. Admin mở Báo cáo phân loại cuộc họp theo phòng ban/vai trò -> Thấy ghi nhận cuộc họp do Manager đứng tên.",
+            "User 1: employee@enterprise.vn (Role: Employee - Bị chặn)\nUser 2: manager@enterprise.vn (Role: Manager - Hợp lệ)\nRoomID: 1 (Boardroom VIP)",
+            "1. Nhân viên bị chặn theo đúng chính sách RBAC.\n2. Manager đặt thành công không gặp trở ngại.\n3. Dữ liệu trên báo cáo phân loại rõ ràng vai trò người tổ chức.",
+            "Hệ thống thực thi chính sách bảo mật RBAC nghiêm ngặt và đồng bộ thông suốt lên Báo cáo.",
+            "Pass",
+            "Kiểm thử bảo mật đa cấp bậc phân quyền từ Đăng nhập tới Báo cáo."
+        )
+    ]
+
+    # Style definitions for data rows
+    font_content = Font(name="Segoe UI", size=9)
+    align_left = Alignment(horizontal="left", vertical="top", wrap_text=True)
+    align_center = Alignment(horizontal="center", vertical="top", wrap_text=True)
+    
+    fill_white = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+    fill_alt = PatternFill(start_color="F8FAFC", end_color="F8FAFC", fill_type="solid") # Light slate 50
+
+    # Status fills and fonts
+    status_styles = {
+        "Pass": {
+            "fill": PatternFill(start_color="DCFCE7", end_color="DCFCE7", fill_type="solid"), # Light green
+            "font": Font(name="Segoe UI", size=9, bold=True, color="166534") # Dark green
+        },
+        "Fail": {
+            "fill": PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid"), # Light red
+            "font": Font(name="Segoe UI", size=9, bold=True, color="991B1B") # Dark red
+        },
+        "Blocked": {
+            "fill": PatternFill(start_color="FEF9C3", end_color="FEF9C3", fill_type="solid"), # Light yellow
+            "font": Font(name="Segoe UI", size=9, bold=True, color="854D0E") # Dark yellow
+        }
+    }
+
+    start_row = 5
+    for i, tc in enumerate(test_cases):
+        curr_row = start_row + i
+        ws1.row_dimensions[curr_row].height = 68 # Comfortable height for wrapped text
+        row_fill = fill_white if i % 2 == 0 else fill_alt
+
+        for col_idx in range(1, 11):
+            val = tc[col_idx - 1]
+            c = ws1.cell(row=curr_row, column=col_idx, value=val)
+            c.border = table_border
+            
+            # Alignments & Styles
+            if col_idx in (1, 9): # TC ID, Status
+                c.alignment = align_center
+            else:
+                c.alignment = align_left
+
+            if col_idx == 9: # Status column
+                st = str(val).strip()
+                if st in status_styles:
+                    c.fill = status_styles[st]["fill"]
+                    c.font = status_styles[st]["font"]
+                else:
+                    c.fill = row_fill
+                    c.font = font_content
+            elif col_idx == 1: # TC ID
+                c.fill = row_fill
+                c.font = Font(name="Segoe UI", size=9, bold=True, color="1E3A8A")
+            elif col_idx == 2: # Module
+                c.fill = row_fill
+                c.font = Font(name="Segoe UI", size=9, bold=True, color="334155")
+            else:
+                c.fill = row_fill
+                c.font = font_content
+
+    # Set Column Widths for readability
+    col_widths = {
+        "A": 16, # Test Case ID
+        "B": 20, # Module / Feature
+        "C": 30, # Tiêu đề kịch bản
+        "D": 28, # Pre-conditions
+        "E": 34, # Test Steps
+        "F": 26, # Test Data
+        "G": 38, # Expected Result
+        "H": 30, # Actual Result
+        "I": 14, # Status
+        "J": 26  # Ghi chú / Bug ID
+    }
+    for col_letter, width in col_widths.items():
+        ws1.column_dimensions[col_letter].width = width
+
+    # Enable AutoFilter on Table Header
+    ws1.auto_filter.ref = f"A4:J{start_row + len(test_cases) - 1}"
+    
+    # Freeze Panes (Header row stays fixed)
+    ws1.freeze_panes = "A5"
+
+
+    # -------------------------------------------------------------
+    # SHEET 2: DASHBOARD & SUMMARY
+    # -------------------------------------------------------------
+    ws2 = wb.create_sheet(title="Dashboard & Thống Kê QA")
+    ws2.views.sheetView[0].showGridLines = True
+    
+    # Title
+    ws2.merge_cells("A1:G1")
+    t2 = ws2["A1"]
+    t2.value = "BÁO CÁO TỔNG HỢP KẾT QUẢ KIỂM THỬ E2E STAGING"
+    t2.font = Font(name="Segoe UI", size=15, bold=True, color="FFFFFF")
+    t2.fill = PatternFill(start_color="1E3A8A", end_color="1E3A8A", fill_type="solid")
+    t2.alignment = Alignment(horizontal="center", vertical="center")
+    ws2.row_dimensions[1].height = 38
+
+    ws2.merge_cells("A2:G2")
+    sub2 = ws2["A2"]
+    sub2.value = "Đợt kiểm thử nghiệm thu toàn trình (E2E) trên môi trường Staging ngày 18/10/2026"
+    sub2.font = Font(name="Segoe UI", size=10, italic=True, color="FFFFFF")
+    sub2.fill = PatternFill(start_color="3B82F6", end_color="3B82F6", fill_type="solid")
+    sub2.alignment = Alignment(horizontal="center", vertical="center")
+    ws2.row_dimensions[2].height = 22
+
+    # KPI Summary Cards
+    cards = [
+        ("TỔNG SỐ TEST CASES", len(test_cases), "1E293B", "F1F5F9"),
+        ("PASS (ĐẠT CHUẨN)", 38, "166534", "DCFCE7"),
+        ("FAIL (LỖI PHÁT SINH)", 0, "991B1B", "FEE2E2"),
+        ("BLOCKED (BỊ CHẶN)", 0, "854D0E", "FEF9C3"),
+        ("TỶ LỆ ĐẠT (PASS RATE)", "100.0%", "1D4ED8", "DBEAFE")
+    ]
+
+    card_cols = [("A", "B"), ("C", "C"), ("D", "D"), ("E", "E"), ("F", "G")]
+    for idx, (label, val, txt_color, bg_color) in enumerate(cards):
+        c_start, c_end = card_cols[idx]
+        
+        # Label cell
+        ws2.merge_cells(f"{c_start}4:{c_end}4")
+        lbl_cell = ws2[f"{c_start}4"]
+        lbl_cell.value = label
+        lbl_cell.font = Font(name="Segoe UI", size=9, bold=True, color="475569")
+        lbl_cell.alignment = Alignment(horizontal="center", vertical="center")
+        lbl_cell.fill = PatternFill(start_color=bg_color, end_color=bg_color, fill_type="solid")
+        lbl_cell.border = table_border
+
+        # Value cell
+        ws2.merge_cells(f"{c_start}5:{c_end}5")
+        v_cell = ws2[f"{c_start}5"]
+        v_cell.value = val
+        v_cell.font = Font(name="Segoe UI", size=18, bold=True, color=txt_color)
+        v_cell.alignment = Alignment(horizontal="center", vertical="center")
+        v_cell.fill = PatternFill(start_color=bg_color, end_color=bg_color, fill_type="solid")
+        v_cell.border = table_border
+    
+    ws2.row_dimensions[4].height = 24
+    ws2.row_dimensions[5].height = 36
+
+    # Breakdown by Module Table
+    ws2.cell(row=7, column=1, value="PHÂN BỔ TEST CASES THEO MODULE NGHIỆP VỤ:").font = Font(name="Segoe UI", size=11, bold=True, color="0F172A")
+    
+    mod_headers = ["STT", "Module / Tính năng", "Phạm vi kiểm thử", "Số lượng Test Cases", "Pass", "Fail", "Tỷ lệ Pass"]
+    for col_idx, h in enumerate(mod_headers, 1):
+        c = ws2.cell(row=8, column=col_idx, value=h)
+        c.font = Font(name="Segoe UI", size=9, bold=True, color="FFFFFF")
+        c.fill = PatternFill(start_color="334155", end_color="334155", fill_type="solid")
+        c.alignment = Alignment(horizontal="center", vertical="center")
+        c.border = table_border
+    ws2.row_dimensions[8].height = 26
+
+    modules_data = [
+        (1, "1. Xác thực & Đăng nhập (Auth & JWT)", "Frontend form validation, Backend JWT, BCrypt, RBAC UI, Session guard, SQLi defense", 9, 9, 0, "100%"),
+        (2, "2. Đặt phòng họp (Core Booking)", "Bộ lọc phòng trống, Đặt phòng thường, Race Condition (FOR UPDATE), Overlap Conflict, Giờ quá khứ, XSS, Đặt định kỳ", 11, 11, 0, "100%"),
+        (3, "3. Mượn thiết bị hội nghị (Equipment)", "Tra cứu thiết bị rảnh theo giờ, Mượn kèm phòng, Chặn thiết bị bảo trì/hỏng, Overlap thiết bị, Giải phóng khi hủy họp", 8, 8, 0, "100%"),
+        (4, "4. Báo cáo & Thống kê (Reports & KPI)", "Tỷ lệ lấp đầy phòng, Tỷ lệ hủy họp, Tần suất mượn thiết bị, Phân quyền xem báo cáo Admin, Xuất file Excel UTF-8", 6, 6, 0, "100%"),
+        (5, "5. Kịch bản Toàn trình Tích hợp (E2E Integration)", "E2E Main Happy Path, E2E Exception & Resource Release, E2E Concurrency 2 Users, E2E RBAC Escalation", 4, 4, 0, "100%")
+    ]
+
+    for row_idx, r_data in enumerate(modules_data, 9):
+        ws2.row_dimensions[row_idx].height = 24
+        for col_idx, val in enumerate(r_data, 1):
+            c = ws2.cell(row=row_idx, column=col_idx, value=val)
+            c.border = table_border
+            c.font = Font(name="Segoe UI", size=9)
+            if col_idx in (1, 4, 5, 6, 7):
+                c.alignment = Alignment(horizontal="center", vertical="center")
+            else:
+                c.alignment = Alignment(horizontal="left", vertical="center")
+
+    # Total row
+    tot_row = 9 + len(modules_data)
+    ws2.cell(row=tot_row, column=1, value="").border = table_border
+    ws2.merge_cells(f"A{tot_row}:C{tot_row}")
+    c_tot_lbl = ws2.cell(row=tot_row, column=1, value="TỔNG CỘNG TOÀN HỆ THỐNG")
+    c_tot_lbl.font = Font(name="Segoe UI", size=9, bold=True, color="0F172A")
+    c_tot_lbl.alignment = Alignment(horizontal="center", vertical="center")
+    c_tot_lbl.fill = PatternFill(start_color="F1F5F9", end_color="F1F5F9", fill_type="solid")
+    c_tot_lbl.border = table_border
+
+    for c_i, val in [(4, 38), (5, 38), (6, 0), (7, "100%")]:
+        c = ws2.cell(row=tot_row, column=c_i, value=val)
+        c.font = Font(name="Segoe UI", size=9, bold=True, color="0F172A")
+        c.fill = PatternFill(start_color="F1F5F9", end_color="F1F5F9", fill_type="solid")
+        c.alignment = Alignment(horizontal="center", vertical="center")
+        c.border = table_border
+
+    # Staging Environment Specs
+    ws2.cell(row=tot_row + 2, column=1, value="THÔNG SỐ MÔI TRƯỜNG THỰC NGHIỆM STAGING:").font = Font(name="Segoe UI", size=11, bold=True, color="0F172A")
+    
+    specs = [
+        ("Base URL Staging", "http://staging.meeting.enterprise.vn (Port 3000 / 80)"),
+        ("API Gateway", "Node.js Express RESTful API (v18.x LTS, JWT Auth Middleware)"),
+        ("Database Cluster", "MySQL 8.0.36 Community Server, InnoDB Engine (Support Transaction & Row-level lock)"),
+        ("Trình duyệt kiểm thử", "Google Chrome 129.0 (64-bit), Microsoft Edge 129.0, DevTools Network Throttle"),
+        ("Công cụ phối hợp", "Postman Collection Runner v10.x, Jest Backend Test, Playwright E2E Runner"),
+        ("Tiêu chuẩn nghiệm thu (DoD)", "100% Test Cases trọng yếu Pass, Không tồn tại blocker bug, Dữ liệu toàn vẹn")
+    ]
+
+    for s_idx, (k, v) in enumerate(specs, tot_row + 3):
+        ws2.row_dimensions[s_idx].height = 22
+        c_k = ws2.cell(row=s_idx, column=1, value=k)
+        c_k.font = Font(name="Segoe UI", size=9, bold=True, color="334155")
+        c_k.border = table_border
+        c_k.fill = PatternFill(start_color="F8FAFC", end_color="F8FAFC", fill_type="solid")
+        
+        ws2.merge_cells(f"B{s_idx}:G{s_idx}")
+        c_v = ws2.cell(row=s_idx, column=2, value=v)
+        c_v.font = Font(name="Segoe UI", size=9, color="0F172A")
+        c_v.border = table_border
+        c_v.alignment = Alignment(horizontal="left", vertical="center")
+
+    # Column widths for Sheet 2
+    ws2.column_dimensions["A"].width = 22
+    ws2.column_dimensions["B"].width = 28
+    ws2.column_dimensions["C"].width = 36
+    ws2.column_dimensions["D"].width = 18
+    ws2.column_dimensions["E"].width = 12
+    ws2.column_dimensions["F"].width = 12
+    ws2.column_dimensions["G"].width = 16
+
+    # Save to file
+    out_path_qa = r"e:\Downloads\TTCS_T926_K16C2_N3 - Copy (2)\QA\TestCase\QA_E2E_STAGING_TEST_CASES_DANG_NHAP_DAT_PHONG_THIET_BI_BAO_CAO.xlsx"
+    out_path_root = r"e:\Downloads\TTCS_T926_K16C2_N3 - Copy (2)\QA_E2E_STAGING_TEST_CASES.xlsx"
+    
+    wb.save(out_path_qa)
+    wb.save(out_path_root)
+    print(f"Successfully generated Excel files:\n1. {out_path_qa}\n2. {out_path_root}")
+
+if __name__ == "__main__":
+    build_test_cases_excel()
