@@ -416,16 +416,6 @@
   // Lắng nghe sự kiện DOMContentLoaded để tự động kích hoạt
   document.addEventListener('DOMContentLoaded', () => {
     MeetingReminderToast.startAutoReminderTicker(30);
-
-    // Gắn vào nút Chuông thông báo trên thanh header
-    const notifBtn = document.getElementById('notifications-btn');
-    if (notifBtn) {
-      // Thay thế listener cũ bằng trình kiểm tra nhắc nhở thông minh
-      notifBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        MeetingReminderToast.checkUpcomingMeetings(true);
-      });
-    }
   });
 
 })(window, document);

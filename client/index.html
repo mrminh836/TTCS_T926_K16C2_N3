@@ -26,7 +26,7 @@
   />
 
   <!-- CSS riêng của project -->
-  <link rel="stylesheet" href="style.css?v=1.22" />
+  <link rel="stylesheet" href="style.css?v=1.23" />
 
   <!-- Auth Guard: Bắt buộc đăng nhập qua trang login.html riêng biệt (chuẩn kiến trúc QLNS_QLTKPM) -->
   <script>
@@ -148,11 +148,41 @@
         </div>
 
         <div class="header-right">
-          <!-- Nút thông báo -->
-          <button class="header-icon-btn" id="notifications-btn" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="badge-dot"></span>
-          </button>
+          <!-- Nút thông báo & Dropdown Bảng thông báo nhỏ chuẩn SaaS -->
+          <div class="notification-menu" id="notification-menu-wrapper">
+            <button class="header-icon-btn" id="notifications-btn" title="Thông báo hệ thống" type="button" aria-expanded="false" aria-haspopup="true">
+              <i class="bi bi-bell"></i>
+              <span class="badge-dot" id="notifications-badge-dot"></span>
+            </button>
+
+            <!-- Bảng thông báo nhỏ chuẩn SaaS (như Facebook, Jira, GitHub) -->
+            <div class="notification-dropdown" id="notification-dropdown">
+              <div class="notification-dropdown-header">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-1.5">
+                    <span class="fw-bold text-slate-900 fs-6">Thông báo</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill ms-1" id="notif-unread-count" style="font-size: 11px;">0</span>
+                  </div>
+                  <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-secondary" id="btn-mark-all-read" style="font-size: 11.5px;">
+                    <i class="bi bi-check2-all me-1"></i>Đã đọc tất cả
+                  </button>
+                </div>
+              </div>
+
+              <!-- Danh sách thông báo -->
+              <div class="notification-dropdown-body" id="notification-items-list">
+                <!-- Nội dung thông báo render động -->
+              </div>
+
+              <!-- Footer -->
+              <div class="notification-dropdown-footer">
+                <a href="#/meetings" class="btn-view-all-notifs" id="btn-view-all-meetings-notif">
+                  <span>Xem tất cả lịch họp</span>
+                  <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
 
           <!-- Chế độ chưa đăng nhập (mặc định ẩn vì Auth Guard bắt buộc qua login.html) -->
           <div id="auth-unlogged-section" class="d-none align-items-center gap-2">
@@ -1837,10 +1867,10 @@
   <script src="js/pages/admin.js?v=1.2"></script>
 
   <!-- Component Toast Nhắc Nhở Trước Giờ Họp & Đồng Bộ iCalendar -->
-  <script src="js/components/meetingReminderToast.js?v=1.0"></script>
+  <script src="js/components/meetingReminderToast.js?v=1.1"></script>
 
   <!-- JavaScript nghiệp vụ chính & Khởi tạo CSDL -->
-  <script src="main.js?v=1.25"></script>
+  <script src="main.js?v=1.26"></script>
 
   <!-- JavaScript Phân quyền giao diện RBAC & Phòng VIP -->
   <script src="rbac.js?v=1.0"></script>

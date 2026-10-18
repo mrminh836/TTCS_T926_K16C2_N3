@@ -486,13 +486,39 @@ function initAppShellEvents() {
     });
   }
 
-  // 4. Notifications
-  if (notificationsBtn) {
-    notificationsBtn.addEventListener("click", () => {
-      if (typeof window.showToast === "function") {
-        window.showToast("Trung tâm thông báo: Bạn không có thông báo mới.", "info");
+  // 4. Notifications Dropdown (Bảng thông báo nhỏ chuẩn SaaS)
+  const notificationDropdown = document.getElementById("notification-dropdown");
+  if (notificationsBtn && notificationDropdown) {
+    notificationsBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (userDropdown) userDropdown.classList.remove("show");
+      const isShowing = notificationDropdown.classList.toggle("show");
+      if (isShowing) {
+        renderNotificationDropdown();
       }
     });
+
+    document.addEventListener("click", (e) => {
+      if (!notificationDropdown.contains(e.target) && !notificationsBtn.contains(e.target)) {
+        notificationDropdown.classList.remove("show");
+      }
+    });
+
+    const markAllReadBtn = document.getElementById("btn-mark-all-read");
+    if (markAllReadBtn) {
+      markAllReadBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        sessionStorage.setItem("notifications_read_all", new Date().toISOString().slice(0, 10));
+        const badge = document.getElementById("notifications-badge-dot");
+        if (badge) badge.classList.add("d-none");
+        const countBadge = document.getElementById("notif-unread-count");
+        if (countBadge) countBadge.textContent = "0";
+        document.querySelectorAll(".notification-item.unread").forEach(el => el.classList.remove("unread"));
+      });
+    }
+
+    // Tự động kiểm tra và cập nhật badge thông báo
+    setTimeout(renderNotificationDropdown, 1200);
   }
 
   // 5. Quick search in header
@@ -661,11 +687,142 @@ function router() {
   updateActiveNav(route);
 }
 
-window.addEventListener("hashchange", router);
-document.addEventListener("DOMContentLoaded", () => {
-  initAppShellEvents();
-  router();
-});
+/**
+ * Render Bảng thông báo nhỏ Dropdown (SaaS Notification Popover)
+ */
+function renderNotificationDropdown() {
+  const container = document.getElementById("notification-items-list");
+  const badgeDot = document.getElementById("notifications-badge-dot");
+  const unreadCountBadge = document.getElementById("notif-unread-count");
+  if (!container) return;
+
+  const authUser = (typeof getActiveAuthUser === "function") ? getActiveAuthUser() : null;
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id || 0) : 0;
+  const currentUserName = authUser ? (authUser.fullName || authUser.name || authUser.username || "") : "";
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const isReadAll = sessionStorage.getItem("notifications_read_all") === todayStr;
+
+  const allMeetings = Array.isArray(meetings) ? meetings : [];
+  const myMeetings = allMeetings.filter(m => {
+    if (m.status === "cancelled") return false;
+    if (authUser && String(authUser.role).toLowerCase() === "admin") return true;
+    const isHost = Number(m.organizerId) === currentUserId || (currentUserName && m.host === currentUserName);
+    const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+    const isInvited = pIds.includes(currentUserId);
+    return isHost || isInvited;
+  });
+
+  const todayMeetings = myMeetings
+    .filter(m => m.date === todayStr)
+    .sort((a, b) => (a.startTime || "").localeCompare(b.startTime || ""));
+
+  const futureMeetings = myMeetings
+    .filter(m => m.date > todayStr)
+    .sort((a, b) => (a.date || "").localeCompare(b.date || "") || (a.startTime || "").localeCompare(b.startTime || ""))
+    .slice(0, 3);
+
+  const notifications = [];
+
+  todayMeetings.forEach(m => {
+    const [sH, sM] = (m.startTime || "00:00").split(":").map(Number);
+    const [eH, eM] = (m.endTime || "23:59").split(":").map(Number);
+    const startMin = sH * 60 + sM;
+    const endMin = eH * 60 + eM;
+
+    const isOngoing = (nowMinutes >= startMin && nowMinutes <= endMin) || m.status === "in-progress";
+    const isEnded = nowMinutes > endMin || m.status === "completed";
+    const diffMin = startMin - nowMinutes;
+
+    if (isOngoing) {
+      notifications.push({
+        id: m.id,
+        title: m.title,
+        statusType: "ongoing",
+        iconClass: "icon-ongoing",
+        icon: "bi-broadcast",
+        label: "Đang diễn ra",
+        badgeClass: "bg-success text-white",
+        timeText: `Hôm nay • ${m.startTime} - ${m.endTime}`,
+        subText: `${m.roomName || "Phòng họp"} • Cuộc họp đang diễn ra`,
+        isUnread: !isReadAll
+      });
+    } else if (!isEnded) {
+      const isUrgent = diffMin <= 30 && diffMin >= 0;
+      notifications.push({
+        id: m.id,
+        title: m.title,
+        statusType: isUrgent ? "urgent" : "upcoming",
+        iconClass: isUrgent ? "icon-alert" : "icon-upcoming",
+        icon: isUrgent ? "bi-alarm-fill" : "bi-calendar-check",
+        label: isUrgent ? `Sắp bắt đầu (${diffMin}p)` : "Hôm nay",
+        badgeClass: isUrgent ? "bg-warning text-dark" : "bg-primary-subtle text-primary",
+        timeText: `Hôm nay • ${m.startTime} - ${m.endTime}`,
+        subText: `${m.roomName || "Phòng họp"} • Do ${m.host || "Đồng nghiệp"} chủ trì`,
+        isUnread: !isReadAll
+      });
+    }
+  });
+
+  futureMeetings.forEach(m => {
+    const formattedDate = (typeof formatDetailedDate === "function") ? formatDetailedDate(m.date) : m.date;
+    notifications.push({
+      id: m.id,
+      title: m.title,
+      statusType: "future",
+      iconClass: "icon-invited",
+      icon: "bi-calendar-event",
+      label: "Sắp tới",
+      badgeClass: "bg-secondary-subtle text-secondary",
+      timeText: `${formattedDate} • ${m.startTime}`,
+      subText: `${m.roomName || "Phòng họp"}`,
+      isUnread: false
+    });
+  });
+
+  const unreadCount = isReadAll ? 0 : notifications.filter(n => n.isUnread).length;
+  if (unreadCountBadge) unreadCountBadge.textContent = String(unreadCount);
+  if (badgeDot) {
+    if (unreadCount > 0) badgeDot.classList.remove("d-none");
+    else badgeDot.classList.add("d-none");
+  }
+
+  if (notifications.length === 0) {
+    container.innerHTML = `
+      <div class="notification-empty-state">
+        <div class="notification-empty-icon">
+          <i class="bi bi-bell-slash"></i>
+        </div>
+        <div class="notification-empty-title">Không có thông báo mới</div>
+        <div class="notification-empty-desc">Hôm nay bạn không có lịch họp nào sắp tới. Lời mời và lịch họp mới sẽ hiển thị tại đây.</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = notifications.map(n => `
+    <div class="notification-item ${n.isUnread ? "unread" : ""}" onclick="document.getElementById('notification-dropdown')?.classList.remove('show'); if (typeof openDetailModal === 'function') openDetailModal(${n.id});">
+      <div class="notification-item-icon ${n.iconClass}">
+        <i class="bi ${n.icon}"></i>
+      </div>
+      <div class="notification-item-content">
+        <div class="d-flex align-items-center justify-content-between gap-1 mb-1">
+          <span class="badge ${n.badgeClass}" style="font-size: 10px; font-weight: 600;">${n.label}</span>
+          <span class="notification-item-time">${n.timeText}</span>
+        </div>
+        <div class="notification-item-title text-truncate" title="${escapeHTML(n.title)}">
+          ${escapeHTML(n.title)}
+        </div>
+        <div class="notification-item-meta">
+          <span><i class="bi bi-geo-alt me-1 text-primary"></i>${escapeHTML(n.subText)}</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+window.renderNotificationDropdown = renderNotificationDropdown;
 
 // =====================================================
 // 4. HOME (ENTERPRISE HERO LANDING)
