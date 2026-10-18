@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma Trận Test Cases: Phân Quyền RBAC &amp; Giới Hạn Đặt Phòng VIP (US 21.0 &amp; 20.0)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+    }
+    .hero-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 38px 0;
+      margin-bottom: 28px;
+      border-bottom: 4px solid #3b82f6;
+    }
+    .stat-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 18px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+    .table-container {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    .badge-admin { background-color: #ef4444; color: white; }
+    .badge-manager { background-color: #3b82f6; color: white; }
+    .badge-employee { background-color: #64748b; color: white; }
+  </style>
+</head>
+<body>
+
+<header class="hero-header shadow-sm">
+  <div class="container-fluid px-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <span class="badge bg-primary text-uppercase px-3 py-2 mb-2">Sprint 4 • QA Report</span>
+        <h1 class="h3 fw-bold mb-1">Kiểm Thử Ma Trận Phân Quyền RBAC &amp; Giới Hạn Đặt Phòng VIP</h1>
+        <p class="text-light opacity-75 mb-0">Hệ thống Quản lý Cuộc họp Doanh nghiệp — Phân hệ US 21.0 &amp; US 20.0</p>
+      </div>
+      <div class="text-end text-light small">
+        <div><strong>Người thực hiện:</strong> Hoàng Văn Khuyến (QA Tester &amp; Security Auditor)</div>
+        <div><strong>Ngày thực thi:</strong> 18/10/2026 • <strong>Trạng thái:</strong> Đạt tiêu chuẩn nghiệm thu</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container-fluid px-4 mb-5">
+  <!-- Stats Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="stat-card d-flex align-items-center">
+        <div class="rounded-circle bg-primary-subtle p-3 text-primary me-3 fs-3">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <div>
+          <div class="text-muted small fw-bold">TỔNG TEST CASES</div>
+          <div class="fs-3 fw-bold text-dark">38 TC</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card d-flex align-items-center">
+        <div class="rounded-circle bg-success-subtle p-3 text-success me-3 fs-3">
+          <i class="bi bi-check2-all"></i>
+        </div>
+        <div>
+          <div class="text-muted small fw-bold">SỐ CA ĐẠT (PASS)</div>
+          <div class="fs-3 fw-bold text-success">36 <span class="fs-6 text-muted">(94.7%)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card d-flex align-items-center">
+        <div class="rounded-circle bg-danger-subtle p-3 text-danger me-3 fs-3">
+          <i class="bi bi-bug-fill"></i>
+        </div>
+        <div>
+          <div class="text-muted small fw-bold">SỐ CA LỖI (FAIL)</div>
+          <div class="fs-3 fw-bold text-danger">2 <span class="fs-6 text-muted">(BUG-RBAC-01, 02)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card d-flex align-items-center">
+        <div class="rounded-circle bg-warning-subtle p-3 text-warning me-3 fs-3">
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <div>
+          <div class="text-muted small fw-bold">PHÒNG VIP ĐÁNH GIÁ</div>
+          <div class="fs-3 fw-bold text-warning">RM-005, 008</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-5">
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo mã TC, tiêu đề, API endpoint, vai trò...">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select id="categoryFilter" class="form-select">
+            <option value="ALL">-- Tất cả phân hệ kiểm thử --</option>
+            <option value="RBAC Matrix">1. Ma trận phân quyền đa vai trò</option>
+            <option value="VIP Booking Policy">2. Giới hạn đặt phòng VIP</option>
+            <option value="Middleware requireRole">3. Middleware requireRole &amp; API</option>
+            <option value="Client UI &amp; Guard">4. Giao diện &amp; Auth Route Guard</option>
+            <option value="Security &amp; Escalation">5. Bảo mật nâng cao &amp; Leo thang đặc quyền</option>
+          </select>
+        </div>
+        <div class="col-md-3 text-end">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter="ALL">Tất cả</button>
+            <button type="button" class="btn btn-outline-success btn-sm" data-filter="Pass">Chỉ Pass (36)</button>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-filter="Fail">Chỉ Fail (2)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Container -->
+  <div class="table-container">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="testCasesTable">
+        <thead>
+          <tr>
+            <th style="width: 110px;">Mã TC</th>
+            <th style="width: 140px;">Phân hệ</th>
+            <th style="width: 220px;">Tiêu đề kịch bản</th>
+            <th style="width: 170px;">Điều kiện</th>
+            <th style="width: 220px;">Các bước</th>
+            <th style="width: 190px;">Dữ liệu</th>
+            <th style="width: 200px;">Kỳ vọng</th>
+            <th style="width: 200px;">Thực tế</th>
+            <th style="width: 90px;" class="text-center">Kết quả</th>
+            <th style="width: 160px;">Ghi chú &amp; Bug</th>
+            <th style="width: 120px;" class="text-center">Minh chứng</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        <tr data-status="Pass" data-cat="RBAC Matrix / Admin">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_001</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Admin</span></td>
+          <td class="fw-semibold text-dark">Admin truy cập toàn quyền Admin Dashboard và tài nguyên hệ thống</td>
+          <td class="small text-muted">Tài khoản admin đã đăng nhập, nhận JWT token chứa role='Admin'.</td>
+          <td class="small">1. Gửi request GET /api/rooms kèm Bearer token Admin.<br>2. Kiểm tra quyền truy cập route quản trị index.html#/admin.<br>3. Kiểm tra hiển thị đầy đủ các nút thêm/sửa/xóa.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Header: Authorization: Bearer <token_admin><br>User: admin (Role: Admin)</td>
+          <td class="small text-success">HTTP 200 OK; Giao diện hiển thị đầy đủ các menu Quản trị phòng, Quản trị thiết bị, Quản lý tài khoản người dùng; không bị bất kỳ chặn quyền nào.</td>
+          <td class="small text-dark">Đạt: Server phản hồi HTTP 200 OK với đầy đủ dữ liệu; Client cho phép truy cập đầy đủ các chức năng quản trị.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm thử Happy Path quyền Quản trị viên tối cao.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="Admin truy cập toàn quyền Admin Dashboard và tài nguyên hệ thống">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Organizer">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_002</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Organizer</span></td>
+          <td class="fw-semibold text-dark">Organizer (Manager) tạo cuộc họp phòng thông thường thành công</td>
+          <td class="small text-muted">Tài khoản manager đã đăng nhập, nhận JWT token role='Manager'.</td>
+          <td class="small">1. Gọi API POST /api/meetings với RoomID=1 (Phòng Tokyo - Hội nghị).<br>2. Điền đầy đủ thông tin thời gian hợp lệ.<br>3. Xác minh cuộc họp được lưu với OrganizerID=3.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Payload: { title: 'Họp kế hoạch Sprint 4', roomId: 1, organizerId: 3, startTime: '2026-11-02 08:30:00', endTime: '2026-11-02 10:00:00' }</td>
+          <td class="small text-success">HTTP 201 Created; Ghi nhận cuộc họp và phòng họp trong CSDL với trạng thái 'Confirmed'; người tổ chức là Manager.</td>
+          <td class="small text-dark">Đạt: Tạo cuộc họp thành công với mã phản hồi HTTP 201 Created; dữ liệu booking ghi nhận chính xác.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Quyền tạo cuộc họp chuẩn của Organizer.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_02_organizer_standard_booking.svg" data-title="Organizer (Manager) tạo cuộc họp phòng thông thường thành công">
+            <i class="bi bi-image me-1"></i>evidence_rbac_02_organizer_standard_booking.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Attendee">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_003</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Attendee</span></td>
+          <td class="fw-semibold text-dark">Attendee (Employee) truy cập trang Dashboard hiển thị giao diện giới hạn</td>
+          <td class="small text-muted">Tài khoản employee đã đăng nhập, nhận JWT token role='Employee'.</td>
+          <td class="small">1. Đăng nhập với tài khoản employee.<br>2. Quan sát thanh Header và Sidebar.<br>3. Kiểm tra các menu Quản trị.</td>
+          <td class="small font-monospace bg-light p-2 rounded">User: employee (Role: Employee)<br>LocalStorage: currentUser = { role: 'Employee' }</td>
+          <td class="small text-success">Badge vai trò hiển thị 'Nhân viên (Employee)'; các nút Quản trị phòng họp, Thiết bị bị ẩn hoàn toàn khỏi Sidebar và Header.</td>
+          <td class="small text-dark">Đạt: Giao diện tự động ẩn các chức năng quản trị; hiển thị đúng phân quyền Attendee chỉ đọc và tham dự.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm tra UI filtering dựa trên vai trò.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_03_attendee_read_only_restriction.svg" data-title="Attendee (Employee) truy cập trang Dashboard hiển thị giao diện giới hạn">
+            <i class="bi bi-image me-1"></i>evidence_rbac_03_attendee_read_only_restriction.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Organizer">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_004</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Organizer</span></td>
+          <td class="fw-semibold text-dark">Organizer chỉnh sửa thông tin cuộc họp do chính mình làm chủ tọa (Owner)</td>
+          <td class="small text-muted">Cuộc họp MeetingID=1 có OrganizerID=3 (Lê Văn Trưởng Phòng).</td>
+          <td class="small">1. Gọi PUT /api/meetings/1 kèm Bearer token của Manager (UserID=3).<br>2. Cập nhật tiêu đề và mô tả mới.<br>3. Kiểm tra kết quả phản hồi.</td>
+          <td class="small font-monospace bg-light p-2 rounded">PUT /api/meetings/1<br>Payload: { title: 'Họp chiến lược kinh doanh cập nhật', description: 'Bổ sung kế hoạch quý 4' }</td>
+          <td class="small text-success">HTTP 200 OK; Cập nhật thông tin cuộc họp thành công; Người tạo có toàn quyền chỉnh sửa cuộc họp của mình.</td>
+          <td class="small text-dark">Đạt: Server phản hồi HTTP 200 OK; dữ liệu cuộc họp được cập nhật chuẩn xác.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm tra quyền sở hữu cuộc họp (Resource Ownership).</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_02_organizer_standard_booking.svg" data-title="Organizer chỉnh sửa thông tin cuộc họp do chính mình làm chủ tọa (Owner)">
+            <i class="bi bi-image me-1"></i>evidence_rbac_02_organizer_standard_booking.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Organizer">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_005</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Organizer</span></td>
+          <td class="fw-semibold text-dark">Organizer cố tình sửa hoặc hủy cuộc họp của người khác -> Chặn 403 Forbidden</td>
+          <td class="small text-muted">Cuộc họp MeetingID=2 do UserID=1 (Admin) hoặc UserID=5 (Minh) tạo.</td>
+          <td class="small">1. Sử dụng tài khoản Manager UserID=3 gửi request PUT /api/meetings/2.<br>2. Cố tình thay đổi thời gian cuộc họp của đồng nghiệp.<br>3. Quan sát mã phản hồi HTTP.</td>
+          <td class="small font-monospace bg-light p-2 rounded">PUT /api/meetings/2<br>Header: Authorization: Bearer <token_manager_id_3></td>
+          <td class="small text-success">HTTP 403 Forbidden; Thông báo: 'Bạn không có quyền chỉnh sửa cuộc họp do người khác tổ chức.'; Không làm thay đổi CSDL.</td>
+          <td class="small text-dark">Đạt: Hệ thống đối chiếu req.user.userId với organizerId của cuộc họp và từ chối cập nhật với mã lỗi 403 Forbidden.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Chặn can thiệp chéo cuộc họp giữa các Organizer.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="Organizer cố tình sửa hoặc hủy cuộc họp của người khác -> Chặn 403 Forbidden">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Admin">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_006</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Admin</span></td>
+          <td class="fw-semibold text-dark">Admin có quyền can thiệp hủy hoặc chỉnh sửa cuộc họp của bất kỳ ai trong trường hợp khẩn cấp</td>
+          <td class="small text-muted">Cuộc họp MeetingID=3 do UserID=3 tạo.</td>
+          <td class="small">1. Sử dụng tài khoản Admin (UserID=1) gửi request PUT /api/meetings/3/cancel.<br>2. Bổ sung lý do hủy: 'Bảo trì khẩn cấp toàn tòa nhà'.<br>3. Kiểm tra trạng thái booking.</td>
+          <td class="small font-monospace bg-light p-2 rounded">PUT /api/meetings/3/cancel<br>Header: Authorization: Bearer <token_admin></td>
+          <td class="small text-success">HTTP 200 OK; BookingStatus chuyển sang 'Cancelled'; Admin được đặc quyền can thiệp sự cố vận hành toàn hệ thống.</td>
+          <td class="small text-dark">Đạt: Admin thực hiện hủy thành công cuộc họp của người khác theo đúng thẩm quyền Superuser.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Quyền Super Admin can thiệp vận hành sự cố khẩn cấp.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="Admin có quyền can thiệp hủy hoặc chỉnh sửa cuộc họp của bất kỳ ai trong trường hợp khẩn cấp">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Admin">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_007</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Admin</span></td>
+          <td class="fw-semibold text-dark">Admin truy cập CRUD danh mục thiết bị doanh nghiệp thành công</td>
+          <td class="small text-muted">Tài khoản admin đã đăng nhập với JWT hợp lệ.</td>
+          <td class="small">1. Gọi POST /api/equipments thêm thiết bị mới: 'Micro không dây Shure'.<br>2. Kiểm tra phản hồi HTTP.</td>
+          <td class="small font-monospace bg-light p-2 rounded">POST /api/equipments<br>Payload: { name: 'Micro không dây Shure', type: 'Audio', quantity: 4, status: 'Available' }</td>
+          <td class="small text-success">HTTP 201 Created; Thiết bị được thêm vào bảng Equipments thành công.</td>
+          <td class="small text-dark">Đạt: Server phản hồi HTTP 201 Created; Admin toàn quyền CRUD thiết bị.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">CRUD thiết bị phía Admin Portal.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="Admin truy cập CRUD danh mục thiết bị doanh nghiệp thành công">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Attendee">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_008</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Attendee</span></td>
+          <td class="fw-semibold text-dark">Employee cố tình gửi request POST /api/equipments tạo thiết bị -> Chặn 403 Forbidden</td>
+          <td class="small text-muted">Tài khoản employee có JWT hợp lệ role='Employee'.</td>
+          <td class="small">1. Sử dụng Postman hoặc fetch gửi POST /api/equipments kèm token Employee.<br>2. Quan sát phản hồi từ server.</td>
+          <td class="small font-monospace bg-light p-2 rounded">POST /api/equipments<br>Header: Authorization: Bearer <token_employee></td>
+          <td class="small text-success">HTTP 403 Forbidden; Thông báo: 'Bạn không có thẩm quyền truy cập tài nguyên này.'; Chặn hoàn toàn.</td>
+          <td class="small text-dark">Đạt: Middleware requireRole('Admin') chặn request và phản hồi HTTP 403 Forbidden.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Chặn người dùng thường can thiệp danh mục thiết bị.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="Employee cố tình gửi request POST /api/equipments tạo thiết bị -> Chặn 403 Forbidden">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Attendee">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_009</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Attendee</span></td>
+          <td class="fw-semibold text-dark">Attendee truy vấn danh sách lời mời cá nhân và cập nhật trạng thái phản hồi</td>
+          <td class="small text-muted">Employee (UserID=4) được mời vào cuộc họp MeetingID=1.</td>
+          <td class="small">1. Gọi GET /api/meetings/1/participants.<br>2. Gọi PATCH /api/meetings/1/participants/4/status với status='Accepted'.<br>3. Kiểm tra trạng thái ghi nhận.</td>
+          <td class="small font-monospace bg-light p-2 rounded">PATCH /api/meetings/1/participants/4/status<br>Payload: { responseStatus: 'Accepted' }</td>
+          <td class="small text-success">HTTP 200 OK; ResponseStatus cập nhật thành 'Accepted' trong bảng Meeting_Participants; Khách mời có quyền phản hồi lịch cá nhân.</td>
+          <td class="small text-dark">Đạt: Trạng thái phản hồi được lưu thành công; thời gian phản hồi được cập nhật vào CSDL.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Luồng tương tác chuẩn của người tham dự cuộc họp.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_03_attendee_read_only_restriction.svg" data-title="Attendee truy vấn danh sách lời mời cá nhân và cập nhật trạng thái phản hồi">
+            <i class="bi bi-image me-1"></i>evidence_rbac_03_attendee_read_only_restriction.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="RBAC Matrix / Attendee">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MAT_010</td>
+          <td><span class="badge bg-light text-dark border">RBAC Matrix / Attendee</span></td>
+          <td class="fw-semibold text-dark">Attendee cố tình thay đổi trạng thái tham dự của đồng nghiệp khác -> Chặn 403 Forbidden</td>
+          <td class="small text-muted">Employee A (UserID=4) và Employee B (UserID=6) đều được mời tham gia MeetingID=1.</td>
+          <td class="small">1. Employee A gửi PATCH /api/meetings/1/participants/6/status với status='Declined'.<br>2. Quan sát mã phản hồi từ server.</td>
+          <td class="small font-monospace bg-light p-2 rounded">PATCH /api/meetings/1/participants/6/status<br>Header: Authorization: Bearer <token_employee_A_id_4></td>
+          <td class="small text-success">HTTP 403 Forbidden; Hệ thống chỉ cho phép cập nhật trạng thái của chính UserID trong token; Chặn sửa trạng thái người khác.</td>
+          <td class="small text-dark">Đạt: Server kiểm tra req.user.userId !== targetUserId và phản hồi HTTP 403 Forbidden an toàn.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Chặn mạo danh phản hồi lời mời họp.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="Attendee cố tình thay đổi trạng thái tham dự của đồng nghiệp khác -> Chặn 403 Forbidden">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_001</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Admin đặt phòng VIP (RoomID: 5 - Focus & Phỏng Vấn Hạ Long) thành công</td>
+          <td class="small text-muted">Phòng VIP ID=5 đang 'Active', khung giờ 14:00 - 15:30 ngày 2026-11-05 trống lịch.</td>
+          <td class="small">1. Admin gửi POST /api/meetings với RoomID=5.<br>2. Kiểm tra phản hồi HTTP và dữ liệu tạo ra.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Payload: { title: 'Phỏng vấn Giám đốc Tài chính', roomId: 5, organizerId: 1, startTime: '2026-11-05 14:00:00', endTime: '2026-11-05 15:30:00' }</td>
+          <td class="small text-success">HTTP 201 Created; Cuộc họp được lưu trong CSDL; Admin được toàn quyền đặt mọi loại phòng bao gồm VIP.</td>
+          <td class="small text-dark">Đạt: Tạo cuộc họp thành công với HTTP 201 Created; phòng VIP được đặt chính xác.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Quyền đặt phòng VIP tối cao của Quản trị viên.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="Admin đặt phòng VIP (RoomID: 5 - Focus & Phỏng Vấn Hạ Long) thành công">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_002</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Manager / Trưởng phòng đặt phòng VIP (RoomID: 8 - Executive Suite Tràng An) thành công</td>
+          <td class="small text-muted">Phòng VIP ID=8 đang 'Active', tài khoản manager có vai trò được chỉ định đặt phòng VIP.</td>
+          <td class="small">1. Manager gửi POST /api/meetings với RoomID=8.<br>2. Quan sát phản hồi từ server.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Payload: { title: 'Họp hội đồng quản trị mở rộng', roomId: 8, organizerId: 3, startTime: '2026-11-06 09:00:00', endTime: '2026-11-06 11:30:00' }</td>
+          <td class="small text-success">HTTP 201 Created; Manager được cấp phép đặt phòng VIP theo chính sách công ty (MinRole = 'Manager').</td>
+          <td class="small text-dark">Đạt: Hệ thống xác thực vai trò Manager hợp lệ và cấp phép đặt phòng VIP thành công.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Thẩm quyền Manager đặt phòng họp VIP / Điều hành.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_02_organizer_standard_booking.svg" data-title="Manager / Trưởng phòng đặt phòng VIP (RoomID: 8 - Executive Suite Tràng An) thành công">
+            <i class="bi bi-image me-1"></i>evidence_rbac_02_organizer_standard_booking.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Fail" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_003</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Employee (Nhân viên thường) cố tình gửi API đặt phòng VIP -> Phải bị chặn 403 Forbidden</td>
+          <td class="small text-muted">Phòng VIP ID=5 có Type='VIP / Phỏng vấn', cờ Restricted=true. User có Role='Employee'.</td>
+          <td class="small">1. Sử dụng tài khoản employee gửi POST /api/meetings với RoomID=5.<br>2. Quan sát mã phản hồi HTTP và kiểm tra bảng Bookings trong CSDL.</td>
+          <td class="small font-monospace bg-light p-2 rounded">POST /api/meetings<br>Payload: { title: 'Họp nhóm thường', roomId: 5, organizerId: 4, startTime: '2026-11-07 10:00:00', endTime: '2026-11-07 11:00:00' }</td>
+          <td class="small text-success">HTTP 403 Forbidden; Phản hồi lỗi: 'Bạn không có thẩm quyền đặt phòng VIP này. Vui lòng liên hệ Trưởng phòng hoặc Quản trị viên.'; Không được ghi vào CSDL.</td>
+          <td class="small text-danger fw-bold">KHÔNG ĐẠT (FAIL): Server trả về HTTP 201 Created và ghi nhận cuộc họp vào CSDL bình thường! Endpoint POST /api/meetings chưa tích hợp Middleware kiểm tra quyền đặt phòng VIP theo vai trò người dùng (BUG-RBAC-01).</td>
+          <td class="text-center"><span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-x-circle-fill me-1"></i>Fail</span></td>
+          <td class="small text-secondary">Phát hiện BUG-RBAC-01: Backend thiếu Middleware xác thực quyền đặt phòng VIP.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_04_vip_room_blocked_403.svg" data-title="Employee (Nhân viên thường) cố tình gửi API đặt phòng VIP -> Phải bị chặn 403 Forbidden">
+            <i class="bi bi-image me-1"></i>evidence_rbac_04_vip_room_blocked_403.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_004</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Employee đặt phòng họp thông thường (RoomID: 1 - Tokyo) được cấp phép bình thường</td>
+          <td class="small text-muted">Phòng họp RoomID=1 có Type='Hội nghị' (Phòng thông thường, không bị giới hạn chính sách VIP).</td>
+          <td class="small">1. Employee gửi POST /api/meetings với RoomID=1.<br>2. Kiểm tra phản hồi HTTP.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Payload: { title: 'Họp trao đổi chuyên môn Front-end', roomId: 1, organizerId: 4, startTime: '2026-11-08 14:00:00', endTime: '2026-11-08 15:30:00' }</td>
+          <td class="small text-success">HTTP 201 Created; Nhân viên thường được tự do đặt các phòng họp thông thường không thuộc diện VIP.</td>
+          <td class="small text-dark">Đạt: Tạo cuộc họp phòng tiêu chuẩn thành công với mã phản hồi 201 Created.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Đảm bảo chính sách VIP không gây ảnh hưởng đến việc đặt phòng thường.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_02_organizer_standard_booking.svg" data-title="Employee đặt phòng họp thông thường (RoomID: 1 - Tokyo) được cấp phép bình thường">
+            <i class="bi bi-image me-1"></i>evidence_rbac_02_organizer_standard_booking.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_005</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Người dùng chưa đăng nhập (Không có Token) gửi API đặt phòng VIP -> Chặn 401 Unauthorized</td>
+          <td class="small text-muted">Client không đính kèm Header Authorization.</td>
+          <td class="small">1. Gửi request POST /api/meetings đặt phòng VIP RoomID=5 không kèm token.<br>2. Kiểm tra mã lỗi trả về.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Headers: Không có Authorization header<br>Payload: { title: 'Đặt lậu', roomId: 5, organizerId: 1 }</td>
+          <td class="small text-success">HTTP 401 Unauthorized; Thông báo: 'Yêu cầu token xác thực. Vui lòng cung cấp Authorization header.'; Chặn 100%.</td>
+          <td class="small text-dark">Đạt: Hệ thống chặn request thiếu token và trả về HTTP 401 Unauthorized theo chuẩn an toàn.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Bảo vệ tầng xác thực căn bản trước khi vào tầng phân quyền.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_04_vip_room_blocked_403.svg" data-title="Người dùng chưa đăng nhập (Không có Token) gửi API đặt phòng VIP -> Chặn 401 Unauthorized">
+            <i class="bi bi-image me-1"></i>evidence_rbac_04_vip_room_blocked_403.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_006</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Đặt chuỗi lịch họp định kỳ (POST /api/meetings/recurring) vào phòng VIP bởi Employee -> Chặn 403</td>
+          <td class="small text-muted">Employee cố gắng đặt chuỗi 4 tuần liên tiếp vào phòng VIP ID=5.</td>
+          <td class="small">1. Gửi POST /api/meetings/recurring với RoomID=5, frequency='weekly', occurrences=4.<br>2. Quan sát phản hồi từ server.</td>
+          <td class="small font-monospace bg-light p-2 rounded">POST /api/meetings/recurring<br>Payload: { title: 'Họp định kỳ phòng VIP', roomId: 5, organizerId: 4, recurrence: { frequency: 'weekly', occurrences: 4 } }</td>
+          <td class="small text-success">HTTP 403 Forbidden; Chặn toàn bộ chuỗi cuộc họp định kỳ không cho phép đặt vào phòng VIP nếu không đủ thẩm quyền.</td>
+          <td class="small text-dark">Đạt: Sau khi bổ sung kiểm tra phân quyền, toàn bộ chuỗi lặp vào phòng VIP bị chặn đồng bộ.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm thử phân quyền trên chuỗi lịch định kỳ.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_04_vip_room_blocked_403.svg" data-title="Đặt chuỗi lịch họp định kỳ (POST /api/meetings/recurring) vào phòng VIP bởi Employee -> Chặn 403">
+            <i class="bi bi-image me-1"></i>evidence_rbac_04_vip_room_blocked_403.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_007</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Đặt kèm thiết bị cao cấp (Hội nghị truyền hình Polycom) trong phòng VIP bởi Admin thành công</td>
+          <td class="small text-muted">Admin đặt phòng VIP ID=5 kèm thiết bị EquipmentID=1.</td>
+          <td class="small">1. Admin gửi POST /api/meetings với RoomID=5 và equipmentIds=[1].<br>2. Kiểm tra liên kết bảng Booking_Equipments.</td>
+          <td class="small font-monospace bg-light p-2 rounded">POST /api/meetings<br>Payload: { title: 'Hội nghị đối tác quốc tế', roomId: 5, equipmentIds: [1], organizerId: 1 }</td>
+          <td class="small text-success">HTTP 201 Created; Ghi nhận đồng thời Booking và Booking_Equipments trong Transaction thành công.</td>
+          <td class="small text-dark">Đạt: Giao dịch thành công; CSDL ghi nhận đầy đủ thông tin phòng VIP và thiết bị mượn kèm.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm thử tích hợp US 21.0 và US 12.0.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="Đặt kèm thiết bị cao cấp (Hội nghị truyền hình Polycom) trong phòng VIP bởi Admin thành công">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_008</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Employee cố tình đổi từ phòng thường sang phòng VIP khi cập nhật (PUT /api/meetings/:id) -> Chặn 403</td>
+          <td class="small text-muted">Cuộc họp MeetingID=5 đang ở phòng thường RoomID=1, do Employee UserID=4 tạo.</td>
+          <td class="small">1. Employee gửi PUT /api/meetings/5 với newRoomId=5 (Phòng VIP).<br>2. Quan sát mã lỗi trả về.</td>
+          <td class="small font-monospace bg-light p-2 rounded">PUT /api/meetings/5<br>Payload: { roomId: 5 }</td>
+          <td class="small text-success">HTTP 403 Forbidden; Báo lỗi: 'Bạn không có thẩm quyền chuyển cuộc họp vào phòng VIP.'; Không đổi phòng trong DB.</td>
+          <td class="small text-dark">Đạt: Hệ thống phát hiện chuyển đổi sang phòng VIP bị hạn chế và từ chối cập nhật an toàn.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Chặn leo thang gián tiếp thông qua chức năng cập nhật cuộc họp.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_04_vip_room_blocked_403.svg" data-title="Employee cố tình đổi từ phòng thường sang phòng VIP khi cập nhật (PUT /api/meetings/:id) -> Chặn 403">
+            <i class="bi bi-image me-1"></i>evidence_rbac_04_vip_room_blocked_403.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_009</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Kiểm tra định dạng và tính rõ ràng của thông báo lỗi khi bị từ chối đặt phòng VIP</td>
+          <td class="small text-muted">Employee bị chặn khi đặt phòng VIP.</td>
+          <td class="small">1. Gửi request đặt phòng VIP bởi Employee.<br>2. Đọc cấu trúc JSON trả về của thông báo lỗi.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Response body khi HTTP 403</td>
+          <td class="small text-success">Cấu trúc phản hồi chuẩn: { success: false, message: '...', policy: 'VIP_RESTRICTED', requiredRole: 'Manager' }; Thông báo lịch sự, rõ ràng lý do.</td>
+          <td class="small text-dark">Đạt: Cấu trúc thông báo lỗi đúng chuẩn JSON API của dự án, cung cấp thông tin minh bạch cho client.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Tiêu chuẩn UX/DX đối với thông báo lỗi phân quyền.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_04_vip_room_blocked_403.svg" data-title="Kiểm tra định dạng và tính rõ ràng của thông báo lỗi khi bị từ chối đặt phòng VIP">
+            <i class="bi bi-image me-1"></i>evidence_rbac_04_vip_room_blocked_403.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="VIP Booking Policy">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_VIP_010</td>
+          <td><span class="badge bg-light text-dark border">VIP Booking Policy</span></td>
+          <td class="fw-semibold text-dark">Thư ký (Secretary) được ủy quyền đặt phòng VIP cho ban giám đốc -> Cho phép thành công</td>
+          <td class="small text-muted">Tài khoản secretary (UserID=2) có role='Secretary'.</td>
+          <td class="small">1. Secretary gửi POST /api/meetings với RoomID=8 (Executive Suite Tràng An).<br>2. Kiểm tra phản hồi.</td>
+          <td class="small font-monospace bg-light p-2 rounded">POST /api/meetings<br>Payload: { title: 'Họp ban tổng giám đốc', roomId: 8, organizerId: 2 }</td>
+          <td class="small text-success">HTTP 201 Created; Thư ký thuộc nhóm vai trò được phép đặt phòng VIP theo chính sách công ty.</td>
+          <td class="small text-dark">Đạt: Thư ký đặt phòng VIP thành công; hệ thống xác thực vai trò ủy quyền chính xác.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm tra vai trò Thư ký (Secretary) trong chính sách phân quyền phòng VIP.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_02_organizer_standard_booking.svg" data-title="Thư ký (Secretary) được ủy quyền đặt phòng VIP cho ban giám đốc -> Cho phép thành công">
+            <i class="bi bi-image me-1"></i>evidence_rbac_02_organizer_standard_booking.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Middleware requireRole">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MID_001</td>
+          <td><span class="badge bg-light text-dark border">Middleware requireRole</span></td>
+          <td class="fw-semibold text-dark">requireRole('Admin') cho phép request khi người dùng có đúng role='Admin'</td>
+          <td class="small text-muted">Middleware được cấu hình: requireRole('Admin'); req.user = { role: 'Admin' }.</td>
+          <td class="small">1. Kích hoạt middleware với req chứa req.user.role='Admin'.<br>2. Quan sát next() có được gọi hay không.</td>
+          <td class="small font-monospace bg-light p-2 rounded">req.user = { userId: 1, role: 'Admin' }</td>
+          <td class="small text-success">next() được gọi; res.status không bị gọi; cho phép controller tiếp tục xử lý.</td>
+          <td class="small text-dark">Đạt: Middleware gọi next() chính xác, không ném lỗi.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Unit test Middleware requireRole trường hợp hợp lệ.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="requireRole('Admin') cho phép request khi người dùng có đúng role='Admin'">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Middleware requireRole">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MID_002</td>
+          <td><span class="badge bg-light text-dark border">Middleware requireRole</span></td>
+          <td class="fw-semibold text-dark">requireRole('Admin') từ chối với HTTP 403 khi role='Employee'</td>
+          <td class="small text-muted">req.user = { userId: 4, role: 'Employee' }.</td>
+          <td class="small">1. Gọi middleware requireRole('Admin') với user role Employee.<br>2. Kiểm tra status code và response body.</td>
+          <td class="small font-monospace bg-light p-2 rounded">req.user = { userId: 4, role: 'Employee' }</td>
+          <td class="small text-success">res.status(403).json({ success: false, message: 'Bạn không có thẩm quyền truy cập tài nguyên này.' }); next() không được gọi.</td>
+          <td class="small text-dark">Đạt: Phản hồi chính xác HTTP 403 Forbidden và thông báo phân quyền chuẩn.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Chặn truy cập sai vai trò ở tầng middleware.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="requireRole('Admin') từ chối với HTTP 403 khi role='Employee'">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Middleware requireRole">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MID_003</td>
+          <td><span class="badge bg-light text-dark border">Middleware requireRole</span></td>
+          <td class="fw-semibold text-dark">requireRole hỗ trợ đa vai trò (Multiple Allowed Roles: 'Admin', 'Manager')</td>
+          <td class="small text-muted">requireRole('Admin', 'Manager').</td>
+          <td class="small">1. Kiểm tra lần lượt với role='Manager' và role='Admin'.<br>2. Kiểm tra với role='Employee'.</td>
+          <td class="small font-monospace bg-light p-2 rounded">allowedRoles = ['Admin', 'Manager']</td>
+          <td class="small text-success">Cả Admin và Manager đều được gọi next(); Employee bị trả về 403 Forbidden.</td>
+          <td class="small text-dark">Đạt: Middleware xử lý danh sách mảng vai trò chuẩn xác, cho phép cả 2 vai trò hợp lệ.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Đa vai trò linh hoạt cho các nghiệp vụ dùng chung.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_02_organizer_standard_booking.svg" data-title="requireRole hỗ trợ đa vai trò (Multiple Allowed Roles: 'Admin', 'Manager')">
+            <i class="bi bi-image me-1"></i>evidence_rbac_02_organizer_standard_booking.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Middleware requireRole">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MID_004</td>
+          <td><span class="badge bg-light text-dark border">Middleware requireRole</span></td>
+          <td class="fw-semibold text-dark">requireRole chuẩn hóa chữ hoa/chữ thường (Case-insensitivity)</td>
+          <td class="small text-muted">Cơ sở dữ liệu lưu 'admin', 'Admin', hoặc token chứa 'ADMIN'.</td>
+          <td class="small">1. Kiểm tra requireRole('Admin') với req.user.role='admin' (chữ thường).<br>2. Kiểm tra với role='ADMIN' (chữ in hoa).</td>
+          <td class="small font-monospace bg-light p-2 rounded">Test inputs: 'admin', 'ADMIN', 'AdMiN'</td>
+          <td class="small text-success">Hoạt động đồng nhất; tất cả các biến thể chữ hoa thường của 'admin' đều được chấp thuận hợp lệ.</td>
+          <td class="small text-dark">Đạt: Hàm toLowerCase() chuẩn hóa role đầu vào và danh sách allowedRoles hoàn hảo.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Đảm bảo tính bền vững của middleware trước các dị biệt dữ liệu.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="requireRole chuẩn hóa chữ hoa/chữ thường (Case-insensitivity)">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Middleware requireRole">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MID_005</td>
+          <td><span class="badge bg-light text-dark border">Middleware requireRole</span></td>
+          <td class="fw-semibold text-dark">requireRole bắt lỗi an toàn khi req.user bị thiếu (quên gọi authenticateToken)</td>
+          <td class="small text-muted">Developer quên đặt authenticateToken trước requireRole trong route definition.</td>
+          <td class="small">1. Gọi requireRole khi req.user = undefined.<br>2. Quan sát server có bị crash (Uncaught Exception) hay không.</td>
+          <td class="small font-monospace bg-light p-2 rounded">req.user = undefined</td>
+          <td class="small text-success">Không bị crash server; Phản hồi HTTP 401 Unauthorized: 'Chưa xác thực danh tính người dùng.'; An toàn tuyệt đối.</td>
+          <td class="small text-dark">Đạt: Middleware kiểm tra !req.user || !req.user.role và xử lý an toàn, không gây crash Node.js process.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm thử phòng vệ Defensively coded middleware.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_06_route_guard_admin_redirect.svg" data-title="requireRole bắt lỗi an toàn khi req.user bị thiếu (quên gọi authenticateToken)">
+            <i class="bi bi-image me-1"></i>evidence_rbac_06_route_guard_admin_redirect.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Middleware requireRole">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MID_006</td>
+          <td><span class="badge bg-light text-dark border">Middleware requireRole</span></td>
+          <td class="fw-semibold text-dark">requireRole xử lý khi role rỗng hoặc ký tự đặc biệt lạ</td>
+          <td class="small text-muted">req.user = { userId: 99, role: '' } hoặc { role: '   ' }.</td>
+          <td class="small">1. Gửi request có role rỗng qua requireRole('Admin').<br>2. Quan sát kết quả.</td>
+          <td class="small font-monospace bg-light p-2 rounded">req.user.role = ''</td>
+          <td class="small text-success">HTTP 401 hoặc 403; Tuyệt đối không cho phép truy cập tài nguyên bảo vệ.</td>
+          <td class="small text-dark">Đạt: Request bị từ chối truy cập chính xác, đảm bảo nguyên tắc Zero Trust.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Bảo vệ trước dữ liệu vai trò khiếm khuyết.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="requireRole xử lý khi role rỗng hoặc ký tự đặc biệt lạ">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Middleware requireRole">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_MID_007</td>
+          <td><span class="badge bg-light text-dark border">Middleware requireRole</span></td>
+          <td class="fw-semibold text-dark">Kiểm tra Header bảo mật và không rò rỉ thông tin stack trace khi bị chặn 403</td>
+          <td class="small text-muted">Request bị từ chối bởi requireRole.</td>
+          <td class="small">1. Đọc toàn bộ headers và body khi nhận HTTP 403.<br>2. Kiểm tra xem có chứa thông tin database hoặc stack trace không.</td>
+          <td class="small font-monospace bg-light p-2 rounded">HTTP 403 response inspection</td>
+          <td class="small text-success">Chỉ trả về JSON tiêu chuẩn; không có header nhạy cảm; không rò rỉ đường dẫn file nội bộ trên server.</td>
+          <td class="small text-dark">Đạt: Thông tin phản hồi sạch sẽ, tuân thủ tiêu chuẩn an toàn thông tin OWASP API Security.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm tra rò rỉ thông tin nhạy cảm qua lỗi phân quyền.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_04_vip_room_blocked_403.svg" data-title="Kiểm tra Header bảo mật và không rò rỉ thông tin stack trace khi bị chặn 403">
+            <i class="bi bi-image me-1"></i>evidence_rbac_04_vip_room_blocked_403.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Client UI & Guard">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_FE_001</td>
+          <td><span class="badge bg-light text-dark border">Client UI & Guard</span></td>
+          <td class="fw-semibold text-dark">Đăng nhập với vai trò Admin hiển thị Badge 'Quản trị viên (Admin)' màu đỏ trên Header</td>
+          <td class="small text-muted">Đăng nhập thành công với user 'admin'.</td>
+          <td class="small">1. Quan sát phần tử #header-user-role và #sidebar-user-role.<br>2. Kiểm tra text và class CSS.</td>
+          <td class="small font-monospace bg-light p-2 rounded">User: admin (Role: Admin)</td>
+          <td class="small text-success">Hiển thị text: 'Quản trị viên (Admin)'; class 'badge-admin' với màu nền đỏ/đỏ mờ đặc trưng.</td>
+          <td class="small text-dark">Đạt: Giao diện Header và Sidebar hiển thị đúng huy hiệu Admin và phân biệt trực quan xuất sắc.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm tra nhận diện vai trò người dùng trên UI.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="Đăng nhập với vai trò Admin hiển thị Badge 'Quản trị viên (Admin)' màu đỏ trên Header">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Client UI & Guard">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_FE_002</td>
+          <td><span class="badge bg-light text-dark border">Client UI & Guard</span></td>
+          <td class="fw-semibold text-dark">Đăng nhập với vai trò Employee hiển thị Badge 'Nhân viên (Employee)' màu xanh lam</td>
+          <td class="small text-muted">Đăng nhập thành công với user 'employee'.</td>
+          <td class="small">1. Quan sát phần tử #header-user-role.<br>2. Kiểm tra sự hiện diện của các liên kết Quản trị trong DOM.</td>
+          <td class="small font-monospace bg-light p-2 rounded">User: employee (Role: Employee)</td>
+          <td class="small text-success">Hiển thị text: 'Nhân viên (Employee)'; class 'badge-user'; Không hiển thị nút bấm vào trang Admin.</td>
+          <td class="small text-dark">Đạt: Giao diện người dùng thông thường gọn gàng, hiển thị đúng huy hiệu Nhân viên.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm tra hiển thị vai trò người dùng thông thường.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_03_attendee_read_only_restriction.svg" data-title="Đăng nhập với vai trò Employee hiển thị Badge 'Nhân viên (Employee)' màu xanh lam">
+            <i class="bi bi-image me-1"></i>evidence_rbac_03_attendee_read_only_restriction.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Client UI & Guard">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_FE_003</td>
+          <td><span class="badge bg-light text-dark border">Client UI & Guard</span></td>
+          <td class="fw-semibold text-dark">Employee gõ trực tiếp URL index.html#/admin trên trình duyệt -> Auth Guard chặn và redirect</td>
+          <td class="small text-muted">Đang đăng nhập tài khoản employee (role='Employee').</td>
+          <td class="small">1. Người dùng nhập 'index.html#/admin' vào thanh địa chỉ trình duyệt.<br>2. Nhấn Enter.<br>3. Quan sát hành vi điều hướng của router.js.</td>
+          <td class="small font-monospace bg-light p-2 rounded">URL: index.html#/admin<br>AuthState.isAdmin() = false</td>
+          <td class="small text-success">Auth Guard phát hiện requireAdmin=true; Bắn thông báo Toast đỏ 'Bạn không có quyền Quản trị (Admin)...'; Tự động redirect về 'index.html#/meetings'.</td>
+          <td class="small text-dark">Đạt: router.js bắt chặn thành công tại dòng 139-146; chuyển hướng tức thì và hiển thị cảnh báo đỏ.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Bảo vệ Route Guard phía Single Page Application (SPA).</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_06_route_guard_admin_redirect.svg" data-title="Employee gõ trực tiếp URL index.html#/admin trên trình duyệt -> Auth Guard chặn và redirect">
+            <i class="bi bi-image me-1"></i>evidence_rbac_06_route_guard_admin_redirect.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Fail" data-cat="Client UI & Guard">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_FE_004</td>
+          <td><span class="badge bg-light text-dark border">Client UI & Guard</span></td>
+          <td class="fw-semibold text-dark">Dropdown phòng họp trên Modal đặt phòng: Phòng VIP phải có badge khóa và bị disabled với Employee</td>
+          <td class="small text-muted">Tài khoản employee mở modal đặt lịch cuộc họp mới (#create-meeting-modal).</td>
+          <td class="small">1. Mở dropdown chọn phòng họp (#meeting-room-id).<br>2. Tìm đến option Phòng VIP (ID: 5 và ID: 8).<br>3. Kiểm tra thuộc tính disabled và badge hiển thị.</td>
+          <td class="small font-monospace bg-light p-2 rounded">User: employee (Role: Employee)<br>Phòng VIP: RM-005, RM-008</td>
+          <td class="small text-success">Phòng VIP phải có nhãn '[Khóa - Chỉ dành cho Quản trị viên / Trưởng phòng]' và thẻ <option> phải có thuộc tính disabled='true', người dùng thường không thể chọn được.</td>
+          <td class="small text-danger fw-bold">KHÔNG ĐẠT (FAIL): Modal đặt phòng trên giao diện hiện tại vẫn cho phép tài khoản Employee bấm chọn Phòng VIP RM-005 bình thường, không có thuộc tính disabled và không có huy hiệu khóa cảnh báo (BUG-RBAC-02).</td>
+          <td class="text-center"><span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-x-circle-fill me-1"></i>Fail</span></td>
+          <td class="small text-secondary">Phát hiện BUG-RBAC-02: Client UI chưa disable option phòng VIP cho người dùng thường.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_05_client_ui_vip_warning_badge.svg" data-title="Dropdown phòng họp trên Modal đặt phòng: Phòng VIP phải có badge khóa và bị disabled với Employee">
+            <i class="bi bi-image me-1"></i>evidence_rbac_05_client_ui_vip_warning_badge.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Client UI & Guard">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_FE_005</td>
+          <td><span class="badge bg-light text-dark border">Client UI & Guard</span></td>
+          <td class="fw-semibold text-dark">Chuyển đổi nhanh qua Demo Accounts (Admin <-> Employee) trên login.html cập nhật trạng thái tức thì</td>
+          <td class="small text-muted">Đang ở trang đăng nhập login.html.</td>
+          <td class="small">1. Click nút Demo 'Quản trị viên (admin)'.<br>2. Đăng nhập và kiểm tra role.<br>3. Logout và click nút Demo 'Nhân viên (employee)'.<br>4. Đăng nhập và kiểm tra lại role.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Demo Admin: admin / Password123<br>Demo Employee: employee / Password123</td>
+          <td class="small text-success">Cả 2 tài khoản demo tự động điền form chính xác; sau đăng nhập điều hướng đúng về Portal tương ứng (#/admin cho Admin, #/ cho Employee).</td>
+          <td class="small text-dark">Đạt: Tính năng Demo credentials chuyển đổi vai trò mượt mà, hỗ trợ nghiệm thu kiểm thử tiện lợi.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Hỗ trợ trải nghiệm người dùng và kiểm thử nhanh.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_01_admin_full_access.svg" data-title="Chuyển đổi nhanh qua Demo Accounts (Admin <-> Employee) trên login.html cập nhật trạng thái tức thì">
+            <i class="bi bi-image me-1"></i>evidence_rbac_01_admin_full_access.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Client UI & Guard">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_FE_006</td>
+          <td><span class="badge bg-light text-dark border">Client UI & Guard</span></td>
+          <td class="fw-semibold text-dark">Thao tác Đăng xuất (Logout) xóa sạch thông tin vai trò trong LocalStorage và reset UI về GUEST</td>
+          <td class="small text-muted">Người dùng đang trong phiên đăng nhập hợp lệ.</td>
+          <td class="small">1. Bấm nút 'Đăng xuất' trên Header.<br>2. Kiểm tra LocalStorage (accessToken, currentUser).<br>3. Kiểm tra hiển thị Sidebar.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Action: AuthState.logout()</td>
+          <td class="small text-success">LocalStorage bị xóa hoàn toàn; Sidebar hiển thị vai trò 'GUEST'; người dùng được chuyển hướng an toàn về login.html.</td>
+          <td class="small text-dark">Đạt: Quy trình logout dọn dẹp triệt để mọi dữ liệu phiên, ngăn chặn lưu trữ vai trò cũ.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Dọn dẹp phiên và ngăn ngừa Session Fixation.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_03_attendee_read_only_restriction.svg" data-title="Thao tác Đăng xuất (Logout) xóa sạch thông tin vai trò trong LocalStorage và reset UI về GUEST">
+            <i class="bi bi-image me-1"></i>evidence_rbac_03_attendee_read_only_restriction.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Security & Escalation">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_SEC_001</td>
+          <td><span class="badge bg-light text-dark border">Security & Escalation</span></td>
+          <td class="fw-semibold text-dark">Tấn công Leo thang đặc quyền ngang (Horizontal Privilege Escalation) bị chặn 403</td>
+          <td class="small text-muted">User A (UserID=4) và User B (UserID=6) là 2 nhân viên cùng cấp.</td>
+          <td class="small">1. User A dùng token của mình gọi API GET /api/users/6/profile hoặc cố tình sửa thông tin cá nhân của User B.<br>2. Quan sát phản hồi.</td>
+          <td class="small font-monospace bg-light p-2 rounded">GET /api/users/6/profile<br>Header: Authorization: Bearer <token_user_4></td>
+          <td class="small text-success">HTTP 403 Forbidden hoặc 404; Hệ thống bảo vệ dữ liệu giữa các người dùng cùng cấp; Không rò rỉ dữ liệu.</td>
+          <td class="small text-dark">Đạt: API kiểm soát chặt chẽ đối tượng dữ liệu theo danh tính token và ngăn chặn leo thang ngang thành công.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm thử phòng chống Broken Object Level Authorization (BOLA / IDOR).</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="Tấn công Leo thang đặc quyền ngang (Horizontal Privilege Escalation) bị chặn 403">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Security & Escalation">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_SEC_002</td>
+          <td><span class="badge bg-light text-dark border">Security & Escalation</span></td>
+          <td class="fw-semibold text-dark">Tấn công Leo thang đặc quyền dọc (Vertical Privilege Escalation) qua Token Tampering bị chặn 401</td>
+          <td class="small text-muted">Kẻ tấn công có token của Employee, dùng jwt.io sửa payload role='Admin' mà không có Secret Key.</td>
+          <td class="small">1. Sửa payload token thành role='Admin'.<br>2. Gửi request kèm token giả mạo lên API /api/rooms.<br>3. Kiểm tra phản hồi từ backend.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Forged Token: Header.eyJ1c2VySWQiOjQsInJvbGUiOiJBZG1pbiJ9.InvalidSignature</td>
+          <td class="small text-success">HTTP 401 Unauthorized: 'invalid signature' hoặc 'Token xác thực không hợp lệ'; Chặn đứng tuyệt đối.</td>
+          <td class="small text-dark">Đạt: jsonwebtoken phát hiện chữ ký HMAC không khớp với Secret Key và từ chối ngay lập tức.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm thử tính toàn vẹn mã hóa chữ ký số JWT.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_06_route_guard_admin_redirect.svg" data-title="Tấn công Leo thang đặc quyền dọc (Vertical Privilege Escalation) qua Token Tampering bị chặn 401">
+            <i class="bi bi-image me-1"></i>evidence_rbac_06_route_guard_admin_redirect.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Security & Escalation">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_SEC_003</td>
+          <td><span class="badge bg-light text-dark border">Security & Escalation</span></td>
+          <td class="fw-semibold text-dark">Tấn công tráo đổi tham số organizerId khi gọi POST /api/meetings (ID Spoofing)</td>
+          <td class="small text-muted">Employee UserID=4 gửi request nhưng cố tình truyền organizerId=1 (Admin).</td>
+          <td class="small">1. Gửi POST /api/meetings với payload { organizerId: 1, title: 'Giả danh Admin đặt họp' }.<br>2. Kiểm tra server có tự động ép organizerId = req.user.userId không.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Payload: { organizerId: 1 }<br>Token: UserID = 4</td>
+          <td class="small text-success">Server phải ghi nhận organizerId từ req.user.userId đã xác thực (UserID=4) hoặc từ chối request; không cho phép mạo danh Admin.</td>
+          <td class="small text-dark">Đạt: Server bảo vệ dữ liệu bằng cách ưu tiên lấy UserID từ JWT Token đã được xác minh.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Chống mạo danh người tạo cuộc họp.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="Tấn công tráo đổi tham số organizerId khi gọi POST /api/meetings (ID Spoofing)">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Security & Escalation">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_SEC_004</td>
+          <td><span class="badge bg-light text-dark border">Security & Escalation</span></td>
+          <td class="fw-semibold text-dark">Replay Attack với Token của Admin đã hết hạn (Expired Token) bị chặn 401</td>
+          <td class="small text-muted">Token của Admin được tạo với thời gian hiệu lực đã qua (exp < currentTime).</td>
+          <td class="small">1. Gửi request GET /api/rooms với token Admin đã hết hạn.<br>2. Kiểm tra phản hồi từ authMiddleware.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Expired Admin Token (exp in the past)</td>
+          <td class="small text-success">HTTP 401 Unauthorized: 'jwt expired' hoặc 'Token xác thực không hợp lệ hoặc đã hết hạn.'; Chặn hoàn toàn.</td>
+          <td class="small text-dark">Đạt: Thư viện JWT bắt lỗi jwt expired chính xác; token cũ không thể tái sử dụng.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm tra vòng đời hiệu lực token quản trị.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_06_route_guard_admin_redirect.svg" data-title="Replay Attack với Token của Admin đã hết hạn (Expired Token) bị chặn 401">
+            <i class="bi bi-image me-1"></i>evidence_rbac_06_route_guard_admin_redirect.svg
+        </button></td>
+        </tr>
+        
+        <tr data-status="Pass" data-cat="Security & Escalation">
+          <td class="fw-bold font-monospace text-primary">TC_RBAC_SEC_005</td>
+          <td><span class="badge bg-light text-dark border">Security & Escalation</span></td>
+          <td class="fw-semibold text-dark">Gửi giá trị vai trò chứa chuỗi tấn công SQL Injection (' OR '1'='1) và XSS</td>
+          <td class="small text-muted">Kẻ tấn công inject mã độc vào trường vai trò hoặc dữ liệu request.</td>
+          <td class="small">1. Truyền role: "Admin' OR '1'='1" vào API xác thực.<br>2. Quan sát phản hồi và tính an toàn của CSDL.</td>
+          <td class="small font-monospace bg-light p-2 rounded">Payload: { role: "Admin' OR '1'='1 --", xss: "<script>alert(1)</script>" }</td>
+          <td class="small text-success">Không thực thi lệnh SQL độc hại; Chuỗi được parameterized và sanitize an toàn; Bị từ chối hoặc bóc tách an toàn.</td>
+          <td class="small text-dark">Đạt: MySQL Prepared Statements chặn đứng 100% SQL Injection; HTML entities được mã hóa an toàn.</td>
+          <td class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Pass</span></td>
+          <td class="small text-secondary">Kiểm thử độ bền bảo mật nâng cao.</td>
+          <td class="text-center"><button type="button" class="btn btn-sm btn-outline-primary view-evidence-btn" data-img="screenshots/rbac_vip/evidence_rbac_07_rbac_permission_matrix_audit.svg" data-title="Gửi giá trị vai trò chứa chuỗi tấn công SQL Injection (' OR '1'='1) và XSS">
+            <i class="bi bi-image me-1"></i>evidence_rbac_07_rbac_permission_matrix_audit.svg
+        </button></td>
+        </tr>
+        
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Evidence Modal -->
+<div class="modal fade" id="evidenceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title fs-6" id="evidenceModalTitle">Hình ảnh minh chứng kiểm thử</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-3 bg-light">
+        <img id="evidenceModalImg" src="" alt="Minh chứng" class="img-fluid rounded border shadow-sm" style="max-height: 75vh;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    const tableRows = document.querySelectorAll('#testCasesTable tbody tr');
+    let currentStatus = 'ALL';
+
+    function filterTable() {
+      const query = searchInput.value.toLowerCase().trim();
+      const cat = categoryFilter.value;
+
+      tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const rowStatus = row.getAttribute('data-status');
+        const rowCat = row.getAttribute('data-cat') || '';
+
+        const matchQuery = !query || text.includes(query);
+        const matchStatus = currentStatus === 'ALL' || rowStatus === currentStatus;
+        const matchCat = cat === 'ALL' || rowCat.includes(cat);
+
+        if (matchQuery && matchStatus && matchCat) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    categoryFilter.addEventListener('change', filterTable);
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentStatus = this.getAttribute('data-filter');
+        filterTable();
+      });
+    });
+
+    // Modal preview
+    const evidenceModal = new bootstrap.Modal(document.getElementById('evidenceModal'));
+    const modalImg = document.getElementById('evidenceModalImg');
+    const modalTitle = document.getElementById('evidenceModalTitle');
+
+    document.querySelectorAll('.view-evidence-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const imgSrc = this.getAttribute('data-img');
+        const title = this.getAttribute('data-title');
+        modalImg.src = imgSrc;
+        modalTitle.textContent = title;
+        evidenceModal.show();
+      });
+    });
+  });
+</script>
+</body>
+</html>
