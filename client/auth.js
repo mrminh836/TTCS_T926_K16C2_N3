@@ -64,6 +64,13 @@
         if (typeof window !== 'undefined') {
           window.meetings = [];
           if (typeof meetings !== 'undefined') meetings = [];
+          const uid = user ? Number(user.userId || user.id || 1) : 1;
+          if (typeof window.syncMeetingOrganizerOptions === 'function') {
+            window.syncMeetingOrganizerOptions(uid);
+          }
+          if (typeof window.initParticipantSelector === 'function') {
+            window.initParticipantSelector([uid], uid);
+          }
         }
       } catch (e) {}
 
@@ -84,6 +91,12 @@
         if (typeof window !== 'undefined') {
           window.meetings = [];
           if (typeof meetings !== 'undefined') meetings = [];
+          if (typeof window.syncMeetingOrganizerOptions === 'function') {
+            window.syncMeetingOrganizerOptions(1);
+          }
+          if (typeof window.initParticipantSelector === 'function') {
+            window.initParticipantSelector([1], 1);
+          }
         }
       } catch (e) {}
 

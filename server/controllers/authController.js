@@ -8,6 +8,7 @@
 
 const authService = require('../services/authService');
 const authValidator = require('../validators/authValidator');
+const User = require('../models/userModel');
 
 const authController = {
     /**
@@ -98,11 +99,30 @@ const authController = {
      * Lấy thông tin tài khoản hiện tại từ JWT Token đã xác thực
      */
     getProfile: async (req, res) => {
-        return res.status(200).json({
-            success: true,
-            message: 'Xác thực tài khoản thành công.',
-            user: req.user
-        });
+        try {
+            const userId = req.user && (req.user.userId || req.user.id);
+            if (userId) {
+                const fullUser = await User.findById(userId);
+                if (fullUser) {
+                    return res.status(200).json({
+                        success: true,
+                        message: 'Xác thực tài khoản thành công.',
+                        user: fullUser
+                    });
+                }
+            }
+            return res.status(200).json({
+                success: true,
+                message: 'Xác thực tài khoản thành công.',
+                user: req.user
+            });
+        } catch {
+            return res.status(200).json({
+                success: true,
+                message: 'Xác thực tài khoản thành công.',
+                user: req.user
+            });
+        }
     }
 };
 

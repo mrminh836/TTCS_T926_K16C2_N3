@@ -63,6 +63,68 @@ function getActiveAuthUser() {
 }
 window.getCurrentUser = getActiveAuthUser;
 
+function getCurrentOrganizerId() {
+  const authUser = getActiveAuthUser();
+  const isAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+  const organizerSelect = document.getElementById("meeting-organizer");
+
+  // Nếu là Admin, có quyền chọn người tổ chức khác qua dropdown
+  if (isAdmin && organizerSelect && organizerSelect.value) {
+    const val = Number(organizerSelect.value);
+    if (!isNaN(val) && val > 0) return val;
+  }
+
+  // Nếu là Nhân viên / Non-admin, BẮT BUỘC là tài khoản đang đăng nhập
+  if (authUser) {
+    const authId = Number(authUser.userId || authUser.id || 0);
+    if (authId > 0) return authId;
+  }
+
+  if (organizerSelect && organizerSelect.value) {
+    const val = Number(organizerSelect.value);
+    if (!isNaN(val) && val > 0) return val;
+  }
+
+  return 1;
+}
+window.getCurrentOrganizerId = getCurrentOrganizerId;
+
+function syncMeetingOrganizerOptions(selectedId = null) {
+  const select = document.getElementById("meeting-organizer");
+  if (!select) return;
+
+  const authUser = getActiveAuthUser();
+  if (authUser && Array.isArray(USERS) && !USERS.some(u => u.id === Number(authUser.userId || authUser.id))) {
+    const authId = Number(authUser.userId || authUser.id);
+    USERS.push({
+      id: authId,
+      name: authUser.fullName || authUser.name || authUser.username || "Thành viên",
+      email: authUser.email || "",
+      role: authUser.role || "Employee",
+      department: authUser.department || (authUser.role === "Admin" || authUser.role === "Manager" ? "Quản trị" : "Kỹ thuật"),
+      avatar: getInitials(authUser.fullName || authUser.name || "Thành viên"),
+      color: getHostColor(authUser.fullName || authUser.name || "Thành viên")
+    });
+  }
+
+  const activeId = selectedId ? Number(selectedId) : getCurrentOrganizerId();
+
+  if (Array.isArray(USERS) && USERS.length > 0) {
+    select.innerHTML = USERS.map(u => `
+      <option value="${u.id}" ${Number(u.id) === Number(activeId) ? 'selected' : ''}>
+        ${escapeHTML(u.name)} (ID: ${u.id} - ${escapeHTML(u.department || u.role)})
+      </option>
+    `).join("");
+  }
+
+  select.value = String(activeId);
+}
+window.syncMeetingOrganizerOptions = syncMeetingOrganizerOptions;
+
 function getInitials(name) {
   if (!name) return "MP";
   const parts = name.trim().split(" ");
@@ -4154,10 +4216,10 @@ let isParticipantDropdownOpen = false;
  * @param {Array<number|string>} initialIds Danh sách ID hoặc Tên người tham gia
  * @param {number} organizerId ID người tổ chức
  */
-function initParticipantSelector(initialIds = [1], organizerId = 1) {
+function initParticipantSelector(initialIds = null, organizerId = null) {
   selectedParticipantIds.clear();
 
-  const orgId = Number(organizerId) || 1;
+  const orgId = organizerId ? Number(organizerId) : getCurrentOrganizerId();
   selectedParticipantIds.add(orgId);
 
   if (Array.isArray(initialIds)) {
@@ -4203,8 +4265,7 @@ function renderParticipantChips() {
   const container = document.getElementById("participant-selected-chips");
   const countBadge = document.getElementById("participants-selected-count");
   const clearBtn = document.getElementById("btn-clear-participants");
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (!container) return;
 
@@ -4221,7 +4282,20 @@ function renderParticipantChips() {
   }
 
   const chipsHtml = Array.from(selectedParticipantIds).map(userId => {
-    const user = USERS.find(u => u.id === userId);
+    let user = USERS.find(u => u.id === userId);
+    if (!user) {
+      const authUser = getActiveAuthUser();
+      if (authUser && Number(authUser.userId || authUser.id) === userId) {
+        user = {
+          id: userId,
+          name: authUser.fullName || authUser.name || authUser.username || "Thành viên",
+          avatar: getInitials(authUser.fullName || authUser.name || "Thành viên"),
+          color: getHostColor(authUser.fullName || authUser.name || "Thành viên"),
+          role: authUser.role || "Employee",
+          department: authUser.department || "Kỹ thuật"
+        };
+      }
+    }
     if (!user) return "";
 
     const isHost = (user.id === currentOrgId);
@@ -4229,7 +4303,7 @@ function renderParticipantChips() {
     const color = user.color || getHostColor(user.name);
 
     return `
-      <div class="participant-chip ${isHost ? 'is-host' : ''}" data-user-id="${user.id}" title="${escapeHTML(user.name)} • ${escapeHTML(user.role)} (${escapeHTML(user.department)})">
+      <div class="participant-chip ${isHost ? 'is-host' : ''}" data-user-id="${user.id}" title="${escapeHTML(user.name)} • ${escapeHTML(user.role || 'Thành viên')} (${escapeHTML(user.department || 'Doanh nghiệp')})">
         <span class="chip-avatar" style="background: ${color};">${escapeHTML(initials)}</span>
         <span class="chip-name">${escapeHTML(user.name)}</span>
         ${isHost ? '<span class="chip-host-badge" title="Người tổ chức cuộc họp">Host</span>' : `
@@ -4250,8 +4324,7 @@ function renderParticipantChips() {
 function renderParticipantDropdownList() {
   const listEl = document.getElementById("participant-options-list");
   const summaryEl = document.getElementById("dropdown-selection-summary");
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (!listEl) return;
 
@@ -4345,8 +4418,7 @@ function triggerParticipantChangeUpdate() {
  */
 function toggleParticipant(userId) {
   const uid = Number(userId);
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (selectedParticipantIds.has(uid)) {
     // Không cho bỏ chọn Host từ click nếu họ đang là Organizer
@@ -4378,8 +4450,7 @@ function removeParticipant(userId, event) {
     event.stopPropagation();
   }
   const uid = Number(userId);
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (uid === currentOrgId) {
     alert("Đồng nghiệp này là Người tổ chức cuộc họp (Host), bắt buộc phải có mặt.");
@@ -4394,8 +4465,7 @@ function removeParticipant(userId, event) {
  * Bỏ chọn tất cả đồng nghiệp (giữ lại Host)
  */
 function clearAllParticipants() {
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   selectedParticipantIds.clear();
   selectedParticipantIds.add(currentOrgId);
@@ -7101,22 +7171,35 @@ function openAddModal(initialEquipmentIds = []) {
     }
   }
 
-  const organizerSelect = document.getElementById("meeting-organizer");
   const authUser = getActiveAuthUser();
   const currentUserId = authUser ? Number(authUser.userId || authUser.id || 1) : 1;
-  const isUserAdmin = Boolean(authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin');
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
 
+  // Đồng bộ options người tổ chức theo danh sách nhân viên thực tế
+  syncMeetingOrganizerOptions(currentUserId);
+
+  const organizerSelect = document.getElementById("meeting-organizer");
   if (organizerSelect) {
     organizerSelect.value = String(currentUserId);
-    if (!organizerSelect.value && organizerSelect.options.length > 0) {
-      organizerSelect.selectedIndex = 0;
-    }
     const groupOrg = document.getElementById("group-organizer");
     if (groupOrg) {
       groupOrg.style.display = isUserAdmin ? "" : "none";
     }
   }
-  const defaultOrgId = Number(isUserAdmin ? (organizerSelect && organizerSelect.value ? organizerSelect.value : currentUserId) : currentUserId);
+
+  const orgIdInput = document.getElementById("meeting-organizer-id");
+  if (orgIdInput) orgIdInput.value = String(currentUserId);
+
+  const defaultOrgId = isUserAdmin
+    ? (Number(organizerSelect && organizerSelect.value ? organizerSelect.value : currentUserId) || currentUserId)
+    : currentUserId;
+
+  selectedParticipantIds.clear();
+  selectedParticipantIds.add(defaultOrgId);
   initParticipantSelector([defaultOrgId], defaultOrgId);
 
   const tagInput = document.getElementById("meeting-tag");
@@ -7263,7 +7346,22 @@ function openEditModal(id) {
       roomHint.textContent = `Sức chứa: ${roomObj.capacity} chỗ • ${roomObj.floor}`;
     }
   }
-  if (organizerSelect) organizerSelect.value = meeting.organizerId ? String(meeting.organizerId) : "1";
+  const authUser = getActiveAuthUser();
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+  syncMeetingOrganizerOptions(meeting.organizerId || 1);
+  if (organizerSelect) {
+    organizerSelect.value = meeting.organizerId ? String(meeting.organizerId) : "1";
+    const groupOrg = document.getElementById("group-organizer");
+    if (groupOrg) {
+      groupOrg.style.display = isUserAdmin ? "" : "none";
+    }
+  }
+  const orgIdInput = document.getElementById("meeting-organizer-id");
+  if (orgIdInput) orgIdInput.value = meeting.organizerId ? String(meeting.organizerId) : "1";
 
   // Nhãn cuộc họp (Tag)
   const tagInput = document.getElementById("meeting-tag");
@@ -8500,8 +8598,11 @@ async function initializeEnterpriseData() {
   // Đồng bộ lại select options phòng họp theo dữ liệu nhận được từ DB
   syncMeetingRoomOptions();
 
-  // Khởi tạo selector người tham gia
-  initParticipantSelector([1], 1);
+  // Đồng bộ select options người tổ chức và khởi tạo selector người tham gia theo user đang đăng nhập
+  const authUser = getActiveAuthUser();
+  const initialOrgId = (authUser && Number(authUser.userId || authUser.id)) || 1;
+  syncMeetingOrganizerOptions(initialOrgId);
+  initParticipantSelector([initialOrgId], initialOrgId);
 
   // Render lại route hiện tại với dữ liệu thực tế từ Database
   router();
@@ -8536,6 +8637,10 @@ window.closeEquipmentModal = closeEquipmentModal;
 window.saveEquipment = saveEquipment;
 window.closeEquipmentDeleteModal = closeEquipmentDeleteModal;
 window.confirmDeleteEquipment = confirmDeleteEquipment;
+window.initParticipantSelector = initParticipantSelector;
+window.renderParticipantChips = renderParticipantChips;
+window.getCurrentOrganizerId = getCurrentOrganizerId;
+window.syncMeetingOrganizerOptions = syncMeetingOrganizerOptions;
 window.RoomAPI = RoomAPI;
 window.MeetingAPI = MeetingAPI;
 window.EquipmentAPI = EquipmentAPI;
