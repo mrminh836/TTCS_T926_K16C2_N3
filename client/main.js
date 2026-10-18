@@ -449,6 +449,12 @@ function initAppShellEvents() {
   const cancelBtn = document.getElementById("btn-cancel");
   const meetingOverlay = document.getElementById("modal-overlay");
 
+  // Room Modals
+  const closeRoomBtn = document.getElementById("btn-close-room-modal");
+  const cancelRoomBtn = document.getElementById("btn-room-cancel");
+  const successCloseRoomBtn = document.getElementById("btn-room-success-close");
+  const roomModalOverlay = document.getElementById("room-modal-overlay");
+
   if (closeDetailBtn) {
     closeDetailBtn.addEventListener("click", () => {
       if (typeof window.closeDetailModal === "function") window.closeDetailModal();
@@ -485,12 +491,52 @@ function initAppShellEvents() {
     });
   }
 
+  if (closeRoomBtn) {
+    closeRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (cancelRoomBtn) {
+    cancelRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (successCloseRoomBtn) {
+    successCloseRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (roomModalOverlay) {
+    roomModalOverlay.addEventListener("click", (e) => {
+      if (e.target === roomModalOverlay && typeof window.closeRoomModal === "function") {
+        window.closeRoomModal();
+      }
+    });
+  }
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       if (detailOverlay && !detailOverlay.classList.contains("hidden")) {
         if (typeof window.closeDetailModal === "function") window.closeDetailModal();
       } else if (meetingOverlay && !meetingOverlay.classList.contains("hidden")) {
         if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+      } else if (roomModalOverlay && !roomModalOverlay.classList.contains("hidden")) {
+        if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+      } else {
+        const roomQrOverlay = document.getElementById("room-qr-overlay");
+        const roomDeleteOverlay = document.getElementById("room-delete-overlay");
+        const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+        const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+
+        if (roomQrOverlay && !roomQrOverlay.classList.contains("hidden")) {
+          if (typeof window.closeRoomQRModal === "function") window.closeRoomQRModal();
+        } else if (roomDeleteOverlay && !roomDeleteOverlay.classList.contains("hidden")) {
+          if (typeof window.closeRoomDeleteModal === "function") window.closeRoomDeleteModal();
+        } else if (equipmentModalOverlay && !equipmentModalOverlay.classList.contains("hidden")) {
+          if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+        } else if (equipmentDeleteOverlay && !equipmentDeleteOverlay.classList.contains("hidden")) {
+          if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+        }
       }
     }
   });
@@ -5328,12 +5374,6 @@ function validateRoomForm(editId = null) {
       globalError.classList.remove("hidden");
       if (globalErrorText) globalErrorText.textContent = "Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi lưu.";
     }
-    const formCard = document.querySelector(".room-modal-card");
-    if (formCard) {
-      formCard.classList.remove("stitch-shake");
-      void formCard.offsetWidth; // Trigger reflow để kích hoạt lại animation
-      formCard.classList.add("stitch-shake");
-    }
     if (firstErrorField) {
       firstErrorField.focus();
     }
@@ -5504,7 +5544,9 @@ function openEditRoomModal(roomId) {
   const successView = document.getElementById("room-success-view");
 
   if (modalTitle) modalTitle.textContent = "Chỉnh sửa phòng họp";
-  if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết phòng ${room.name}`;
+  const cleanName = (room.name || "").trim();
+  const displayName = /^phòng\s+/i.test(cleanName) ? cleanName : `phòng ${cleanName}`;
+  if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết ${displayName}`;
   if (submitText) submitText.textContent = "Cập nhật phòng họp";
 
   if (form) form.classList.remove("hidden");
@@ -8184,6 +8226,12 @@ window.showConfirmDialog = showConfirmDialog;
 window.saveMeeting = saveMeeting;
 window.closeMeetingModal = closeMeetingModal;
 window.closeDetailModal = closeDetailModal;
+window.closeRoomModal = closeRoomModal;
+window.saveRoom = saveRoom;
+window.closeRoomQRModal = closeRoomQRModal;
+window.closeRoomDeleteModal = closeRoomDeleteModal;
+window.closeEquipmentModal = closeEquipmentModal;
+window.closeEquipmentDeleteModal = closeEquipmentDeleteModal;
 window.RoomAPI = RoomAPI;
 window.MeetingAPI = MeetingAPI;
 window.EquipmentAPI = EquipmentAPI;
