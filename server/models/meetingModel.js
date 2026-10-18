@@ -19,7 +19,10 @@ const Meeting = {
             endDate,
             status,
             page = 1,
-            limit = 10
+            limit = 10,
+            userId,
+            userRole,
+            sortOrder = 'DESC'
         } = filters;
 
         // ── Xây dựng câu truy vấn cơ bản với JOIN đầy đủ ──
@@ -32,6 +35,20 @@ const Meeting = {
 
         const conditions = [];
         const params = [];
+
+        // ── Phân quyền dữ liệu theo vai trò (Backend RBAC Enforcement) ──
+        // Admin: Xem toàn bộ lịch doanh nghiệp.
+        // Nhân viên / Người dùng khác: Chỉ xem cuộc họp mình tổ chức HOẶC được mời tham gia (Meeting_Participants)
+        const isAdmin = userRole && String(userRole).trim().toLowerCase() === 'admin';
+        if (!isAdmin) {
+            if (userId) {
+                conditions.push('(m.OrganizerID = ? OR EXISTS (SELECT 1 FROM Meeting_Participants mp WHERE mp.MeetingID = m.MeetingID AND mp.UserID = ?))');
+                params.push(userId, userId);
+            } else {
+                // Không có danh tính người dùng hợp lệ => Không trả về dữ liệu (Zero Trust)
+                conditions.push('1 = 0');
+            }
+        }
 
         // ── Lọc theo ngày cụ thể (date=2026-10-01) ──
         if (date) {
@@ -69,6 +86,9 @@ const Meeting = {
         const offset = (page - 1) * limit;
         const totalPages = Math.ceil(total / limit);
 
+        // ── Hướng sắp xếp (mặc định DESC cho danh sách, ASC cho lịch tuần) ──
+        const orderDirection = String(sortOrder).trim().toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
         // ── Truy vấn dữ liệu chính với đầy đủ thông tin ──
         const dataQuery = `
             SELECT 
@@ -88,7 +108,7 @@ const Meeting = {
                 r.RoomName      AS roomName,
                 r.Capacity      AS roomCapacity
             ${baseQuery}
-            ORDER BY m.StartTime DESC
+            ORDER BY m.StartTime ${orderDirection}
             LIMIT ? OFFSET ?
         `;
 
