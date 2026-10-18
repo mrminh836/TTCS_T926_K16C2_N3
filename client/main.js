@@ -192,19 +192,7 @@ function calcDuration() {
     return false;
   }
 
-  // Chống đặt trong quá khứ nếu là tạo mới
-  if (!isEdit && date) {
-    const selectedStart = new Date(`${date}T${start}:00`);
-    if (selectedStart.getTime() < Date.now() - 60000) {
-      if (timeErrorText) timeErrorText.textContent = "Thời gian bắt đầu không thể diễn ra trong quá khứ.";
-      timeErrorMsg.classList.remove("hidden");
-      durationBadge.className = "stitch-duration-badge error";
-      durationText.innerText = "Thời gian trong quá khứ";
-      startInput.classList.add("has-error", "is-invalid");
-      durationBadge.classList.remove("hidden");
-      return false;
-    }
-  }
+  // (Kiểm tra thời gian quá khứ được thực hiện khi người dùng bấm nút Tạo cuộc họp trong validateMeetingForm)
 
   // Hợp lệ
   timeErrorMsg.classList.add("hidden");
@@ -452,6 +440,148 @@ function initAppShellEvents() {
       }
     });
   }
+
+  // 6. Global Modal Close Handlers (Hoạt động thống nhất trên tất cả các trang Admin, Meeting, Calendar...)
+  const closeDetailBtn = document.getElementById("btn-close-detail");
+  const closeDetailBottom = document.getElementById("btn-close-detail-bottom");
+  const detailOverlay = document.getElementById("detail-overlay");
+  const closeModalBtn = document.getElementById("btn-close-modal");
+  const cancelBtn = document.getElementById("btn-cancel");
+  const meetingOverlay = document.getElementById("modal-overlay");
+
+  // Room Modals
+  const closeRoomBtn = document.getElementById("btn-close-room-modal");
+  const cancelRoomBtn = document.getElementById("btn-room-cancel");
+  const successCloseRoomBtn = document.getElementById("btn-room-success-close");
+  const roomModalOverlay = document.getElementById("room-modal-overlay");
+
+  if (closeDetailBtn) {
+    closeDetailBtn.addEventListener("click", () => {
+      if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+    });
+  }
+  if (closeDetailBottom) {
+    closeDetailBottom.addEventListener("click", () => {
+      if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+    });
+  }
+  if (detailOverlay) {
+    detailOverlay.addEventListener("click", (e) => {
+      if (e.target === detailOverlay && typeof window.closeDetailModal === "function") {
+        window.closeDetailModal();
+      }
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+      if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+    });
+  }
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+    });
+  }
+  if (meetingOverlay) {
+    meetingOverlay.addEventListener("click", (e) => {
+      if (e.target === meetingOverlay && typeof window.closeMeetingModal === "function") {
+        window.closeMeetingModal();
+      }
+    });
+  }
+
+  if (closeRoomBtn) {
+    closeRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (cancelRoomBtn) {
+    cancelRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (successCloseRoomBtn) {
+    successCloseRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (roomModalOverlay) {
+    roomModalOverlay.addEventListener("click", (e) => {
+      if (e.target === roomModalOverlay && typeof window.closeRoomModal === "function") {
+        window.closeRoomModal();
+      }
+    });
+  }
+
+  const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+  const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+  const closeEquipmentBtn = document.getElementById("btn-close-equipment-modal");
+  const cancelEquipmentBtn = document.getElementById("btn-equipment-cancel");
+  const closeEquipmentDeleteBtn = document.getElementById("btn-close-equipment-delete");
+  const cancelEquipmentDeleteBtn = document.getElementById("btn-cancel-equipment-delete");
+
+  if (closeEquipmentBtn) {
+    closeEquipmentBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+    });
+  }
+  if (cancelEquipmentBtn) {
+    cancelEquipmentBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+    });
+  }
+  if (equipmentModalOverlay) {
+    equipmentModalOverlay.addEventListener("click", (e) => {
+      if (e.target === equipmentModalOverlay && typeof window.closeEquipmentModal === "function") {
+        window.closeEquipmentModal();
+      }
+    });
+  }
+  if (closeEquipmentDeleteBtn) {
+    closeEquipmentDeleteBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+    });
+  }
+  if (cancelEquipmentDeleteBtn) {
+    cancelEquipmentDeleteBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+    });
+  }
+  if (equipmentDeleteOverlay) {
+    equipmentDeleteOverlay.addEventListener("click", (e) => {
+      if (e.target === equipmentDeleteOverlay && typeof window.closeEquipmentDeleteModal === "function") {
+        window.closeEquipmentDeleteModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (detailOverlay && !detailOverlay.classList.contains("hidden")) {
+        if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+      } else if (meetingOverlay && !meetingOverlay.classList.contains("hidden")) {
+        if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+      } else if (roomModalOverlay && !roomModalOverlay.classList.contains("hidden")) {
+        if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+      } else {
+        const roomQrOverlay = document.getElementById("room-qr-overlay");
+        const roomDeleteOverlay = document.getElementById("room-delete-overlay");
+        const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+        const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+
+        if (roomQrOverlay && !roomQrOverlay.classList.contains("hidden")) {
+          if (typeof window.closeRoomQRModal === "function") window.closeRoomQRModal();
+        } else if (roomDeleteOverlay && !roomDeleteOverlay.classList.contains("hidden")) {
+          if (typeof window.closeRoomDeleteModal === "function") window.closeRoomDeleteModal();
+        } else if (equipmentModalOverlay && !equipmentModalOverlay.classList.contains("hidden")) {
+          if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+        } else if (equipmentDeleteOverlay && !equipmentDeleteOverlay.classList.contains("hidden")) {
+          if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+        }
+      }
+    }
+  });
 }
 
 function router() {
@@ -2218,7 +2348,7 @@ function renderAdminEquipmentsPage() {
             <span>Xuất CSV / Excel</span>
           </button>
 
-          <button type="button" id="btn-add-equipment" class="btn-stitch-create">
+          <button type="button" id="btn-add-equipment" class="btn-stitch-create" onclick="openAddEquipmentModal()">
             <i class="bi bi-plus-circle-fill"></i>
             <span>Thêm thiết bị mới</span>
           </button>
@@ -2788,18 +2918,22 @@ async function saveEquipment(event) {
     if (res && res.success) {
       closeEquipmentModal();
       const current = getCurrentRoute();
-      if (current === "/admin/equipments" || current === "/equipments") {
-        renderAdminEquipmentsPage();
+      if (current.includes("equipment")) {
+        if (current.startsWith("/admin")) {
+          renderAdminEquipmentsPage();
+        } else if (typeof window.renderEquipmentUserPage === "function") {
+          window.renderEquipmentUserPage();
+        }
       }
     } else {
       if (errorBox) {
-        errorBox.classList.remove("d-none");
+        errorBox.classList.remove("d-none", "hidden");
         errorMsg.textContent = res ? res.message : "Đã xảy ra lỗi khi lưu thiết bị.";
       }
     }
   } catch (err) {
     if (errorBox) {
-      errorBox.classList.remove("d-none");
+      errorBox.classList.remove("d-none", "hidden");
       errorMsg.textContent = err.message || "Lỗi hệ thống khi lưu thiết bị.";
     }
   } finally {
@@ -2817,8 +2951,12 @@ async function handleQuickToggleEquipmentStatus(id, currentStatus) {
   const res = await EquipmentAPI.updateStatus(id, newStatus);
   if (res && res.success) {
     const current = getCurrentRoute();
-    if (current === "/admin/equipments" || current === "/equipments") {
-      renderAdminEquipmentsPage();
+    if (current.includes("equipment")) {
+      if (current.startsWith("/admin")) {
+        renderAdminEquipmentsPage();
+      } else if (typeof window.renderEquipmentUserPage === "function") {
+        window.renderEquipmentUserPage();
+      }
     }
   } else {
     alert(res ? res.message : "Không thể thay đổi trạng thái thiết bị.");
@@ -2892,8 +3030,12 @@ async function confirmDeleteEquipment() {
     if (res && res.success) {
       closeEquipmentDeleteModal();
       const current = getCurrentRoute();
-      if (current === "/admin/equipments" || current === "/equipments") {
-        renderAdminEquipmentsPage();
+      if (current.includes("equipment")) {
+        if (current.startsWith("/admin")) {
+          renderAdminEquipmentsPage();
+        } else if (typeof window.renderEquipmentUserPage === "function") {
+          window.renderEquipmentUserPage();
+        }
       }
     } else {
       const content = document.getElementById("equipment-delete-content");
@@ -3547,12 +3689,7 @@ function validateMeetingForm(editId = null) {
       globalError.classList.remove("hidden");
     }
 
-    const modalCard = document.querySelector(".meeting-modal-card");
-    if (modalCard) {
-      modalCard.classList.remove("stitch-shake");
-      void modalCard.offsetWidth;
-      modalCard.classList.add("stitch-shake");
-    }
+    // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
 
     if (firstErrorField) {
       firstErrorField.focus();
@@ -3609,50 +3746,51 @@ function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
   if (!container) return;
 
   const summaryEl = document.getElementById("equipment-avail-summary");
-  // Chỉ hiển thị các thiết bị còn dùng được (ẩn thiết bị bảo trì, hỏng hóc)
+  // Chỉ hiển thị các thiết bị đang hoạt động (loại bỏ bảo trì, hỏng hóc, ngừng hoạt động)
   const usableEquipments = EQUIPMENTS.filter(eq => {
     const status = (eq.status || "").toLowerCase();
     return status !== "maintenance" && status !== "broken" && status !== "inactive";
   });
 
-  let availableCount = 0;
+  // CHỈ HIỂN THỊ CÁC THIẾT BỊ CÒN TRỐNG (sẵn sàng) HOẶC ĐÃ ĐƯỢC CHỌN CHO PHIÊN HỌP NÀY
+  const displayEquipments = usableEquipments.filter(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    if (availabilityMap !== null) {
+      return availabilityMap.has(eqId) || selectedIds.includes(eqId);
+    }
+    return true;
+  });
+
+  const availableCount = displayEquipments.length;
   const totalCount = usableEquipments.length;
 
-  const html = usableEquipments.map(eq => {
-    const eqId = Number(eq.id || eq.equipmentId);
-    const isAvailable = (availabilityMap === null || availabilityMap.has(eqId));
-    const isBusy = availabilityMap !== null && !availabilityMap.has(eqId);
-
-    if (isAvailable) availableCount++;
-
-    let badgeHTML = "";
-    let cardClass = "";
-    let isDisabled = false;
-    let tooltip = "";
-
-    if (isBusy) {
-      badgeHTML = `<span class="badge badge-eq-status badge-eq-busy" title="Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>`;
-      cardClass = "is-busy";
-      isDisabled = true;
-      tooltip = "Thiết bị đang được sử dụng trong phiên họp khác cùng khung giờ (Không thể chọn)";
-    } else {
-      badgeHTML = `<span class="badge badge-eq-status badge-eq-avail" title="Thiết bị sẵn sàng để sử dụng"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>`;
-      cardClass = "";
-      isDisabled = false;
-      tooltip = "Thiết bị sẵn sàng phục vụ cuộc họp";
+  if (displayEquipments.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 py-3 text-center text-muted small" style="grid-column: 1 / -1;">
+        <i class="bi bi-info-circle me-1 text-slate-400"></i>
+        Không có thiết bị khả dụng trong khung giờ này.
+      </div>
+    `;
+    if (summaryEl) {
+      summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>0/${totalCount}</strong> thiết bị sẵn sàng`;
     }
+    return;
+  }
 
-    const isChecked = !isDisabled && selectedIds.includes(eqId);
+  const html = displayEquipments.map(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    const badgeHTML = `<span class="badge badge-eq-status badge-eq-avail" title="Thiết bị sẵn sàng để sử dụng"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>`;
+    const isChecked = selectedIds.includes(eqId);
     const iconClass = getEquipmentIconClass(eq);
+    const tooltip = "Thiết bị sẵn sàng phục vụ cuộc họp";
 
     return `
-      <label class="eq-check-card ${cardClass}" for="eq-${eqId}" id="eq-card-${eqId}" data-id="${eqId}" title="${escapeHTML(tooltip)}">
+      <label class="eq-check-card" for="eq-${eqId}" id="eq-card-${eqId}" data-id="${eqId}" title="${escapeHTML(tooltip)}">
         <input
           type="checkbox"
           class="form-check-input eq-checkbox"
           value="${eqId}"
           id="eq-${eqId}"
-          ${isDisabled ? "disabled" : ""}
           ${isChecked ? "checked" : ""}
           aria-label="${escapeHTML(eq.name || eq.equipmentName)}"
         />
@@ -3678,11 +3816,7 @@ function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
   container.innerHTML = html;
 
   if (summaryEl) {
-    if (availabilityMap !== null) {
-      summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị sẵn sàng`;
-    } else {
-      summaryEl.innerHTML = `<i class="bi bi-info-circle me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị hoạt động`;
-    }
+    summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị sẵn sàng`;
   }
 }
 
@@ -3749,6 +3883,9 @@ function setupMeetingFormValidationEvents() {
 
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
+
+    // Đồng bộ dropdown phòng họp: chỉ hiển thị phòng còn trống và đang hoạt động
+    syncMeetingRoomOptions();
 
     // Tự động rà soát và cập nhật Badge trạng thái thiết bị thời gian thực (Luồng 2.3)
     updateEquipmentCardsAvailability(editId);
@@ -5291,12 +5428,6 @@ function validateRoomForm(editId = null) {
       globalError.classList.remove("hidden");
       if (globalErrorText) globalErrorText.textContent = "Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi lưu.";
     }
-    const formCard = document.querySelector(".room-modal-card");
-    if (formCard) {
-      formCard.classList.remove("stitch-shake");
-      void formCard.offsetWidth; // Trigger reflow để kích hoạt lại animation
-      formCard.classList.add("stitch-shake");
-    }
     if (firstErrorField) {
       firstErrorField.focus();
     }
@@ -5467,7 +5598,9 @@ function openEditRoomModal(roomId) {
   const successView = document.getElementById("room-success-view");
 
   if (modalTitle) modalTitle.textContent = "Chỉnh sửa phòng họp";
-  if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết phòng ${room.name}`;
+  const cleanName = (room.name || "").trim();
+  const displayName = /^phòng\s+/i.test(cleanName) ? cleanName : `phòng ${cleanName}`;
+  if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết ${displayName}`;
   if (submitText) submitText.textContent = "Cập nhật phòng họp";
 
   if (form) form.classList.remove("hidden");
@@ -6222,21 +6355,50 @@ function syncMeetingRoomOptions() {
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
     const currentVal = roomSelect.value;
-    const activeRooms = ROOMS.filter(r => r.status === "Active");
-    if (activeRooms.length === 0) {
-      roomSelect.innerHTML = `<option value="">-- Hiện không có phòng họp khả dụng --</option>`;
+    const dateInput = document.getElementById("meeting-date");
+    const startInput = document.getElementById("meeting-start");
+    const endInput = document.getElementById("meeting-end");
+    const idInput = document.getElementById("meeting-id");
+    const editId = idInput && idInput.value ? Number(idInput.value) : null;
+    const date = dateInput ? dateInput.value : "";
+    const start = startInput ? startInput.value : "";
+    const end = endInput ? endInput.value : "";
+
+    // 1. Chỉ lấy các phòng đang hoạt động (Active), loại bỏ hoàn toàn phòng bảo trì (Maintenance) và Inactive
+    let roomsToShow = ROOMS.filter(r => r.status === "Active");
+
+    // 2. Nếu đã chọn ngày và khung giờ hợp lệ, chỉ hiển thị các phòng còn trống (không trùng lịch)
+    if (date && start && end && start < end) {
+      roomsToShow = roomsToShow.filter(r => {
+        // Nếu là phòng đang được chọn trong cuộc họp đang sửa thì giữ lại
+        if (editId && currentVal && Number(currentVal) === r.id) return true;
+        const conflict = checkMeetingRoomConflict(r.id, date, start, end, editId);
+        return !conflict;
+      });
+    }
+
+    if (roomsToShow.length === 0) {
+      roomSelect.innerHTML = `<option value="">-- Không có phòng trống trong khung giờ này --</option>`;
+      const roomHint = document.getElementById("room-capacity-hint");
+      if (roomHint) roomHint.textContent = "Không còn phòng trống";
     } else {
       roomSelect.innerHTML = `
-        <option value="">-- Chọn phòng họp --</option>
-        ${activeRooms.map(r => `
+        <option value="">-- Chọn phòng họp (${roomsToShow.length} phòng khả dụng) --</option>
+        ${roomsToShow.map(r => `
           <option value="${r.id}">
             ${escapeHTML(r.name)} (${r.capacity} chỗ - ${escapeHTML(r.floor || 'Tầng 1')})
           </option>
         `).join("")}
       `;
 
-      if (currentVal && activeRooms.some(r => r.id === parseInt(currentVal, 10))) {
+      if (currentVal && roomsToShow.some(r => r.id === parseInt(currentVal, 10))) {
         roomSelect.value = currentVal;
+      } else if (roomsToShow.length > 0) {
+        roomSelect.value = String(roomsToShow[0].id);
+        const roomHint = document.getElementById("room-capacity-hint");
+        if (roomHint) {
+          roomHint.textContent = `Sức chứa: ${roomsToShow[0].capacity} chỗ • ${roomsToShow[0].floor || 'Tầng 1'}`;
+        }
       }
     }
   }
@@ -7061,12 +7223,7 @@ async function saveMeeting(event) {
             globalError.classList.remove("hidden");
           }
 
-          const modalCard = document.querySelector(".meeting-modal-card");
-          if (modalCard) {
-            modalCard.classList.remove("stitch-shake");
-            void modalCard.offsetWidth;
-            modalCard.classList.add("stitch-shake");
-          }
+          // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
           return;
         }
 
@@ -7148,12 +7305,7 @@ async function saveMeeting(event) {
             globalError.classList.remove("hidden");
           }
 
-          const modalCard = document.querySelector(".meeting-modal-card");
-          if (modalCard) {
-            modalCard.classList.remove("stitch-shake");
-            void modalCard.offsetWidth;
-            modalCard.classList.add("stitch-shake");
-          }
+          // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
 
           if (apiResult.isConflict) {
             const roomConflictAlert = document.getElementById("room-conflict-alert");
@@ -7403,21 +7555,101 @@ function deleteMeeting(id) {
 // 15. XEM CHI TIẾT
 // =====================================================
 
+// =====================================================
+// 15. XEM CHI TIẾT CUỘC HỌP (ENTERPRISE STITCH SPEC)
+// =====================================================
+
+function formatDetailedDate(dateStr) {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr + "T00:00:00");
+    if (!isNaN(d.getTime())) {
+      const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+      const dayName = days[d.getDay()];
+      const parts = dateStr.split("-");
+      if (parts.length === 3) {
+        return `${dayName}, ${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
+  } catch (e) {}
+  return formatDate(dateStr);
+}
+
+function renderDetailEquipments(meeting) {
+  const eqNames = (meeting.equipmentNames && meeting.equipmentNames.length)
+    ? meeting.equipmentNames
+    : ((meeting.equipmentIds && meeting.equipmentIds.length)
+        ? meeting.equipmentIds.map(eid => {
+            const found = Array.isArray(EQUIPMENTS) ? EQUIPMENTS.find(e => Number(e.id) === Number(eid)) : null;
+            return found ? (found.name || `Thiết bị #${eid}`) : `Thiết bị #${eid}`;
+          })
+        : []);
+
+  if (!eqNames || eqNames.length === 0) {
+    return `<div class="detail-empty-equipment"><i class="bi bi-info-circle me-1.5 text-slate-400"></i>Không yêu cầu thiết bị bổ sung cho cuộc họp này.</div>`;
+  }
+
+  return eqNames.map(name => {
+    const eqObj = (Array.isArray(EQUIPMENTS) ? EQUIPMENTS.find(e => e.name === name) : null) || { name, type: "" };
+    const iconClass = typeof getEquipmentIconClass === "function" ? getEquipmentIconClass(eqObj) : "bi-laptop";
+    return `
+      <div class="detail-equipment-chip">
+        <i class="bi ${iconClass} text-primary"></i>
+        <span>${escapeHTML(name)}</span>
+      </div>
+    `;
+  }).join("");
+}
+
 function openDetailModal(id) {
-
-  const meeting =
-    meetings.find(
-      item => item.id === id
-    );
-
+  const meetingId = Number(id);
+  let meeting = Array.isArray(meetings) ? meetings.find(item => Number(item.id) === meetingId) : null;
+  if (!meeting && window.meetings && Array.isArray(window.meetings)) {
+    meeting = window.meetings.find(item => Number(item.id) === meetingId);
+  }
 
   if (!meeting) {
+    if (typeof MeetingAPI !== "undefined" && typeof fetch === "function") {
+      fetch(`${MEETING_API_URL}/${meetingId}`)
+        .then(r => r.json())
+        .then(json => {
+          if (json && json.data) {
+            const m = json.data;
+            const startD = new Date(m.startTime);
+            const endD = new Date(m.endTime);
+            const dateStr = !isNaN(startD.getTime()) ? startD.toISOString().slice(0, 10) : "";
+            const startHHMM = !isNaN(startD.getTime()) ? startD.toTimeString().slice(0, 5) : "";
+            const endHHMM = !isNaN(endD.getTime()) ? endD.toTimeString().slice(0, 5) : "";
+            const parsed = {
+              id: m.meetingId || m.id,
+              title: m.title || "Cuộc họp",
+              tag: m.isRecurring ? "Định kỳ" : "Thường kỳ",
+              date: dateStr,
+              startTime: startHHMM,
+              endTime: endHHMM,
+              time: `${startHHMM} - ${endHHMM}`,
+              roomId: m.roomId,
+              roomName: m.roomName || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.name) || "Phòng họp",
+              capacity: m.roomCapacity || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.capacity) || 20,
+              organizerId: m.organizerId,
+              host: m.organizerName || "Admin",
+              participants: [m.organizerName || "Admin"],
+              participantIds: [m.organizerId],
+              status: m.bookingStatus ? m.bookingStatus.toLowerCase() : "scheduled",
+              notes: m.description || "",
+              isRecurring: !!m.isRecurring
+            };
+            meetings.push(parsed);
+            openDetailModal(meetingId);
+          }
+        })
+        .catch(() => {});
+    }
     return;
   }
 
-
-  const roomName = meeting.roomName || (meeting.roomId ? (ROOMS.find(r => r.id === meeting.roomId)?.name) : (meeting.location || "Phòng Tokyo (Tầng 4)"));
-  const roomCapacity = meeting.capacity || (meeting.roomId ? (ROOMS.find(r => r.id === meeting.roomId)?.capacity) : 20);
+  const roomName = meeting.roomName || (meeting.roomId ? (ROOMS.find(r => Number(r.id) === Number(meeting.roomId))?.name) : (meeting.location || "Phòng Tokyo (Tầng 4)"));
+  const roomCapacity = meeting.capacity || (meeting.roomId ? (ROOMS.find(r => Number(r.id) === Number(meeting.roomId))?.capacity) : 20);
   const roomId = meeting.roomId || 1;
   const organizerId = meeting.organizerId || 1;
   const organizerName = meeting.host || "Nguyễn Văn An";
@@ -7428,112 +7660,129 @@ function openDetailModal(id) {
     if (meeting.tag === "Quan trọng") tagClass = "tag-danger";
     else if (meeting.tag === "Sprint 24" || meeting.tag === "Dự án mới") tagClass = "tag-primary";
     else if (meeting.tag === "Thiết kế" || meeting.tag === "Tuyển dụng") tagClass = "tag-sky";
-    tagHtml = `<span class="stitch-tag-chip ${tagClass} ms-2">${escapeHTML(meeting.tag)}</span>`;
+    tagHtml = `<span class="stitch-tag-chip ${tagClass}">${escapeHTML(meeting.tag)}</span>`;
   }
 
   const content = document.getElementById("detail-content");
   if (!content) return;
 
   content.innerHTML = `
-    <div class="mb-3 pb-2 border-bottom">
-      <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small fw-medium">MÃ CUỘC HỌP</span>
-        <span class="badge bg-light text-dark border">#${meeting.id}</span>
+    <!-- 1. Hero Title & Metadata Banner -->
+    <div class="detail-hero-banner">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="detail-id-pill">#${meeting.id}</span>
+          <span class="detail-type-badge">
+            <i class="bi ${meeting.isRecurring ? 'bi-repeat text-primary' : 'bi-calendar-check text-muted'} me-1"></i>
+            ${meeting.isRecurring ? 'Lịch họp định kỳ' : 'Cuộc họp thường'}
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          ${tagHtml}
+          <span class="${getStatusClass(meeting.status)}">
+            <span class="status-indicator-dot"></span>
+            <span>${getStatusText(meeting.status)}</span>
+          </span>
+        </div>
       </div>
-      <h5 class="fw-bold text-dark m-0 d-flex align-items-center flex-wrap">
-        ${escapeHTML(meeting.title)}
-        ${tagHtml}
-      </h5>
+      <h4 class="detail-meeting-title">${escapeHTML(meeting.title)}</h4>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <div class="p-2 rounded border bg-light">
-          <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP
-          </span>
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
-            <div class="fw-semibold text-primary cursor-pointer" onclick="closeDetailModal(); openRoomQRModal(${roomId});" title="Nhấp để xem chi tiết phòng &amp; mã QR" style="cursor: pointer;">
-              ${escapeHTML(roomName)} <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
-            </div>
-            ${renderCapacityBadge(roomCapacity, { isPill: true })}
+    <!-- 2. Core 2-Column Metrics Grid: Thời gian & Phòng họp -->
+    <div class="detail-metrics-grid">
+      <!-- Card Thời gian -->
+      <div class="detail-metric-card">
+        <div class="metric-icon-box bg-blue-50">
+          <i class="bi bi-calendar3"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-label">THỜI GIAN HỌP</div>
+          <div class="metric-value-primary">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
+          <div class="metric-subtext">
+            <span class="fw-semibold text-slate-800">${formatDetailedDate(meeting.date)}</span>
+            <span class="metric-duration-pill">${calcDurationString(meeting.startTime, meeting.endTime)}</span>
           </div>
-          <div class="small text-muted mt-1">Định danh: <code>RM-00${roomId}</code></div>
+          ${meeting.isRecurring ? `
+            <div class="metric-recurring-badge mt-2">
+              <i class="bi bi-arrow-repeat me-1"></i>${meeting.occurrenceIndex ? `Phiên họp #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp định kỳ'}
+            </div>
+          ` : ''}
         </div>
       </div>
 
-      <div class="col-12 col-md-6">
-        <div class="p-2 rounded border bg-light">
-          <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-clock-history text-primary me-1"></i> THỜI GIAN HỌP
-          </span>
-          <div class="fw-semibold text-dark">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
-          <div class="small text-muted">Ngày: ${formatDate(meeting.date)} (${calcDurationString(meeting.startTime, meeting.endTime)})</div>
+      <!-- Card Phòng họp -->
+      <div class="detail-metric-card">
+        <div class="metric-icon-box bg-indigo-50">
+          <i class="bi bi-door-open-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-label">PHÒNG HỌP &amp; ĐỊA ĐIỂM</div>
+          <div class="metric-value-primary text-truncate" title="${escapeHTML(roomName)}">${escapeHTML(roomName)}</div>
+          <div class="metric-subtext">
+            <span class="detail-cap-badge"><i class="bi bi-people-fill me-1"></i>${roomCapacity} chỗ</span>
+            <span class="detail-room-code">Định danh: <code>RM-00${roomId}</code></span>
+          </div>
+          <div class="mt-2">
+            <button type="button" class="btn-detail-room-link" onclick="closeDetailModal(); openRoomQRModal(${roomId});">
+              <i class="bi bi-qr-code me-1"></i>Chi tiết phòng &amp; QR <i class="bi bi-box-arrow-up-right ms-0.5"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-person-badge text-primary me-1"></i> NGƯỜI CHỦ TRÌ
-        </span>
-        <div class="fw-medium text-dark">${escapeHTML(organizerName)} <span class="text-muted small">(ID: ${organizerId})</span></div>
+    <!-- 3. Người chủ trì -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-person-badge text-primary me-1.5"></i>
+        <span>NGƯỜI CHỦ TRÌ</span>
       </div>
-
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-shield-check text-success me-1"></i> TRẠNG THÁI
-        </span>
-        <span class="${getStatusClass(meeting.status)}">
-          ${getStatusText(meeting.status)}
-        </span>
+      <div class="detail-host-row">
+        <div class="detail-avatar-circle" style="background: ${getHostColor(organizerName)};">
+          ${getInitials(organizerName)}
+        </div>
+        <div class="detail-host-info">
+          <div class="detail-host-name">${escapeHTML(organizerName)}</div>
+          <div class="detail-host-role">Chủ trì phiên họp • Mã tài khoản ID: ${organizerId}</div>
+        </div>
       </div>
     </div>
 
-    <div class="mb-3">
-      <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small">
-          <i class="bi bi-people text-primary me-1"></i> THÀNH VIÊN THAM GIA
-        </span>
-        <span id="detail-participant-summary-badges" class="small"></span>
+    <!-- 4. Thành viên tham gia -->
+    <div class="detail-section-card">
+      <div class="detail-section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <i class="bi bi-people text-primary me-1.5"></i>
+          <span>THÀNH VIÊN THAM GIA</span>
+        </div>
+        <div id="detail-participant-summary-badges" class="detail-summary-pills"></div>
       </div>
-      <div id="detail-participants-list" class="text-dark small d-flex flex-wrap gap-1">
+      <div id="detail-participants-list" class="detail-participants-grid mt-2">
         ${renderDetailParticipantsHtml(meeting)}
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-arrow-repeat text-primary me-1"></i> LỊCH HỌP ĐỊNH KỲ
-        </span>
-        <div>
-          ${meeting.isRecurring 
-            ? `<span class="badge bg-primary-subtle text-primary border border-primary"><i class="bi bi-arrow-repeat me-1"></i>Có (${meeting.occurrenceIndex ? `Buổi #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp lại định kỳ'})</span>` 
-            : '<span class="badge bg-light text-muted border">Không (Cuộc họp một lần)</span>'}
-        </div>
+    <!-- 5. Thiết bị phòng họp yêu cầu -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-laptop text-primary me-1.5"></i>
+        <span>THIẾT BỊ PHÒNG HỌP YÊU CẦU</span>
       </div>
-
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-laptop text-primary me-1"></i> THIẾT BỊ PHÒNG HỌP
-        </span>
-        <div class="text-dark small">
-          ${(meeting.equipmentNames && meeting.equipmentNames.length) 
-            ? meeting.equipmentNames.map(eq => `<span class="badge bg-light text-dark border me-1">${escapeHTML(eq)}</span>`).join("")
-            : (meeting.equipmentIds && meeting.equipmentIds.length)
-              ? meeting.equipmentIds.map(eid => `<span class="badge bg-light text-dark border me-1">${escapeHTML(EQUIPMENTS.find(e => e.id === eid)?.name || `Thiết bị #${eid}`)}</span>`).join("")
-              : '<span class="text-muted">Không yêu cầu thiết bị bổ sung</span>'}
-        </div>
+      <div class="detail-equipments-wrap mt-2">
+        ${renderDetailEquipments(meeting)}
       </div>
     </div>
 
-    <div>
-      <span class="text-muted small d-block mb-0.5">
-        <i class="bi bi-card-text text-primary me-1"></i> NỘI DUNG CUỘC HỌP
-      </span>
-      <div class="p-2 rounded bg-light border small text-dark">${escapeHTML(meeting.notes || "Không có ghi chú")}</div>
+    <!-- 6. Nội dung cuộc họp -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-card-text text-primary me-1.5"></i>
+        <span>NỘI DUNG CUỘC HỌP</span>
+      </div>
+      <div class="detail-notes-card mt-2">
+        <i class="bi bi-quote detail-quote-icon"></i>
+        <div class="detail-notes-text">${escapeHTML(meeting.notes || "Không có ghi chú bổ sung cho cuộc họp này.")}</div>
+      </div>
     </div>
   `;
 
@@ -7551,11 +7800,11 @@ function openDetailModal(id) {
   if (actionsEl) {
     if (canModify) {
       actionsEl.innerHTML = `
-        <button type="button" class="btn btn-outline-primary btn-sm" onclick="if (typeof closeDetailModal === 'function') closeDetailModal(); openEditModal(${meeting.id});">
-          <i class="bi bi-pencil-square"></i> Chỉnh sửa
+        <button type="button" class="btn btn-outline-primary btn-sm stitch-detail-action-btn" onclick="closeDetailModal(); openEditModal(${meeting.id});">
+          <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
         </button>
-        <button type="button" class="btn btn-danger btn-sm" onclick="confirmCancelMeeting(${meeting.id});">
-          <i class="bi bi-trash3"></i> Hủy cuộc họp
+        <button type="button" class="btn btn-outline-danger btn-sm stitch-detail-action-btn" onclick="confirmCancelMeeting(${meeting.id});">
+          <i class="bi bi-trash3 me-1"></i> Hủy cuộc họp
         </button>
       `;
     } else {
@@ -7563,63 +7812,72 @@ function openDetailModal(id) {
     }
   }
 
-  detailOverlay.classList.remove("hidden");
+  const detailOverlay = document.getElementById("detail-overlay");
+  if (detailOverlay) {
+    detailOverlay.classList.remove("hidden");
+  }
 
   // Truy vấn trực tiếp trạng thái phản hồi của người tham gia từ Backend API
-  MeetingAPI.getParticipants(meeting.id).then(res => {
-    if (res.success && res.data && res.data.participants) {
-      const pListEl = document.getElementById("detail-participants-list");
-      const summaryEl = document.getElementById("detail-participant-summary-badges");
-      if (pListEl && res.data.participants.length > 0) {
-        pListEl.innerHTML = res.data.participants.map(p => {
-          let badgeClass = "bg-warning-subtle text-warning border-warning-subtle";
-          let icon = "bi-clock";
-          let label = "Chờ phản hồi";
-          if (p.responseStatus === "Accepted") {
-            badgeClass = "bg-success-subtle text-success border-success-subtle";
-            icon = "bi-check-circle-fill";
-            label = "Đồng ý";
-          } else if (p.responseStatus === "Declined") {
-            badgeClass = "bg-danger-subtle text-danger border-danger-subtle";
-            icon = "bi-x-circle-fill";
-            label = "Từ chối";
-          } else if (p.responseStatus === "Tentative") {
-            badgeClass = "bg-info-subtle text-info border-info-subtle";
-            icon = "bi-question-circle-fill";
-            label = "Cân nhắc";
-          }
+  if (typeof MeetingAPI !== "undefined" && typeof MeetingAPI.getParticipants === "function") {
+    MeetingAPI.getParticipants(meeting.id).then(res => {
+      if (res.success && res.data && res.data.participants) {
+        const pListEl = document.getElementById("detail-participants-list");
+        const summaryEl = document.getElementById("detail-participant-summary-badges");
+        if (pListEl && res.data.participants.length > 0) {
+          pListEl.innerHTML = res.data.participants.map(p => {
+            let statusBadge = '';
+            if (p.responseStatus === "Accepted") {
+              statusBadge = '<span class="part-status-badge status-accepted"><i class="bi bi-check-circle-fill me-1"></i>Đồng ý</span>';
+            } else if (p.responseStatus === "Declined") {
+              statusBadge = '<span class="part-status-badge status-declined"><i class="bi bi-x-circle-fill me-1"></i>Từ chối</span>';
+            } else if (p.responseStatus === "Tentative") {
+              statusBadge = '<span class="part-status-badge status-tentative"><i class="bi bi-question-circle-fill me-1"></i>Cân nhắc</span>';
+            } else {
+              statusBadge = '<span class="part-status-badge status-pending"><i class="bi bi-clock me-1"></i>Chờ phản hồi</span>';
+            }
 
-          return `
-            <div class="d-inline-flex align-items-center gap-1 border rounded-pill px-2 py-0.5 bg-white small mb-1 shadow-sm">
-              <span class="fw-semibold text-dark">${escapeHTML(p.fullName)}</span>
-              <span class="badge ${badgeClass} border rounded-pill" style="font-size: 10px;">
-                <i class="bi ${icon} me-1"></i>${label}
-              </span>
-            </div>
+            const pInitials = getInitials(p.fullName);
+            const pColor = getHostColor(p.fullName);
+
+            return `
+              <div class="detail-participant-pill">
+                <div class="part-avatar" style="background: ${pColor};">${pInitials}</div>
+                <div class="part-info">
+                  <span class="part-name" title="${escapeHTML(p.fullName)}">${escapeHTML(p.fullName)}</span>
+                  ${statusBadge}
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+        if (summaryEl && res.data.summary) {
+          const s = res.data.summary;
+          summaryEl.innerHTML = `
+            <span class="part-counter-chip chip-accepted"><i class="bi bi-check-circle-fill me-1"></i>${s.accepted} đồng ý</span>
+            <span class="part-counter-chip chip-pending"><i class="bi bi-clock-fill me-1"></i>${s.pending} chờ</span>
+            <span class="part-counter-chip chip-declined"><i class="bi bi-x-circle-fill me-1"></i>${s.declined} từ chối</span>
           `;
-        }).join("");
+        }
       }
-      if (summaryEl && res.data.summary) {
-        const s = res.data.summary;
-        summaryEl.innerHTML = `
-          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill me-1">${s.accepted} đồng ý</span>
-          <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill me-1">${s.declined} từ chối</span>
-          <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">${s.pending} chờ</span>
-        `;
-      }
-    }
-  });
+    }).catch(() => {});
+  }
 }
 
+window.openDetailModal = openDetailModal;
 
 // =====================================================
 // 16. ĐÓNG MODAL
 // =====================================================
 
 function closeMeetingModal() {
-  modalOverlay.classList.add("hidden");
+  const overlay = document.getElementById("modal-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
   clearMeetingFormErrors();
-  closeParticipantDropdown();
+  if (typeof closeParticipantDropdown === "function") {
+    closeParticipantDropdown();
+  }
 
   const form = document.getElementById("meeting-form");
   const successView = document.getElementById("success-view");
@@ -7640,12 +7898,15 @@ function closeMeetingModal() {
   if (recurringInput) recurringInput.checked = false;
   document.querySelectorAll(".eq-checkbox").forEach(cb => { cb.checked = false; });
 }
-
+window.closeMeetingModal = closeMeetingModal;
 
 function closeDetailModal() {
-
-  detailOverlay.classList.add("hidden");
+  const overlay = document.getElementById("detail-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
 }
+window.closeDetailModal = closeDetailModal;
 
 
 // =====================================================
@@ -7653,21 +7914,9 @@ function closeDetailModal() {
 // =====================================================
 
 function formatDate(date) {
-
-  if (!date) {
-    return "";
-  }
-
-
-  const parts =
-    date.split("-");
-
-
-  if (parts.length !== 3) {
-    return date;
-  }
-
-
+  if (!date) return "";
+  const parts = date.split("-");
+  if (parts.length !== 3) return date;
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
@@ -7677,29 +7926,30 @@ function formatDate(date) {
 // =====================================================
 
 function getStatusText(status) {
-
+  if (!status) return "Sắp diễn ra";
+  const s = String(status).trim().toLowerCase();
   const statusMap = {
-
     scheduled: "Sắp diễn ra",
-
+    confirmed: "Sắp diễn ra",
+    active: "Sắp diễn ra",
     "in-progress": "Đang diễn ra",
-
+    inprogress: "Đang diễn ra",
+    ongoing: "Đang diễn ra",
     completed: "Đã hoàn thành",
-
-    cancelled: "Đã hủy"
-
+    cancelled: "Đã hủy",
+    canceled: "Đã hủy",
+    pending: "Chờ xác nhận"
   };
-
-
-  return (
-    statusMap[status] ||
-    "Không xác định"
-  );
+  return statusMap[s] || "Sắp diễn ra";
 }
 
-
 function getStatusClass(status) {
-  return `stitch-status-pill status-${status}`;
+  const s = String(status || "scheduled").trim().toLowerCase();
+  if (s === "confirmed" || s === "scheduled" || s === "active") return "stitch-status-pill status-scheduled";
+  if (s === "in-progress" || s === "inprogress" || s === "ongoing") return "stitch-status-pill status-in-progress";
+  if (s === "completed") return "stitch-status-pill status-completed";
+  if (s === "cancelled" || s === "canceled") return "stitch-status-pill status-cancelled";
+  return `stitch-status-pill status-${s}`;
 }
 
 
@@ -8029,6 +8279,15 @@ window.confirmCancelMeeting = confirmCancelMeeting;
 window.showConfirmDialog = showConfirmDialog;
 window.saveMeeting = saveMeeting;
 window.closeMeetingModal = closeMeetingModal;
+window.closeDetailModal = closeDetailModal;
+window.closeRoomModal = closeRoomModal;
+window.saveRoom = saveRoom;
+window.closeRoomQRModal = closeRoomQRModal;
+window.closeRoomDeleteModal = closeRoomDeleteModal;
+window.closeEquipmentModal = closeEquipmentModal;
+window.saveEquipment = saveEquipment;
+window.closeEquipmentDeleteModal = closeEquipmentDeleteModal;
+window.confirmDeleteEquipment = confirmDeleteEquipment;
 window.RoomAPI = RoomAPI;
 window.MeetingAPI = MeetingAPI;
 window.EquipmentAPI = EquipmentAPI;

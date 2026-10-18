@@ -530,6 +530,7 @@
           type="button"
           id="btn-close-modal"
           class="stitch-close-btn"
+          onclick="closeMeetingModal()"
           aria-label="Đóng modal">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -575,86 +576,102 @@
         </div>
       </div>
 
-      <!-- 2. Form Body (Chứa 3 Business sections trọng tâm) -->
-      <form id="meeting-form" class="stitch-form-body" novalidate onsubmit="event.preventDefault(); if (typeof window.saveMeeting === 'function') window.saveMeeting(event);">
+      <!-- 2. Form Body (Chứa 4 Business sections chuẩn Enterprise SaaS) -->
+      <form id="meeting-form" class="stitch-form-wrapper" novalidate onsubmit="event.preventDefault(); if (typeof window.saveMeeting === 'function') window.saveMeeting(event);">
 
         <input
           type="hidden"
           id="meeting-id"
         />
 
-        <!-- Global Error Alert (Cho Validation) -->
-        <div id="global-error" class="stitch-alert-error hidden">
-          <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-0.5 fs-5"></i>
-          <div>
-            <div class="fw-semibold" id="global-error-title">Thông tin chưa hợp lệ</div>
-            <div class="small" id="global-error-desc">Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi tiếp tục.</div>
-          </div>
-        </div>
+        <div class="stitch-form-body">
 
-        <!-- BƯỚC 1: Tiêu đề cuộc họp -->
-        <div class="stitch-form-group" id="group-title">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <label for="meeting-title" class="stitch-label">
-              Tiêu đề cuộc họp <span class="text-danger">*</span>
-            </label>
-            <span class="stitch-hint">Tối đa 200 ký tự</span>
-          </div>
-
-          <div class="stitch-input-relative">
-            <input
-              type="text"
-              id="meeting-title"
-              name="meeting_title"
-              class="form-control stitch-input"
-              placeholder="Ví dụ: Họp thảo luận kế hoạch dự án..."
-              maxlength="200"
-              aria-label="Tiêu đề cuộc họp"
-              required
-            />
-            <div id="title-error-icon" class="stitch-input-error-icon hidden">
-              <i class="bi bi-exclamation-circle-fill text-danger"></i>
+          <!-- Global Error Alert (Cho Validation) -->
+          <div id="global-error" class="stitch-alert-error hidden">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-0.5 fs-5"></i>
+            <div>
+              <div class="fw-semibold" id="global-error-title">Thông tin chưa hợp lệ</div>
+              <div class="small" id="global-error-desc">Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi tiếp tục.</div>
             </div>
           </div>
 
-          <p id="title-error" class="stitch-field-error hidden">
-            <i class="bi bi-exclamation-circle-fill me-1"></i>
-            Tiêu đề cuộc họp không được để trống.
-          </p>
-        </div>
-
-        <!-- BƯỚC 2: Mô tả / Nội dung cuộc họp -->
-        <div class="stitch-form-group" id="group-desc">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <label for="meeting-description" class="stitch-label">
-              Mô tả nội dung cuộc họp
-            </label>
-            <span class="stitch-hint" id="desc-char-count">Tối đa 2000 ký tự</span>
+        <!-- SECTION A — THÔNG TIN CUỘC HỌP -->
+        <div class="stitch-section-card" id="section-general-info">
+          <div class="stitch-section-header">
+            <div class="stitch-section-title-group">
+              <span class="stitch-section-index">1</span>
+              <div>
+                <h4 class="stitch-section-title">Thông tin cuộc họp</h4>
+                <p class="stitch-section-desc">Tiêu đề bắt buộc và tóm tắt mục tiêu cuộc họp</p>
+              </div>
+            </div>
           </div>
 
-          <textarea
-            id="meeting-description"
-            name="meeting_description"
-            class="form-control stitch-textarea"
-            rows="3"
-            maxlength="2000"
-            aria-label="Mô tả nội dung cuộc họp"
-            placeholder="Nhập nội dung tóm tắt, mục tiêu hoặc chương trình cuộc họp..."></textarea>
-          <p id="desc-error" class="stitch-field-error hidden"></p>
-          <!-- Giữ input id meeting-notes ẩn để hoàn toàn tương thích ngược -->
-          <input type="hidden" id="meeting-notes" />
+          <div class="stitch-section-content">
+            <!-- Tiêu đề cuộc họp -->
+            <div class="stitch-form-group" id="group-title">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="meeting-title" class="stitch-label">
+                  Tiêu đề cuộc họp <span class="text-danger">*</span>
+                </label>
+                <span class="stitch-hint">Tối đa 200 ký tự</span>
+              </div>
+
+              <div class="stitch-input-relative">
+                <input
+                  type="text"
+                  id="meeting-title"
+                  name="meeting_title"
+                  class="form-control stitch-input"
+                  placeholder="Ví dụ: Họp thảo luận kế hoạch dự án..."
+                  maxlength="200"
+                  aria-label="Tiêu đề cuộc họp"
+                  required
+                />
+                <div id="title-error-icon" class="stitch-input-error-icon hidden">
+                  <i class="bi bi-exclamation-circle-fill text-danger"></i>
+                </div>
+              </div>
+
+              <p id="title-error" class="stitch-field-error hidden">
+                <i class="bi bi-exclamation-circle-fill me-1"></i>
+                Tiêu đề cuộc họp không được để trống.
+              </p>
+            </div>
+
+            <!-- Mô tả / Nội dung cuộc họp -->
+            <div class="stitch-form-group mt-3" id="group-desc">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="meeting-description" class="stitch-label">
+                  Mô tả nội dung cuộc họp <span class="stitch-label-optional text-muted font-normal small">(Tùy chọn)</span>
+                </label>
+                <span class="stitch-hint" id="desc-char-count">0/2000 ký tự</span>
+              </div>
+
+              <textarea
+                id="meeting-description"
+                name="meeting_description"
+                class="form-control stitch-textarea"
+                rows="3"
+                maxlength="2000"
+                aria-label="Mô tả nội dung cuộc họp"
+                placeholder="Nhập nội dung tóm tắt, mục tiêu hoặc chương trình cuộc họp..."></textarea>
+              <p id="desc-error" class="stitch-field-error hidden"></p>
+              <!-- Giữ input id meeting-notes ẩn để hoàn toàn tương thích ngược -->
+              <input type="hidden" id="meeting-notes" />
+            </div>
+          </div>
         </div>
 
-        <!-- BƯỚC 3: Ngày và giờ bắt đầu, kết thúc -->
-        <div class="stitch-time-card" id="group-time-section">
-          <div class="stitch-time-card-header">
-            <div class="d-flex align-items-center gap-2">
-              <span class="stitch-time-icon">
-                <i class="bi bi-clock"></i>
-              </span>
-              <span class="stitch-label m-0">
-                Thời gian cuộc họp <span class="text-danger">*</span>
-              </span>
+        <!-- SECTION B — THỜI GIAN VÀ PHÒNG HỌP -->
+        <div class="stitch-section-card" id="section-schedule-room">
+          <div class="stitch-section-header">
+            <div class="stitch-section-title-group">
+              <span class="stitch-section-index">2</span>
+              <div>
+                <h4 class="stitch-section-title">Thời gian &amp; Phòng họp</h4>
+                <p class="stitch-section-desc">Khung giờ tổ chức và địa điểm phòng hội nghị</p>
+              </div>
             </div>
 
             <!-- Dynamic Duration Indicator Badge -->
@@ -664,305 +681,329 @@
             </div>
           </div>
 
-          <!-- 3 Columns: Ngày, Giờ bắt đầu, Giờ kết thúc -->
-          <div class="row g-3">
-            <div class="col-12 col-md-4">
-              <label for="meeting-date" class="stitch-sublabel">
-                Ngày họp <span class="text-danger">*</span>
-              </label>
-              <input
-                type="date"
-                id="meeting-date"
-                name="meeting_date"
-                class="form-control stitch-input stitch-input-sm"
-                aria-label="Ngày họp"
-                required
-              />
-            </div>
-
-            <div class="col-12 col-md-4">
-              <label for="meeting-start" class="stitch-sublabel">
-                Giờ bắt đầu <span class="text-danger">*</span>
-              </label>
-              <input
-                type="time"
-                id="meeting-start"
-                name="meeting_start"
-                class="form-control stitch-input stitch-input-sm"
-                aria-label="Thời gian bắt đầu"
-                required
-              />
-            </div>
-
-            <div class="col-12 col-md-4">
-              <label for="meeting-end" class="stitch-sublabel">
-                Giờ kết thúc <span class="text-danger">*</span>
-              </label>
-              <input
-                type="time"
-                id="meeting-end"
-                name="meeting_end"
-                class="form-control stitch-input stitch-input-sm"
-                aria-label="Thời gian kết thúc"
-                required
-              />
-            </div>
-          </div>
-
-          <!-- Quick Duration Presets -->
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2">
-            <span class="stitch-hint"><i class="bi bi-hourglass-split me-1"></i>Chọn nhanh thời lượng:</span>
-            <div class="stitch-time-presets" id="quick-duration-presets">
-              <button type="button" class="btn-time-chip" data-duration="15">15p</button>
-              <button type="button" class="btn-time-chip" data-duration="30">30p</button>
-              <button type="button" class="btn-time-chip" data-duration="45">45p</button>
-              <button type="button" class="btn-time-chip" data-duration="60">1 giờ</button>
-              <button type="button" class="btn-time-chip active" data-duration="90">1h 30p</button>
-              <button type="button" class="btn-time-chip" data-duration="120">2 giờ</button>
-            </div>
-          </div>
-
-          <!-- Compatibility hidden elements -->
-          <input type="hidden" id="meeting-time" />
-          <span id="timeline-start-label" class="d-none"></span>
-          <span id="timeline-end-label" class="d-none"></span>
-          <button type="button" class="d-none" data-date-preset="today" id="btn-date-today"></button>
-          <button type="button" class="d-none" data-date-preset="tomorrow" id="btn-date-tomorrow"></button>
-          <button type="button" class="d-none" data-date-preset="next-monday" id="btn-date-monday"></button>
-
-          <!-- Time Error alert -->
-          <div id="time-error-msg" class="stitch-time-error-box hidden mt-2">
-            <i class="bi bi-exclamation-triangle-fill text-danger flex-shrink-0"></i>
-            <span id="time-error-text">Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.</span>
-          </div>
-        </div>
-
-        <!-- BƯỚC 4: Chọn phòng họp -->
-        <div class="stitch-form-group" id="group-room">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <label for="meeting-room" class="stitch-label m-0">
-              <i class="bi bi-door-open-fill text-primary me-1"></i> Chọn phòng họp <span class="text-danger">*</span>
-            </label>
-            <span class="stitch-hint" id="room-capacity-hint">Chọn phòng đặt lịch</span>
-          </div>
-
-          <div class="stitch-input-relative">
-            <select id="meeting-room" name="roomId" class="form-select stitch-input" aria-label="Phòng họp" required>
-              <option value="">-- Chọn phòng họp --</option>
-            </select>
-          </div>
-
-          <p id="room-error" class="stitch-field-error hidden m-0 mt-1">
-            <i class="bi bi-exclamation-circle-fill me-1"></i> Vui lòng chọn phòng họp cho cuộc họp này.
-          </p>
-
-          <!-- Cảnh báo xung đột phòng nếu khung giờ đã chọn bị trùng -->
-          <div id="room-conflict-alert" class="stitch-time-error-box hidden mt-2">
-            <i class="bi bi-calendar-x-fill text-danger flex-shrink-0"></i>
-            <span id="room-conflict-text">Phòng họp đã có người đặt trong khung giờ này.</span>
-          </div>
-
-          <!-- Ẩn compatibility inputs để các hàm JS phụ trợ không bị lỗi runtime -->
-          <div id="realtime-room-grid" class="d-none" role="radiogroup"></div>
-          <span id="realtime-avail-count" class="d-none">0</span>
-          <span id="realtime-busy-count" class="d-none">0</span>
-          <span id="realtime-maint-count" class="d-none">0</span>
-          <div id="smart-room-recommendation-box" class="d-none"></div>
-          <div id="room-select-wrapper" class="d-none"></div>
-          <input type="hidden" id="meeting-location" />
-          <input type="hidden" id="meeting-organizer-id" value="1" />
-        </div>
-
-        <!-- BƯỚC 5: Chọn người tham gia cuộc họp -->
-        <div class="stitch-form-group" id="group-participants">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <label for="participant-search-input" class="stitch-label m-0">
-              <i class="bi bi-people-fill text-primary me-1"></i> Thành viên tham gia
-            </label>
-            <div class="d-flex align-items-center gap-2">
-              <span class="stitch-hint" id="participants-count-badge">
-                Đã chọn: <strong id="participants-selected-count">1</strong> đồng nghiệp
-              </span>
-            </div>
-          </div>
-
-          <!-- Multi-select Interactive Box -->
-          <div class="stitch-multiselect-container" id="participant-multiselect-container">
-            <div class="stitch-multiselect-control" id="participant-multiselect-trigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-controls="participant-dropdown-menu">
-              <!-- Selected Chips Container -->
-              <div class="stitch-multiselect-chips" id="participant-selected-chips"></div>
-
-              <!-- Inline Search Input -->
-              <input
-                type="text"
-                id="participant-search-input"
-                class="stitch-multiselect-input"
-                placeholder="Tìm tên, email, vai trò, phòng ban..."
-                aria-label="Tìm kiếm đồng nghiệp tham gia cuộc họp"
-                autocomplete="off"
-              />
-
-              <!-- Control Action Icons -->
-              <div class="stitch-multiselect-actions">
-                <button type="button" class="btn-clear-participants hidden" id="btn-clear-participants" title="Bỏ chọn tất cả (trừ người tổ chức)" aria-label="Bỏ chọn tất cả">
-                  <i class="bi bi-x-circle-fill"></i>
-                </button>
-                <span class="stitch-multiselect-arrow">
-                  <i class="bi bi-chevron-down"></i>
-                </span>
-              </div>
-            </div>
-
-            <!-- Quick Department / Team Filter Chips -->
-            <div class="stitch-participant-quick-filters">
-              <span class="stitch-hint me-1"><i class="bi bi-funnel"></i> Lọc &amp; chọn nhanh:</span>
-              <div class="d-flex flex-wrap gap-1 align-items-center" id="participant-quick-dept-chips">
-                <button type="button" class="btn-dept-chip active" data-dept="all">Tất cả</button>
-                <button type="button" class="btn-dept-chip" data-dept="Kỹ thuật">Kỹ thuật</button>
-                <button type="button" class="btn-dept-chip" data-dept="Thiết kế">Thiết kế</button>
-                <button type="button" class="btn-dept-chip" data-dept="Kiểm thử">Kiểm thử</button>
-                <button type="button" class="btn-dept-chip" data-dept="Quản trị">Quản trị/HR</button>
-                <span class="text-slate-300 mx-1">|</span>
-                <button type="button" class="btn-quick-select-action" id="btn-select-tech-team" title="Chọn toàn bộ nhóm Kỹ thuật/Dev">+ Nhóm Dev</button>
-                <button type="button" class="btn-quick-select-action" id="btn-select-qa-team" title="Chọn toàn bộ nhóm QA">+ Nhóm QA</button>
-                <button type="button" class="btn-quick-select-action" id="btn-select-all-participants" title="Chọn tất cả đồng nghiệp">+ Chọn tất cả</button>
-              </div>
-            </div>
-
-            <!-- Dropdown Menu -->
-            <div class="stitch-multiselect-dropdown hidden" id="participant-dropdown-menu" role="listbox" aria-multiselectable="true">
-              <div class="stitch-dropdown-header">
-                <div class="small fw-semibold text-slate-700">
-                  <i class="bi bi-person-lines-fill text-primary me-1"></i> Danh bạ đồng nghiệp doanh nghiệp
+          <div class="stitch-section-content">
+            <!-- Khối thời gian -->
+            <div class="stitch-time-card" id="group-time-section">
+              <!-- 3 Columns: Ngày, Giờ bắt đầu, Giờ kết thúc -->
+              <div class="row g-3">
+                <div class="col-12 col-md-4">
+                  <label for="meeting-date" class="stitch-sublabel">
+                    <i class="bi bi-calendar3 me-1 text-primary"></i> Ngày họp <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="meeting-date"
+                    name="meeting_date"
+                    class="form-control stitch-input stitch-input-sm"
+                    aria-label="Ngày họp"
+                    required
+                  />
                 </div>
-                <span class="stitch-hint" id="dropdown-selection-summary">Đã chọn 1 / 17</span>
+
+                <div class="col-12 col-md-4">
+                  <label for="meeting-start" class="stitch-sublabel">
+                    <i class="bi bi-clock me-1 text-primary"></i> Giờ bắt đầu <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="time"
+                    id="meeting-start"
+                    name="meeting_start"
+                    class="form-control stitch-input stitch-input-sm"
+                    aria-label="Thời gian bắt đầu"
+                    required
+                  />
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <label for="meeting-end" class="stitch-sublabel">
+                    <i class="bi bi-clock-history me-1 text-primary"></i> Giờ kết thúc <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="time"
+                    id="meeting-end"
+                    name="meeting_end"
+                    class="form-control stitch-input stitch-input-sm"
+                    aria-label="Thời gian kết thúc"
+                    required
+                  />
+                </div>
               </div>
 
-              <!-- Dropdown Colleagues List -->
-              <div class="stitch-dropdown-list" id="participant-options-list">
-                <!-- Populated dynamically -->
+              <!-- Quick Duration Presets -->
+              <div class="stitch-quick-presets-row">
+                <span class="stitch-hint"><i class="bi bi-lightning-charge me-1"></i>Chọn nhanh thời lượng:</span>
+                <div class="stitch-time-presets" id="quick-duration-presets">
+                  <button type="button" class="btn-time-chip" data-duration="15">15p</button>
+                  <button type="button" class="btn-time-chip" data-duration="30">30p</button>
+                  <button type="button" class="btn-time-chip" data-duration="45">45p</button>
+                  <button type="button" class="btn-time-chip" data-duration="60">1 giờ</button>
+                  <button type="button" class="btn-time-chip active" data-duration="90">1h 30p</button>
+                  <button type="button" class="btn-time-chip" data-duration="120">2 giờ</button>
+                </div>
               </div>
 
-              <div class="stitch-dropdown-footer">
-                <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>Đồng nghiệp được chọn sẽ nhận thông báo mời họp tự động</span>
-                <button type="button" class="btn btn-sm btn-light py-0 px-2" id="btn-close-participant-dropdown" style="font-size: 0.75rem;">Đóng</button>
+              <!-- Compatibility hidden elements -->
+              <input type="hidden" id="meeting-time" />
+              <span id="timeline-start-label" class="d-none"></span>
+              <span id="timeline-end-label" class="d-none"></span>
+              <button type="button" class="d-none" data-date-preset="today" id="btn-date-today"></button>
+              <button type="button" class="d-none" data-date-preset="tomorrow" id="btn-date-tomorrow"></button>
+              <button type="button" class="d-none" data-date-preset="next-monday" id="btn-date-monday"></button>
+
+              <!-- Time Error alert -->
+              <div id="time-error-msg" class="stitch-time-error-box hidden mt-2">
+                <i class="bi bi-exclamation-triangle-fill text-danger flex-shrink-0"></i>
+                <span id="time-error-text">Thời gian kết thúc phải lớn hơn thời gian bắt đầu. Vui lòng kiểm tra lại.</span>
               </div>
             </div>
-          </div>
 
-          <!-- Cảnh báo sức chứa nếu người tham gia vượt quá sức chứa phòng -->
-          <div id="capacity-warning-alert" class="stitch-time-warning-box hidden mt-2">
-            <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0"></i>
-            <span id="capacity-warning-text">Số người tham gia vượt quá sức chứa phòng đã chọn.</span>
-          </div>
-
-          <!-- Input ẩn tương thích ngược với code cũ / test case -->
-          <input type="hidden" id="meeting-participants" name="participants" />
-        </div>
-
-        <!-- THIẾT LẬP NÂNG CAO (Mặc định thu gọn để không làm rối người dùng mới) -->
-        <details class="stitch-advanced-details mt-3">
-          <summary class="stitch-advanced-summary">
-            <span><i class="bi bi-sliders me-1"></i> Tùy chọn nâng cao (Chủ trì, Nhãn, Định kỳ, Thiết bị)</span>
-            <i class="bi bi-chevron-down stitch-chevron"></i>
-          </summary>
-          <div class="stitch-advanced-body pt-3">
-
-            <div class="mb-3" id="group-organizer">
-              <label for="meeting-organizer" class="stitch-label">
-                <i class="bi bi-person-badge text-primary me-1"></i> Người chủ trì cuộc họp
-              </label>
-              <select id="meeting-organizer" name="organizerId" class="form-select stitch-input" aria-label="Người tổ chức">
-                <option value="1">Nguyễn Văn An (ID: 1 - Kỹ thuật)</option>
-                <option value="2">Trần Thu Hà (ID: 2 - Quản trị / Manager)</option>
-                <option value="3">Lê Minh Tuấn (ID: 3 - Kỹ thuật)</option>
-                <option value="4">Hoàng Bảo Ngọc (ID: 4 - HR Lead)</option>
-                <option value="5">Phạm Quốc Dũng (ID: 5 - Tech Lead)</option>
-                <option value="6">Vũ Tuấn Kiệt (ID: 6 - Director)</option>
-                <option value="7">Hoàng Minh Khánh (ID: 7 - Frontend Dev)</option>
-                <option value="8">Nguyễn Minh Lượng (ID: 8 - Frontend Dev)</option>
-                <option value="9">Vũ Thị Thanh Ngân (ID: 9 - UI/UX Designer)</option>
-                <option value="10">Đặng Hùng (ID: 10 - QA Engineer)</option>
-                <option value="11">Hà Sỹ Nguyên (ID: 11 - Backend Lead)</option>
-                <option value="12">Đoàn Ngọc Mạnh (ID: 12 - Backend Dev)</option>
-                <option value="13">Đào Đức Mạnh (ID: 13 - Backend Dev)</option>
-                <option value="14">Hoàng Văn Khuyến (ID: 14 - QA Lead)</option>
-                <option value="15">Ngô Đức Khải (ID: 15 - QA Engineer)</option>
-                <option value="16">Triệu Quốc Khánh (ID: 16 - QA Engineer)</option>
-                <option value="17">Đỗ Quang Minh (ID: 17 - Scrum Master)</option>
-              </select>
-            </div>
-
-            <!-- Nhãn cuộc họp / Phân loại (Tag) -->
-            <div class="mb-3" id="group-tag">
+            <!-- Khối chọn phòng họp -->
+            <div class="stitch-form-group mt-3" id="group-room">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <label for="meeting-tag" class="stitch-label">
-                  <i class="bi bi-tag me-1 text-primary"></i> Nhãn cuộc họp (Tag)
+                <label for="meeting-room" class="stitch-label m-0">
+                  <i class="bi bi-door-open-fill text-primary me-1"></i> Chọn phòng họp <span class="text-danger">*</span>
                 </label>
-                <span class="stitch-hint">Tùy chọn</span>
+                <span class="stitch-hint" id="room-capacity-hint">Chọn phòng đặt lịch</span>
               </div>
 
               <div class="stitch-input-relative">
-                <input
-                  type="text"
-                  id="meeting-tag"
-                  name="meeting_tag"
-                  class="form-control stitch-input"
-                  placeholder="Chọn hoặc nhập nhãn (ví dụ: Tuyển dụng, Quan trọng...)"
-                  list="tag-preset-list"
-                  aria-label="Nhãn cuộc họp"
-                  autocomplete="off"
-                />
-                <datalist id="tag-preset-list">
-                  <option value="Tuyển dụng"></option>
-                  <option value="Quan trọng"></option>
-                  <option value="Thiết kế"></option>
-                  <option value="Sprint 24"></option>
-                  <option value="Dự án mới"></option>
-                  <option value="Hằng ngày"></option>
-                  <option value="Nội bộ"></option>
-                </datalist>
+                <select id="meeting-room" name="roomId" class="form-select stitch-input" aria-label="Phòng họp" required>
+                  <option value="">-- Chọn phòng họp --</option>
+                </select>
               </div>
 
-              <div class="d-flex flex-wrap gap-1 mt-2 align-items-center" id="quick-tag-selector">
-                <span class="stitch-hint me-1">Chọn nhanh:</span>
-                <button type="button" class="btn-tag-chip-select tag-sky" data-tag="Tuyển dụng" onclick="selectTag('Tuyển dụng')">Tuyển dụng</button>
-                <button type="button" class="btn-tag-chip-select tag-danger" data-tag="Quan trọng" onclick="selectTag('Quan trọng')">Quan trọng</button>
-                <button type="button" class="btn-tag-chip-select tag-sky" data-tag="Thiết kế" onclick="selectTag('Thiết kế')">Thiết kế</button>
-                <button type="button" class="btn-tag-chip-select tag-primary" data-tag="Sprint 24" onclick="selectTag('Sprint 24')">Sprint 24</button>
-                <button type="button" class="btn-tag-chip-select tag-primary" data-tag="Dự án mới" onclick="selectTag('Dự án mới')">Dự án mới</button>
+              <p id="room-error" class="stitch-field-error hidden m-0 mt-1">
+                <i class="bi bi-exclamation-circle-fill me-1"></i> Vui lòng chọn phòng họp cho cuộc họp này.
+              </p>
+
+              <!-- Cảnh báo xung đột phòng nếu khung giờ đã chọn bị trùng -->
+              <div id="room-conflict-alert" class="stitch-time-error-box hidden mt-2">
+                <i class="bi bi-calendar-x-fill text-danger flex-shrink-0"></i>
+                <span id="room-conflict-text">Phòng họp đã có người đặt trong khung giờ này.</span>
+              </div>
+
+              <!-- Ẩn compatibility inputs để các hàm JS phụ trợ không bị lỗi runtime -->
+              <div id="realtime-room-grid" class="d-none" role="radiogroup"></div>
+              <span id="realtime-avail-count" class="d-none">0</span>
+              <span id="realtime-busy-count" class="d-none">0</span>
+              <span id="realtime-maint-count" class="d-none">0</span>
+              <div id="smart-room-recommendation-box" class="d-none"></div>
+              <div id="room-select-wrapper" class="d-none"></div>
+              <input type="hidden" id="meeting-location" />
+              <input type="hidden" id="meeting-organizer-id" value="1" />
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION C — THÀNH VIÊN THAM GIA -->
+        <div class="stitch-section-card" id="section-participants">
+          <div class="stitch-section-header">
+            <div class="stitch-section-title-group">
+              <span class="stitch-section-index">3</span>
+              <div>
+                <h4 class="stitch-section-title">Thành viên tham gia</h4>
+                <p class="stitch-section-desc">Đồng nghiệp nhận thông báo và tham gia cuộc họp</p>
+              </div>
+            </div>
+            <span class="stitch-hint-badge" id="participants-count-badge">
+              <i class="bi bi-people"></i>
+              <span>Đã chọn: <strong id="participants-selected-count">1</strong> đồng nghiệp</span>
+            </span>
+          </div>
+
+          <div class="stitch-section-content">
+            <div class="stitch-form-group" id="group-participants">
+              <!-- Multi-select Interactive Box -->
+              <div class="stitch-multiselect-container" id="participant-multiselect-container">
+                <div class="stitch-multiselect-control" id="participant-multiselect-trigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-controls="participant-dropdown-menu">
+                  <!-- Selected Chips Container -->
+                  <div class="stitch-multiselect-chips" id="participant-selected-chips"></div>
+
+                  <!-- Inline Search Input -->
+                  <input
+                    type="text"
+                    id="participant-search-input"
+                    class="stitch-multiselect-input"
+                    placeholder="Tìm theo tên hoặc email..."
+                    aria-label="Tìm kiếm đồng nghiệp tham gia cuộc họp"
+                    autocomplete="off"
+                  />
+
+                  <!-- Control Action Icons -->
+                  <div class="stitch-multiselect-actions">
+                    <button type="button" class="btn-clear-participants hidden" id="btn-clear-participants" title="Bỏ chọn tất cả (trừ người tổ chức)" aria-label="Bỏ chọn tất cả">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                    <span class="stitch-multiselect-arrow">
+                      <i class="bi bi-chevron-down"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Quick Department / Team Filter Chips -->
+                <div class="stitch-participant-quick-filters">
+                  <div class="d-flex flex-wrap gap-1 align-items-center" id="participant-quick-dept-chips">
+                    <span class="stitch-filter-label"><i class="bi bi-funnel me-1"></i>Phòng ban:</span>
+                    <button type="button" class="btn-dept-chip active" data-dept="all">Tất cả</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Kỹ thuật">Kỹ thuật</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Thiết kế">Thiết kế</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Kiểm thử">Kiểm thử</button>
+                    <button type="button" class="btn-dept-chip" data-dept="Quản trị">Quản trị/HR</button>
+                    <span class="stitch-filter-divider">|</span>
+                    <button type="button" class="btn-quick-select-action" id="btn-select-tech-team" title="Chọn toàn bộ nhóm Kỹ thuật/Dev">+ Nhóm Dev</button>
+                    <button type="button" class="btn-quick-select-action" id="btn-select-qa-team" title="Chọn toàn bộ nhóm QA">+ Nhóm QA</button>
+                    <button type="button" class="btn-quick-select-action" id="btn-select-all-participants" title="Chọn tất cả đồng nghiệp">+ Chọn tất cả</button>
+                  </div>
+                </div>
+
+                <!-- Dropdown Menu -->
+                <div class="stitch-multiselect-dropdown hidden" id="participant-dropdown-menu" role="listbox" aria-multiselectable="true">
+                  <div class="stitch-dropdown-header">
+                    <div class="small fw-semibold text-slate-700">
+                      <i class="bi bi-person-lines-fill text-primary me-1"></i> Danh bạ đồng nghiệp doanh nghiệp
+                    </div>
+                    <span class="stitch-hint" id="dropdown-selection-summary">Đã chọn 1 / 17</span>
+                  </div>
+
+                  <!-- Dropdown Colleagues List -->
+                  <div class="stitch-dropdown-list" id="participant-options-list">
+                    <!-- Populated dynamically -->
+                  </div>
+
+                  <div class="stitch-dropdown-footer">
+                    <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>Đồng nghiệp sẽ nhận lời mời tự động</span>
+                    <button type="button" class="btn btn-sm btn-light py-0 px-2" id="btn-close-participant-dropdown" style="font-size: 0.75rem;">Đóng</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cảnh báo sức chứa nếu người tham gia vượt quá sức chứa phòng -->
+              <div id="capacity-warning-alert" class="stitch-time-warning-box hidden mt-2">
+                <i class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0"></i>
+                <span id="capacity-warning-text">Số người tham gia vượt quá sức chứa phòng đã chọn.</span>
+              </div>
+
+              <!-- Input ẩn tương thích ngược với code cũ / test case -->
+              <input type="hidden" id="meeting-participants" name="participants" />
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION D — TÙY CHỌN NÂNG CAO -->
+        <details class="stitch-advanced-details" id="section-advanced">
+          <summary class="stitch-advanced-summary">
+            <div class="stitch-section-title-group">
+              <span class="stitch-section-index stitch-section-index-advanced">4</span>
+              <div>
+                <span class="stitch-section-title">Tùy chọn nâng cao</span>
+                <span class="stitch-advanced-subtext">Chủ trì, Nhãn &amp; Thiết bị</span>
+              </div>
+            </div>
+            <i class="bi bi-chevron-down stitch-chevron"></i>
+          </summary>
+
+          <div class="stitch-advanced-body pt-3">
+            <!-- Grid 2 Cột Desktop: Chủ trì + Trạng thái / Nhãn cuộc họp -->
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <div class="stitch-form-group" id="group-organizer">
+                  <label for="meeting-organizer" class="stitch-label mb-1">
+                    <i class="bi bi-person-badge text-primary me-1"></i> Người chủ trì cuộc họp
+                  </label>
+                  <select id="meeting-organizer" name="organizerId" class="form-select stitch-input" aria-label="Người tổ chức">
+                    <option value="1">Nguyễn Văn An (ID: 1 - Kỹ thuật)</option>
+                    <option value="2">Trần Thu Hà (ID: 2 - Quản trị / Manager)</option>
+                    <option value="3">Lê Minh Tuấn (ID: 3 - Kỹ thuật)</option>
+                    <option value="4">Hoàng Bảo Ngọc (ID: 4 - HR Lead)</option>
+                    <option value="5">Phạm Quốc Dũng (ID: 5 - Tech Lead)</option>
+                    <option value="6">Vũ Tuấn Kiệt (ID: 6 - Director)</option>
+                    <option value="7">Hoàng Minh Khánh (ID: 7 - Frontend Dev)</option>
+                    <option value="8">Nguyễn Minh Lượng (ID: 8 - Frontend Dev)</option>
+                    <option value="9">Vũ Thị Thanh Ngân (ID: 9 - UI/UX Designer)</option>
+                    <option value="10">Đặng Hùng (ID: 10 - QA Engineer)</option>
+                    <option value="11">Hà Sỹ Nguyên (ID: 11 - Backend Lead)</option>
+                    <option value="12">Đoàn Ngọc Mạnh (ID: 12 - Backend Dev)</option>
+                    <option value="13">Đào Đức Mạnh (ID: 13 - Backend Dev)</option>
+                    <option value="14">Hoàng Văn Khuyến (ID: 14 - QA Lead)</option>
+                    <option value="15">Ngô Đức Khải (ID: 15 - QA Engineer)</option>
+                    <option value="16">Triệu Quốc Khánh (ID: 16 - QA Engineer)</option>
+                    <option value="17">Đỗ Quang Minh (ID: 17 - Scrum Master)</option>
+                  </select>
+                </div>
+
+                <div class="stitch-form-group mt-3" id="group-status">
+                  <label for="meeting-status" class="stitch-label mb-1">
+                    <i class="bi bi-flag text-primary me-1"></i> Trạng thái
+                  </label>
+                  <select
+                    id="meeting-status"
+                    class="form-select stitch-input"
+                    aria-label="Trạng thái cuộc họp">
+                    <option value="scheduled">Sắp diễn ra</option>
+                    <option value="in-progress">Đang diễn ra</option>
+                    <option value="completed">Đã hoàn thành</option>
+                    <option value="cancelled">Đã hủy</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <div class="stitch-form-group" id="group-tag">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="meeting-tag" class="stitch-label m-0">
+                      <i class="bi bi-tag text-primary me-1"></i> Nhãn cuộc họp (Tag)
+                    </label>
+                    <span class="stitch-hint">Tùy chọn</span>
+                  </div>
+
+                  <div class="stitch-input-relative">
+                    <input
+                      type="text"
+                      id="meeting-tag"
+                      name="meeting_tag"
+                      class="form-control stitch-input"
+                      placeholder="Chọn hoặc nhập nhãn (ví dụ: Quan trọng...)"
+                      list="tag-preset-list"
+                      aria-label="Nhãn cuộc họp"
+                      autocomplete="off"
+                    />
+                    <datalist id="tag-preset-list">
+                      <option value="Tuyển dụng"></option>
+                      <option value="Quan trọng"></option>
+                      <option value="Thiết kế"></option>
+                      <option value="Sprint 24"></option>
+                      <option value="Dự án mới"></option>
+                      <option value="Hằng ngày"></option>
+                      <option value="Nội bộ"></option>
+                    </datalist>
+                  </div>
+
+                  <div class="stitch-quick-tags-row mt-2" id="quick-tag-selector">
+                    <span class="stitch-hint me-1">Gợi ý:</span>
+                    <button type="button" class="btn-tag-chip-select tag-sky" data-tag="Tuyển dụng" onclick="selectTag('Tuyển dụng')">Tuyển dụng</button>
+                    <button type="button" class="btn-tag-chip-select tag-danger" data-tag="Quan trọng" onclick="selectTag('Quan trọng')">Quan trọng</button>
+                    <button type="button" class="btn-tag-chip-select tag-sky" data-tag="Thiết kế" onclick="selectTag('Thiết kế')">Thiết kế</button>
+                    <button type="button" class="btn-tag-chip-select tag-primary" data-tag="Sprint 24" onclick="selectTag('Sprint 24')">Sprint 24</button>
+                    <button type="button" class="btn-tag-chip-select tag-primary" data-tag="Dự án mới" onclick="selectTag('Dự án mới')">Dự án mới</button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="mb-3" id="group-status">
-              <label for="meeting-status" class="stitch-label">
-                Trạng thái
-              </label>
-              <select
-                id="meeting-status"
-                class="form-select stitch-input"
-                aria-label="Trạng thái cuộc họp">
-                <option value="scheduled">Sắp diễn ra</option>
-                <option value="in-progress">Đang diễn ra</option>
-                <option value="completed">Đã hoàn thành</option>
-                <option value="cancelled">Đã hủy</option>
-              </select>
-            </div>
-
-            <!-- CUỘC HỌP ĐỊNH KỲ (IsRecurring & Recurring_Patterns) -->
-            <div class="recurring-setting-card mb-3 p-3 rounded-3 border" style="background: rgba(37, 99, 235, 0.03); border-color: rgba(37, 99, 235, 0.2) !important;">
+            <!-- CUỘC HỌP ĐỊNH KỲ (Ẩn khỏi giao diện theo yêu cầu) -->
+            <div class="recurring-setting-card mt-3 d-none" style="display: none !important;" aria-hidden="true">
               <div class="form-check form-switch d-flex align-items-center justify-content-between p-0 m-0">
                 <div>
                   <label class="form-check-label stitch-label fw-bold mb-0 d-flex align-items-center gap-2" for="meeting-recurring" style="cursor: pointer;">
                     <i class="bi bi-arrow-repeat text-primary fs-5"></i>
                     <span>Thiết lập cuộc họp lặp định kỳ</span>
                   </label>
-                  <div class="stitch-field-help mt-1">Tự động sinh chuỗi lịch họp theo Tuần / Tháng & xác thực chống trùng lịch toàn chuỗi</div>
+                  <div class="stitch-field-help mt-1">Tự động sinh chuỗi lịch họp theo Tuần / Tháng &amp; xác thực chống trùng lịch toàn chuỗi</div>
                 </div>
                 <input class="form-check-input ms-2" type="checkbox" id="meeting-recurring" name="isRecurring" role="switch" style="width: 2.5em; height: 1.3em; cursor: pointer;" aria-label="Bật tính năng cuộc họp lặp định kỳ" />
               </div>
 
-              <!-- KHỐI TÙY CHỌN CHI TIẾT LẶP ĐỊNH KỲ (Ẩn/Hiện khi bật switch) -->
+              <!-- KHỐI TÙY CHỌN CHI TIẾT LẶP ĐỊNH KỲ -->
               <div id="recurring-options-panel" class="mt-3 pt-3 border-top" style="display: none;">
                 <div class="row g-2">
                   <div class="col-md-6">
@@ -1035,19 +1076,15 @@
             </div>
 
             <!-- THIẾT BỊ PHÒNG HỌP -->
-            <div class="mb-3" id="group-equipments">
+            <div class="stitch-equipments-section mt-3" id="group-equipments">
               <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
                 <div>
                   <span class="stitch-label d-block mb-0">
                     <i class="bi bi-laptop text-primary me-1"></i> Thiết bị phòng họp yêu cầu
                   </span>
-                  <span class="stitch-hint">Tự động kiểm tra trạng thái khả dụng theo ngày &amp; khung giờ họp</span>
+                  <span class="stitch-hint">Chỉ hiển thị các thiết bị còn trống &amp; đang hoạt động</span>
                 </div>
-                <div class="equipment-legend d-flex gap-2 align-items-center small">
-                  <span class="eq-legend-pill pill-avail"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>
-                  <span class="eq-legend-pill pill-busy"><i class="bi bi-clock-fill me-1"></i>Đang bận</span>
-                  <span class="eq-legend-pill pill-maint"><i class="bi bi-tools me-1"></i>Bảo trì</span>
-                </div>
+                <!-- Bỏ nhãn có sẵn theo yêu cầu người dùng -->
               </div>
 
               <!-- Lưới các thẻ thiết bị có Badge & Checkbox -->
@@ -1063,13 +1100,15 @@
             </div>
           </div>
         </details>
+        </div>
 
-        <!-- 3. Footer Action Buttons -->
+        <!-- 3. Footer Action Buttons (Cố định ở đáy modal) -->
         <div class="stitch-modal-footer">
           <button
             type="button"
             id="btn-cancel"
-            class="btn btn-outline-secondary stitch-btn-cancel">
+            class="btn btn-outline-secondary stitch-btn-cancel"
+            onclick="closeMeetingModal()">
             Hủy
           </button>
 
@@ -1111,6 +1150,7 @@
           type="button"
           id="btn-close-detail"
           class="stitch-close-btn"
+          onclick="closeDetailModal()"
           aria-label="Đóng">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -1118,14 +1158,15 @@
 
       <div id="detail-content" class="stitch-detail-body"></div>
 
-      <div class="stitch-modal-footer" id="detail-modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+      <div class="stitch-modal-footer" id="detail-modal-footer">
         <div class="d-flex align-items-center gap-2" id="detail-permission-actions">
           <!-- Các nút theo quyền (Chỉnh sửa, Hủy cuộc họp) sẽ được hiển thị bằng JavaScript -->
         </div>
         <button
           type="button"
           id="btn-close-detail-bottom"
-          class="btn btn-secondary">
+          class="btn btn-secondary stitch-btn-close-detail"
+          onclick="closeDetailModal()">
           Đóng
         </button>
       </div>
@@ -1185,6 +1226,7 @@
           type="button"
           id="btn-close-room-modal"
           class="stitch-close-btn"
+          onclick="closeRoomModal()"
           aria-label="Đóng modal phòng họp">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -1197,14 +1239,15 @@
         </div>
         <h4 class="stitch-success-title" id="room-success-title">Thông tin phòng họp đã được lưu thành công!</h4>
         <p class="stitch-success-subtitle" id="room-success-desc">Dữ liệu phòng họp đã được đồng bộ với hệ thống.</p>
-        <button type="button" id="btn-room-success-close" class="btn btn-primary stitch-btn-submit mt-3">
+        <button type="button" id="btn-room-success-close" class="btn btn-primary stitch-btn-submit mt-3" onclick="closeRoomModal()">
           <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách phòng
         </button>
       </div>
 
       <!-- Form Body -->
-      <form id="room-form" class="stitch-form-body" novalidate>
-        <input type="hidden" id="room-form-id" name="roomId" value="" />
+      <form id="room-form" class="room-modal-form" novalidate>
+        <div class="stitch-form-body room-modal-body">
+          <input type="hidden" id="room-form-id" name="roomId" value="" />
 
         <!-- Global Error Alert -->
         <div id="room-global-error" class="stitch-alert-box stitch-alert-danger hidden">
@@ -1454,13 +1497,15 @@
             aria-label="Mô tả tiện ích phòng họp"
             placeholder="Ghi chú đặc điểm phòng họp, tầm nhìn, thiết bị chuyên dụng hoặc hướng dẫn sử dụng..."></textarea>
         </div>
+      </div>
 
         <!-- Footer -->
-        <div class="stitch-modal-footer mt-4">
+        <div class="stitch-modal-footer">
           <button
             type="button"
             id="btn-room-cancel"
-            class="btn btn-outline-secondary stitch-btn-cancel">
+            class="btn btn-outline-secondary stitch-btn-cancel"
+            onclick="closeRoomModal()">
             Hủy
           </button>
 
@@ -1502,6 +1547,7 @@
           type="button"
           id="btn-close-room-qr"
           class="stitch-close-btn"
+          onclick="closeRoomQRModal()"
           aria-label="Đóng modal chi tiết phòng">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -1531,7 +1577,8 @@
           <button
             type="button"
             id="btn-close-room-qr-bottom"
-            class="btn btn-outline-secondary stitch-btn-cancel">
+            class="btn btn-outline-secondary stitch-btn-cancel"
+            onclick="closeRoomQRModal()">
             Đóng
           </button>
           <button
@@ -1567,6 +1614,7 @@
           type="button"
           id="btn-close-room-delete"
           class="stitch-close-btn"
+          onclick="closeRoomDeleteModal()"
           aria-label="Đóng modal xác nhận xóa">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -1606,17 +1654,18 @@
           type="button"
           id="btn-close-equipment-modal"
           class="stitch-close-btn"
+          onclick="closeEquipmentModal()"
           aria-label="Đóng modal thiết bị">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
 
       <!-- Form Body -->
-      <form id="equipment-form" novalidate>
-        <div class="stitch-modal-body p-4">
+      <form id="equipment-form" class="equipment-modal-form" onsubmit="saveEquipment(event)" novalidate>
+        <div class="stitch-modal-body p-4 equipment-modal-body">
 
           <!-- Alert box thông báo lỗi nếu có -->
-          <div id="equipment-form-error" class="alert alert-danger d-none align-items-center gap-2 mb-3" role="alert">
+          <div id="equipment-form-error" class="stitch-alert-box stitch-alert-danger hidden align-items-center gap-2 mb-3" role="alert">
             <i class="bi bi-exclamation-octagon-fill fs-5"></i>
             <span id="equipment-form-error-msg"></span>
           </div>
@@ -1717,11 +1766,12 @@
         </div>
 
         <!-- Footer Area -->
-        <div class="stitch-modal-footer px-4 pb-4 pt-3 d-flex justify-content-end align-items-center gap-2">
+        <div class="stitch-modal-footer">
           <button
             type="button"
             id="btn-equipment-cancel"
-            class="btn btn-outline-secondary stitch-btn-cancel">
+            class="btn btn-outline-secondary stitch-btn-cancel"
+            onclick="closeEquipmentModal()">
             Hủy
           </button>
 
@@ -1760,6 +1810,7 @@
           type="button"
           id="btn-close-equipment-delete"
           class="stitch-close-btn"
+          onclick="closeEquipmentDeleteModal()"
           aria-label="Đóng modal xác nhận xóa thiết bị">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -1773,7 +1824,8 @@
         <button
           type="button"
           id="btn-cancel-equipment-delete"
-          class="btn btn-outline-secondary stitch-btn-cancel">
+          class="btn btn-outline-secondary stitch-btn-cancel"
+          onclick="closeEquipmentDeleteModal()">
           Đóng
         </button>
 
