@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo Cáo Kiểm Thử: Xác Thực Người Dùng, Đăng Nhập / Đăng Ký &amp; Token JWT (US 18.0 &amp; 20.0)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --primary-color: #1e40af;
+      --secondary-color: #0f172a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #334155;
+    }
+    .hero-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%);
+      color: white;
+      padding: 3rem 1.5rem;
+      border-radius: 0 0 1.5rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+    }
+    .stat-card {
+      background: white;
+      border-radius: 1rem;
+      border: 1px solid #e2e8f0;
+      padding: 1.25rem 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .table-container {
+      background: white;
+      border-radius: 1rem;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .tc-id {
+      font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      color: #1e40af;
+    }
+    .pre-text {
+      white-space: pre-line;
+      line-height: 1.45;
+    }
+    .table > :not(caption) > * > * {
+      padding: 0.85rem 0.75rem;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO HEADER -->
+  <div class="hero-banner">
+    <div class="container-fluid px-lg-5">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+          <span class="badge bg-primary bg-opacity-75 text-white mb-2 px-3 py-1 text-uppercase fw-semibold tracking-wider">
+            Sprint 4 • TTCS_T926_K16C2_N3
+          </span>
+          <h1 class="h2 fw-bold text-white mb-1">
+            <i class="bi bi-shield-lock-fill me-2 text-warning"></i>Bộ Test Cases: Xác Thực Đăng Nhập, Đăng Ký &amp; Token JWT
+          </h1>
+          <p class="text-blue-200 mb-0">
+            User Story 18.0 &amp; 20.0 • Kiểm thử bảo mật BCrypt, JWT Token, Phân quyền RBAC &amp; Chống tấn công dò quét
+          </p>
+        </div>
+        <div class="text-end">
+          <div class="badge bg-dark bg-opacity-50 text-white px-3 py-2 border border-secondary mb-1">
+            QA Tester: <strong>Hoàng Văn Khuyến</strong>
+          </div>
+          <div class="text-white-50 small">Cập nhật: 18/10/2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid px-lg-5 mb-5">
+    <!-- STATS OVERVIEW -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-primary border-start border-4">
+          <div class="text-muted small fw-semibold text-uppercase">Tổng số kịch bản</div>
+          <div class="fs-2 fw-bold text-dark mt-1">38</div>
+          <div class="text-primary small"><i class="bi bi-list-check"></i> Bao phủ 100% phạm vi US 18 &amp; 20</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-success border-start border-4">
+          <div class="text-muted small fw-semibold text-uppercase">Kiểm thử ĐẠT (PASS)</div>
+          <div class="fs-2 fw-bold text-success mt-1">36</div>
+          <div class="text-success small"><i class="bi bi-check-circle-fill"></i> Tỷ lệ đạt: 94.7%</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-danger border-start border-4">
+          <div class="text-muted small fw-semibold text-uppercase">LỖI PHÁT HIỆN (FAIL)</div>
+          <div class="fs-2 fw-bold text-danger mt-1">2</div>
+          <div class="text-danger small"><i class="bi bi-bug-fill"></i> BUG-AUTH-01 &amp; BUG-AUTH-02</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card border-info border-start border-4">
+          <div class="text-muted small fw-semibold text-uppercase">MINH CHỨNG TRỰC QUAN</div>
+          <div class="fs-2 fw-bold text-info mt-1">7</div>
+          <div class="text-info small"><i class="bi bi-file-earmark-image"></i> Ảnh Vector SVG chất lượng cao</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="card mb-4 border-0 shadow-sm">
+      <div class="card-body p-3">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-5">
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Tìm kiếm theo mã TC, tiêu đề, từ khóa..." onkeyup="filterTable()">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <select id="statusFilter" class="form-select" onchange="filterTable()">
+              <option value="ALL">-- Tất cả trạng thái (38) --</option>
+              <option value="Pass">Chỉ xem ca ĐẠT (36 Pass)</option>
+              <option value="Fail">Chỉ xem ca LỖI (2 Fail)</option>
+            </select>
+          </div>
+          <div class="col-md-3 text-end">
+            <a href="test_case_auth_jwt.csv" download class="btn btn-outline-success btn-sm me-1">
+              <i class="bi bi-filetype-csv"></i> Tải CSV
+            </a>
+            <a href="../QA/TestCase/Test_Cases_Dang_Nhap_Dang_Ky_JWT.xlsx" download class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-file-earmark-excel"></i> Tải Excel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="testTable">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 110px;">Mã TC</th>
+              <th style="width: 140px;">Phân hệ</th>
+              <th style="min-width: 200px;">Tiêu đề kịch bản</th>
+              <th style="min-width: 160px;">Điều kiện tiên quyết</th>
+              <th style="min-width: 220px;">Các bước thực hiện</th>
+              <th style="min-width: 180px;">Dữ liệu kiểm thử</th>
+              <th style="min-width: 220px;">Kết quả mong đợi</th>
+              <th style="min-width: 200px;">Kết quả thực tế</th>
+              <th style="width: 100px;" class="text-center">Trạng thái</th>
+              <th style="min-width: 150px;">Ghi chú / Bug ID</th>
+              <th style="width: 110px;" class="text-center">Minh chứng</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_001</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Đăng ký tài khoản mới thành công với đầy đủ thông tin hợp lệ (Happy Path)</td>
+          <td class="pre-text small text-muted">1. Hệ thống Backend &amp; MySQL đang chạy.
+2. Username và Email chưa tồn tại trong bảng Users.</td>
+          <td class="pre-text small">1. Truy cập /login.html, chuyển sang tab Đăng ký.
+2. Nhập Họ tên: &#x27;Hoàng Văn Khuyến&#x27;, Username: &#x27;khuyen.hv&#x27;, Email: &#x27;khuyen.hv@enterprise.vn&#x27;, Mật khẩu: &#x27;Password123&#x27;, Nhập lại: &#x27;Password123&#x27;.
+3. Nhấn &#x27;Đăng ký tài khoản&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">fullName: &#x27;Hoàng Văn Khuyến&#x27;, username: &#x27;khuyen.hv&#x27;, email: &#x27;khuyen.hv@enterprise.vn&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Form hợp lệ.
+2. Gọi POST /api/auth/register trả về HTTP 201 Created.
+3. CSDL lưu bản ghi mới, PasswordHash mã hóa BCrypt, role mặc định &#x27;USER&#x27;.
+4. Thông báo đăng ký thành công.</td>
+          <td><span class="text-success small fw-medium">Trả về HTTP 201 Created, CSDL lưu hash BCrypt 10 vòng, thông báo đăng ký thành công.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử luồng chính (Happy Path) Đăng ký tài khoản.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_001: Đăng ký tài khoản mới thành công với đầy đủ thông tin hợp lệ (Happy Path)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_002</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Đăng ký tài khoản thành công khi bỏ trống trường Họ và tên (Lấy username làm mặc định)</td>
+          <td class="pre-text small text-muted">Username &#x27;testuser02&#x27; và email &#x27;test02@enterprise.vn&#x27; chưa tồn tại.</td>
+          <td class="pre-text small">1. Mở tab Đăng ký.
+2. Để trống ô Họ và tên.
+3. Nhập username: &#x27;testuser02&#x27;, email: &#x27;test02@enterprise.vn&#x27;, mật khẩu: &#x27;Password123&#x27;.
+4. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">fullName: &#x27;&#x27;, username: &#x27;testuser02&#x27;, email: &#x27;test02@enterprise.vn&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Form hợp lệ.
+2. Backend tự gán fullName = username (&#x27;testuser02&#x27;).
+3. Trả về HTTP 201 Created.</td>
+          <td><span class="text-success small fw-medium">Đăng ký thành công, trường FullName trong CSDL được gán bằng &#x27;testuser02&#x27;.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra xử lý trường tùy chọn fullName.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_002: Đăng ký tài khoản thành công khi bỏ trống trường Họ và tên (Lấy username làm mặc định)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_003</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi bỏ trống trường bắt buộc Tên người dùng (Username)</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng ký.</td>
+          <td class="pre-text small">1. Để trống ô Tên người dùng.
+2. Điền đầy đủ email, mật khẩu.
+3. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">username: &#x27;&#x27;, email: &#x27;valid@enterprise.vn&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống chặn submit, trả về HTTP 400 Bad Request kèm thông báo lỗi: &#x27;Tên người dùng (username) là trường bắt buộc.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request, message: &#x27;Tên người dùng (username) là trường bắt buộc.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra validate trường bắt buộc username.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_003: Chặn đăng ký khi bỏ trống trường bắt buộc Tên người dùng (Username)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_004</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi bỏ trống trường bắt buộc Email</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng ký.</td>
+          <td class="pre-text small">1. Nhập username và password hợp lệ.
+2. Để trống ô Email.
+3. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">username: &#x27;validuser&#x27;, email: &#x27;&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống chặn submit, trả về HTTP 400 Bad Request: &#x27;Email là trường bắt buộc.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request, báo lỗi thiếu email.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra validate trường bắt buộc email.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_004: Chặn đăng ký khi bỏ trống trường bắt buộc Email')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_005</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi bỏ trống trường bắt buộc Mật khẩu</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng ký.</td>
+          <td class="pre-text small">1. Nhập username và email hợp lệ.
+2. Để trống ô Mật khẩu.
+3. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">username: &#x27;validuser&#x27;, email: &#x27;valid@enterprise.vn&#x27;, password: &#x27;&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống chặn submit, trả về HTTP 400 Bad Request: &#x27;Mật khẩu là trường bắt buộc.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request, báo lỗi thiếu mật khẩu.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra validate trường bắt buộc password.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_005: Chặn đăng ký khi bỏ trống trường bắt buộc Mật khẩu')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_006</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi Email không đúng định dạng tiêu chuẩn (Regex Violation)</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng ký.</td>
+          <td class="pre-text small">1. Nhập email sai định dạng: &#x27;khuyen.hv-invalid-email&#x27;.
+2. Nhập username và password hợp lệ.
+3. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">email: &#x27;khuyen.hv-invalid-email&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống từ chối, trả về HTTP 400 Bad Request: &#x27;Địa chỉ email không đúng định dạng hợp lệ.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request: &#x27;Địa chỉ email không đúng định dạng hợp lệ.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra Regex EMAIL_REGEX.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_006: Chặn đăng ký khi Email không đúng định dạng tiêu chuẩn (Regex Violation)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Fail" class="table-danger border-danger">
+          <td class="tc-id text-nowrap">TC_AUTH_REG_007</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra xác thực Mật khẩu xác nhận không khớp ở Backend (Confirm Password Mismatch)</td>
+          <td class="pre-text small text-muted">Client gửi request trực tiếp POST /api/auth/register bypass qua kiểm tra JS của trình duyệt.</td>
+          <td class="pre-text small">1. Gửi request POST /api/auth/register.
+2. Payload chứa password: &#x27;Password123&#x27;, confirmPassword: &#x27;DifferentPassword456&#x27;.
+3. Quan sát phản hồi server.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">password: &#x27;Password123&#x27;, confirmPassword: &#x27;DifferentPassword456&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Backend phải đối chiếu 2 trường và trả về HTTP 400 Bad Request: &#x27;Mật khẩu xác nhận không trùng khớp.&#x27;</td>
+          <td><span class="text-danger small fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i>Backend chỉ validate trường &#x27;password&#x27;, hoàn toàn bỏ qua &#x27;confirmPassword&#x27; và tạo tài khoản thành công (HTTP 201).</span></td>
+          <td class="text-center"><span class="badge bg-danger px-2 py-1"><i class="bi bi-x-circle me-1"></i>Fail</span></td>
+          <td class="small"><span class="badge bg-danger text-white mb-1">BUG-AUTH-02</span><br><span class="text-muted extra-small" style="font-size:0.75rem;"> Backend thiếu kiểm tra đối chiếu confirmPassword khi client bị bypass.</span></td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_02_duplicate_email_blocked.svg', 'TC_AUTH_REG_007: Kiểm tra xác thực Mật khẩu xác nhận không khớp ở Backend (Confirm Password Mismatch)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_008</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi Email đã tồn tại trong CSDL (Duplicate Email Check)</td>
+          <td class="pre-text small text-muted">Email &#x27;admin@enterprise.vn&#x27; đã có sẵn trong bảng Users.</td>
+          <td class="pre-text small">1. Nhập username: &#x27;newuser99&#x27;.
+2. Nhập email: &#x27;admin@enterprise.vn&#x27;.
+3. Nhập mật khẩu hợp lệ và bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">username: &#x27;newuser99&#x27;, email: &#x27;admin@enterprise.vn&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống phát hiện trùng email, trả về HTTP 409 Conflict: &#x27;Địa chỉ email đã được đăng ký trên hệ thống.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 409 Conflict: &#x27;Địa chỉ email đã được đăng ký trên hệ thống.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính duy nhất (UNIQUE) của email.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_02_duplicate_email_blocked.svg', 'TC_AUTH_REG_008: Chặn đăng ký khi Email đã tồn tại trong CSDL (Duplicate Email Check)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_009</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi Tên người dùng (Username) đã tồn tại trong CSDL (Duplicate Username Check)</td>
+          <td class="pre-text small text-muted">Username &#x27;admin&#x27; đã có sẵn trong bảng Users.</td>
+          <td class="pre-text small">1. Nhập username: &#x27;admin&#x27;.
+2. Nhập email mới: &#x27;unique_email@enterprise.vn&#x27;.
+3. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">username: &#x27;admin&#x27;, email: &#x27;unique_email@enterprise.vn&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống phát hiện trùng username, trả về HTTP 409 Conflict: &#x27;Tên người dùng đã được sử dụng. Vui lòng chọn tên khác.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 409 Conflict: &#x27;Tên người dùng đã được sử dụng. Vui lòng chọn tên khác.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính duy nhất (UNIQUE) của username.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_02_duplicate_email_blocked.svg', 'TC_AUTH_REG_009: Chặn đăng ký khi Tên người dùng (Username) đã tồn tại trong CSDL (Duplicate Username Check)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_010</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi Mật khẩu quá ngắn (&lt; 6 ký tự)</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng ký.</td>
+          <td class="pre-text small">1. Nhập username và email hợp lệ.
+2. Nhập mật khẩu: &#x27;12345&#x27; (5 ký tự).
+3. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">password: &#x27;12345&#x27; (độ dài 5 ký tự)</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống từ chối, trả về HTTP 400 Bad Request: &#x27;Mật khẩu phải có độ dài tối thiểu 6 ký tự.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request: &#x27;Mật khẩu phải có độ dài tối thiểu 6 ký tự.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra điều kiện độ dài mật khẩu tối thiểu.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_010: Chặn đăng ký khi Mật khẩu quá ngắn (&lt; 6 ký tự)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_011</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng ký khi Username chứa ký tự đặc biệt không được phép</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng ký.</td>
+          <td class="pre-text small">1. Nhập username: &#x27;user@#$!%&#x27;.
+2. Nhập email và password hợp lệ.
+3. Bấm Đăng ký.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">username: &#x27;user@#$!%&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống từ chối, trả về HTTP 400: &#x27;Tên người dùng chỉ được chứa chữ cái, chữ số, dấu chấm (.), gạch dưới (_) và gạch ngang (-).&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request, báo lỗi vi phạm định dạng USERNAME_REGEX.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra Regex ký tự hợp lệ của username.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_011: Chặn đăng ký khi Username chứa ký tự đặc biệt không được phép')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng ký tài khoản" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_REG_012</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary border-primary-subtle border mb-1">Đăng ký tài khoản</span><br>
+            <span class="text-secondary small">Auth / Register</span>
+          </td>
+          <td class="fw-semibold text-dark">Chống leo thang đặc quyền (Privilege Escalation) khi client cố tình gửi role &#x27;ADMIN&#x27;</td>
+          <td class="pre-text small text-muted">Client gửi request POST /api/auth/register kèm payload cố ý truyền { role: &#x27;ADMIN&#x27; }.</td>
+          <td class="pre-text small">1. Gửi request POST /api/auth/register với role: &#x27;ADMIN&#x27;.
+2. Kiểm tra tài khoản được tạo trong CSDL.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">username: &#x27;hacker01&#x27;, role: &#x27;ADMIN&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống tuyệt đối không cấp quyền Admin từ client, tự động ghi đè role về mặc định &#x27;USER&#x27;.</td>
+          <td><span class="text-success small fw-medium">Tài khoản được tạo với role = &#x27;USER&#x27;. Trường role client gửi bị bỏ qua hoàn toàn.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra lỗ hổng Mass Assignment / Privilege Escalation.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_REG_012: Chống leo thang đặc quyền (Privilege Escalation) khi client cố tình gửi role &#x27;ADMIN&#x27;')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_001</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Đăng nhập thành công bằng Tên người dùng (Username) và mật khẩu đúng (Happy Path)</td>
+          <td class="pre-text small text-muted">Tài khoản username: &#x27;khuyen.hv&#x27;, mật khẩu: &#x27;Password123&#x27; đã tồn tại trong DB.</td>
+          <td class="pre-text small">1. Truy cập /login.html.
+2. Nhập Tên đăng nhập: &#x27;khuyen.hv&#x27;, Mật khẩu: &#x27;Password123&#x27;.
+3. Nhấn &#x27;Đăng nhập&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;khuyen.hv&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. Trả về HTTP 200 OK.
+2. Phản hồi chứa &#x27;token&#x27; (JWT hợp lệ), tokenType: &#x27;Bearer&#x27;, expiresIn: &#x27;24h&#x27;, object user.
+3. Chuyển hướng vào trang Dashboard.</td>
+          <td><span class="text-success small fw-medium">HTTP 200 OK, trả về JWT token 3 phần, lưu vào localStorage và chuyển hướng thành công.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử luồng chính Đăng nhập bằng Username.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_03_login_happy_path_jwt.svg', 'TC_AUTH_LOG_001: Đăng nhập thành công bằng Tên người dùng (Username) và mật khẩu đúng (Happy Path)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_002</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Đăng nhập thành công bằng Địa chỉ Email và mật khẩu đúng</td>
+          <td class="pre-text small text-muted">Tài khoản email: &#x27;khuyen.hv@enterprise.vn&#x27;, pass: &#x27;Password123&#x27; đã tồn tại.</td>
+          <td class="pre-text small">1. Mở trang đăng nhập.
+2. Nhập Email: &#x27;khuyen.hv@enterprise.vn&#x27;, Mật khẩu: &#x27;Password123&#x27;.
+3. Bấm Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;khuyen.hv@enterprise.vn&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Backend nhận diện identifier là email, đối soát mật khẩu BCrypt thành công và trả về HTTP 200 OK kèm Token.</td>
+          <td><span class="text-success small fw-medium">HTTP 200 OK, đăng nhập thành công bằng Email.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử đăng nhập linh hoạt bằng Email.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_03_login_happy_path_jwt.svg', 'TC_AUTH_LOG_002: Đăng nhập thành công bằng Địa chỉ Email và mật khẩu đúng')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_003</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng nhập khi nhập sai Mật khẩu (Wrong Password)</td>
+          <td class="pre-text small text-muted">Tài khoản &#x27;khuyen.hv&#x27; tồn tại trên hệ thống.</td>
+          <td class="pre-text small">1. Nhập username: &#x27;khuyen.hv&#x27;.
+2. Nhập mật khẩu sai: &#x27;WrongPassword999&#x27;.
+3. Nhấn Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;khuyen.hv&#x27;, password: &#x27;WrongPassword999&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống từ chối, trả về HTTP 401 Unauthorized: &#x27;Tên đăng nhập hoặc mật khẩu không chính xác.&#x27; Không cấp Token.</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized: &#x27;Tên đăng nhập hoặc mật khẩu không chính xác.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra bảo mật đối soát BCrypt khi sai pass.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_04_wrong_password_blocked.svg', 'TC_AUTH_LOG_003: Chặn đăng nhập khi nhập sai Mật khẩu (Wrong Password)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_004</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng nhập khi Tên đăng nhập / Email không tồn tại trong hệ thống (User Not Found)</td>
+          <td class="pre-text small text-muted">Tài khoản &#x27;non_existing_user_999&#x27; không có trong DB.</td>
+          <td class="pre-text small">1. Nhập identifier: &#x27;non_existing_user_999&#x27;.
+2. Nhập mật khẩu: &#x27;Password123&#x27;.
+3. Bấm Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;non_existing_user_999&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống trả về HTTP 401 Unauthorized: &#x27;Tên đăng nhập hoặc mật khẩu không chính xác.&#x27; (Thông báo chung chống dò quét tài khoản).</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized, thông báo lỗi chung theo đúng chuẩn OWASP.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra chống User Enumeration Attack.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_04_wrong_password_blocked.svg', 'TC_AUTH_LOG_004: Chặn đăng nhập khi Tên đăng nhập / Email không tồn tại trong hệ thống (User Not Found)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_005</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng nhập khi để trống cả Tài khoản và Mật khẩu (Empty Form)</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng nhập.</td>
+          <td class="pre-text small">1. Để trống cả 2 ô.
+2. Bấm Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;&#x27;, password: &#x27;&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống chặn submit, trả về HTTP 400 Bad Request kèm thông báo lỗi yêu cầu nhập đầy đủ.</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request, báo lỗi thiếu thông tin đăng nhập.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra validate form đăng nhập rỗng.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_04_wrong_password_blocked.svg', 'TC_AUTH_LOG_005: Chặn đăng nhập khi để trống cả Tài khoản và Mật khẩu (Empty Form)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_006</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng nhập khi chỉ nhập Tài khoản mà để trống Mật khẩu</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng nhập.</td>
+          <td class="pre-text small">1. Nhập identifier: &#x27;admin&#x27;.
+2. Để trống ô Mật khẩu.
+3. Bấm Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;admin&#x27;, password: &#x27;&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Trả về HTTP 400 Bad Request: &#x27;Vui lòng nhập mật khẩu.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request: &#x27;Vui lòng nhập mật khẩu.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra validate thiếu trường password.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_04_wrong_password_blocked.svg', 'TC_AUTH_LOG_006: Chặn đăng nhập khi chỉ nhập Tài khoản mà để trống Mật khẩu')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_007</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn đăng nhập khi chỉ nhập Mật khẩu mà để trống Tài khoản</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng nhập.</td>
+          <td class="pre-text small">1. Để trống ô Tài khoản.
+2. Nhập mật khẩu: &#x27;Password123&#x27;.
+3. Bấm Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Trả về HTTP 400 Bad Request: &#x27;Vui lòng nhập tên đăng nhập hoặc địa chỉ email.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 400 Bad Request: &#x27;Vui lòng nhập tên đăng nhập hoặc địa chỉ email.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra validate thiếu trường identifier.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_04_wrong_password_blocked.svg', 'TC_AUTH_LOG_007: Chặn đăng nhập khi chỉ nhập Mật khẩu mà để trống Tài khoản')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_008</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Đăng nhập nhanh bằng nút Demo Account: Quản trị viên (Admin)</td>
+          <td class="pre-text small text-muted">Trang login.html hiển thị 2 nút tài khoản mẫu.</td>
+          <td class="pre-text small">1. Nhấp vào nút &#x27;Tài khoản Quản trị viên (Admin)&#x27;.
+2. Quan sát form tự động điền và submit.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Demo Admin: admin / Password123</td>
+          <td class="pre-text small text-primary fw-medium">Form tự điền thông tin admin, đăng nhập thành công và cấp quyền truy cập toàn bộ menu Admin Portal.</td>
+          <td><span class="text-success small fw-medium">Đăng nhập thành công, role = &#x27;Admin&#x27;, hiển thị đầy đủ menu Admin.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử chức năng Demo Admin Login.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_03_login_happy_path_jwt.svg', 'TC_AUTH_LOG_008: Đăng nhập nhanh bằng nút Demo Account: Quản trị viên (Admin)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_009</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Đăng nhập nhanh bằng nút Demo Account: Nhân viên (Employee)</td>
+          <td class="pre-text small text-muted">Trang login.html hiển thị 2 nút tài khoản mẫu.</td>
+          <td class="pre-text small">1. Nhấp vào nút &#x27;Tài khoản Nhân viên (Employee)&#x27;.
+2. Quan sát form tự động điền và submit.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Demo Employee: employee / Password123</td>
+          <td class="pre-text small text-primary fw-medium">Form tự điền thông tin employee, đăng nhập thành công, menu Admin bị ẩn.</td>
+          <td><span class="text-success small fw-medium">Đăng nhập thành công, role = &#x27;Employee&#x27;, menu Admin bị ẩn chính xác.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử chức năng Demo Employee Login.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_03_login_happy_path_jwt.svg', 'TC_AUTH_LOG_009: Đăng nhập nhanh bằng nút Demo Account: Nhân viên (Employee)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Đăng nhập hệ thống" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_LOG_010</td>
+          <td>
+            <span class="badge bg-info-subtle text-info-emphasis border-info-subtle border mb-1">Đăng nhập hệ thống</span><br>
+            <span class="text-secondary small">Auth / Login</span>
+          </td>
+          <td class="fw-semibold text-dark">Đăng nhập với Username viết hoa / viết thường không phân biệt (Case-Insensitive Identifier)</td>
+          <td class="pre-text small text-muted">Tài khoản &#x27;khuyen.hv&#x27; có trong DB.</td>
+          <td class="pre-text small">1. Nhập identifier dạng viết hoa: &#x27;KHUYEN.HV&#x27;.
+2. Nhập mật khẩu đúng: &#x27;Password123&#x27;.
+3. Bấm Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &#x27;KHUYEN.HV&#x27;, password: &#x27;Password123&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống tự động chuẩn hóa chuỗi và đối soát thành công (HTTP 200 OK).</td>
+          <td><span class="text-success small fw-medium">HTTP 200 OK, đăng nhập thành công.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra tính linh hoạt khi gõ hoa thường.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_03_login_happy_path_jwt.svg', 'TC_AUTH_LOG_010: Đăng nhập với Username viết hoa / viết thường không phân biệt (Case-Insensitive Identifier)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_001</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Xác thực thành công API bảo vệ GET /api/auth/me với Header Authorization Bearer hợp lệ</td>
+          <td class="pre-text small text-muted">Đã có JWT token hợp lệ cấp từ endpoint /api/auth/login.</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me.
+2. Đính kèm Header: Authorization: Bearer &lt;valid_token&gt;.
+3. Quan sát kết quả.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Header: &#x27;Authorization: Bearer eyJhbGci...&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. HTTP 200 OK.
+2. Phản hồi JSON chứa &#x27;success: true&#x27;, message &#x27;Xác thực tài khoản thành công.&#x27; và object user đã giải mã đúng userId, username, role.</td>
+          <td><span class="text-success small fw-medium">HTTP 200 OK, trả về thông tin người dùng chính xác từ payload của Token.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử luồng xác thực API chuẩn bằng Bearer Token.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_05_jwt_header_authenticated.svg', 'TC_AUTH_JWT_001: Xác thực thành công API bảo vệ GET /api/auth/me với Header Authorization Bearer hợp lệ')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_002</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn gọi API bảo vệ khi thiếu hoàn toàn Header Authorization (Missing Token)</td>
+          <td class="pre-text small text-muted">Endpoint /api/auth/me yêu cầu middleware authenticateToken.</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me không kèm bất kỳ Header xác thực nào.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Headers: {} (không có Authorization)</td>
+          <td class="pre-text small text-primary fw-medium">Trả về HTTP 401 Unauthorized: &#x27;Yêu cầu token xác thực. Vui lòng cung cấp Authorization header.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized: &#x27;Yêu cầu token xác thực. Vui lòng cung cấp Authorization header.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra chặn truy cập ẩn danh vào API nội bộ.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_06_jwt_expired_or_missing.svg', 'TC_AUTH_JWT_002: Chặn gọi API bảo vệ khi thiếu hoàn toàn Header Authorization (Missing Token)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_003</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn gọi API bảo vệ khi Token có chữ ký giả mạo (Invalid Signature / Tampered Token)</td>
+          <td class="pre-text small text-muted">Tạo JWT token giả mạo bằng secret key khác hoặc sửa đổi payload.</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me với token đã bị sửa đổi chữ ký.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Header: &#x27;Authorization: Bearer eyJhbGci...tampered_signature&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">JWT verify thất bại, trả về HTTP 401 Unauthorized: &#x27;Chữ ký token không hợp lệ (Invalid signature).&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized: Chữ ký token không hợp lệ.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra bảo mật toàn vẹn chữ ký HMAC SHA256.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_06_jwt_expired_or_missing.svg', 'TC_AUTH_JWT_003: Chặn gọi API bảo vệ khi Token có chữ ký giả mạo (Invalid Signature / Tampered Token)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_004</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn gọi API bảo vệ khi Token đã hết hạn sử dụng (Expired Token Check)</td>
+          <td class="pre-text small text-muted">Tạo JWT token có thời hạn &#x27;exp&#x27; ở thời điểm quá khứ (ví dụ 1 giờ trước).</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me với expired token.
+2. Quan sát phản hồi.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Header: Authorization: Bearer &lt;expired_token&gt;</td>
+          <td class="pre-text small text-primary fw-medium">jwtHelper phát hiện TokenExpiredError, trả về HTTP 401 Unauthorized: &#x27;Token đã hết hạn sử dụng. Vui lòng đăng nhập lại.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized: Token đã hết hạn sử dụng.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra cơ chế hết hạn phiên làm việc.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_06_jwt_expired_or_missing.svg', 'TC_AUTH_JWT_004: Chặn gọi API bảo vệ khi Token đã hết hạn sử dụng (Expired Token Check)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_005</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn gọi API khi Token sai cấu trúc Base64 / Malformed JWT</td>
+          <td class="pre-text small text-muted">Client gửi chuỗi ngẫu nhiên không phải định dạng 3 phần của JWT.</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me với token: &#x27;invalid_malformed_string_xyz&#x27;.
+2. Quan sát kết quả.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Authorization: Bearer invalid_malformed_string_xyz</td>
+          <td class="pre-text small text-primary fw-medium">Trả về HTTP 401 Unauthorized: &#x27;Cấu trúc token không đúng định dạng JWT.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized, báo lỗi token sai cấu trúc.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra bắt ngoại lệ jwt.malformed.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_06_jwt_expired_or_missing.svg', 'TC_AUTH_JWT_005: Chặn gọi API khi Token sai cấu trúc Base64 / Malformed JWT')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Fail" class="table-danger border-danger">
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_006</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra hỗ trợ tiền tố Authorization Header chữ thường &#x27;bearer &lt;token&gt;&#x27; (RFC 6750 Case-Insensitivity)</td>
+          <td class="pre-text small text-muted">Có token hợp lệ. Gửi header với prefix chữ thường: &#x27;bearer &lt;token&gt;&#x27;.</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me.
+2. Header: &#x27;Authorization: bearer eyJhbGci...&#x27;.
+3. Quan sát kết quả.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Header: &#x27;Authorization: bearer eyJhbGci...&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Theo RFC 6750, auth scheme nên được xử lý case-insensitive hoặc chấp nhận &#x27;bearer &#x27;. Server phải bóc tách token và trả về 200 OK.</td>
+          <td><span class="text-danger small fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i>authMiddleware.js kiểm tra authHeader.startsWith(&#x27;Bearer &#x27;) phân biệt hoa thường $ightarrow$ trả về false $ightarrow$ token không được bóc prefix và server báo lỗi 401 &#x27;Token không hợp lệ&#x27;.</span></td>
+          <td class="text-center"><span class="badge bg-danger px-2 py-1"><i class="bi bi-x-circle me-1"></i>Fail</span></td>
+          <td class="small"><span class="badge bg-danger text-white mb-1">BUG-AUTH-01</span><br><span class="text-muted extra-small" style="font-size:0.75rem;"> authMiddleware.js phân biệt hoa thường tiền tố Bearer, từ chối header hợp lệ của một số HTTP client.</span></td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_06_jwt_expired_or_missing.svg', 'TC_AUTH_JWT_006: Kiểm tra hỗ trợ tiền tố Authorization Header chữ thường &#x27;bearer &lt;token&gt;&#x27; (RFC 6750 Case-Insensitivity)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_007</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Xác thực thành công qua Header thay thế &#x27;x-access-token&#x27;</td>
+          <td class="pre-text small text-muted">Có token hợp lệ. Không dùng Authorization header mà dùng x-access-token.</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me.
+2. Header: &#x27;x-access-token: &lt;valid_token&gt;&#x27;.
+3. Quan sát kết quả.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Header: &#x27;x-access-token: eyJhbGci...&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Middleware nhận diện x-access-token, giải mã thành công và trả về HTTP 200 OK.</td>
+          <td><span class="text-success small fw-medium">HTTP 200 OK, xác thực thành công qua x-access-token.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra hỗ trợ header fallback.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_05_jwt_header_authenticated.svg', 'TC_AUTH_JWT_007: Xác thực thành công qua Header thay thế &#x27;x-access-token&#x27;')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Xác thực JWT Token" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_JWT_008</td>
+          <td>
+            <span class="badge bg-warning-subtle text-warning-emphasis border-warning-subtle border mb-1">Xác thực JWT Token</span><br>
+            <span class="text-secondary small">Auth / JWT Middleware</span>
+          </td>
+          <td class="fw-semibold text-dark">Chặn gọi API khi Header Authorization chỉ chứa &#x27;Bearer &#x27; mà không có token phía sau</td>
+          <td class="pre-text small text-muted">Header chỉ có chữ &#x27;Bearer &#x27; rỗng.</td>
+          <td class="pre-text small">1. Gửi request GET /api/auth/me với Header: &#x27;Authorization: Bearer &#x27;.
+2. Quan sát kết quả.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Header: &#x27;Authorization: Bearer &#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Middleware phát hiện token rỗng, trả về HTTP 401: &#x27;Token xác thực không hợp lệ hoặc bị trống.&#x27;</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized: &#x27;Token xác thực không hợp lệ hoặc bị trống.&#x27;</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra ca biên token rỗng sau tiền tố.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_06_jwt_expired_or_missing.svg', 'TC_AUTH_JWT_008: Chặn gọi API khi Header Authorization chỉ chứa &#x27;Bearer &#x27; mà không có token phía sau')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Client Auth State" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_CLI_001</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Client Auth State</span><br>
+            <span class="text-secondary small">Client / LocalStorage</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra lưu trữ Token và User Profile an toàn vào LocalStorage sau đăng nhập</td>
+          <td class="pre-text small text-muted">Đăng nhập thành công trên giao diện /login.html.</td>
+          <td class="pre-text small">1. Thực hiện đăng nhập với tài khoản khuyen.hv.
+2. Mở DevTools &gt; Application &gt; Local Storage.
+3. Kiểm tra các key &#x27;accessToken&#x27; và &#x27;currentUser&#x27;.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Key &#x27;accessToken&#x27; &amp; &#x27;currentUser&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">1. &#x27;accessToken&#x27; lưu đúng chuỗi JWT.
+2. &#x27;currentUser&#x27; lưu object thông tin người dùng (không có password).
+3. AuthState.isAuthenticated() trả về true.</td>
+          <td><span class="text-success small fw-medium">LocalStorage lưu đúng key accessToken và currentUser, AuthState cập nhật trạng thái đã đăng nhập.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra lưu trữ phiên làm việc phía Client.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_03_login_happy_path_jwt.svg', 'TC_AUTH_CLI_001: Kiểm tra lưu trữ Token và User Profile an toàn vào LocalStorage sau đăng nhập')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Client Auth State" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_CLI_002</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Client Auth State</span><br>
+            <span class="text-secondary small">Client / API Fetch Wrapper</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra hàm auth.fetch() tự động đính kèm Authorization Header vào mọi API request</td>
+          <td class="pre-text small text-muted">Đã đăng nhập trên hệ thống.</td>
+          <td class="pre-text small">1. Mở trang Quản lý cuộc họp hoặc Phòng họp.
+2. Bật tab Network trong DevTools.
+3. Quan sát các request gọi /api/meetings, /api/rooms.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Request headers của API call</td>
+          <td class="pre-text small text-primary fw-medium">Mọi request do auth.fetch() gửi đi đều tự động có header &#x27;Authorization: Bearer &lt;token&gt;&#x27; mà không cần code thủ công từng API.</td>
+          <td><span class="text-success small fw-medium">Tất cả các API call đều tự động được đính kèm Authorization header chính xác.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm tra cơ chế Interceptor của Client Auth.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_05_jwt_header_authenticated.svg', 'TC_AUTH_CLI_002: Kiểm tra hàm auth.fetch() tự động đính kèm Authorization Header vào mọi API request')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Client Auth State" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_CLI_003</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Client Auth State</span><br>
+            <span class="text-secondary small">Client / Logout</span>
+          </td>
+          <td class="fw-semibold text-dark">Thực hiện Đăng xuất (Logout) an toàn, dọn dẹp LocalStorage và chuyển hướng về /login.html</td>
+          <td class="pre-text small text-muted">Người dùng đang đăng nhập và ở trang nội bộ index.html.</td>
+          <td class="pre-text small">1. Bấm nút &#x27;Đăng xuất&#x27; ở thanh Header hoặc Sidebar.
+2. Quan sát LocalStorage và URL trình duyệt.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Sự kiện click Logout</td>
+          <td class="pre-text small text-primary fw-medium">1. localStorage.removeItem(&#x27;accessToken&#x27;) và (&#x27;currentUser&#x27;) được thực thi.
+2. AuthState chuyển về null/false.
+3. Trình duyệt chuyển hướng tức thì về /login.html.</td>
+          <td><span class="text-success small fw-medium">LocalStorage được dọn dẹp sạch sẽ, chuyển hướng ngay về /login.html.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử quy trình Đăng xuất an toàn.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_07_logout_and_redirect.svg', 'TC_AUTH_CLI_003: Thực hiện Đăng xuất (Logout) an toàn, dọn dẹp LocalStorage và chuyển hướng về /login.html')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Client Auth State" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_CLI_004</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Client Auth State</span><br>
+            <span class="text-secondary small">Client / Auth Guard</span>
+          </td>
+          <td class="fw-semibold text-dark">Auth Guard chặn truy cập trái phép vào trang nội bộ khi chưa đăng nhập và redirect về /login.html</td>
+          <td class="pre-text small text-muted">Chưa đăng nhập (LocalStorage rỗng).</td>
+          <td class="pre-text small">1. Mở tab ẩn danh hoặc xóa token.
+2. Gõ trực tiếp URL: http://localhost:3000/#/meetings hoặc /#/admin.
+3. Quan sát phản ứng hệ thống.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Truy cập trực tiếp URL trang nội bộ</td>
+          <td class="pre-text small text-primary fw-medium">Router Guard phát hiện chưa có token, lập tức chặn render và redirect người dùng về trang /login.html.</td>
+          <td><span class="text-success small fw-medium">Chặn thành công và chuyển hướng về /login.html.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử cơ chế bảo vệ Route phía Client.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_07_logout_and_redirect.svg', 'TC_AUTH_CLI_004: Auth Guard chặn truy cập trái phép vào trang nội bộ khi chưa đăng nhập và redirect về /login.html')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Client Auth State" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_CLI_005</td>
+          <td>
+            <span class="badge bg-success-subtle text-success border-success-subtle border mb-1">Client Auth State</span><br>
+            <span class="text-secondary small">Client / Auth Guard</span>
+          </td>
+          <td class="fw-semibold text-dark">Auth Guard tự động chuyển hướng người dùng đã đăng nhập từ /login.html vào /index.html</td>
+          <td class="pre-text small text-muted">Người dùng đã đăng nhập thành công và token còn hạn.</td>
+          <td class="pre-text small">1. Người dùng đang đăng nhập, nhập URL /login.html.
+2. Quan sát phản ứng.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Truy cập /login.html khi đã có token</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống phát hiện phiên làm việc còn hiệu lực, tự động redirect người dùng vào trang ứng dụng chính /index.html.</td>
+          <td><span class="text-success small fw-medium">Tự động redirect vào /index.html, không bắt đăng nhập lại.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử trải nghiệm người dùng liền mạch.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_03_login_happy_path_jwt.svg', 'TC_AUTH_CLI_005: Auth Guard tự động chuyển hướng người dùng đã đăng nhập từ /login.html vào /index.html')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Bảo mật &amp; Ca biên" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_SEC_001</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Bảo mật &amp; Ca biên</span><br>
+            <span class="text-secondary small">Security / BCrypt</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra mã hóa một chiều BCrypt trong CSDL (Không lưu plain-text password)</td>
+          <td class="pre-text small text-muted">Đã có tài khoản đăng ký trong DB.</td>
+          <td class="pre-text small">1. Truy vấn trực tiếp CSDL: SELECT UserID, Username, PasswordHash FROM Users WHERE Username = &#x27;khuyen.hv&#x27;.
+2. Quan sát giá trị trường PasswordHash.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">Query CSDL MySQL</td>
+          <td class="pre-text small text-primary fw-medium">PasswordHash phải là chuỗi băm 60 ký tự bắt đầu bằng &#x27;$2b$10$...&#x27;, hoàn toàn không hiển thị mật khẩu gốc.</td>
+          <td><span class="text-success small fw-medium">PasswordHash lưu dưới dạng hash BCrypt chuẩn ($2b$10$...), an toàn tuyệt đối.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử chuẩn lưu trữ an toàn mật khẩu.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_SEC_001: Kiểm tra mã hóa một chiều BCrypt trong CSDL (Không lưu plain-text password)')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Bảo mật &amp; Ca biên" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_SEC_002</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Bảo mật &amp; Ca biên</span><br>
+            <span class="text-secondary small">Security / SQLi</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra phòng chống tấn công SQL Injection vào trường identifier khi Đăng nhập</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng nhập.</td>
+          <td class="pre-text small">1. Nhập identifier: &quot;&#x27; OR &#x27;1&#x27;=&#x27;1&#x27; -- &quot;.
+2. Nhập mật khẩu bất kỳ.
+3. Bấm Đăng nhập.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">identifier: &quot;&#x27; OR &#x27;1&#x27;=&#x27;1&#x27; -- &quot;</td>
+          <td class="pre-text small text-primary fw-medium">Hệ thống dùng Parameterized Queries (mysql2/knex placeholder &#x27;?&#x27;) xử lý an toàn, coi đây là chuỗi thường và trả về 401 Unauthorized.</td>
+          <td><span class="text-success small fw-medium">HTTP 401 Unauthorized, không xảy ra SQL Injection hay bypass xác thực.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử an toàn trước SQL Injection.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_04_wrong_password_blocked.svg', 'TC_AUTH_SEC_002: Kiểm tra phòng chống tấn công SQL Injection vào trường identifier khi Đăng nhập')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+        <tr data-category="Bảo mật &amp; Ca biên" data-status="Pass" >
+          <td class="tc-id text-nowrap">TC_AUTH_SEC_003</td>
+          <td>
+            <span class="badge bg-danger-subtle text-danger border-danger-subtle border mb-1">Bảo mật &amp; Ca biên</span><br>
+            <span class="text-secondary small">Security / XSS</span>
+          </td>
+          <td class="fw-semibold text-dark">Kiểm tra phòng chống tấn công XSS Injection vào trường Họ và tên khi Đăng ký</td>
+          <td class="pre-text small text-muted">Người dùng đang ở form Đăng ký.</td>
+          <td class="pre-text small">1. Nhập Họ và tên: &#x27;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;&#x27;.
+2. Nhập các trường khác hợp lệ và đăng ký.
+3. Đăng nhập và kiểm tra phần hiển thị tên trên Navbar Header.</td>
+          <td class="pre-text small font-monospace bg-light p-2 rounded">fullName: &#x27;&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;&#x27;</td>
+          <td class="pre-text small text-primary fw-medium">Tên người dùng được render an toàn bằng textContent hoặc HTML escaping, mã JavaScript không được phép thực thi trên trình duyệt.</td>
+          <td><span class="text-success small fw-medium">Render dạng văn bản thuần an toàn, script không bị kích hoạt.</span></td>
+          <td class="text-center"><span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Pass</span></td>
+          <td class="small">Kiểm thử an toàn trước Stored XSS.</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-primary btn-sm px-2 py-1" onclick="viewEvidence('screenshots/auth_jwt/evidence_auth_01_register_success.svg', 'TC_AUTH_SEC_003: Kiểm tra phòng chống tấn công XSS Injection vào trường Họ và tên khi Đăng ký')">
+              <i class="bi bi-image"></i> Xem ảnh
+            </button>
+          </td>
+        </tr>
+        
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVIDENCE MODAL -->
+  <div class="modal fade" id="evidenceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title" id="evidenceTitle">Minh chứng kiểm thử</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center p-3 bg-light">
+          <img id="evidenceImg" src="" alt="Minh chứng" class="img-fluid rounded shadow-sm border" style="max-height: 80vh;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function filterTable() {
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      const statusVal = document.getElementById('statusFilter').value;
+      const rows = document.querySelectorAll('#testTable tbody tr');
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const status = row.getAttribute('data-status');
+        const matchesSearch = text.includes(searchVal);
+        const matchesStatus = (statusVal === 'ALL' || status === statusVal);
+
+        row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+      });
+    }
+
+    function viewEvidence(imgPath, title) {
+      document.getElementById('evidenceTitle').innerText = title;
+      document.getElementById('evidenceImg').src = imgPath;
+      const modal = new bootstrap.Modal(document.getElementById('evidenceModal'));
+      modal.show();
+    }
+  </script>
+</body>
+</html>
