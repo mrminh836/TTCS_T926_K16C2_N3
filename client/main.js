@@ -509,8 +509,8 @@ function renderHome() {
           </a>
 
           <button type="button" class="btn btn-primary btn-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
-            <i class="bi bi-plus-lg"></i>
-            <span>+ Tạo cuộc họp mới</span>
+            <i class="bi bi-plus-lg me-1"></i>
+            <span>Tạo cuộc họp mới</span>
           </button>
         </div>
       </div>
@@ -572,7 +572,7 @@ function renderHome() {
               <h6 class="empty-state-title fw-bold text-slate-800 mb-1">Hiện tại bạn không có cuộc họp nào sắp tới</h6>
               <p class="empty-state-desc text-secondary small mb-3">Lịch làm việc của bạn đang trống. Bạn có thể thư thả làm việc hoặc tạo cuộc họp mới.</p>
               <button type="button" class="btn btn-primary btn-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
-                <i class="bi bi-plus-lg me-1"></i> + Tạo cuộc họp mới
+                <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp mới
               </button>
             </div>
           ` : `
@@ -669,8 +669,8 @@ function renderMeetingsPage() {
           </button>
 
           <button type="button" id="btn-add-meeting" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-lg"></i>
-            <span>+ Tạo cuộc họp</span>
+            <i class="bi bi-plus-lg me-1"></i>
+            <span>Tạo cuộc họp</span>
           </button>
         </div>
       </div>
@@ -794,7 +794,7 @@ function renderMeetingsPage() {
           <h5 class="empty-state-title fw-bold text-slate-800 mb-1" id="empty-state-title">Bạn chưa có cuộc họp nào</h5>
           <p class="empty-state-desc text-secondary small mb-3" id="empty-state-desc">Hãy tạo cuộc họp đầu tiên để bắt đầu phân bổ thời gian và làm việc cùng đồng nghiệp.</p>
           <button type="button" class="btn btn-primary btn-sm px-3 py-2 fw-semibold" onclick="if (typeof openAddModal === 'function') openAddModal()">
-            <i class="bi bi-plus-lg me-1"></i> + Tạo cuộc họp đầu tiên
+            <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp đầu tiên
           </button>
         </div>
 

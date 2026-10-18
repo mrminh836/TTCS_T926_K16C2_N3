@@ -90,7 +90,7 @@
             </button>
 
             <button type="button" class="btn btn-primary stitch-btn-primary btn-sm py-2 px-3 fw-semibold shadow-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
-              <i class="bi bi-plus-lg me-1"></i> + Đặt cuộc họp
+              <i class="bi bi-plus-lg me-1"></i> Đặt cuộc họp
             </button>
           </div>
         </div>
