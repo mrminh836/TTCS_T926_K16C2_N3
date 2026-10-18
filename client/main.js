@@ -670,42 +670,6 @@ function renderMeetingsPage() {
         </div>
       </div>
 
-      <!-- Stats Grid: 3 Thẻ KPI Đồng bộ QLNS_QLTKPM -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-info">
-            <span class="stat-label">Tổng số cuộc họp</span>
-            <span class="stat-value text-dark" id="kpi-total">${totalCount}</span>
-            <span class="stat-meta"><i class="bi bi-calendar-event text-primary"></i> Toàn bộ phiên họp</span>
-          </div>
-          <div class="stat-icon icon-blue">
-            <i class="bi bi-calendar-event"></i>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-info">
-            <span class="stat-label">Sắp diễn ra</span>
-            <span class="stat-value text-primary" id="kpi-scheduled">${scheduledCount}</span>
-            <span class="stat-meta"><i class="bi bi-clock-history text-success"></i> Cần chuẩn bị</span>
-          </div>
-          <div class="stat-icon icon-green">
-            <i class="bi bi-clock-history"></i>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-info">
-            <span class="stat-label">Đang diễn ra</span>
-            <span class="stat-value text-warning" id="kpi-inprogress">${inProgressCount}</span>
-            <span class="stat-meta"><i class="bi bi-broadcast text-warning"></i> Trực tiếp trong phòng</span>
-          </div>
-          <div class="stat-icon icon-orange">
-            <i class="bi bi-broadcast"></i>
-          </div>
-        </div>
-      </div>
-
       <!-- Toolbar Tìm kiếm & Tab Lọc trạng thái trong Card -->
       <div class="card mb-4">
         <div class="card-body p-3">
