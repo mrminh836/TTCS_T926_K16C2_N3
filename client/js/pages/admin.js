@@ -98,19 +98,6 @@
           <h1 class="admin-page-title m-0">${title}</h1>
           <p class="admin-page-subtitle text-secondary small m-0 mt-1">${subtitle}</p>
         </div>
-
-        <div class="d-flex align-items-center gap-2">
-          ${activeTab !== 'dashboard' ? `
-            <a href="#/admin" class="btn btn-outline-secondary btn-sm admin-view-member-btn d-inline-flex align-items-center gap-2">
-              <i class="bi bi-speedometer2"></i>
-              <span>Về Tổng quan</span>
-            </a>
-          ` : ''}
-          <a href="#/meetings" class="btn btn-outline-secondary btn-sm admin-view-member-btn d-inline-flex align-items-center gap-2" title="Chuyển sang xem lịch họp góc nhìn thành viên">
-            <i class="bi bi-box-arrow-up-right"></i>
-            <span>Xem góc nhìn Thành viên</span>
-          </a>
-        </div>
       </div>
     `;
   }

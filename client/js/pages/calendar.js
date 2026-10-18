@@ -83,11 +83,6 @@
                 <i class="bi bi-chevron-right"></i>
               </button>
             </div>
-
-            <!-- Nút tạo cuộc họp -->
-            <button type="button" class="btn btn-primary stitch-btn-submit btn-sm py-2 px-3" id="btn-cal-create-meeting">
-              <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp
-            </button>
           </div>
         </div>
 
@@ -159,13 +154,6 @@
     document.getElementById('btn-current-week')?.addEventListener('click', () => {
       currentWeekOffset = 0;
       renderCalendarPage();
-    });
-
-    // Nút tạo cuộc họp
-    document.getElementById('btn-cal-create-meeting')?.addEventListener('click', () => {
-      if (typeof window.openAddModal === 'function') {
-        window.openAddModal();
-      }
     });
 
     // Nút đặt lịch nhanh vào ngày cụ thể

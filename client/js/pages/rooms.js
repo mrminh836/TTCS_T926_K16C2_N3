@@ -123,18 +123,8 @@
           </div>
 
           <div class="d-flex align-items-center gap-2">
-            ${isAdmin ? `
-              <a href="#/admin/rooms" class="btn btn-outline-danger btn-sm py-2 px-3" title="Chuyển sang màn hình quản lý phòng">
-                <i class="bi bi-shield-lock me-1"></i> Quản trị phòng
-              </a>
-            ` : ''}
-
             <button type="button" class="btn btn-outline-primary btn-sm py-2 px-3 fw-medium" id="btn-toggle-availability">
               <i class="bi bi-search me-1"></i> ${isCheckingAvailability ? 'Đóng kiểm tra phòng trống' : 'Kiểm tra phòng trống'}
-            </button>
-
-            <button type="button" class="btn btn-primary stitch-btn-primary btn-sm py-2 px-3 fw-semibold shadow-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
-              <i class="bi bi-plus-lg me-1"></i> Đặt cuộc họp
             </button>
           </div>
         </div>

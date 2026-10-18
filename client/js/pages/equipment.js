@@ -50,17 +50,6 @@
             </div>
             <p class="text-secondary small m-0">Hạ tầng công nghệ và trang thiết bị hỗ trợ hội nghị trực tuyến & làm việc nhóm</p>
           </div>
-
-          <div class="d-flex align-items-center gap-2">
-            ${isAdmin ? `
-              <a href="#/admin/equipment" class="btn btn-outline-danger btn-sm py-2 px-3">
-                <i class="bi bi-shield-lock me-1"></i> Quản trị thiết bị (Admin)
-              </a>
-            ` : ''}
-            <button type="button" class="btn btn-primary stitch-btn-submit btn-sm py-2 px-3" onclick="if (typeof openAddModal === 'function') openAddModal()">
-              <i class="bi bi-calendar-plus me-1"></i> Đặt lịch mượn thiết bị
-            </button>
-          </div>
         </div>
 
         <!-- Filter Bar -->
