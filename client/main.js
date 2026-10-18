@@ -766,9 +766,6 @@ function renderHome() {
         <div class="card-body p-0">
           ${upcomingMeetings.length === 0 ? `
             <div class="empty-state py-5">
-              <div class="empty-state-icon mx-auto mb-3" style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                <i class="bi bi-calendar-smile"></i>
-              </div>
               <h6 class="empty-state-title fw-bold text-slate-800 mb-1">Hiện tại bạn không có cuộc họp nào sắp tới</h6>
               <p class="empty-state-desc text-secondary small mb-3">Lịch làm việc của bạn đang trống. Bạn có thể thư thả làm việc hoặc tạo cuộc họp mới.</p>
               <button type="button" class="btn btn-primary btn-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
