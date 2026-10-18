@@ -111,25 +111,29 @@ const Report = {
         const summary = summaryRows[0];
 
         // ── 3. Thống kê số cuộc họp theo phòng ──
+        // Xây dựng WHERE clause riêng cho roomStats, đảm bảo luôn có điều kiện r.RoomID IS NOT NULL
+        let roomStatsWhere;
+        if (conditions.length > 0) {
+            roomStatsWhere = ' WHERE ' + conditions.join(' AND ') + ' AND r.RoomID IS NOT NULL';
+        } else {
+            roomStatsWhere = ' WHERE r.RoomID IS NOT NULL';
+        }
+
         const roomStatsQuery = `
             SELECT
                 r.RoomID        AS roomId,
                 r.RoomName      AS roomName,
                 r.Floor         AS floor,
                 COUNT(DISTINCT m.MeetingID) AS meetingCount
-            ${baseQuery}
-            AND r.RoomID IS NOT NULL
+            FROM Meetings m
+            LEFT JOIN Users u ON m.OrganizerID = u.UserID
+            LEFT JOIN Bookings b ON m.MeetingID = b.MeetingID
+            LEFT JOIN Rooms r ON b.RoomID = r.RoomID
+            ${roomStatsWhere}
             GROUP BY r.RoomID, r.RoomName, r.Floor
             ORDER BY meetingCount DESC
         `;
-        // Cần xử lý trường hợp không có WHERE trước AND
-        let roomStatsQueryFinal;
-        if (conditions.length > 0) {
-            roomStatsQueryFinal = roomStatsQuery;
-        } else {
-            roomStatsQueryFinal = roomStatsQuery.replace('AND r.RoomID IS NOT NULL', 'WHERE r.RoomID IS NOT NULL');
-        }
-        const [roomStats] = await db.execute(roomStatsQueryFinal, params);
+        const [roomStats] = await db.execute(roomStatsQuery, params);
 
         // ── 4. Tính toán phân trang ──
         const offset = (page - 1) * limit;
