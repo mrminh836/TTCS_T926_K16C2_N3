@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620">
+  <defs>
+    <filter id="sh_a5" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="900" height="620" rx="10" ry="10" fill="#f8fafc"/>
+  
+    <rect width="900" height="42" fill="#0f172a" rx="10" ry="10"/>
+    <rect y="32" width="900" height="10" fill="#0f172a"/>
+    <circle cx="24" cy="21" r="6" fill="#ef4444"/>
+    <circle cx="44" cy="21" r="6" fill="#f59e0b"/>
+    <circle cx="64" cy="21" r="6" fill="#10b981"/>
+    <text x="450" y="26" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-size="12" font-weight="600" fill="#94a3b8">Xác Thực API Header • GET /api/auth/me với Authorization Bearer Token (HTTP 200 OK)</text>
+    
+
+  <g transform="translate(60, 70)" filter="url(#sh_a5)">
+    <rect width="780" height="500" rx="16" ry="16" fill="#0f172a" stroke="#334155"/>
+
+    <!-- Terminal Header Bar -->
+    <rect width="780" height="45" rx="16" ry="16" fill="#1e293b"/>
+    <rect y="35" width="780" height="10" fill="#1e293b"/>
+    <text x="25" y="28" font-family="monospace" font-size="13" font-weight="700" fill="#38bdf8">API Request &amp; Response Inspector • Protected Endpoint: /api/auth/me</text>
+
+    <!-- Request Block -->
+    <g transform="translate(25, 65)">
+      <rect width="730" height="145" rx="8" ry="8" fill="#020617" stroke="#1e293b"/>
+      <text x="16" y="26" font-family="monospace" font-size="12" font-weight="700" fill="#a7f3d0">1. CLIENT HTTP REQUEST:</text>
+      <text x="16" y="52" font-family="monospace" font-size="12" fill="#38bdf8">GET <tspan fill="#f8fafc">/api/auth/me</tspan> HTTP/1.1</text>
+      <text x="16" y="74" font-family="monospace" font-size="11.5" fill="#facc15">Host: <tspan fill="#e2e8f0">localhost:3000</tspan></text>
+      <text x="16" y="96" font-family="monospace" font-size="11.5" fill="#f43f5e">Authorization: <tspan fill="#cbd5e1">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLC...</tspan></text>
+      <text x="16" y="118" font-family="monospace" font-size="11" fill="#64748b">Accept: application/json • Connection: keep-alive</text>
+      <text x="16" y="134" font-family="sans-serif" font-size="10.5" fill="#10b981">✓ authMiddleware.js xác minh chữ ký thành công (JWT Valid)</text>
+    </g>
+
+    <!-- Response Block -->
+    <g transform="translate(25, 230)">
+      <rect width="730" height="245" rx="8" ry="8" fill="#020617" stroke="#1e293b"/>
+      <text x="16" y="26" font-family="monospace" font-size="12" font-weight="700" fill="#a7f3d0">2. SERVER HTTP RESPONSE (200 OK):</text>
+      <text x="16" y="50" font-family="monospace" font-size="12" fill="#22c55e">HTTP/1.1 200 OK • Content-Type: application/json; charset=utf-8</text>
+
+      <text x="16" y="76" font-family="monospace" font-size="11.5" fill="#e2e8f0">&#123;</text>
+      <text x="32" y="98" font-family="monospace" font-size="11.5" fill="#38bdf8">"success": <tspan fill="#34d399">true</tspan>,</text>
+      <text x="32" y="118" font-family="monospace" font-size="11.5" fill="#38bdf8">"message": <tspan fill="#facc15">"Xác thực tài khoản thành công."</tspan>,</text>
+      <text x="32" y="138" font-family="monospace" font-size="11.5" fill="#38bdf8">"user": &#123;</text>
+      <text x="50" y="158" font-family="monospace" font-size="11.5" fill="#93c5fd">"userId": <tspan fill="#f59e0b">10</tspan>,</text>
+      <text x="50" y="176" font-family="monospace" font-size="11.5" fill="#93c5fd">"username": <tspan fill="#facc15">"khuyen.hv"</tspan>,</text>
+      <text x="50" y="194" font-family="monospace" font-size="11.5" fill="#93c5fd">"email": <tspan fill="#facc15">"khuyen.hv@enterprise.vn"</tspan>,</text>
+      <text x="50" y="212" font-family="monospace" font-size="11.5" fill="#93c5fd">"role": <tspan fill="#a855f7">"Employee"</tspan></text>
+      <text x="32" y="228" font-family="monospace" font-size="11.5" fill="#38bdf8">&#125;</text>
+      <text x="16" y="240" font-family="monospace" font-size="11.5" fill="#e2e8f0">&#125;</text>
+    </g>
+  </g>
+</svg>
