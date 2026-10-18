@@ -8,6 +8,7 @@
     "dev": "node --watch server.js",
     "test": "node --test",
     "test:auth": "node --test test/auth.test.js",
+    "test:rbac": "node --test test/authMiddleware.test.js test/authIntegration.test.js",
     "test:auth-qa": "node ../QA/AutomatedTests/run_auth_tests.js",
     "test:equipment": "node ../QA/AutomatedTests/run_equipment_conflict_tests.js",
     "test:equipment-crud": "node ../QA/AutomatedTests/run_equipment_crud_tests.js",

@@ -9,15 +9,15 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { verifyJWT, authenticateToken } = require('../middleware/authMiddleware');
 
-// 1. Đăng ký tài khoản người dùng
+// 1. Đăng ký tài khoản người dùng (Public)
 router.post('/register', authController.register);
 
-// 2. Đăng nhập nhận JWT Token
+// 2. Đăng nhập nhận JWT Token (Public)
 router.post('/login', authController.login);
 
 // 3. Lấy thông tin tài khoản đang đăng nhập (Yêu cầu Bearer Token)
-router.get('/me', authenticateToken, authController.getProfile);
+router.get('/me', verifyJWT, authController.getProfile);
 
 module.exports = router;

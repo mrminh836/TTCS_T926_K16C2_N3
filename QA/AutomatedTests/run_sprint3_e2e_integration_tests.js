@@ -40,23 +40,37 @@ const parsedUrl = new URL(BASE_URL);
 const HOST = parsedUrl.hostname;
 const PORT = parsedUrl.port || 3000;
 
+const jwtHelper = require('../../server/utils/jwtHelper');
+const defaultAdminToken = jwtHelper.generateToken({
+  userId: 1,
+  username: 'admin',
+  email: 'admin@enterprise.vn',
+  role: 'Admin'
+});
+
 const testResults = [];
 let passedCount = 0;
 let failedCount = 0;
 
 // Helper thực hiện HTTP Request
-function makeRequest(method, endpoint, body = null) {
+function makeRequest(method, endpoint, body = null, token = defaultAdminToken) {
   return new Promise((resolve) => {
     const dataString = body !== null ? JSON.stringify(body) : null;
+    const headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const options = {
       hostname: HOST,
       port: PORT,
       path: endpoint,
       method: method,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
+      headers: headers,
       timeout: 5000
     };
 
