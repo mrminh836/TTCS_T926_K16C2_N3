@@ -687,6 +687,12 @@ function router() {
   updateActiveNav(route);
 }
 
+window.addEventListener("hashchange", router);
+document.addEventListener("DOMContentLoaded", () => {
+  initAppShellEvents();
+  router();
+});
+
 /**
  * Render Bảng thông báo nhỏ Dropdown (SaaS Notification Popover)
  */
