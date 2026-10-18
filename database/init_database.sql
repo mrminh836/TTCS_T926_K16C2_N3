@@ -12,6 +12,7 @@ CREATE TABLE Users (
     Email VARCHAR(100) UNIQUE NOT NULL,
     PasswordHash VARCHAR(255) NOT NULL,
     Role VARCHAR(50) DEFAULT 'USER',
+    Department VARCHAR(100) DEFAULT 'Kỹ thuật',
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE Rooms (
@@ -85,21 +86,21 @@ DELETE FROM Rooms;
 DELETE FROM Users;
 
 -- 1. Danh sách người dùng / nhân viên các phòng ban (Mật khẩu mặc định: Password123)
-INSERT INTO Users (UserID, Username, FullName, Email, PasswordHash, Role) VALUES
-    (1, 'admin', 'Nguyễn Văn Quản Trị', 'admin@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Admin'),
-    (2, 'secretary', 'Trần Thị Thư Ký', 'secretary@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Secretary'),
-    (3, 'manager', 'Lê Văn Trưởng Phòng', 'manager@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Manager'),
-    (4, 'employee', 'Phạm Hoàng Nhân Viên', 'employee@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (5, 'minh.dq', 'Đỗ Quang Minh', 'minh.dq@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Manager'),
-    (6, 'manh.dn', 'Đoàn Ngọc Mạnh', 'manh.dn@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (7, 'manh.dd', 'Đào Đức Mạnh', 'manh.dd@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (8, 'khanh.hm', 'Hoàng Minh Khánh', 'khanh.hm@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (9, 'luong.nm', 'Nguyễn Minh Lượng', 'luong.nm@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (10, 'khuyen.hv', 'Hoàng Văn Khuyến', 'khuyen.hv@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (11, 'khanh.tq', 'Triệu Quốc Khánh', 'khanh.tq@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (12, 'ngan.vt', 'Vũ Thị Thanh Ngân', 'ngan.vt@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (13, 'khai.nd', 'Ngô Đức Khải', 'khai.nd@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee'),
-    (14, 'nguyen.hs', 'Hà Sỹ Nguyên', 'nguyen.hs@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee');
+INSERT INTO Users (UserID, Username, FullName, Email, PasswordHash, Role, Department) VALUES
+    (1, 'admin', 'Nguyễn Văn Quản Trị', 'admin@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Admin', 'Quản trị'),
+    (2, 'secretary', 'Trần Thị Thư Ký', 'secretary@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Secretary', 'Hành chính'),
+    (3, 'manager', 'Lê Văn Trưởng Phòng', 'manager@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Manager', 'Kỹ thuật'),
+    (4, 'employee', 'Phạm Hoàng Nhân Viên', 'employee@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kỹ thuật'),
+    (5, 'minh.dq', 'Đỗ Quang Minh', 'minh.dq@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Manager', 'Quản trị'),
+    (6, 'manh.dn', 'Đoàn Ngọc Mạnh', 'manh.dn@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kỹ thuật'),
+    (7, 'manh.dd', 'Đào Đức Mạnh', 'manh.dd@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kỹ thuật'),
+    (8, 'khanh.hm', 'Hoàng Minh Khánh', 'khanh.hm@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kỹ thuật'),
+    (9, 'luong.nm', 'Nguyễn Minh Lượng', 'luong.nm@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kỹ thuật'),
+    (10, 'khuyen.hv', 'Hoàng Văn Khuyến', 'khuyen.hv@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kiểm thử'),
+    (11, 'khanh.tq', 'Triệu Quốc Khánh', 'khanh.tq@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kiểm thử'),
+    (12, 'ngan.vt', 'Vũ Thị Thanh Ngân', 'ngan.vt@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Thiết kế'),
+    (13, 'khai.nd', 'Ngô Đức Khải', 'khai.nd@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kiểm thử'),
+    (14, 'nguyen.hs', 'Hà Sỹ Nguyên', 'nguyen.hs@enterprise.vn', '$2b$10$9Vx3g97.Yj135dHeRacwN.x3hOC72c8fYKATQCrzxsXwL2pSyg0lS', 'Employee', 'Kỹ thuật');
 
 -- 2. Danh mục phòng họp chuẩn doanh nghiệp công nghệ tại Việt Nam
 INSERT INTO Rooms (RoomID, RoomCode, RoomName, Capacity, Type, Floor, Status, QRCode, Description) VALUES
