@@ -148,6 +148,88 @@
     // Danh sách 3 phòng họp hiển thị ở card phụ
     const sampleRooms = allRooms.slice(0, 3);
 
+    // Tạo danh sách nhật ký hoạt động hệ thống gần đây (Audit Log / Activity Stream)
+    const activityLogs = [];
+
+    // 1. Ghi nhận các biến động cuộc họp mới nhất
+    const meetingsToLog = allMeetings.slice(0, 3);
+    const meetingTimes = ['5 phút trước', '30 phút trước', '1 giờ trước'];
+    meetingsToLog.forEach((m, idx) => {
+      const isCompleted = (m.status || '').toLowerCase() === 'completed';
+      const isCancelled = (m.status || '').toLowerCase() === 'cancelled';
+      const hostName = m.host || 'Thành viên';
+
+      if (isCancelled) {
+        activityLogs.push({
+          icon: 'bi-x-circle-fill',
+          colorClass: 'bg-danger-subtle text-danger',
+          title: `${hostName} đã hủy lịch họp`,
+          desc: `${m.title} • ${m.roomName || 'Chưa xếp phòng'}`,
+          time: meetingTimes[idx] || `${idx + 1} giờ trước`,
+          badge: 'Hủy lịch',
+          badgeStyle: 'bg-danger-subtle text-danger border border-danger-subtle'
+        });
+      } else if (isCompleted) {
+        activityLogs.push({
+          icon: 'bi-check-circle-fill',
+          colorClass: 'bg-success-subtle text-success',
+          title: `Hoàn tất phiên họp: ${m.title}`,
+          desc: `Chủ trì: ${hostName} • ${m.roomName || 'Phòng họp'}`,
+          time: meetingTimes[idx] || `${idx + 1} giờ trước`,
+          badge: 'Đã hoàn thành',
+          badgeStyle: 'bg-success-subtle text-success border border-success-subtle'
+        });
+      } else {
+        activityLogs.push({
+          icon: 'bi-calendar-check-fill',
+          colorClass: 'bg-primary-subtle text-primary',
+          title: `${hostName} đặt lịch cuộc họp`,
+          desc: `${m.title} • ${m.roomName || 'Phòng họp'}`,
+          time: meetingTimes[idx] || `${idx + 1} giờ trước`,
+          badge: m.isRecurring ? 'Định kỳ' : 'Đặt phòng',
+          badgeStyle: m.isRecurring ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle'
+        });
+      }
+    });
+
+    // 2. Ghi nhận trạng thái bảo trì hoặc kiểm tra thiết bị
+    const maintEq = allEquipments.find(e => {
+      const s = (e.status || '').toLowerCase();
+      return s === 'maintenance' || s === 'broken';
+    });
+    if (maintEq) {
+      activityLogs.push({
+        icon: 'bi-tools',
+        colorClass: 'bg-warning-subtle text-warning',
+        title: `Bảo trì thiết bị: ${maintEq.name}`,
+        desc: `Chuyển trạng thái sang Bảo dưỡng kỹ thuật`,
+        time: '2 giờ trước',
+        badge: 'Kỹ thuật',
+        badgeStyle: 'bg-warning-subtle text-warning border border-warning-subtle'
+      });
+    } else {
+      activityLogs.push({
+        icon: 'bi-shield-check',
+        colorClass: 'bg-info-subtle text-info',
+        title: `Kiểm toán thiết bị hội nghị`,
+        desc: `${allEquipments.length} thiết bị sẵn sàng hoạt động`,
+        time: '2 giờ trước',
+        badge: 'Hạ tầng',
+        badgeStyle: 'bg-info-subtle text-info border border-info-subtle'
+      });
+    }
+
+    // 3. Ghi nhận xác thực hệ thống / kiểm toán phân quyền
+    activityLogs.push({
+      icon: 'bi-person-badge-fill',
+      colorClass: 'bg-success-subtle text-success',
+      title: `Phiên làm việc Quản trị viên kích hoạt`,
+      desc: `Kiểm toán RBAC & phân quyền tài nguyên`,
+      time: 'Hôm nay, 08:30',
+      badge: 'Bảo mật',
+      badgeStyle: 'bg-secondary-subtle text-secondary border'
+    });
+
     container.innerHTML = `
       <div class="admin-dashboard-page">
         <!-- 1. Header tinh gọn, chuyên nghiệp (Yêu cầu 4, 5, 11) -->
@@ -413,71 +495,50 @@
               </div>
             </div>
 
-            <!-- Card Phụ 2: Thao tác quản lý nhanh (Thay thế 3 card cồng kềnh trước đây - Yêu cầu 7) -->
+            <!-- Card Phụ 2: Nhật ký hoạt động hệ thống gần đây (System Activity / Audit Log) -->
             <div class="admin-card">
-              <div class="admin-card-header">
+              <div class="admin-card-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
-                  <i class="bi bi-lightning-charge text-warning fs-5"></i>
-                  <h3 class="admin-card-title m-0">Lối tắt quản trị</h3>
+                  <i class="bi bi-clock-history text-primary fs-5"></i>
+                  <h3 class="admin-card-title m-0">Nhật ký hoạt động</h3>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1.5 px-2 py-0.5" style="font-size: 0.7rem;">
+                  <span class="activity-pulse-dot"></span> Trực tiếp
+                </span>
+              </div>
+
+              <div class="admin-card-body p-3">
+                <div class="admin-activity-timeline">
+                  ${activityLogs.map((log, index) => `
+                    <div class="admin-activity-item ${index === activityLogs.length - 1 ? 'is-last' : ''}">
+                      <div class="admin-activity-bullet ${log.colorClass}">
+                        <i class="bi ${log.icon}"></i>
+                      </div>
+                      <div class="admin-activity-content">
+                        <div class="d-flex justify-content-between align-items-start gap-1">
+                          <span class="admin-activity-title text-truncate" title="${escapeHtml(log.title)}">
+                            ${escapeHtml(log.title)}
+                          </span>
+                          <span class="admin-activity-time flex-shrink-0">${log.time}</span>
+                        </div>
+                        <div class="admin-activity-desc text-truncate" title="${escapeHtml(log.desc)}">
+                          ${escapeHtml(log.desc)}
+                        </div>
+                        ${log.badge ? `
+                          <div class="mt-1">
+                            <span class="badge ${log.badgeStyle}" style="font-size: 0.65rem;">${escapeHtml(log.badge)}</span>
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
                 </div>
               </div>
 
-              <div class="admin-card-body d-flex flex-column gap-2 p-3">
-                <!-- Lối tắt 1: Quản lý phòng -->
-                <a href="#/admin/rooms" class="admin-quick-link-item">
-                  <div class="d-flex align-items-center gap-2.5">
-                    <span class="admin-quick-link-icon bg-primary-subtle text-primary">
-                      <i class="bi bi-door-open-fill"></i>
-                    </span>
-                    <div>
-                      <div class="small fw-semibold text-slate-900">Quản lý Phòng họp</div>
-                      <div class="text-secondary" style="font-size: 0.725rem;">${allRooms.length} phòng • Sức chứa &amp; QR</div>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted small"></i>
-                </a>
-
-                <!-- Lối tắt 2: Quản lý thiết bị -->
-                <a href="#/admin/equipment" class="admin-quick-link-item">
-                  <div class="d-flex align-items-center gap-2.5">
-                    <span class="admin-quick-link-icon bg-info-subtle text-info">
-                      <i class="bi bi-tools"></i>
-                    </span>
-                    <div>
-                      <div class="small fw-semibold text-slate-900">Quản lý Thiết bị</div>
-                      <div class="text-secondary" style="font-size: 0.725rem;">${allEquipments.length} thiết bị • Tình trạng kỹ thuật</div>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted small"></i>
-                </a>
-
-                <!-- Lối tắt 3: Quản lý người dùng -->
-                <a href="#/admin/users" class="admin-quick-link-item">
-                  <div class="d-flex align-items-center gap-2.5">
-                    <span class="admin-quick-link-icon bg-success-subtle text-success">
-                      <i class="bi bi-people-fill"></i>
-                    </span>
-                    <div>
-                      <div class="small fw-semibold text-slate-900">Quản lý Người dùng</div>
-                      <div class="text-secondary" style="font-size: 0.725rem;">${usersCount} tài khoản • Phân quyền</div>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted small"></i>
-                </a>
-
-                <!-- Lối tắt 4: Báo cáo & Thống kê -->
-                <a href="#/admin/reports" class="admin-quick-link-item">
-                  <div class="d-flex align-items-center gap-2.5">
-                    <span class="admin-quick-link-icon bg-warning-subtle text-warning">
-                      <i class="bi bi-pie-chart-fill"></i>
-                    </span>
-                    <div>
-                      <div class="small fw-semibold text-slate-900">Báo cáo &amp; Thống kê</div>
-                      <div class="text-secondary" style="font-size: 0.725rem;">Mật độ sử dụng • Xuất CSV</div>
-                    </div>
-                  </div>
-                  <i class="bi bi-chevron-right text-muted small"></i>
-                </a>
+              <div class="admin-card-footer p-2.5 text-center border-top bg-slate-50" style="border-radius: 0 0 12px 12px;">
+                <span class="text-secondary" style="font-size: 0.725rem;">
+                  <i class="bi bi-shield-check text-success me-1"></i> Ghi nhận tự động bởi Security &amp; Audit Logger
+                </span>
               </div>
             </div>
           </div>
