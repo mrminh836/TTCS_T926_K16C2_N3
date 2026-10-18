@@ -198,8 +198,8 @@
           ${weekDays.map(day => `
             <div class="calendar-day-column ${day.isToday ? 'today' : ''}">
               <div class="calendar-day-header ${day.isToday ? 'today' : ''}">
-                <span class="day-name">${day.dayName}</span>
-                <span class="day-date ${day.isToday ? 'badge bg-primary text-white' : ''}">${day.displayDate}</span>
+                <span class="day-name">${day.dayName}${day.isToday ? ' <span class="badge bg-primary text-white ms-1" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 999px;">Hôm nay</span>' : ''}</span>
+                <span class="day-date ${day.isToday ? 'badge bg-primary text-white shadow-sm' : ''}">${day.displayDate}</span>
               </div>
               <div class="calendar-events-container d-flex flex-column justify-content-center align-items-center py-4 text-muted">
                 <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
@@ -317,8 +317,8 @@
       return `
         <div class="calendar-day-column ${day.isToday ? 'today' : ''}">
           <div class="calendar-day-header ${day.isToday ? 'today' : ''}">
-            <span class="day-name">${day.dayName}</span>
-            <span class="day-date ${day.isToday ? 'badge bg-primary text-white' : ''}">${day.displayDate}</span>
+            <span class="day-name">${day.dayName}${day.isToday ? ' <span class="badge bg-primary text-white ms-1" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 999px;">Hôm nay</span>' : ''}</span>
+            <span class="day-date ${day.isToday ? 'badge bg-primary text-white shadow-sm' : ''}">${day.displayDate}</span>
           </div>
 
           <div class="calendar-events-container">

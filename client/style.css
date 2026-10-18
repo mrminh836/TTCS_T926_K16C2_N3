@@ -8034,9 +8034,51 @@ textarea.form-control {
 }
 
 .calendar-day-column.today {
-  border-color: #93c5fd;
-  background: #f8fafc;
-  box-shadow: 0 0 0 1px #3b82f6;
+  border: 2px solid #2563eb !important;
+  border-top: 4px solid #1d4ed8 !important;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 160px) !important;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.18), 0 0 0 1px rgba(37, 99, 235, 0.1) !important;
+  position: relative;
+}
+
+.calendar-day-column.today:hover {
+  box-shadow: 0 14px 28px -4px rgba(37, 99, 235, 0.25), 0 0 0 1px rgba(37, 99, 235, 0.2) !important;
+  border-color: #1d4ed8 !important;
+}
+
+.calendar-day-header.today {
+  border-bottom: 1px solid #bfdbfe;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.calendar-day-header.today .day-name {
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.calendar-day-column.today .calendar-empty-slot {
+  background: rgba(239, 246, 255, 0.7);
+  border: 1px dashed #93c5fd;
+}
+
+.calendar-day-column.today .calendar-empty-slot span {
+  color: #2563eb !important;
+  font-weight: 500;
+}
+
+.calendar-day-column.today .btn-add-day-slot {
+  background: #ffffff;
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.calendar-day-column.today .btn-add-day-slot:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
 .calendar-day-header {
