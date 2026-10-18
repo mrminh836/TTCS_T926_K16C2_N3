@@ -1703,6 +1703,11 @@ function renderAdminRoomsTable() {
             <div>
               <div class="room-name-text" onclick="openRoomQRModal(${room.id})" title="Nhấp để xem chi tiết phòng">
                 ${escapeHTML(room.name)}
+                ${(typeof isRestrictedRoom === "function" && isRestrictedRoom(room)) ? `
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1 px-1.5 py-0.5 rounded fw-semibold" style="font-size: 0.68rem;" title="Phòng VIP / Giới hạn quyền đặt">
+                    <i class="bi bi-shield-lock-fill"></i> VIP
+                  </span>
+                ` : ''}
               </div>
               <div class="room-location-text">
                 <i class="bi bi-geo-alt"></i>
@@ -1775,6 +1780,10 @@ function renderAdminRoomsTable() {
       </tr>
     `;
   }).join("");
+
+  if (typeof applyRoleUI === "function") {
+    applyRoleUI();
+  }
 }
 
 function updateRoomStatusTabs() {
@@ -2760,6 +2769,10 @@ function renderAdminEquipmentsTable() {
       </tr>
     `;
   }).join("");
+
+  if (typeof applyRoleUI === "function") {
+    applyRoleUI();
+  }
 }
 
 function setupAdminEquipmentEvents() {
@@ -3636,6 +3649,24 @@ function validateMeetingForm(editId = null) {
     }
     if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
     if (!firstErrorField) firstErrorField = roomSelect;
+  }
+
+  // 4b. Kiểm tra quyền đặt phòng giới hạn / VIP (RBAC Restricted Room)
+  if (roomObj && typeof isRestrictedRoom === "function" && isRestrictedRoom(roomObj)) {
+    if (typeof can === "function" && !can("book_restricted_room")) {
+      isValid = false;
+      const restrictedMsg = `Phòng "${roomObj.name}" là phòng VIP / Giới hạn dành riêng cho Ban Giám Đốc. Tài khoản của bạn không có quyền đặt phòng này.`;
+      if (roomError) {
+        roomError.textContent = restrictedMsg;
+        roomError.classList.remove("hidden");
+      }
+      if (roomConflictAlert && roomConflictText) {
+        roomConflictText.innerHTML = `<i class="bi bi-shield-lock-fill text-danger me-1"></i> ${escapeHTML(restrictedMsg)}`;
+        roomConflictAlert.classList.remove("hidden");
+      }
+      if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+      if (!firstErrorField) firstErrorField = roomSelect;
+    }
   }
 
   // 5. Kiểm tra trùng lịch phòng phía Client (Conflict Pre-check)
@@ -5120,6 +5151,10 @@ function renderRealtimeRoomCards(editId = null) {
   container.innerHTML = filtered.map(room => {
     const isSelected = room.id === selectedRoomId;
     const isRecommended = recommendation && recommendation.room && recommendation.room.id === room.id;
+    const isRestricted = typeof isRestrictedRoom === "function" ? isRestrictedRoom(room) : false;
+    const canBookVIP = typeof can === "function" ? can("book_restricted_room") : true;
+    const isLockedVIP = isRestricted && !canBookVIP;
+
     let cardStatusClass = "status-available";
     let statusBadgeHtml = `
       <div class="room-card-status-bar">
@@ -5128,7 +5163,15 @@ function renderRealtimeRoomCards(editId = null) {
       </div>
     `;
 
-    if (room.isMaintenance) {
+    if (isLockedVIP) {
+      cardStatusClass = "status-busy rbac-room-locked";
+      statusBadgeHtml = `
+        <div class="room-card-status-bar" title="Phòng VIP giới hạn quyền đặt cho Quản trị viên & Tổ chức">
+          <span><i class="bi bi-shield-lock-fill me-1 text-danger"></i> Phòng VIP giới hạn</span>
+          <span class="text-danger fw-semibold">Đã khóa</span>
+        </div>
+      `;
+    } else if (room.isMaintenance) {
       cardStatusClass = "status-maintenance";
       statusBadgeHtml = `
         <div class="room-card-status-bar">
@@ -5154,6 +5197,12 @@ function renderRealtimeRoomCards(editId = null) {
       </div>
     ` : "";
 
+    const vipBadgeHtml = isRestricted ? `
+      <span class="rbac-restricted-badge ${isLockedVIP ? 'is-locked' : 'is-vip'}" title="${isLockedVIP ? 'Phòng VIP giới hạn - Tài khoản của bạn không có quyền đặt' : 'Phòng VIP / Giới hạn quyền đặt'}">
+        <i class="bi bi-shield-lock-fill"></i> ${isLockedVIP ? 'VIP • Đã khóa' : 'Phòng VIP'}
+      </span>
+    ` : "";
+
     return `
       <div
         class="realtime-room-card ${cardStatusClass} ${isSelected ? 'is-selected' : ''} ${isRecommended ? 'is-recommended' : ''}"
@@ -5167,7 +5216,10 @@ function renderRealtimeRoomCards(editId = null) {
         ${recommendBadgeHtml}
         <div class="room-card-top">
           <div>
-            <div class="room-card-name">${escapeHTML(room.name)}</div>
+            <div class="d-flex align-items-center gap-1.5 flex-wrap">
+              <div class="room-card-name">${escapeHTML(room.name)}</div>
+              ${vipBadgeHtml}
+            </div>
             <div class="d-flex align-items-center gap-1 mt-0.5">
               <span class="room-card-code">${escapeHTML(room.code || `RM-00${room.id}`)}</span>
               <span class="text-muted" style="font-size: 0.7rem;">• ${escapeHTML(room.type || 'Phòng họp')}</span>
@@ -5200,6 +5252,22 @@ function renderRealtimeRoomCards(editId = null) {
 function selectRealtimeRoom(roomId) {
   const room = ROOMS.find(r => r.id === roomId);
   if (!room) return;
+
+  // RBAC: Chặn chọn phòng VIP / Giới hạn nếu không đủ quyền
+  if (typeof isRestrictedRoom === "function" && isRestrictedRoom(room)) {
+    if (typeof can === "function" && !can("book_restricted_room")) {
+      const roomConflictAlert = document.getElementById("room-conflict-alert");
+      const roomConflictText = document.getElementById("room-conflict-text");
+      if (roomConflictAlert && roomConflictText) {
+        roomConflictText.innerHTML = `<i class="bi bi-shield-lock-fill text-danger me-1"></i> Phòng <strong>${escapeHTML(room.name)}</strong> là phòng VIP giới hạn dành riêng cho Ban Giám Đốc. Tài khoản của bạn không có quyền đặt phòng này.`;
+        roomConflictAlert.classList.remove("hidden");
+      }
+      if (typeof window.showToast === "function") {
+        window.showToast(`Phòng "${room.name}" là phòng VIP giới hạn. Bạn không có quyền đặt phòng này.`, "error");
+      }
+      return;
+    }
+  }
 
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
@@ -6434,22 +6502,45 @@ function syncMeetingRoomOptions() {
       const roomHint = document.getElementById("room-capacity-hint");
       if (roomHint) roomHint.textContent = "Không còn phòng trống";
     } else {
+      const canBookVIP = typeof can === "function" ? can("book_restricted_room") : true;
+
       roomSelect.innerHTML = `
         <option value="">-- Chọn phòng họp (${roomsToShow.length} phòng khả dụng) --</option>
-        ${roomsToShow.map(r => `
-          <option value="${r.id}">
-            ${escapeHTML(r.name)} (${r.capacity} chỗ - ${escapeHTML(r.floor || 'Tầng 1')})
-          </option>
-        `).join("")}
+        ${roomsToShow.map(r => {
+          const isRestricted = typeof isRestrictedRoom === "function" && isRestrictedRoom(r);
+          const isLocked = isRestricted && !canBookVIP;
+          const prefix = isLocked ? "[VIP - Khóa] " : (isRestricted ? "[VIP] " : "");
+          const suffix = isLocked ? " - Chỉ dành cho Ban Giám Đốc" : "";
+          const disabledAttr = isLocked ? "disabled" : "";
+          return `
+            <option value="${r.id}" ${disabledAttr} ${isLocked ? 'data-rbac-locked="true"' : ''}>
+              ${prefix}${escapeHTML(r.name)} (${r.capacity} chỗ - ${escapeHTML(r.floor || 'Tầng 1')}${suffix})
+            </option>
+          `;
+        }).join("")}
       `;
 
+      // Chọn phòng đầu tiên khả dụng và không bị khóa bởi RBAC
+      const availableRoomsForUser = roomsToShow.filter(r => {
+        if (typeof isRestrictedRoom === "function" && isRestrictedRoom(r)) {
+          return canBookVIP;
+        }
+        return true;
+      });
+
       if (currentVal && roomsToShow.some(r => r.id === parseInt(currentVal, 10))) {
-        roomSelect.value = currentVal;
-      } else if (roomsToShow.length > 0) {
-        roomSelect.value = String(roomsToShow[0].id);
+        const curRoomObj = roomsToShow.find(r => r.id === parseInt(currentVal, 10));
+        const curLocked = curRoomObj && typeof isRestrictedRoom === "function" && isRestrictedRoom(curRoomObj) && !canBookVIP;
+        if (!curLocked) {
+          roomSelect.value = currentVal;
+        } else if (availableRoomsForUser.length > 0) {
+          roomSelect.value = String(availableRoomsForUser[0].id);
+        }
+      } else if (availableRoomsForUser.length > 0) {
+        roomSelect.value = String(availableRoomsForUser[0].id);
         const roomHint = document.getElementById("room-capacity-hint");
         if (roomHint) {
-          roomHint.textContent = `Sức chứa: ${roomsToShow[0].capacity} chỗ • ${roomsToShow[0].floor || 'Tầng 1'}`;
+          roomHint.textContent = `Sức chứa: ${availableRoomsForUser[0].capacity} chỗ • ${availableRoomsForUser[0].floor || 'Tầng 1'}`;
         }
       }
     }
@@ -6830,19 +6921,35 @@ function renderMeetingTable() {
             <i class="bi bi-eye me-1"></i>Chi tiết
           </button>
 
-          <button type="button" class="btn btn-light btn-sm py-1 px-2 text-secondary" data-action="edit" data-id="${meeting.id}" title="Chỉnh sửa cuộc họp">
-            <i class="bi bi-pencil"></i>
-          </button>
+          ${(typeof canEditMeeting === "function" ? canEditMeeting(meeting) : true) ? `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-secondary" data-action="edit" data-id="${meeting.id}" title="Chỉnh sửa cuộc họp">
+              <i class="bi bi-pencil"></i>
+            </button>
+          ` : `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-muted" disabled style="opacity: 0.45; cursor: not-allowed;" title="Chỉ người tổ chức hoặc Quản trị viên mới được sửa cuộc họp này">
+              <i class="bi bi-lock-fill"></i>
+            </button>
+          `}
 
-          <button type="button" class="btn btn-light btn-sm py-1 px-2 text-danger" data-action="delete" data-id="${meeting.id}" title="Hủy cuộc họp này">
-            <i class="bi bi-trash3"></i>
-          </button>
+          ${(typeof canCancelMeeting === "function" ? canCancelMeeting(meeting) : true) ? `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-danger" data-action="delete" data-id="${meeting.id}" title="Hủy cuộc họp này">
+              <i class="bi bi-trash3"></i>
+            </button>
+          ` : `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-muted" disabled style="opacity: 0.45; cursor: not-allowed;" title="Chỉ người tổ chức hoặc Quản trị viên mới được hủy cuộc họp này">
+              <i class="bi bi-trash3 text-muted"></i>
+            </button>
+          `}
         </div>
       </td>
     `;
 
     list.appendChild(row);
   });
+
+  if (typeof applyRoleUI === "function") {
+    applyRoleUI();
+  }
 }
 
 
@@ -6902,6 +7009,16 @@ function openAddModal(initialEquipmentIds = []) {
     MeetingAPI.checkHealth();
   }
 
+  // RBAC: Chặn nếu người dùng không có quyền tạo cuộc họp
+  if (typeof can === 'function' && !can('book_meeting')) {
+    if (typeof window.showToast === 'function') {
+      window.showToast('Tài khoản của bạn không có quyền đặt cuộc họp mới.', 'error');
+    } else {
+      alert('Tài khoản của bạn không có quyền đặt cuộc họp mới.');
+    }
+    return;
+  }
+
   const preselectedEqIds = Array.isArray(initialEquipmentIds)
     ? initialEquipmentIds.map(Number).filter(id => !isNaN(id) && id > 0)
     : (initialEquipmentIds ? [Number(initialEquipmentIds)].filter(id => !isNaN(id) && id > 0) : []);
@@ -6943,7 +7060,7 @@ function openAddModal(initialEquipmentIds = []) {
 
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
-    const firstActiveRoom = ROOMS.find(r => r.status === "Active") || ROOMS[0];
+    const firstActiveRoom = ROOMS.find(r => r.status === "Active" && (typeof can !== "function" || can("book_restricted_room") || !isRestrictedRoom(r))) || ROOMS[0];
     roomSelect.value = firstActiveRoom ? String(firstActiveRoom.id) : "1";
     const roomHint = document.getElementById("room-capacity-hint");
     if (roomHint && firstActiveRoom) {
@@ -6952,8 +7069,15 @@ function openAddModal(initialEquipmentIds = []) {
   }
 
   const organizerSelect = document.getElementById("meeting-organizer");
-  if (organizerSelect) organizerSelect.value = "1";
-  const defaultOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
+  const currentUserId = currentUser ? (currentUser.id || currentUser.userId || 1) : 1;
+  if (organizerSelect) {
+    organizerSelect.value = String(currentUserId);
+    if (!organizerSelect.value && organizerSelect.options.length > 0) {
+      organizerSelect.selectedIndex = 0;
+    }
+  }
+  const defaultOrgId = Number(organizerSelect && organizerSelect.value ? organizerSelect.value : currentUserId);
   initParticipantSelector([defaultOrgId], defaultOrgId);
 
   const tagInput = document.getElementById("meeting-tag");
@@ -7018,6 +7142,9 @@ function openAddModal(initialEquipmentIds = []) {
   updateEquipmentCardsAvailability(null);
 
   modalOverlay.classList.remove("hidden");
+  if (typeof applyMeetingModalRBAC === "function") {
+    applyMeetingModalRBAC();
+  }
   if (titleInput) {
     setTimeout(() => titleInput.focus(), 100);
   }
@@ -7037,6 +7164,16 @@ function openEditModal(id) {
 
   if (!meeting) {
     alert("Không tìm thấy cuộc họp.");
+    return;
+  }
+
+  // RBAC: Kiểm tra quyền chỉnh sửa cuộc họp (Admin hoặc chính Organizer)
+  if (typeof canEditMeeting === "function" && !canEditMeeting(meeting)) {
+    if (typeof window.showToast === "function") {
+      window.showToast("Bạn không có quyền chỉnh sửa cuộc họp này.", "error");
+    } else {
+      alert("Bạn không có quyền chỉnh sửa cuộc họp này.");
+    }
     return;
   }
 
@@ -7156,6 +7293,9 @@ function openEditModal(id) {
   renderRealtimeRoomCards(meeting.id);
 
   modalOverlay.classList.remove("hidden");
+  if (typeof applyMeetingModalRBAC === "function") {
+    applyMeetingModalRBAC();
+  }
   if (titleInput) {
     setTimeout(() => titleInput.focus(), 100);
   }
@@ -7582,6 +7722,16 @@ function showConfirmDialog({ title, desc, cancelText = 'Giữ cuộc họp', con
 function confirmCancelMeeting(id) {
   const meeting = meetings.find(item => item.id === id);
   if (!meeting) return;
+
+  // RBAC: Kiểm tra quyền hủy / xóa cuộc họp (Admin hoặc chính Organizer)
+  if (typeof canCancelMeeting === "function" && !canCancelMeeting(meeting)) {
+    if (typeof window.showToast === "function") {
+      window.showToast("Bạn không có quyền hủy hoặc xóa cuộc họp này.", "error");
+    } else {
+      alert("Bạn không có quyền hủy hoặc xóa cuộc họp này.");
+    }
+    return;
+  }
 
   showConfirmDialog({
     title: 'Hủy cuộc họp này?',
