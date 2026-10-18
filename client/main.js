@@ -8229,8 +8229,15 @@ function openDetailModal(id) {
 
   const actionsEl = document.getElementById("detail-permission-actions");
   if (actionsEl) {
+    const exportIcsBtn = `
+      <a href="/api/meetings/${meeting.id}/export-ics" class="btn btn-outline-success btn-sm stitch-detail-action-btn" download title="Xuất tệp iCalendar (.ics) đồng bộ Google Calendar & Outlook">
+        <i class="bi bi-calendar2-plus me-1"></i> Xuất Lịch (.ics)
+      </a>
+    `;
+
     if (canModify) {
       actionsEl.innerHTML = `
+        ${exportIcsBtn}
         <button type="button" class="btn btn-outline-primary btn-sm stitch-detail-action-btn" onclick="closeDetailModal(); openEditModal(${meeting.id});">
           <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
         </button>
@@ -8239,7 +8246,7 @@ function openDetailModal(id) {
         </button>
       `;
     } else {
-      actionsEl.innerHTML = '';
+      actionsEl.innerHTML = exportIcsBtn;
     }
   }
 
