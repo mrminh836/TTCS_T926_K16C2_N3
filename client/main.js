@@ -498,8 +498,8 @@ function renderHome() {
             <span class="breadcrumb-separator">/</span>
             <span class="breadcrumb-item active">Tổng quan</span>
           </nav>
-          <h1 class="page-header-title">Xin chào, ${escapeHTML(userName)}! 👋</h1>
-          <p class="page-header-subtitle">Tổng quan lịch làm việc và các cuộc họp sắp diễn ra của bạn</p>
+          <h1 class="page-header-title">Tổng quan lịch họp</h1>
+          <p class="page-header-subtitle">Theo dõi lịch làm việc và các cuộc họp sắp diễn ra</p>
         </div>
 
         <div class="page-header-actions">
