@@ -1052,8 +1052,8 @@ function renderFinderRoomCards() {
   }).join("");
 }
 
-function openAddModalWithSelection(roomId = null, date = null, start = null, end = null) {
-  openAddModal();
+function openAddModalWithSelection(roomId = null, date = null, start = null, end = null, equipmentIds = null) {
+  openAddModal(equipmentIds || []);
   if (roomId) {
     const roomSelect = document.getElementById("meeting-room");
     if (roomSelect) {
@@ -1085,6 +1085,58 @@ function openAddModalWithSelection(roomId = null, date = null, start = null, end
   const idInput = document.getElementById("meeting-id");
   const editId = idInput && idInput.value ? Number(idInput.value) : null;
   renderRealtimeRoomCards(editId);
+}
+
+function openAddModalWithEquipment(equipmentId, roomId = null) {
+  const eqId = Number(equipmentId);
+  const eq = (Array.isArray(EQUIPMENTS) ? EQUIPMENTS : []).find(e => Number(e.id || e.equipmentId) === eqId);
+
+  // Tìm phòng họp có sẵn thiết bị này (nếu có)
+  let targetRoomId = roomId;
+  if (!targetRoomId && eq) {
+    const allRooms = Array.isArray(ROOMS) ? ROOMS : [];
+    const equippedRoom = allRooms.find(r => (r.equipmentNames || []).includes(eq.name) && r.status === "Active");
+    if (equippedRoom) {
+      targetRoomId = equippedRoom.id;
+    }
+  }
+
+  // Mở modal tạo cuộc họp và tick chọn sẵn thiết bị
+  openAddModal([eqId]);
+
+  // Nếu xác định được phòng có thiết bị -> chọn phòng
+  if (targetRoomId) {
+    const roomSelect = document.getElementById("meeting-room");
+    if (roomSelect) {
+      roomSelect.value = String(targetRoomId);
+      roomSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    const idInput = document.getElementById("meeting-id");
+    const editId = idInput && idInput.value ? Number(idInput.value) : null;
+    renderRealtimeRoomCards(editId);
+  }
+
+  // Tự động mở rộng phần "Tùy chọn nâng cao" để hiển thị rõ danh sách thiết bị
+  const advancedDetails = document.getElementById("section-advanced");
+  if (advancedDetails) {
+    advancedDetails.open = true;
+  }
+
+  // Scroll và tạo hiệu ứng highlight thẻ thiết bị vừa chọn
+  setTimeout(() => {
+    const eqCard = document.getElementById(`eq-card-${eqId}`);
+    if (eqCard) {
+      eqCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      eqCard.classList.add("eq-card-highlighted");
+      setTimeout(() => eqCard.classList.remove("eq-card-highlighted"), 2500);
+    }
+  }, 150);
+
+  // Hiển thị thông báo Toast
+  const eqName = eq ? eq.name : `Thiết bị #${eqId}`;
+  if (typeof window.showToast === "function") {
+    window.showToast(`Đã tự động chọn "${eqName}" cho cuộc họp!`, "success");
+  }
 }
 
 // =====================================================
@@ -6845,10 +6897,14 @@ function handleMeetingAction(event) {
 // 10. THÊM CUỘC HỌP (STITCH FORM SPEC)
 // =====================================================
 
-function openAddModal() {
+function openAddModal(initialEquipmentIds = []) {
   if (typeof MeetingAPI !== "undefined") {
     MeetingAPI.checkHealth();
   }
+
+  const preselectedEqIds = Array.isArray(initialEquipmentIds)
+    ? initialEquipmentIds.map(Number).filter(id => !isNaN(id) && id > 0)
+    : (initialEquipmentIds ? [Number(initialEquipmentIds)].filter(id => !isNaN(id) && id > 0) : []);
 
   const form = document.getElementById("meeting-form");
   const title = document.getElementById("modal-title");
@@ -6919,7 +6975,9 @@ function openAddModal() {
     const typeSelect = document.getElementById("recurring-type");
     if (typeSelect) typeSelect.value = "weekly";
   }
-  document.querySelectorAll(".eq-checkbox").forEach(cb => { cb.checked = false; });
+  document.querySelectorAll(".eq-checkbox").forEach(cb => {
+    cb.checked = preselectedEqIds.includes(Number(cb.value));
+  });
 
   const descCount = document.getElementById("desc-char-count");
   if (descCount) descCount.textContent = "0/2000 ký tự";
@@ -6956,7 +7014,7 @@ function openAddModal() {
 
   calcDuration();
   renderRealtimeRoomCards(null);
-  renderEquipmentCheckboxGrid([]);
+  renderEquipmentCheckboxGrid(preselectedEqIds);
   updateEquipmentCardsAvailability(null);
 
   modalOverlay.classList.remove("hidden");
@@ -8272,6 +8330,7 @@ window.openAddEquipmentModal = openAddEquipmentModal;
 window.openEditEquipmentModal = openEditEquipmentModal;
 window.openEquipmentDeleteModal = openEquipmentDeleteModal;
 window.openAddModalWithSelection = openAddModalWithSelection;
+window.openAddModalWithEquipment = openAddModalWithEquipment;
 window.exportToCSV = exportToCSV;
 window.getInitials = getInitials;
 window.getHostColor = getHostColor;
