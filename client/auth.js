@@ -59,6 +59,31 @@
       } catch (err) {
         console.warn('[AuthState] Không thể ghi vào localStorage:', err);
       }
+      // Dọn sạch mảng meetings cũ trong bộ nhớ để tránh lưu vết dữ liệu của tài khoản trước
+      try {
+        if (typeof window !== 'undefined') {
+          window.meetings = [];
+          if (typeof meetings !== 'undefined') meetings = [];
+          const uid = user ? Number(user.userId || user.id || 1) : 1;
+          if (typeof window.syncMeetingOrganizerOptions === 'function') {
+            window.syncMeetingOrganizerOptions(uid);
+          }
+          if (typeof window.initParticipantSelector === 'function') {
+            window.initParticipantSelector([uid], uid);
+          }
+          // Tự động đồng bộ lại lịch họp tương ứng với tài khoản vừa đăng nhập
+          if (typeof window.MeetingAPI !== 'undefined' && typeof window.MeetingAPI.getAll === 'function') {
+            window.MeetingAPI.getAll().then(() => {
+              if (window.location.hash.startsWith('#/calendar') && typeof window.renderCalendarPage === 'function') {
+                window.renderCalendarPage();
+              } else if (window.location.hash.startsWith('#/meetings') && typeof window.renderMeetingsPage === 'function') {
+                window.renderMeetingsPage();
+              }
+            });
+          }
+        }
+      } catch (e) {}
+
       this.notify('login', user);
       updateHeaderAuthUI();
     },
@@ -71,6 +96,25 @@
       } catch (err) {
         console.warn('[AuthState] Lỗi khi xóa localStorage:', err);
       }
+      // Dọn sạch mảng meetings cũ trong bộ nhớ khi đăng xuất
+      try {
+        if (typeof window !== 'undefined') {
+          window.meetings = [];
+          if (typeof meetings !== 'undefined') meetings = [];
+          if (typeof window.syncMeetingOrganizerOptions === 'function') {
+            window.syncMeetingOrganizerOptions(1);
+          }
+          if (typeof window.initParticipantSelector === 'function') {
+            window.initParticipantSelector([1], 1);
+          }
+          if (window.location.hash.startsWith('#/calendar') && typeof window.renderCalendarPage === 'function') {
+            window.renderCalendarPage();
+          } else if (window.location.hash.startsWith('#/meetings') && typeof window.renderMeetingsPage === 'function') {
+            window.renderMeetingsPage();
+          }
+        }
+      } catch (e) {}
+
       this.notify('logout', { reason });
       updateHeaderAuthUI();
     },
@@ -287,6 +331,27 @@
         };
       } catch {
         return { ok: false, status: 0, user: null };
+      }
+    },
+
+    async changePassword({ currentPassword, newPassword, confirmPassword }) {
+      try {
+        const res = await apiFetch('/api/auth/change-password', {
+          method: 'POST',
+          body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+        });
+        const data = await res.json().catch(() => ({}));
+        return {
+          ok: res.ok,
+          status: res.status,
+          data
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          status: 0,
+          data: { success: false, message: 'Không thể kết nối máy chủ backend. Vui lòng kiểm tra mạng.' }
+        };
       }
     }
   };
@@ -540,6 +605,18 @@
       if (regPwdInput) {
         regPwdInput.addEventListener('input', () => this.updatePasswordStrength(regPwdInput.value));
       }
+
+      // Tự động xóa trạng thái báo lỗi khi người dùng gõ lại
+      ['login-identifier', 'login-password', 'register-username', 'register-email', 'register-fullname', 'register-password', 'register-confirm-password'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', () => {
+            el.classList.remove('is-invalid');
+            const errDiv = document.getElementById(`${id}-error`);
+            if (errDiv) errDiv.classList.add('hidden');
+          });
+        }
+      });
 
       // Chọn tài khoản trải nghiệm nhanh (Demo chips)
       document.querySelectorAll('.btn-demo-chip').forEach(chip => {

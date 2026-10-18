@@ -1181,14 +1181,57 @@ textarea.form-control {
   cursor: not-allowed;
 }
 
-/* Validation states */
-.form-control.is-invalid, .form-select.is-invalid {
-  border-color: var(--danger);
+/* Validation states - Loại bỏ triệt để icon đỏ (background-image) của Bootstrap trên tất cả input, chỉ báo đỏ qua viền và nền */
+.form-control.is-invalid, 
+.form-select.is-invalid,
+.stitch-input.is-invalid,
+.stitch-input.has-error,
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid,
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid,
+.was-validated .stitch-input:invalid,
+.was-validated input:invalid,
+.was-validated select:invalid,
+.was-validated textarea:invalid,
+.input-group > .form-control.is-invalid,
+.input-group > .stitch-input.is-invalid,
+.input-group > input.is-invalid,
+.stitch-input-wrapper > .stitch-input.is-invalid,
+.stitch-input-wrapper > .form-control.is-invalid,
+.stitch-input-wrapper > input.is-invalid,
+input[type="password"].is-invalid,
+.was-validated input[type="password"]:invalid {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  background-image: none !important;
 }
 
-.form-control.is-invalid:focus, .form-select.is-invalid:focus {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+.form-control.is-invalid:focus, 
+.form-select.is-invalid:focus,
+.stitch-input.is-invalid:focus,
+.stitch-input.has-error:focus,
+input.is-invalid:focus,
+select.is-invalid:focus,
+textarea.is-invalid:focus,
+.was-validated .form-control:invalid:focus,
+.was-validated .form-select:invalid:focus,
+.was-validated .stitch-input:invalid:focus,
+.was-validated input:invalid:focus,
+.was-validated select:invalid:focus,
+.was-validated textarea:invalid:focus,
+.input-group > .form-control.is-invalid:focus,
+.input-group > .stitch-input.is-invalid:focus,
+.input-group > input.is-invalid:focus,
+.stitch-input-wrapper > .stitch-input.is-invalid:focus,
+.stitch-input-wrapper > .form-control.is-invalid:focus,
+.stitch-input-wrapper > input.is-invalid:focus,
+input[type="password"].is-invalid:focus,
+.was-validated input[type="password"]:invalid:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18) !important;
+  background-image: none !important;
 }
 
 .invalid-feedback {
@@ -3300,11 +3343,13 @@ textarea.form-control {
 .stitch-input.is-invalid {
   border-color: #dc2626 !important;
   background-color: #fff1f2 !important;
+  background-image: none !important;
 }
 
 .stitch-input.has-error:focus,
 .stitch-input.is-invalid:focus {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+  background-image: none !important;
 }
 
 .stitch-input-error-icon {
@@ -5958,12 +6003,14 @@ textarea.form-control {
   border-color: #ef4444 !important;
   background-color: #fef2f2 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+  background-image: none !important;
 }
 
 .stitch-input.has-error:focus,
 .stitch-input.is-invalid:focus {
   border-color: #dc2626 !important;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+  background-image: none !important;
 }
 
 .room-maintenance-warning {
@@ -7740,6 +7787,7 @@ textarea.form-control {
   border-color: #ef4444 !important;
   background-color: #fef2f2 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+  background-image: none !important;
 }
 
 /* Thanh đo độ mạnh mật khẩu */
@@ -8034,9 +8082,51 @@ textarea.form-control {
 }
 
 .calendar-day-column.today {
-  border-color: #93c5fd;
-  background: #f8fafc;
-  box-shadow: 0 0 0 1px #3b82f6;
+  border: 2px solid #2563eb !important;
+  border-top: 4px solid #1d4ed8 !important;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 160px) !important;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.18), 0 0 0 1px rgba(37, 99, 235, 0.1) !important;
+  position: relative;
+}
+
+.calendar-day-column.today:hover {
+  box-shadow: 0 14px 28px -4px rgba(37, 99, 235, 0.25), 0 0 0 1px rgba(37, 99, 235, 0.2) !important;
+  border-color: #1d4ed8 !important;
+}
+
+.calendar-day-header.today {
+  border-bottom: 1px solid #bfdbfe;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.calendar-day-header.today .day-name {
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.calendar-day-column.today .calendar-empty-slot {
+  background: rgba(239, 246, 255, 0.7);
+  border: 1px dashed #93c5fd;
+}
+
+.calendar-day-column.today .calendar-empty-slot span {
+  color: #2563eb !important;
+  font-weight: 500;
+}
+
+.calendar-day-column.today .btn-add-day-slot {
+  background: #ffffff;
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.calendar-day-column.today .btn-add-day-slot:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
 .calendar-day-header {
@@ -8598,7 +8688,154 @@ textarea.form-control {
   border-bottom: none;
 }
 
+/* ==========================================================================
+   FRONTEND RBAC & RESTRICTED ROOMS STYLING (Stitch Enterprise Design System)
+   ========================================================================== */
 
+/* 1. Trạng thái ẩn/khóa phân quyền */
+.rbac-hidden {
+  display: none !important;
+}
 
+[data-rbac-disabled="true"],
+.rbac-disabled {
+  pointer-events: none !important;
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.35);
+  user-select: none;
+}
 
+button[data-rbac-disabled="true"],
+a[data-rbac-disabled="true"] {
+  box-shadow: none !important;
+}
+
+/* 2. Huy hiệu Role người dùng */
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-role.badge-admin {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.badge-role.badge-organizer {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-role.badge-attendee {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* 3. Thẻ phòng bị khóa do giới hạn phân quyền (Restricted Rooms) */
+.realtime-room-card.rbac-room-locked {
+  position: relative;
+  background: #f8fafc !important;
+  border: 1.5px dashed #cbd5e1 !important;
+  opacity: 0.72;
+  cursor: not-allowed !important;
+  transition: all 0.2s ease;
+}
+
+.realtime-room-card.rbac-room-locked:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: #fca5a5 !important;
+}
+
+.realtime-room-card.rbac-room-locked .room-card-name {
+  color: #64748b;
+}
+
+/* 4. Huy hiệu cảnh báo phòng VIP / Giới hạn */
+.rbac-restricted-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.rbac-restricted-badge.is-vip {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+  box-shadow: 0 1px 2px rgba(245, 158, 11, 0.15);
+}
+
+.rbac-restricted-badge.is-locked {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.1);
+}
+
+/* 5. Banner thông báo Read-Only cho Organizer tại trang Quản trị */
+.rbac-readonly-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.rbac-readonly-banner .banner-icon {
+  font-size: 1.25rem;
+  color: #d97706;
+}
+
+.rbac-readonly-banner .banner-content {
+  flex: 1;
+}
+
+/* 6. Cảnh báo trong Form đặt phòng khi chọn phòng giới hạn */
+.rbac-restricted-alert {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.rbac-restricted-alert-warning {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.rbac-restricted-alert-danger {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
 

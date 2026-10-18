@@ -118,26 +118,42 @@ const User = {
      * @param {number|string} userId
      * @returns {Promise<Object|null>}
      */
-    findById: async (userId) => {
+    findById: async (userId, options = { includePassword: false }) => {
         const id = Number(userId);
         if (isNaN(id) || id <= 0) return null;
 
         try {
             const sql = `
-                SELECT UserID, Username, FullName, Email, Role, CreatedAt
+                SELECT UserID, Username, FullName, Email, PasswordHash, Role, CreatedAt
                 FROM Users
                 WHERE UserID = ?
                 LIMIT 1
             `;
             const [rows] = await db.query(sql, [id]);
             if (rows && rows.length > 0) {
-                return formatUserRow(rows[0]);
+                const row = rows[0];
+                const safeUser = formatUserRow(row);
+                if (options.includePassword) {
+                    return {
+                        ...safeUser,
+                        PasswordHash: row.PasswordHash
+                    };
+                }
+                return safeUser;
             }
             return null;
         } catch (error) {
             console.warn(`[User Model] findById(${id}) chuyển sang Fallback:`, error.message);
             const found = mockUsersFallback.find(u => u.userId === id);
-            return found ? formatUserRow(found) : null;
+            if (!found) return null;
+            const safeUser = formatUserRow(found);
+            if (options.includePassword) {
+                return {
+                    ...safeUser,
+                    PasswordHash: found.passwordHash
+                };
+            }
+            return safeUser;
         }
     },
 
@@ -296,6 +312,35 @@ const User = {
 
             mockUsersFallback.push(newRecord);
             return formatUserRow(newRecord);
+        }
+    },
+
+    /**
+     * Cập nhật mật khẩu mới cho người dùng
+     * @param {number} userId - ID người dùng
+     * @param {string} newPasswordHash - Chuỗi hash BCrypt mật khẩu mới
+     * @returns {Promise<boolean>}
+     */
+    updatePassword: async (userId, newPasswordHash) => {
+        const id = Number(userId);
+        if (isNaN(id) || id <= 0 || !newPasswordHash) return false;
+
+        try {
+            const sql = `UPDATE Users SET PasswordHash = ? WHERE UserID = ?`;
+            const [result] = await db.query(sql, [newPasswordHash, id]);
+            const fallbackUser = mockUsersFallback.find(u => u.userId === id);
+            if (fallbackUser) {
+                fallbackUser.passwordHash = newPasswordHash;
+            }
+            return Boolean(result && result.affectedRows > 0);
+        } catch (error) {
+            console.warn(`[User Model] updatePassword(${id}) chuyển sang Fallback:`, error.message);
+            const fallbackUser = mockUsersFallback.find(u => u.userId === id);
+            if (fallbackUser) {
+                fallbackUser.passwordHash = newPasswordHash;
+                return true;
+            }
+            return false;
         }
     }
 };

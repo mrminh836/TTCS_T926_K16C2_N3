@@ -19,7 +19,10 @@ const Meeting = {
             endDate,
             status,
             page = 1,
-            limit = 10
+            limit = 10,
+            userId,
+            userRole,
+            sortOrder = 'DESC'
         } = filters;
 
         // ── Xây dựng câu truy vấn cơ bản với JOIN đầy đủ ──
@@ -32,6 +35,20 @@ const Meeting = {
 
         const conditions = [];
         const params = [];
+
+        // ── Phân quyền dữ liệu theo vai trò (Backend RBAC Enforcement) ──
+        // Admin: Xem toàn bộ lịch doanh nghiệp.
+        // Nhân viên / Người dùng khác: Chỉ xem cuộc họp mình tổ chức HOẶC được mời tham gia (Meeting_Participants)
+        const isAdmin = userRole && String(userRole).trim().toLowerCase() === 'admin';
+        if (!isAdmin) {
+            if (userId) {
+                conditions.push('(m.OrganizerID = ? OR EXISTS (SELECT 1 FROM Meeting_Participants mp WHERE mp.MeetingID = m.MeetingID AND mp.UserID = ?))');
+                params.push(userId, userId);
+            } else {
+                // Không có danh tính người dùng hợp lệ => Không trả về dữ liệu (Zero Trust)
+                conditions.push('1 = 0');
+            }
+        }
 
         // ── Lọc theo ngày cụ thể (date=2026-10-01) ──
         if (date) {
@@ -69,6 +86,9 @@ const Meeting = {
         const offset = (page - 1) * limit;
         const totalPages = Math.ceil(total / limit);
 
+        // ── Hướng sắp xếp (mặc định DESC cho danh sách, ASC cho lịch tuần) ──
+        const orderDirection = String(sortOrder).trim().toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
         // ── Truy vấn dữ liệu chính với đầy đủ thông tin ──
         const dataQuery = `
             SELECT 
@@ -86,17 +106,35 @@ const Meeting = {
                 b.BookingStatus AS bookingStatus,
                 r.RoomID        AS roomId,
                 r.RoomName      AS roomName,
-                r.Capacity      AS roomCapacity
+                r.Capacity      AS roomCapacity,
+                (SELECT GROUP_CONCAT(mp.UserID) FROM Meeting_Participants mp WHERE mp.MeetingID = m.MeetingID) AS participantIds,
+                (SELECT GROUP_CONCAT(pu.FullName) FROM Meeting_Participants mp JOIN Users pu ON mp.UserID = pu.UserID WHERE mp.MeetingID = m.MeetingID) AS participantNames
             ${baseQuery}
-            ORDER BY m.StartTime DESC
+            ORDER BY m.StartTime ${orderDirection}
             LIMIT ? OFFSET ?
         `;
 
         const dataParams = [...params, String(limit), String(offset)];
         const [rows] = await db.execute(dataQuery, dataParams);
 
+        // Chuẩn hóa danh sách người tham gia dạng mảng Number
+        const normalizedRows = (rows || []).map(row => {
+            const parsedParticipantIds = row.participantIds
+                ? String(row.participantIds).split(',').map(Number).filter(id => !isNaN(id) && id > 0)
+                : (row.organizerId ? [Number(row.organizerId)] : []);
+            const parsedParticipantNames = row.participantNames
+                ? String(row.participantNames).split(',').map(s => s.trim()).filter(Boolean)
+                : (row.organizerName ? [row.organizerName] : []);
+
+            return {
+                ...row,
+                participantIds: parsedParticipantIds,
+                participantNames: parsedParticipantNames
+            };
+        });
+
         return {
-            meetings: rows,
+            meetings: normalizedRows,
             pagination: {
                 currentPage: page,
                 limit,

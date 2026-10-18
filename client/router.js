@@ -129,16 +129,19 @@
         return;
       }
 
-      if (route.options.requireAdmin && window.AuthState) {
-        if (!window.AuthState.isAuthenticated()) {
+      if (route.options.requireAdmin) {
+        if (window.AuthState && !window.AuthState.isAuthenticated()) {
           window.location.href = 'login.html';
           isNavigating = false;
           return;
         }
 
-        if (!window.AuthState.isAdmin()) {
+        const isAdmin = window.AuthState ? window.AuthState.isAdmin() : false;
+        const canViewAdmin = typeof window.can === 'function' ? window.can('view_admin') : isAdmin;
+
+        if (!canViewAdmin) {
           if (window.showToast) {
-            window.showToast('Bạn không có quyền Quản trị (Admin) để truy cập trang này.', 'error');
+            window.showToast('Bạn không có quyền truy cập trang Quản trị (Admin).', 'error');
           }
           this.navigate('/meetings');
           isNavigating = false;
@@ -174,6 +177,11 @@
         this.hidePageLoading();
         isNavigating = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // [RBAC] Tự động áp dụng phân quyền giao diện sau mỗi lần chuyển trang
+        if (typeof window.applyRoleUI === 'function') {
+          setTimeout(window.applyRoleUI, 50);
+        }
       }
     },
 
