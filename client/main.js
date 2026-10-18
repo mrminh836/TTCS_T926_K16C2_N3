@@ -8911,4 +8911,68 @@ window.EquipmentAPI = EquipmentAPI;
 
 setupRoomFormValidationEvents();
 setupMeetingFormValidationEvents();
+
+// =====================================================
+// 23. BẪY LỖI & GIÁM SÁT KẾT NỐI MẠNG (ONLINE/OFFLINE NETWORK DETECTION)
+// =====================================================
+function setupNetworkStatusListeners() {
+  const offlineBanner = document.getElementById("offline-notification-banner");
+  const retryBtn = document.getElementById("offline-banner-retry-btn");
+
+  function updateNetworkUI(isOnline) {
+    if (!offlineBanner) return;
+    if (isOnline) {
+      offlineBanner.classList.add("hidden");
+    } else {
+      offlineBanner.classList.remove("hidden");
+    }
+  }
+
+  // Khởi tạo trạng thái ban đầu
+  if (typeof navigator !== "undefined") {
+    updateNetworkUI(navigator.onLine);
+  }
+
+  window.addEventListener("offline", () => {
+    updateNetworkUI(false);
+    if (typeof showToast === "function") {
+      showToast("Mất kết nối mạng Internet. Hệ thống đang ở chế độ ngoại tuyến.", "error");
+    }
+  });
+
+  window.addEventListener("online", () => {
+    updateNetworkUI(true);
+    if (typeof showToast === "function") {
+      showToast("Đã khôi phục kết nối mạng thành công!", "success");
+    }
+    initializeEnterpriseData();
+  });
+
+  if (retryBtn) {
+    retryBtn.addEventListener("click", async () => {
+      retryBtn.disabled = true;
+      retryBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang thử lại...';
+      try {
+        const ping = await fetch("/api/users/profile", { method: "GET", cache: "no-store" }).catch(() => null);
+        if (ping || (typeof navigator !== "undefined" && navigator.onLine)) {
+          updateNetworkUI(true);
+          await initializeEnterpriseData();
+          if (typeof showToast === "function") {
+            showToast("Kết nối máy chủ thành công!", "success");
+          }
+        } else {
+          updateNetworkUI(false);
+          if (typeof showToast === "function") {
+            showToast("Vẫn chưa thể kết nối tới máy chủ.", "warning");
+          }
+        }
+      } finally {
+        retryBtn.disabled = false;
+        retryBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Thử kết nối lại';
+      }
+    });
+  }
+}
+
+setupNetworkStatusListeners();
 initializeEnterpriseData();

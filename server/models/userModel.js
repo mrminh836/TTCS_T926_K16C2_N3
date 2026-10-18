@@ -69,7 +69,7 @@ const User = {
 
         try {
             let sql = `
-                SELECT UserID, Username, FullName, Email, Role, CreatedAt
+                SELECT UserID, Username, FullName, Email, Role, Department, CreatedAt
                 FROM Users
                 WHERE 1=1
             `;
@@ -124,7 +124,7 @@ const User = {
 
         try {
             const sql = `
-                SELECT UserID, Username, FullName, Email, PasswordHash, Role, CreatedAt
+                SELECT UserID, Username, FullName, Email, PasswordHash, Role, Department, CreatedAt
                 FROM Users
                 WHERE UserID = ?
                 LIMIT 1
@@ -168,7 +168,7 @@ const User = {
 
         try {
             const sql = `
-                SELECT UserID, Username, FullName, Email, Role, CreatedAt
+                SELECT UserID, Username, FullName, Email, Role, Department, CreatedAt
                 FROM Users
                 WHERE LOWER(Username) = ?
                 LIMIT 1
@@ -196,7 +196,7 @@ const User = {
 
         try {
             const sql = `
-                SELECT UserID, Username, FullName, Email, Role, CreatedAt
+                SELECT UserID, Username, FullName, Email, Role, Department, CreatedAt
                 FROM Users
                 WHERE LOWER(Email) = ?
                 LIMIT 1
@@ -226,7 +226,7 @@ const User = {
 
         try {
             const sql = `
-                SELECT UserID, Username, FullName, Email, PasswordHash, Role, CreatedAt
+                SELECT UserID, Username, FullName, Email, PasswordHash, Role, Department, CreatedAt
                 FROM Users
                 WHERE LOWER(Username) = ? OR LOWER(Email) = ?
                 LIMIT 1
@@ -341,6 +341,119 @@ const User = {
                 return true;
             }
             return false;
+        }
+    },
+
+    /**
+     * Cập nhật thông tin hồ sơ người dùng (FullName, Email, Department)
+     * @param {number} userId
+     * @param {Object} updateData - { fullName, email, department }
+     * @returns {Promise<Object|null>} Safe user object sau khi cập nhật
+     */
+    updateProfile: async (userId, updateData = {}) => {
+        const id = Number(userId);
+        if (isNaN(id) || id <= 0) return null;
+
+        const updates = [];
+        const params = [];
+
+        if (updateData.fullName !== undefined) {
+            updates.push('FullName = ?');
+            params.push(updateData.fullName.trim());
+        }
+        if (updateData.email !== undefined) {
+            updates.push('Email = ?');
+            params.push(updateData.email.trim().toLowerCase());
+        }
+        if (updateData.department !== undefined) {
+            updates.push('Department = ?');
+            params.push(updateData.department.trim());
+        }
+
+        if (updates.length === 0) {
+            return await User.findById(id);
+        }
+
+        params.push(id);
+
+        try {
+            const sql = `UPDATE Users SET ${updates.join(', ')} WHERE UserID = ?`;
+            await db.query(sql, params);
+
+            // Cập nhật fallback
+            const fallbackUser = mockUsersFallback.find(u => u.userId === id);
+            if (fallbackUser) {
+                if (updateData.fullName !== undefined) fallbackUser.fullName = updateData.fullName.trim();
+                if (updateData.email !== undefined) fallbackUser.email = updateData.email.trim().toLowerCase();
+                if (updateData.department !== undefined) fallbackUser.department = updateData.department.trim();
+            }
+
+            return await User.findById(id);
+        } catch (error) {
+            console.warn(`[User Model] updateProfile(${id}) gặp lỗi, thử Fallback:`, error.message);
+            const fallbackUser = mockUsersFallback.find(u => u.userId === id);
+            if (fallbackUser) {
+                if (updateData.fullName !== undefined) fallbackUser.fullName = updateData.fullName.trim();
+                if (updateData.email !== undefined) fallbackUser.email = updateData.email.trim().toLowerCase();
+                if (updateData.department !== undefined) fallbackUser.department = updateData.department.trim();
+                return formatUserRow(fallbackUser);
+            }
+            throw error;
+        }
+    },
+
+    /**
+     * Lấy tóm tắt thống kê cuộc họp của người dùng (chủ trì, tham gia, sắp diễn ra)
+     * @param {number} userId
+     * @returns {Promise<Object>} { hostedCount, participantCount, upcomingCount }
+     */
+    getUserMeetingStats: async (userId) => {
+        const id = Number(userId);
+        if (isNaN(id) || id <= 0) {
+            return { hostedCount: 0, participantCount: 0, upcomingCount: 0 };
+        }
+
+        try {
+            // 1. Số cuộc họp chủ trì
+            const [hostedRows] = await db.query(
+                'SELECT COUNT(*) AS count FROM Meetings WHERE OrganizerID = ?',
+                [id]
+            );
+            const hostedCount = Number(hostedRows[0]?.count || 0);
+
+            // 2. Số cuộc họp được mời tham gia (không tính do mình chủ trì)
+            const [partRows] = await db.query(
+                `SELECT COUNT(*) AS count 
+                 FROM Meeting_Participants mp 
+                 JOIN Meetings m ON mp.MeetingID = m.MeetingID 
+                 WHERE mp.UserID = ? AND (m.OrganizerID IS NULL OR m.OrganizerID != ?)`,
+                [id, id]
+            );
+            const participantCount = Number(partRows[0]?.count || 0);
+
+            // 3. Số cuộc họp sắp tới (chưa kết thúc)
+            const [upcomingRows] = await db.query(
+                `SELECT COUNT(DISTINCT m.MeetingID) AS count
+                 FROM Meetings m
+                 LEFT JOIN Meeting_Participants mp ON m.MeetingID = mp.MeetingID
+                 WHERE (m.OrganizerID = ? OR mp.UserID = ?)
+                   AND m.EndTime >= NOW()`,
+                [id, id]
+            );
+            const upcomingCount = Number(upcomingRows[0]?.count || 0);
+
+            return {
+                hostedCount,
+                participantCount,
+                upcomingCount
+            };
+        } catch (error) {
+            console.warn(`[User Model] getUserMeetingStats(${id}) fallback:`, error.message);
+            return {
+                hostedCount: 0,
+                participantCount: 0,
+                upcomingCount: 0
+            };
         }
     }
 };

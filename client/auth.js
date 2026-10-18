@@ -549,9 +549,22 @@
       // Nút đăng xuất trên header hoặc dropdown
       const logoutBtn = document.getElementById('btn-header-logout');
       if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
+        logoutBtn.addEventListener('click', async (e) => {
           e.preventDefault();
-          if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?')) {
+          let shouldLogout = false;
+          if (typeof window.showConfirmDialog === 'function') {
+            shouldLogout = await window.showConfirmDialog({
+              title: 'Đăng xuất tài khoản',
+              message: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống Enterprise Sync không?',
+              confirmText: 'Đăng xuất',
+              cancelText: 'Ở lại',
+              type: 'danger',
+              icon: 'bi-box-arrow-right'
+            });
+          } else {
+            shouldLogout = confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?');
+          }
+          if (shouldLogout) {
             AuthState.logout('login.html');
           }
         });

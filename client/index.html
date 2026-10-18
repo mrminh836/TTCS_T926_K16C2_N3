@@ -145,6 +145,8 @@
           <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open mobile menu">
             <i class="bi bi-list fs-4"></i>
           </button>
+          <!-- Thanh điều hướng Breadcrumbs chuẩn Stitch Enterprise -->
+          <nav class="app-breadcrumbs" id="app-breadcrumbs" aria-label="Đường dẫn điều hướng"></nav>
         </div>
 
         <div class="header-right">
@@ -227,6 +229,17 @@
           </div>
         </div>
       </header>
+
+      <!-- Offline Banner cảnh báo khi mất kết nối mạng -->
+      <div id="offline-notification-banner" class="offline-notification-banner hidden" role="alert" aria-live="assertive">
+        <div class="offline-banner-content">
+          <i class="bi bi-wifi-off fs-5"></i>
+          <span><strong>Mất kết nối mạng:</strong> Thiết bị đang ở chế độ ngoại tuyến (Offline). Các tác vụ tạo mới hoặc cập nhật sẽ bị gián đoạn.</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger offline-retry-btn" id="offline-banner-retry-btn">
+          <i class="bi bi-arrow-clockwise me-1"></i> Thử kết nối lại
+        </button>
+      </div>
 
       <!-- Vùng hiển thị nội dung trang (Main Content) -->
       <main class="main-content" id="page-container">
@@ -1859,6 +1872,9 @@
 
   <!-- Component Toast Nhắc Nhở Trước Giờ Họp & Đồng Bộ iCalendar -->
   <script src="js/components/meetingReminderToast.js?v=1.1"></script>
+
+  <!-- Component Modal Thông Báo & Hộp thoại Xác Nhận Chuẩn Stitch Enterprise -->
+  <script src="js/components/confirmModal.js?v=1.0"></script>
 
   <!-- JavaScript nghiệp vụ chính & Khởi tạo CSDL -->
   <script src="main.js?v=1.28"></script>

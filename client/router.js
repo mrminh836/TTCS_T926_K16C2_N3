@@ -97,6 +97,9 @@
       // Cập nhật trạng thái active trên navbar
       this.updateActiveNavigation(path);
 
+      // Cập nhật thanh Breadcrumbs điều hướng
+      this.renderBreadcrumbs(path, matched ? matched.route : null);
+
       const appContainer = document.getElementById('app');
       if (!appContainer) {
         isNavigating = false;
@@ -186,6 +189,73 @@
     },
 
     /**
+     * Render Breadcrumbs điều hướng trực quan
+     */
+    renderBreadcrumbs(path, route = null) {
+      const breadcrumbsContainer = document.getElementById('app-breadcrumbs');
+      if (!breadcrumbsContainer) return;
+
+      const crumbs = [
+        { label: 'Trang chủ', path: '#/', icon: 'bi-house-door' }
+      ];
+
+      if (path === '/' || path === '/home') {
+        // Chỉ ở trang chủ
+      } else if (path === '/meetings') {
+        crumbs.push({ label: 'Cuộc họp của tôi', path: '#/meetings', icon: 'bi-calendar3' });
+      } else if (path === '/meetings/create') {
+        crumbs.push({ label: 'Cuộc họp', path: '#/meetings', icon: 'bi-calendar3' });
+        crumbs.push({ label: 'Đặt phòng họp mới', path: '#/meetings/create', icon: 'bi-plus-circle' });
+      } else if (path.startsWith('/meetings/')) {
+        crumbs.push({ label: 'Cuộc họp', path: '#/meetings', icon: 'bi-calendar3' });
+        crumbs.push({ label: 'Chi tiết cuộc họp', path: `#${path}`, icon: 'bi-info-circle' });
+      } else if (path === '/calendar') {
+        crumbs.push({ label: 'Lịch họp', path: '#/calendar', icon: 'bi-calendar-week' });
+      } else if (path === '/rooms') {
+        crumbs.push({ label: 'Phòng họp', path: '#/rooms', icon: 'bi-door-closed' });
+      } else if (path === '/equipment' || path === '/equipments') {
+        crumbs.push({ label: 'Trang thiết bị', path: '#/equipment', icon: 'bi-cpu' });
+      } else if (path === '/profile') {
+        crumbs.push({ label: 'Hồ sơ cá nhân', path: '#/profile', icon: 'bi-person-circle' });
+      } else if (path === '/admin') {
+        crumbs.push({ label: 'Cổng Quản trị', path: '#/admin', icon: 'bi-speedometer2' });
+      } else if (path === '/admin/rooms') {
+        crumbs.push({ label: 'Quản trị', path: '#/admin', icon: 'bi-speedometer2' });
+        crumbs.push({ label: 'Quản lý Phòng họp', path: '#/admin/rooms', icon: 'bi-door-open-fill' });
+      } else if (path === '/admin/equipment' || path === '/admin/equipments') {
+        crumbs.push({ label: 'Quản trị', path: '#/admin', icon: 'bi-speedometer2' });
+        crumbs.push({ label: 'Quản lý Thiết bị', path: '#/admin/equipment', icon: 'bi-tools' });
+      } else if (path === '/admin/users') {
+        crumbs.push({ label: 'Quản trị', path: '#/admin', icon: 'bi-speedometer2' });
+        crumbs.push({ label: 'Quản lý Người dùng', path: '#/admin/users', icon: 'bi-people-fill' });
+      } else if (path === '/admin/reports') {
+        crumbs.push({ label: 'Quản trị', path: '#/admin', icon: 'bi-speedometer2' });
+        crumbs.push({ label: 'Báo cáo & Thống kê', path: '#/admin/reports', icon: 'bi-pie-chart-fill' });
+      } else {
+        const title = (route && route.options && route.options.title) ? route.options.title : 'Nội dung';
+        crumbs.push({ label: title, path: `#${path}` });
+      }
+
+      // Tạo HTML breadcrumbs
+      const lastIdx = crumbs.length - 1;
+      const html = crumbs.map((crumb, idx) => {
+        const isLast = idx === lastIdx;
+        const iconHtml = crumb.icon ? `<i class="bi ${crumb.icon} breadcrumb-icon"></i>` : '';
+        if (isLast) {
+          return `<span class="breadcrumb-item current" aria-current="page">${iconHtml}<span>${crumb.label}</span></span>`;
+        }
+        return `
+          <a href="${crumb.path}" class="breadcrumb-item link">
+            ${iconHtml}<span>${crumb.label}</span>
+          </a>
+          <i class="bi bi-chevron-right breadcrumb-separator" aria-hidden="true"></i>
+        `;
+      }).join('');
+
+      breadcrumbsContainer.innerHTML = html;
+    },
+
+    /**
      * Cập nhật CSS class active trên các liên kết điều hướng
      */
     updateActiveNavigation(path) {
@@ -203,18 +273,34 @@
           isActive = (path === '/admin');
         } else if (linkPath === '/admin/equipment' || linkPath === '/admin/equipments') {
           isActive = (path === '/admin/equipment' || path === '/admin/equipments');
+        } else if (linkPath === '/admin/rooms') {
+          isActive = (path === '/admin/rooms');
+        } else if (linkPath === '/admin/users') {
+          isActive = (path === '/admin/users');
+        } else if (linkPath === '/admin/reports') {
+          isActive = (path === '/admin/reports');
         } else if (linkPath.startsWith('/admin/')) {
           isActive = path.startsWith(linkPath);
         } else if (linkPath === '/equipment' || linkPath === '/equipments') {
           isActive = (path === '/equipment' || path === '/equipments');
+        } else if (linkPath === '/rooms') {
+          isActive = (path === '/rooms');
+        } else if (linkPath === '/calendar') {
+          isActive = (path === '/calendar');
+        } else if (linkPath === '/meetings') {
+          isActive = (path === '/meetings' || path.startsWith('/meetings/'));
+        } else if (linkPath === '/profile') {
+          isActive = (path === '/profile');
         } else {
-          isActive = path.startsWith(linkPath);
+          isActive = (path === linkPath);
         }
 
         if (isActive) {
           link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
         } else {
           link.classList.remove('active');
+          link.removeAttribute('aria-current');
         }
       });
 

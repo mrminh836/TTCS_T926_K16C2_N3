@@ -13,7 +13,10 @@ CREATE TABLE Users (
     PasswordHash VARCHAR(255) NOT NULL,
     Role VARCHAR(50) DEFAULT 'USER',
     Department VARCHAR(100) DEFAULT 'Kỹ thuật',
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_users_role (Role),
+    INDEX idx_users_department (Department),
+    INDEX idx_users_fullname (FullName)
 );
 CREATE TABLE Rooms (
     RoomID INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,7 +30,8 @@ CREATE TABLE Rooms (
     Description TEXT,
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_rooms_status_capacity (Status, Capacity)
+    INDEX idx_rooms_status_capacity (Status, Capacity),
+    INDEX idx_rooms_type (Type)
 );
 CREATE TABLE Meetings (
     MeetingID INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,7 +42,12 @@ CREATE TABLE Meetings (
     OrganizerID INT,
     IsRecurring BOOLEAN DEFAULT FALSE,
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (OrganizerID) REFERENCES Users(UserID)
+    FOREIGN KEY (OrganizerID) REFERENCES Users(UserID),
+    INDEX idx_meetings_start_time (StartTime),
+    INDEX idx_meetings_end_time (EndTime),
+    INDEX idx_meetings_timerange (StartTime, EndTime),
+    INDEX idx_meetings_organizer (OrganizerID),
+    INDEX idx_meetings_created_at (CreatedAt)
 );
 CREATE TABLE Bookings (
     BookingID INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,7 +56,10 @@ CREATE TABLE Bookings (
     BookingStatus VARCHAR(50) DEFAULT 'Confirmed',
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (MeetingID) REFERENCES Meetings(MeetingID),
-    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
+    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID),
+    INDEX idx_bookings_meetingid (MeetingID),
+    INDEX idx_bookings_roomid_status (RoomID, BookingStatus),
+    INDEX idx_bookings_status (BookingStatus)
 );
 CREATE TABLE Meeting_Participants (
     MeetingID INT,
@@ -55,14 +67,18 @@ CREATE TABLE Meeting_Participants (
     ResponseStatus VARCHAR(50) DEFAULT 'Pending',
     PRIMARY KEY (MeetingID, UserID),
     FOREIGN KEY (MeetingID) REFERENCES Meetings(MeetingID),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    INDEX idx_participants_userid (UserID),
+    INDEX idx_participants_user_status (UserID, ResponseStatus)
 );
 
 CREATE TABLE Equipments (
     EquipmentID INT AUTO_INCREMENT PRIMARY KEY,
     EquipmentName VARCHAR(100) NOT NULL,
     Type VARCHAR(50),
-    Status VARCHAR(50) DEFAULT 'Available'
+    Status VARCHAR(50) DEFAULT 'Available',
+    INDEX idx_equipments_status (Status),
+    INDEX idx_equipments_type (Type)
 );
 CREATE TABLE Booking_Equipments (
     BookingID INT,
@@ -70,7 +86,8 @@ CREATE TABLE Booking_Equipments (
     Quantity INT DEFAULT 1,
     PRIMARY KEY (BookingID, EquipmentID),
     FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID),
-    FOREIGN KEY (EquipmentID) REFERENCES Equipments(EquipmentID)
+    FOREIGN KEY (EquipmentID) REFERENCES Equipments(EquipmentID),
+    INDEX idx_booking_equipments_equipmentid (EquipmentID)
 );
 
 -- =====================================================
