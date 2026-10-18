@@ -606,6 +606,18 @@
         regPwdInput.addEventListener('input', () => this.updatePasswordStrength(regPwdInput.value));
       }
 
+      // Tự động xóa trạng thái báo lỗi khi người dùng gõ lại
+      ['login-identifier', 'login-password', 'register-username', 'register-email', 'register-fullname', 'register-password', 'register-confirm-password'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', () => {
+            el.classList.remove('is-invalid');
+            const errDiv = document.getElementById(`${id}-error`);
+            if (errDiv) errDiv.classList.add('hidden');
+          });
+        }
+      });
+
       // Chọn tài khoản trải nghiệm nhanh (Demo chips)
       document.querySelectorAll('.btn-demo-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {

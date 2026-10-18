@@ -1181,14 +1181,57 @@ textarea.form-control {
   cursor: not-allowed;
 }
 
-/* Validation states */
-.form-control.is-invalid, .form-select.is-invalid {
-  border-color: var(--danger);
+/* Validation states - Loại bỏ triệt để icon đỏ (background-image) của Bootstrap trên tất cả input, chỉ báo đỏ qua viền và nền */
+.form-control.is-invalid, 
+.form-select.is-invalid,
+.stitch-input.is-invalid,
+.stitch-input.has-error,
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid,
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid,
+.was-validated .stitch-input:invalid,
+.was-validated input:invalid,
+.was-validated select:invalid,
+.was-validated textarea:invalid,
+.input-group > .form-control.is-invalid,
+.input-group > .stitch-input.is-invalid,
+.input-group > input.is-invalid,
+.stitch-input-wrapper > .stitch-input.is-invalid,
+.stitch-input-wrapper > .form-control.is-invalid,
+.stitch-input-wrapper > input.is-invalid,
+input[type="password"].is-invalid,
+.was-validated input[type="password"]:invalid {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  background-image: none !important;
 }
 
-.form-control.is-invalid:focus, .form-select.is-invalid:focus {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+.form-control.is-invalid:focus, 
+.form-select.is-invalid:focus,
+.stitch-input.is-invalid:focus,
+.stitch-input.has-error:focus,
+input.is-invalid:focus,
+select.is-invalid:focus,
+textarea.is-invalid:focus,
+.was-validated .form-control:invalid:focus,
+.was-validated .form-select:invalid:focus,
+.was-validated .stitch-input:invalid:focus,
+.was-validated input:invalid:focus,
+.was-validated select:invalid:focus,
+.was-validated textarea:invalid:focus,
+.input-group > .form-control.is-invalid:focus,
+.input-group > .stitch-input.is-invalid:focus,
+.input-group > input.is-invalid:focus,
+.stitch-input-wrapper > .stitch-input.is-invalid:focus,
+.stitch-input-wrapper > .form-control.is-invalid:focus,
+.stitch-input-wrapper > input.is-invalid:focus,
+input[type="password"].is-invalid:focus,
+.was-validated input[type="password"]:invalid:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18) !important;
+  background-image: none !important;
 }
 
 .invalid-feedback {
@@ -3300,11 +3343,13 @@ textarea.form-control {
 .stitch-input.is-invalid {
   border-color: #dc2626 !important;
   background-color: #fff1f2 !important;
+  background-image: none !important;
 }
 
 .stitch-input.has-error:focus,
 .stitch-input.is-invalid:focus {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+  background-image: none !important;
 }
 
 .stitch-input-error-icon {
@@ -5958,12 +6003,14 @@ textarea.form-control {
   border-color: #ef4444 !important;
   background-color: #fef2f2 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+  background-image: none !important;
 }
 
 .stitch-input.has-error:focus,
 .stitch-input.is-invalid:focus {
   border-color: #dc2626 !important;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
+  background-image: none !important;
 }
 
 .room-maintenance-warning {
@@ -7740,6 +7787,7 @@ textarea.form-control {
   border-color: #ef4444 !important;
   background-color: #fef2f2 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+  background-image: none !important;
 }
 
 /* Thanh đo độ mạnh mật khẩu */

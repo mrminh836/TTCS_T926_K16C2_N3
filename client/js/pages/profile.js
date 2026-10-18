@@ -415,6 +415,18 @@
         });
       });
 
+      // Tự động xóa lỗi khi người dùng gõ
+      ['change-pwd-current', 'change-pwd-new', 'change-pwd-confirm'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          input.addEventListener('input', () => {
+            input.classList.remove('is-invalid');
+            const alertBox = document.getElementById('change-pwd-alert');
+            if (alertBox) alertBox.classList.add('d-none');
+          });
+        }
+      });
+
       // Xử lý gửi Form đổi mật khẩu
       const form = document.getElementById('form-change-password');
       form?.addEventListener('submit', async (e) => {
@@ -423,24 +435,41 @@
         const spinner = document.getElementById('change-pwd-spinner');
         const submitBtn = document.getElementById('btn-submit-change-pwd');
 
-        const currentPassword = document.getElementById('change-pwd-current')?.value || '';
-        const newPassword = document.getElementById('change-pwd-new')?.value || '';
-        const confirmPassword = document.getElementById('change-pwd-confirm')?.value || '';
+        const currentInput = document.getElementById('change-pwd-current');
+        const newInput = document.getElementById('change-pwd-new');
+        const confirmInput = document.getElementById('change-pwd-confirm');
+
+        const currentPassword = currentInput?.value || '';
+        const newPassword = newInput?.value || '';
+        const confirmPassword = confirmInput?.value || '';
+
+        // Xóa class is-invalid cũ
+        currentInput?.classList.remove('is-invalid');
+        newInput?.classList.remove('is-invalid');
+        confirmInput?.classList.remove('is-invalid');
 
         // Validation phía Client
         if (!currentPassword) {
+          currentInput?.classList.add('is-invalid');
+          currentInput?.focus();
           showModalAlert(alertBox, 'Vui lòng nhập mật khẩu hiện tại.', 'danger');
           return;
         }
         if (!newPassword || newPassword.length < 6) {
+          newInput?.classList.add('is-invalid');
+          newInput?.focus();
           showModalAlert(alertBox, 'Mật khẩu mới phải có ít nhất 6 ký tự.', 'danger');
           return;
         }
         if (currentPassword === newPassword) {
+          newInput?.classList.add('is-invalid');
+          newInput?.focus();
           showModalAlert(alertBox, 'Mật khẩu mới không được trùng với mật khẩu hiện tại.', 'danger');
           return;
         }
         if (newPassword !== confirmPassword) {
+          confirmInput?.classList.add('is-invalid');
+          confirmInput?.focus();
           showModalAlert(alertBox, 'Xác nhận lại mật khẩu mới không khớp.', 'danger');
           return;
         }
