@@ -1497,6 +1497,7 @@
             aria-label="Mô tả tiện ích phòng họp"
             placeholder="Ghi chú đặc điểm phòng họp, tầm nhìn, thiết bị chuyên dụng hoặc hướng dẫn sử dụng..."></textarea>
         </div>
+      </div>
 
         <!-- Footer -->
         <div class="stitch-modal-footer">
@@ -1660,11 +1661,11 @@
       </div>
 
       <!-- Form Body -->
-      <form id="equipment-form" novalidate>
-        <div class="stitch-modal-body p-4">
+      <form id="equipment-form" class="equipment-modal-form" onsubmit="saveEquipment(event)" novalidate>
+        <div class="stitch-modal-body p-4 equipment-modal-body">
 
           <!-- Alert box thông báo lỗi nếu có -->
-          <div id="equipment-form-error" class="alert alert-danger d-none align-items-center gap-2 mb-3" role="alert">
+          <div id="equipment-form-error" class="stitch-alert-box stitch-alert-danger hidden align-items-center gap-2 mb-3" role="alert">
             <i class="bi bi-exclamation-octagon-fill fs-5"></i>
             <span id="equipment-form-error-msg"></span>
           </div>
@@ -1765,7 +1766,7 @@
         </div>
 
         <!-- Footer Area -->
-        <div class="stitch-modal-footer px-4 pb-4 pt-3 d-flex justify-content-end align-items-center gap-2">
+        <div class="stitch-modal-footer">
           <button
             type="button"
             id="btn-equipment-cancel"

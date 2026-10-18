@@ -4953,6 +4953,66 @@ textarea.form-control {
   text-align: center;
 }
 
+/* Modal Quản lý thiết bị & Xóa thiết bị (Enterprise Stitch Spec) */
+#equipment-modal-overlay .equipment-modal-card,
+.equipment-modal-card,
+#equipment-delete-overlay .equipment-delete-modal-card,
+.equipment-delete-modal-card {
+  max-width: 620px;
+  width: 95%;
+  max-height: 90vh;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+  animation: cardScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0 !important;
+}
+
+#equipment-modal-overlay .stitch-modal-header,
+.equipment-modal-card .stitch-modal-header,
+#equipment-delete-overlay .stitch-modal-header,
+.equipment-delete-modal-card .stitch-modal-header {
+  flex-shrink: 0;
+  padding: 18px 26px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.equipment-modal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+.equipment-modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 22px 26px !important;
+  overscroll-behavior: contain;
+}
+
+#equipment-modal-overlay .stitch-modal-footer,
+.equipment-modal-card .stitch-modal-footer,
+#equipment-delete-overlay .stitch-modal-footer,
+.equipment-delete-modal-card .stitch-modal-footer {
+  padding: 14px 26px !important;
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
 /* Equipment checkbox cards in modal */
 .room-equipment-checkbox-grid {
   display: grid;

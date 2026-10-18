@@ -514,6 +514,48 @@ function initAppShellEvents() {
     });
   }
 
+  const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+  const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+  const closeEquipmentBtn = document.getElementById("btn-close-equipment-modal");
+  const cancelEquipmentBtn = document.getElementById("btn-equipment-cancel");
+  const closeEquipmentDeleteBtn = document.getElementById("btn-close-equipment-delete");
+  const cancelEquipmentDeleteBtn = document.getElementById("btn-cancel-equipment-delete");
+
+  if (closeEquipmentBtn) {
+    closeEquipmentBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+    });
+  }
+  if (cancelEquipmentBtn) {
+    cancelEquipmentBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+    });
+  }
+  if (equipmentModalOverlay) {
+    equipmentModalOverlay.addEventListener("click", (e) => {
+      if (e.target === equipmentModalOverlay && typeof window.closeEquipmentModal === "function") {
+        window.closeEquipmentModal();
+      }
+    });
+  }
+  if (closeEquipmentDeleteBtn) {
+    closeEquipmentDeleteBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+    });
+  }
+  if (cancelEquipmentDeleteBtn) {
+    cancelEquipmentDeleteBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+    });
+  }
+  if (equipmentDeleteOverlay) {
+    equipmentDeleteOverlay.addEventListener("click", (e) => {
+      if (e.target === equipmentDeleteOverlay && typeof window.closeEquipmentDeleteModal === "function") {
+        window.closeEquipmentDeleteModal();
+      }
+    });
+  }
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       if (detailOverlay && !detailOverlay.classList.contains("hidden")) {
@@ -2306,7 +2348,7 @@ function renderAdminEquipmentsPage() {
             <span>Xuất CSV / Excel</span>
           </button>
 
-          <button type="button" id="btn-add-equipment" class="btn-stitch-create">
+          <button type="button" id="btn-add-equipment" class="btn-stitch-create" onclick="openAddEquipmentModal()">
             <i class="bi bi-plus-circle-fill"></i>
             <span>Thêm thiết bị mới</span>
           </button>
@@ -2876,18 +2918,22 @@ async function saveEquipment(event) {
     if (res && res.success) {
       closeEquipmentModal();
       const current = getCurrentRoute();
-      if (current === "/admin/equipments" || current === "/equipments") {
-        renderAdminEquipmentsPage();
+      if (current.includes("equipment")) {
+        if (current.startsWith("/admin")) {
+          renderAdminEquipmentsPage();
+        } else if (typeof window.renderEquipmentUserPage === "function") {
+          window.renderEquipmentUserPage();
+        }
       }
     } else {
       if (errorBox) {
-        errorBox.classList.remove("d-none");
+        errorBox.classList.remove("d-none", "hidden");
         errorMsg.textContent = res ? res.message : "Đã xảy ra lỗi khi lưu thiết bị.";
       }
     }
   } catch (err) {
     if (errorBox) {
-      errorBox.classList.remove("d-none");
+      errorBox.classList.remove("d-none", "hidden");
       errorMsg.textContent = err.message || "Lỗi hệ thống khi lưu thiết bị.";
     }
   } finally {
@@ -2905,8 +2951,12 @@ async function handleQuickToggleEquipmentStatus(id, currentStatus) {
   const res = await EquipmentAPI.updateStatus(id, newStatus);
   if (res && res.success) {
     const current = getCurrentRoute();
-    if (current === "/admin/equipments" || current === "/equipments") {
-      renderAdminEquipmentsPage();
+    if (current.includes("equipment")) {
+      if (current.startsWith("/admin")) {
+        renderAdminEquipmentsPage();
+      } else if (typeof window.renderEquipmentUserPage === "function") {
+        window.renderEquipmentUserPage();
+      }
     }
   } else {
     alert(res ? res.message : "Không thể thay đổi trạng thái thiết bị.");
@@ -2980,8 +3030,12 @@ async function confirmDeleteEquipment() {
     if (res && res.success) {
       closeEquipmentDeleteModal();
       const current = getCurrentRoute();
-      if (current === "/admin/equipments" || current === "/equipments") {
-        renderAdminEquipmentsPage();
+      if (current.includes("equipment")) {
+        if (current.startsWith("/admin")) {
+          renderAdminEquipmentsPage();
+        } else if (typeof window.renderEquipmentUserPage === "function") {
+          window.renderEquipmentUserPage();
+        }
       }
     } else {
       const content = document.getElementById("equipment-delete-content");
@@ -8231,7 +8285,9 @@ window.saveRoom = saveRoom;
 window.closeRoomQRModal = closeRoomQRModal;
 window.closeRoomDeleteModal = closeRoomDeleteModal;
 window.closeEquipmentModal = closeEquipmentModal;
+window.saveEquipment = saveEquipment;
 window.closeEquipmentDeleteModal = closeEquipmentDeleteModal;
+window.confirmDeleteEquipment = confirmDeleteEquipment;
 window.RoomAPI = RoomAPI;
 window.MeetingAPI = MeetingAPI;
 window.EquipmentAPI = EquipmentAPI;
