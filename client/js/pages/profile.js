@@ -124,14 +124,6 @@
             <h2 class="fw-bold fs-3 text-slate-900 m-0">Hồ sơ cá nhân</h2>
             <p class="text-secondary small m-0">Thông tin tài khoản và nhật ký lịch họp doanh nghiệp</p>
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-outline-primary btn-sm" id="btn-top-change-pwd">
-              <i class="bi bi-key me-1"></i> Đổi mật khẩu
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-sm" id="btn-profile-logout">
-              <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
-            </button>
-          </div>
         </div>
 
         <div class="row g-4">
@@ -164,9 +156,12 @@
                 </div>
               </div>
 
-              <!-- Nút đổi mật khẩu trong Thẻ thông tin cá nhân -->
+              <!-- Nút đổi mật khẩu & Đăng xuất trong Thẻ thông tin cá nhân -->
               <button type="button" class="btn btn-outline-primary btn-sm w-100 mt-4 fw-medium py-2" id="btn-card-change-pwd">
                 <i class="bi bi-shield-lock me-1"></i> Đổi mật khẩu tài khoản
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-medium py-2" id="btn-profile-logout">
+                <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
               </button>
             </div>
 
@@ -201,18 +196,20 @@
               </div>
 
               <!-- Tabs chuyển đổi giữa Cuộc họp chủ trì và Cuộc họp được mời -->
-              <ul class="nav nav-pills mb-3 border-bottom pb-2" id="profile-meeting-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active btn-sm" id="tab-hosted-btn" data-bs-toggle="pill" data-bs-target="#tab-hosted-content" type="button" role="tab">
-                    <i class="bi bi-person-workspace me-1"></i> Tôi chủ trì (${myHostedMeetings.length})
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link btn-sm" id="tab-invited-btn" data-bs-toggle="pill" data-bs-target="#tab-invited-content" type="button" role="tab">
-                    <i class="bi bi-envelope-open me-1"></i> Được mời tham gia (${myInvitedMeetings.length})
-                  </button>
-                </li>
-              </ul>
+              <div class="profile-tabs-wrapper mb-3">
+                <ul class="nav nav-pills profile-tabs-pill p-1 m-0" id="profile-meeting-tabs" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link profile-tab-btn active" id="tab-hosted-btn" data-bs-toggle="pill" data-bs-target="#tab-hosted-content" type="button" role="tab">
+                      <i class="bi bi-person-workspace me-1.5"></i> Tôi chủ trì (${myHostedMeetings.length})
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link profile-tab-btn" id="tab-invited-btn" data-bs-toggle="pill" data-bs-target="#tab-invited-content" type="button" role="tab">
+                      <i class="bi bi-envelope-open me-1.5"></i> Được mời tham gia (${myInvitedMeetings.length})
+                    </button>
+                  </li>
+                </ul>
+              </div>
 
               <div class="tab-content" id="profile-meeting-tab-content">
                 <!-- Tab 1: Tôi chủ trì -->

@@ -26,7 +26,7 @@
   />
 
   <!-- CSS riêng của project -->
-  <link rel="stylesheet" href="style.css?v=1.20" />
+  <link rel="stylesheet" href="style.css?v=1.23" />
 
   <!-- Auth Guard: Bắt buộc đăng nhập qua trang login.html riêng biệt (chuẩn kiến trúc QLNS_QLTKPM) -->
   <script>
@@ -148,11 +148,41 @@
         </div>
 
         <div class="header-right">
-          <!-- Nút thông báo -->
-          <button class="header-icon-btn" id="notifications-btn" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="badge-dot"></span>
-          </button>
+          <!-- Nút thông báo & Dropdown Bảng thông báo nhỏ chuẩn SaaS -->
+          <div class="notification-menu" id="notification-menu-wrapper">
+            <button class="header-icon-btn" id="notifications-btn" title="Thông báo hệ thống" type="button" aria-expanded="false" aria-haspopup="true">
+              <i class="bi bi-bell"></i>
+              <span class="badge-dot" id="notifications-badge-dot"></span>
+            </button>
+
+            <!-- Bảng thông báo nhỏ chuẩn SaaS (như Facebook, Jira, GitHub) -->
+            <div class="notification-dropdown" id="notification-dropdown">
+              <div class="notification-dropdown-header">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-1.5">
+                    <span class="fw-bold text-slate-900 fs-6">Thông báo</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill ms-1" id="notif-unread-count" style="font-size: 11px;">0</span>
+                  </div>
+                  <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-secondary" id="btn-mark-all-read" style="font-size: 11.5px;">
+                    <i class="bi bi-check2-all me-1"></i>Đã đọc tất cả
+                  </button>
+                </div>
+              </div>
+
+              <!-- Danh sách thông báo -->
+              <div class="notification-dropdown-body" id="notification-items-list">
+                <!-- Nội dung thông báo render động -->
+              </div>
+
+              <!-- Footer -->
+              <div class="notification-dropdown-footer">
+                <a href="#/meetings" class="btn-view-all-notifs" id="btn-view-all-meetings-notif">
+                  <span>Xem tất cả lịch họp</span>
+                  <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
 
           <!-- Chế độ chưa đăng nhập (mặc định ẩn vì Auth Guard bắt buộc qua login.html) -->
           <div id="auth-unlogged-section" class="d-none align-items-center gap-2">
@@ -791,6 +821,7 @@
               <div id="room-select-wrapper" class="d-none"></div>
               <input type="hidden" id="meeting-location" />
               <input type="hidden" id="meeting-organizer-id" value="1" />
+              <input type="hidden" id="meeting-organizer" name="organizerId" value="1" />
             </div>
           </div>
         </div>
@@ -896,39 +927,17 @@
               <span class="stitch-section-index stitch-section-index-advanced">4</span>
               <div>
                 <span class="stitch-section-title">Tùy chọn nâng cao</span>
-                <span class="stitch-advanced-subtext">Chủ trì, Nhãn &amp; Thiết bị</span>
+                <span class="stitch-advanced-subtext">Trạng thái, Nhãn &amp; Thiết bị</span>
               </div>
             </div>
             <i class="bi bi-chevron-down stitch-chevron"></i>
           </summary>
 
           <div class="stitch-advanced-body pt-3">
-            <!-- Grid 2 Cột Desktop: Chủ trì + Trạng thái / Nhãn cuộc họp -->
+            <!-- Grid 2 Cột Desktop: Trạng thái & Nhãn cuộc họp -->
             <div class="row g-3">
               <div class="col-12 col-md-6">
-                <div class="stitch-form-group" id="group-organizer">
-                  <label for="meeting-organizer" class="stitch-label mb-1">
-                    <i class="bi bi-person-badge text-primary me-1"></i> Người chủ trì cuộc họp
-                  </label>
-                  <select id="meeting-organizer" name="organizerId" class="form-select stitch-input" aria-label="Người tổ chức">
-                    <option value="1">Nguyễn Văn Quản Trị (ID: 1 - Quản trị)</option>
-                    <option value="2">Trần Thị Thư Ký (ID: 2 - Hành chính)</option>
-                    <option value="3">Lê Văn Trưởng Phòng (ID: 3 - Kỹ thuật)</option>
-                    <option value="4">Phạm Hoàng Nhân Viên (ID: 4 - Kỹ thuật)</option>
-                    <option value="5">Đỗ Quang Minh (ID: 5 - Quản trị)</option>
-                    <option value="6">Đoàn Ngọc Mạnh (ID: 6 - Kỹ thuật)</option>
-                    <option value="7">Đào Đức Mạnh (ID: 7 - Kỹ thuật)</option>
-                    <option value="8">Hoàng Minh Khánh (ID: 8 - Kỹ thuật)</option>
-                    <option value="9">Nguyễn Minh Lượng (ID: 9 - Kỹ thuật)</option>
-                    <option value="10">Hoàng Văn Khuyến (ID: 10 - Kiểm thử)</option>
-                    <option value="11">Triệu Quốc Khánh (ID: 11 - Kiểm thử)</option>
-                    <option value="12">Vũ Thị Thanh Ngân (ID: 12 - Thiết kế)</option>
-                    <option value="13">Ngô Đức Khải (ID: 13 - Kiểm thử)</option>
-                    <option value="14">Hà Sỹ Nguyên (ID: 14 - Kỹ thuật)</option>
-                  </select>
-                </div>
-
-                <div class="stitch-form-group mt-3" id="group-status">
+                <div class="stitch-form-group" id="group-status">
                   <label for="meeting-status" class="stitch-label mb-1">
                     <i class="bi bi-flag text-primary me-1"></i> Trạng thái
                   </label>
@@ -973,15 +982,6 @@
                       <option value="Hằng ngày"></option>
                       <option value="Nội bộ"></option>
                     </datalist>
-                  </div>
-
-                  <div class="stitch-quick-tags-row mt-2" id="quick-tag-selector">
-                    <span class="stitch-hint me-1">Gợi ý:</span>
-                    <button type="button" class="btn-tag-chip-select tag-sky" data-tag="Tuyển dụng" onclick="selectTag('Tuyển dụng')">Tuyển dụng</button>
-                    <button type="button" class="btn-tag-chip-select tag-danger" data-tag="Quan trọng" onclick="selectTag('Quan trọng')">Quan trọng</button>
-                    <button type="button" class="btn-tag-chip-select tag-sky" data-tag="Thiết kế" onclick="selectTag('Thiết kế')">Thiết kế</button>
-                    <button type="button" class="btn-tag-chip-select tag-primary" data-tag="Sprint 24" onclick="selectTag('Sprint 24')">Sprint 24</button>
-                    <button type="button" class="btn-tag-chip-select tag-primary" data-tag="Dự án mới" onclick="selectTag('Dự án mới')">Dự án mới</button>
                   </div>
                 </div>
               </div>
@@ -1854,11 +1854,14 @@
   <script src="js/pages/calendar.js?v=1.3"></script>
   <script src="js/pages/rooms.js?v=1.3"></script>
   <script src="js/pages/equipment.js?v=1.1"></script>
-  <script src="js/pages/profile.js?v=1.4"></script>
+  <script src="js/pages/profile.js?v=1.6"></script>
   <script src="js/pages/admin.js?v=1.2"></script>
 
+  <!-- Component Toast Nhắc Nhở Trước Giờ Họp & Đồng Bộ iCalendar -->
+  <script src="js/components/meetingReminderToast.js?v=1.1"></script>
+
   <!-- JavaScript nghiệp vụ chính & Khởi tạo CSDL -->
-  <script src="main.js?v=1.22"></script>
+  <script src="main.js?v=1.28"></script>
 
   <!-- JavaScript Phân quyền giao diện RBAC & Phòng VIP -->
   <script src="rbac.js?v=1.0"></script>
