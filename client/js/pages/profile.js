@@ -94,6 +94,19 @@
       return false;
     });
 
+    // Lọc danh sách cuộc họp người dùng này được mời tham gia
+    const myInvitedMeetings = (allMeetings || []).filter(m => {
+      const mOrgId = Number(m.organizerId || 0);
+      if (userId && mOrgId && mOrgId === userId) return false; // Không tính cuộc họp mình chủ trì
+      const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+      if (userId && pIds.includes(userId)) return true;
+      const pNames = Array.isArray(m.participants) ? m.participants.map(s => String(s).toLowerCase()) : [];
+      if (displayName && pNames.includes(displayName.toLowerCase())) return true;
+      return false;
+    });
+
+    const isUserAdmin = Boolean(user.role && String(user.role).toLowerCase() === 'admin');
+
     let roleBadge = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-6">Thành viên (USER)</span>';
     if (user.role && String(user.role).toLowerCase() === 'admin') {
       roleBadge = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-6"><i class="bi bi-shield-check me-1"></i>Quản trị viên (Admin)</span>';
@@ -159,88 +172,133 @@
 
             <!-- Thống kê hoạt động -->
             <div class="stitch-card p-4 mt-4">
-              <h6 class="fw-bold text-slate-800 mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Thống kê hoạt động</h6>
-              <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded-3">
-                <span class="text-secondary small">Cuộc họp do tôi chủ trì:</span>
+              <h6 class="fw-bold text-slate-800 mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Thống kê lịch họp</h6>
+              <div class="d-flex justify-content-between align-items-center mb-2 p-3 bg-light rounded-3">
+                <span class="text-secondary small">Cuộc họp tôi chủ trì:</span>
                 <span class="fw-bold fs-5 text-primary">${myHostedMeetings.length}</span>
               </div>
-              <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3">
-                <span class="text-secondary small">Tổng cuộc họp hệ thống:</span>
-                <span class="fw-bold fs-5 text-dark">${(allMeetings || []).length}</span>
+              <div class="d-flex justify-content-between align-items-center mb-2 p-3 bg-light rounded-3">
+                <span class="text-secondary small">Cuộc họp được mời:</span>
+                <span class="fw-bold fs-5 text-success">${myInvitedMeetings.length}</span>
               </div>
+              ${isUserAdmin ? `
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3">
+                  <span class="text-secondary small">Toàn bộ doanh nghiệp:</span>
+                  <span class="fw-bold fs-5 text-dark">${(allMeetings || []).length}</span>
+                </div>
+              ` : ''}
             </div>
           </div>
 
-          <!-- Cột bên phải: Danh sách cuộc họp của tôi (Đã lược bỏ nút tạo cuộc họp theo yêu cầu) -->
+          <!-- Cột bên phải: Danh sách cuộc họp của tôi -->
           <div class="col-lg-8">
             <div class="stitch-card p-4">
-              <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div>
                   <h4 class="fw-bold text-slate-900 m-0">Lịch họp của tôi</h4>
-                  <p class="text-secondary small m-0">Danh sách các cuộc họp bạn đang chủ trì hoặc tạo trên hệ thống</p>
+                  <p class="text-secondary small m-0">Chỉ hiển thị các cuộc họp bạn tổ chức hoặc được mời tham gia</p>
                 </div>
               </div>
 
-              ${myHostedMeetings.length === 0 ? `
-                <div class="text-center py-5">
-                  <i class="bi bi-calendar-check text-muted fs-1 mb-2 d-block"></i>
-                  <h6 class="fw-bold text-slate-700">Bạn chưa chủ trì cuộc họp nào</h6>
-                  <p class="text-secondary small mb-0">Các cuộc họp do bạn tạo hoặc chủ trì sẽ tự động hiển thị tại đây.</p>
-                </div>
-              ` : `
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                      <tr>
-                        <th class="small fw-semibold">Tiêu đề cuộc họp</th>
-                        <th class="small fw-semibold">Thời gian</th>
-                        <th class="small fw-semibold">Phòng họp</th>
-                        <th class="small fw-semibold">Trạng thái</th>
-                        <th class="small fw-semibold text-end">Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${myHostedMeetings.map(m => {
-                        const timeStr = m.time || (m.startTime ? `${m.startTime} - ${m.endTime}` : '--');
-                        let statusPill = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle">Đã lên lịch</span>';
-                        if (m.status === 'in-progress') statusPill = '<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Đang diễn ra</span>';
-                        else if (m.status === 'completed') statusPill = '<span class="badge bg-success-subtle text-success border border-success-subtle">Đã kết thúc</span>';
-                        else if (m.status === 'cancelled') statusPill = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Đã hủy</span>';
+              <!-- Tabs chuyển đổi giữa Cuộc họp chủ trì và Cuộc họp được mời -->
+              <ul class="nav nav-pills mb-3 border-bottom pb-2" id="profile-meeting-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active btn-sm" id="tab-hosted-btn" data-bs-toggle="pill" data-bs-target="#tab-hosted-content" type="button" role="tab">
+                    <i class="bi bi-person-workspace me-1"></i> Tôi chủ trì (${myHostedMeetings.length})
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link btn-sm" id="tab-invited-btn" data-bs-toggle="pill" data-bs-target="#tab-invited-content" type="button" role="tab">
+                    <i class="bi bi-envelope-open me-1"></i> Được mời tham gia (${myInvitedMeetings.length})
+                  </button>
+                </li>
+              </ul>
 
-                        return `
-                          <tr>
-                            <td>
-                              <div class="fw-bold text-slate-900">${escapeHtml(m.title)}</div>
-                              ${m.tag ? `<span class="badge bg-light text-secondary border small">${escapeHtml(m.tag)}</span>` : ''}
-                            </td>
-                            <td>
-                              <div class="small fw-medium">${m.date || '--'}</div>
-                              <div class="text-muted small">${timeStr}</div>
-                            </td>
-                            <td>
-                              <div class="small fw-medium"><i class="bi bi-door-closed me-1 text-primary"></i>${escapeHtml(m.roomName || 'Phòng họp')}</div>
-                            </td>
-                            <td>${statusPill}</td>
-                            <td class="text-end">
-                              <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2" onclick="if (typeof openDetailModal === 'function') openDetailModal(${m.id})" title="Xem chi tiết">
-                                <i class="bi bi-eye"></i>
-                              </button>
-                              <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2" onclick="if (typeof openEditModal === 'function') openEditModal(${m.id})" title="Chỉnh sửa">
-                                <i class="bi bi-pencil"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        `;
-                      }).join('')}
-                    </tbody>
-                  </table>
+              <div class="tab-content" id="profile-meeting-tab-content">
+                <!-- Tab 1: Tôi chủ trì -->
+                <div class="tab-pane fade show active" id="tab-hosted-content" role="tabpanel">
+                  ${myHostedMeetings.length === 0 ? `
+                    <div class="text-center py-5">
+                      <i class="bi bi-calendar-check text-muted fs-1 mb-2 d-block"></i>
+                      <h6 class="fw-bold text-slate-700">Bạn chưa chủ trì cuộc họp nào</h6>
+                      <p class="text-secondary small mb-0">Các cuộc họp do bạn đứng ra tổ chức sẽ xuất hiện tại đây.</p>
+                    </div>
+                  ` : renderMeetingListTable(myHostedMeetings, true)}
                 </div>
-              `}
+
+                <!-- Tab 2: Được mời tham gia -->
+                <div class="tab-pane fade" id="tab-invited-content" role="tabpanel">
+                  ${myInvitedMeetings.length === 0 ? `
+                    <div class="text-center py-5">
+                      <i class="bi bi-envelope text-muted fs-1 mb-2 d-block"></i>
+                      <h6 class="fw-bold text-slate-700">Chưa có lời mời họp nào</h6>
+                      <p class="text-secondary small mb-0">Khi đồng nghiệp mời bạn tham gia cuộc họp, lịch họp sẽ tự động hiển thị tại đây.</p>
+                    </div>
+                  ` : renderMeetingListTable(myInvitedMeetings, false)}
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
     `;
+
+    // Hàm render bảng cuộc họp tái sử dụng trong trang profile
+    function renderMeetingListTable(items, isOrganizer) {
+      return `
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th class="small fw-semibold">Tiêu đề cuộc họp</th>
+                <th class="small fw-semibold">${isOrganizer ? 'Thời gian' : 'Chủ trì / Thời gian'}</th>
+                <th class="small fw-semibold">Phòng họp</th>
+                <th class="small fw-semibold">Trạng thái</th>
+                <th class="small fw-semibold text-end">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(m => {
+                const timeStr = m.time || (m.startTime ? `${m.startTime} - ${m.endTime}` : '--');
+                let statusPill = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle">Đã lên lịch</span>';
+                if (m.status === 'in-progress') statusPill = '<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Đang diễn ra</span>';
+                else if (m.status === 'completed') statusPill = '<span class="badge bg-success-subtle text-success border border-success-subtle">Đã kết thúc</span>';
+                else if (m.status === 'cancelled') statusPill = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Đã hủy</span>';
+
+                return `
+                  <tr>
+                    <td>
+                      <div class="fw-bold text-slate-900">${escapeHtml(m.title)}</div>
+                      ${m.tag ? `<span class="badge bg-light text-secondary border small">${escapeHtml(m.tag)}</span>` : ''}
+                    </td>
+                    <td>
+                      ${!isOrganizer ? `<div class="small fw-semibold text-primary"><i class="bi bi-person me-1"></i>${escapeHtml(m.host || m.organizerName || 'Người tổ chức')}</div>` : ''}
+                      <div class="small fw-medium">${m.date || '--'}</div>
+                      <div class="text-muted small">${timeStr}</div>
+                    </td>
+                    <td>
+                      <div class="small fw-medium"><i class="bi bi-door-closed me-1 text-primary"></i>${escapeHtml(m.roomName || 'Phòng họp')}</div>
+                    </td>
+                    <td>${statusPill}</td>
+                    <td class="text-end">
+                      <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2" onclick="if (typeof openDetailModal === 'function') openDetailModal(${m.id})" title="Xem chi tiết">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      ${isOrganizer ? `
+                        <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2" onclick="if (typeof openEditModal === 'function') openEditModal(${m.id})" title="Chỉnh sửa">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                      ` : ''}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
 
     // Gắn sự kiện các nút
     document.getElementById('btn-profile-logout')?.addEventListener('click', () => {

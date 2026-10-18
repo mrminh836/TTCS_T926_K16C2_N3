@@ -71,6 +71,16 @@
           if (typeof window.initParticipantSelector === 'function') {
             window.initParticipantSelector([uid], uid);
           }
+          // Tự động đồng bộ lại lịch họp tương ứng với tài khoản vừa đăng nhập
+          if (typeof window.MeetingAPI !== 'undefined' && typeof window.MeetingAPI.getAll === 'function') {
+            window.MeetingAPI.getAll().then(() => {
+              if (window.location.hash.startsWith('#/calendar') && typeof window.renderCalendarPage === 'function') {
+                window.renderCalendarPage();
+              } else if (window.location.hash.startsWith('#/meetings') && typeof window.renderMeetingsPage === 'function') {
+                window.renderMeetingsPage();
+              }
+            });
+          }
         }
       } catch (e) {}
 
@@ -96,6 +106,11 @@
           }
           if (typeof window.initParticipantSelector === 'function') {
             window.initParticipantSelector([1], 1);
+          }
+          if (window.location.hash.startsWith('#/calendar') && typeof window.renderCalendarPage === 'function') {
+            window.renderCalendarPage();
+          } else if (window.location.hash.startsWith('#/meetings') && typeof window.renderMeetingsPage === 'function') {
+            window.renderMeetingsPage();
           }
         }
       } catch (e) {}

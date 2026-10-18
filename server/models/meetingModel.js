@@ -106,7 +106,9 @@ const Meeting = {
                 b.BookingStatus AS bookingStatus,
                 r.RoomID        AS roomId,
                 r.RoomName      AS roomName,
-                r.Capacity      AS roomCapacity
+                r.Capacity      AS roomCapacity,
+                (SELECT GROUP_CONCAT(mp.UserID) FROM Meeting_Participants mp WHERE mp.MeetingID = m.MeetingID) AS participantIds,
+                (SELECT GROUP_CONCAT(pu.FullName) FROM Meeting_Participants mp JOIN Users pu ON mp.UserID = pu.UserID WHERE mp.MeetingID = m.MeetingID) AS participantNames
             ${baseQuery}
             ORDER BY m.StartTime ${orderDirection}
             LIMIT ? OFFSET ?
@@ -115,8 +117,24 @@ const Meeting = {
         const dataParams = [...params, String(limit), String(offset)];
         const [rows] = await db.execute(dataQuery, dataParams);
 
+        // Chuẩn hóa danh sách người tham gia dạng mảng Number
+        const normalizedRows = (rows || []).map(row => {
+            const parsedParticipantIds = row.participantIds
+                ? String(row.participantIds).split(',').map(Number).filter(id => !isNaN(id) && id > 0)
+                : (row.organizerId ? [Number(row.organizerId)] : []);
+            const parsedParticipantNames = row.participantNames
+                ? String(row.participantNames).split(',').map(s => s.trim()).filter(Boolean)
+                : (row.organizerName ? [row.organizerName] : []);
+
+            return {
+                ...row,
+                participantIds: parsedParticipantIds,
+                participantNames: parsedParticipantNames
+            };
+        });
+
         return {
-            meetings: rows,
+            meetings: normalizedRows,
             pagination: {
                 currentPage: page,
                 limit,

@@ -839,11 +839,36 @@ function renderHome() {
 // =====================================================
 
 function renderMeetingsPage() {
-  const totalCount = meetings.length;
-  const scheduledCount = meetings.filter(m => m.status === "scheduled").length;
-  const inProgressCount = meetings.filter(m => m.status === "in-progress").length;
-  const completedCount = meetings.filter(m => m.status === "completed").length;
-  const cancelledCount = meetings.filter(m => m.status === "cancelled").length;
+  const authUser = getActiveAuthUser();
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id) : null;
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+
+  // RBAC Lọc danh sách cuộc họp:
+  // Admin: xem toàn bộ doanh nghiệp.
+  // Nhân viên: CHỈ xem cuộc họp do mình tổ chức HOẶC được mời tham gia.
+  const authorizedMeetings = meetings.filter(m => {
+    if (isUserAdmin) return true;
+    if (!currentUserId) return false;
+    const isOrg = Number(m.organizerId) === currentUserId;
+    const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+    const isInvited = pIds.includes(currentUserId);
+    return isOrg || isInvited;
+  });
+
+  const totalCount = authorizedMeetings.length;
+  const scheduledCount = authorizedMeetings.filter(m => m.status === "scheduled").length;
+  const inProgressCount = authorizedMeetings.filter(m => m.status === "in-progress").length;
+  const completedCount = authorizedMeetings.filter(m => m.status === "completed").length;
+  const cancelledCount = authorizedMeetings.filter(m => m.status === "cancelled").length;
+
+  const pageTitle = isUserAdmin ? "Danh sách cuộc họp" : "Cuộc họp của tôi";
+  const pageSubtitle = isUserAdmin
+    ? "Xem, tìm kiếm và quản lý toàn bộ lịch họp doanh nghiệp"
+    : "Danh sách các cuộc họp do bạn tổ chức hoặc được mời tham gia";
 
   app.innerHTML = `
     <div id="meetings-section" class="meetings-view-wrapper">
@@ -858,8 +883,8 @@ function renderMeetingsPage() {
             <span class="breadcrumb-separator">/</span>
             <span class="breadcrumb-item active">Cuộc họp</span>
           </nav>
-          <h1 class="page-header-title">Cuộc họp của tôi</h1>
-          <p class="page-header-subtitle">Xem, tìm kiếm và quản lý lịch họp doanh nghiệp</p>
+          <h1 class="page-header-title">${escapeHTML(pageTitle)}</h1>
+          <p class="page-header-subtitle">${escapeHTML(pageSubtitle)}</p>
         </div>
 
         <div class="page-header-actions">
@@ -3250,24 +3275,51 @@ const MeetingAPI = {
   async getAll() {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      const res = await fetch(`${MEETING_API_URL}?limit=100`, { signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+      const token = (window.AuthState && typeof window.AuthState.getToken === 'function')
+        ? window.AuthState.getToken()
+        : (localStorage.getItem('accessToken') || null);
+      const reqHeaders = { 'Accept': 'application/json' };
+      if (token) {
+        reqHeaders['Authorization'] = `Bearer ${token}`;
+      }
+
+      const fetchFn = window.apiFetch || fetch;
+      const res = await fetchFn(`${MEETING_API_URL}?limit=100`, {
+        headers: reqHeaders,
+        signal: controller.signal
+      });
       clearTimeout(timeoutId);
+
       if (res.ok) {
         const json = await res.json();
         this.isBackendConnected = true;
         this.updateStatusBadges();
         const serverMeetings = json.data || json;
         if (Array.isArray(serverMeetings)) {
-          meetings = serverMeetings.map(m => {
+          let parsedMeetings = serverMeetings.map(m => {
             const startD = new Date(m.startTime);
             const endD = new Date(m.endTime);
             const dateStr = !isNaN(startD.getTime()) ? startD.toISOString().slice(0, 10) : "";
             const startHHMM = !isNaN(startD.getTime()) ? startD.toTimeString().slice(0, 5) : "";
             const endHHMM = !isNaN(endD.getTime()) ? endD.toTimeString().slice(0, 5) : "";
 
+            const parsedParticipantIds = Array.isArray(m.participantIds)
+              ? m.participantIds.map(Number).filter(id => !isNaN(id) && id > 0)
+              : (typeof m.participantIds === 'string'
+                  ? m.participantIds.split(',').map(Number).filter(id => !isNaN(id) && id > 0)
+                  : (m.organizerId ? [Number(m.organizerId)] : []));
+
+            const parsedParticipantNames = Array.isArray(m.participantNames)
+              ? m.participantNames
+              : (Array.isArray(m.participants)
+                  ? m.participants
+                  : (typeof m.participantNames === 'string' ? m.participantNames.split(',').map(s => s.trim()) : [m.organizerName || "Admin"]));
+
             return {
               id: m.meetingId || m.id,
+              meetingId: m.meetingId || m.id,
               title: m.title || "Cuộc họp",
               tag: m.isRecurring ? "Định kỳ" : "Thường kỳ",
               date: dateStr,
@@ -3279,12 +3331,33 @@ const MeetingAPI = {
               capacity: m.roomCapacity || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.capacity) || 20,
               organizerId: m.organizerId,
               host: m.organizerName || "Admin",
-              participants: [m.organizerName || "Admin"],
-              participantIds: [m.organizerId],
+              participants: parsedParticipantNames,
+              participantIds: parsedParticipantIds,
+              participantNames: parsedParticipantNames,
               status: m.bookingStatus ? m.bookingStatus.toLowerCase() : "scheduled",
               notes: m.description || ""
             };
           });
+
+          // ── RBAC Lọc dữ liệu nghiêm ngặt phía Client (Defense-in-depth) ──
+          const authUser = getActiveAuthUser();
+          const currentUserId = authUser ? Number(authUser.userId || authUser.id) : null;
+          const isUserAdmin = Boolean(
+            (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+              ? window.AuthState.isAdmin()
+              : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+          );
+
+          if (!isUserAdmin && currentUserId) {
+            parsedMeetings = parsedMeetings.filter(m => {
+              const isOrg = Number(m.organizerId) === currentUserId;
+              const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+              const isInvited = pIds.includes(currentUserId);
+              return isOrg || isInvited;
+            });
+          }
+
+          meetings = parsedMeetings;
         }
         return { success: true, data: meetings, isFallback: false };
       }
@@ -6851,9 +6924,25 @@ function renderMeetingTable() {
 
   if (!list || !table || !empty) return;
 
+  const authUser = getActiveAuthUser();
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id) : null;
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+
   const keyword = (searchInput ? searchInput.value : "").trim().toLowerCase();
 
   const filteredMeetings = meetings.filter(meeting => {
+    // RBAC: Nếu là nhân viên, CHỈ hiển thị nếu mình là người tổ chức HOẶC được mời tham gia
+    if (!isUserAdmin && currentUserId) {
+      const isOrg = Number(meeting.organizerId) === currentUserId;
+      const pIds = Array.isArray(meeting.participantIds) ? meeting.participantIds.map(Number) : [];
+      const isInvited = pIds.includes(currentUserId);
+      if (!isOrg && !isInvited) return false;
+    }
+
     const title = (meeting.title || "").toLowerCase();
     const roomName = (meeting.roomName || meeting.location || "").toLowerCase();
     const host = (meeting.host || "").toLowerCase();

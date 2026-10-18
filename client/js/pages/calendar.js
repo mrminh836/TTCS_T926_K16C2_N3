@@ -219,7 +219,20 @@
     // 5. Gọi API lấy danh sách cuộc họp có phân quyền tại Backend
     try {
       const apiUrl = `/api/meetings?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&limit=100&sortOrder=ASC`;
-      const response = await fetch(apiUrl, { signal: activeAbortController.signal });
+      
+      const token = (window.AuthState && typeof window.AuthState.getToken === 'function')
+        ? window.AuthState.getToken()
+        : (localStorage.getItem('accessToken') || null);
+      const reqHeaders = { 'Accept': 'application/json' };
+      if (token) {
+        reqHeaders['Authorization'] = `Bearer ${token}`;
+      }
+
+      const fetchFn = window.apiFetch || fetch;
+      const response = await fetchFn(apiUrl, {
+        headers: reqHeaders,
+        signal: activeAbortController.signal
+      });
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -236,7 +249,7 @@
       const serverMeetings = resJson.data || resJson.meetings || [];
 
       // 6. Chuẩn hóa dữ liệu cuộc họp trả về từ API
-      cachedCalendarMeetings = (Array.isArray(serverMeetings) ? serverMeetings : []).map(m => {
+      let normalizedMeetings = (Array.isArray(serverMeetings) ? serverMeetings : []).map(m => {
         const meetingDate = extractLocalDateStr(m.startTime || m.date);
         const startHHMM = formatHHMM(m.startTime);
         const endHHMM = formatHHMM(m.endTime);
@@ -244,6 +257,18 @@
         const roomName = m.roomName || 'Phòng họp';
         const isRecurring = Boolean(m.isRecurring);
         const bookingStatus = (m.bookingStatus || m.status || 'confirmed').toLowerCase();
+
+        const parsedParticipantIds = Array.isArray(m.participantIds)
+          ? m.participantIds.map(Number).filter(id => !isNaN(id) && id > 0)
+          : (typeof m.participantIds === 'string'
+              ? m.participantIds.split(',').map(Number).filter(id => !isNaN(id) && id > 0)
+              : (m.organizerId ? [Number(m.organizerId)] : []));
+
+        const parsedParticipantNames = Array.isArray(m.participantNames)
+          ? m.participantNames
+          : (Array.isArray(m.participants)
+              ? m.participants
+              : (typeof m.participantNames === 'string' ? m.participantNames.split(',').map(s => s.trim()) : [hostName]));
 
         return {
           id: m.meetingId || m.id,
@@ -261,9 +286,31 @@
           host: hostName,
           status: bookingStatus,
           notes: m.description || '',
-          isRecurring: isRecurring
+          isRecurring: isRecurring,
+          participantIds: parsedParticipantIds,
+          participantNames: parsedParticipantNames,
+          participants: parsedParticipantNames
         };
       });
+
+      // ── RBAC Lọc phân quyền nghiêm ngặt phía Client (Defense-in-depth) ──
+      // Admin: Xem lịch toàn cơ quan.
+      // Nhân viên: CHỈ hiển thị cuộc họp do mình tổ chức HOẶC mình được mời tham gia (participantIds)
+      const currentUserId = (currentUser && (currentUser.userId || currentUser.id)) ? Number(currentUser.userId || currentUser.id) : null;
+      const isCurrentAdmin = Boolean(
+        isAdmin || (currentUser && currentUser.role && String(currentUser.role).toLowerCase() === 'admin')
+      );
+
+      if (!isCurrentAdmin && currentUserId) {
+        normalizedMeetings = normalizedMeetings.filter(m => {
+          const isOrganizer = Number(m.organizerId) === currentUserId;
+          const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+          const isInvited = pIds.includes(currentUserId);
+          return isOrganizer || isInvited;
+        });
+      }
+
+      cachedCalendarMeetings = normalizedMeetings;
 
       // Đồng bộ vào window.meetings để modal chi tiết và các hàm toàn cục khác sử dụng an toàn
       window.meetings = cachedCalendarMeetings;
