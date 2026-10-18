@@ -7179,6 +7179,9 @@ textarea.form-control {
   padding: 8px 10px;
   transition: all 0.15s ease;
   font-size: 0.82rem;
+  min-width: 0;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .calendar-event-card:hover {
@@ -7197,11 +7200,39 @@ textarea.form-control {
   font-weight: 600;
   color: #0f172a;
   margin-bottom: 2px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .calendar-event-card .event-room {
   font-size: 0.75rem;
   color: #64748b;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-event-card .event-footer {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.calendar-event-card .event-host-group {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.calendar-event-card .event-host {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
 }
 
 .user-avatar-tiny {

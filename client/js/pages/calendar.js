@@ -123,11 +123,11 @@
                         <div class="event-title text-truncate" title="${m.title || ''}">${m.title || 'Cuộc họp'}</div>
                         <div class="event-room text-truncate"><i class="bi bi-door-closed me-1"></i>${m.roomName || 'Phòng họp'}</div>
                         <div class="event-footer mt-2 d-flex align-items-center justify-content-between">
-                          <div class="d-flex align-items-center gap-1">
-                            <span class="user-avatar-tiny" style="background-color: ${hostColor}">${initials}</span>
-                            <span class="event-host text-truncate small text-secondary">${hostName}</span>
+                          <div class="event-host-group d-flex align-items-center gap-1">
+                            <span class="user-avatar-tiny flex-shrink-0" style="background-color: ${hostColor}">${initials}</span>
+                            <span class="event-host text-truncate small text-secondary" title="${hostName}">${hostName}</span>
                           </div>
-                          <span class="badge-status-dot status-${m.status || 'scheduled'}"></span>
+                          <span class="badge-status-dot flex-shrink-0 ms-1 status-${m.status || 'scheduled'}"></span>
                         </div>
                       </div>
                     `;
