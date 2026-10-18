@@ -791,6 +791,7 @@
               <div id="room-select-wrapper" class="d-none"></div>
               <input type="hidden" id="meeting-location" />
               <input type="hidden" id="meeting-organizer-id" value="1" />
+              <input type="hidden" id="meeting-organizer" name="organizerId" value="1" />
             </div>
           </div>
         </div>
@@ -896,39 +897,17 @@
               <span class="stitch-section-index stitch-section-index-advanced">4</span>
               <div>
                 <span class="stitch-section-title">Tùy chọn nâng cao</span>
-                <span class="stitch-advanced-subtext">Chủ trì, Nhãn &amp; Thiết bị</span>
+                <span class="stitch-advanced-subtext">Trạng thái, Nhãn &amp; Thiết bị</span>
               </div>
             </div>
             <i class="bi bi-chevron-down stitch-chevron"></i>
           </summary>
 
           <div class="stitch-advanced-body pt-3">
-            <!-- Grid 2 Cột Desktop: Chủ trì + Trạng thái / Nhãn cuộc họp -->
+            <!-- Grid 2 Cột Desktop: Trạng thái & Nhãn cuộc họp -->
             <div class="row g-3">
               <div class="col-12 col-md-6">
-                <div class="stitch-form-group" id="group-organizer">
-                  <label for="meeting-organizer" class="stitch-label mb-1">
-                    <i class="bi bi-person-badge text-primary me-1"></i> Người chủ trì cuộc họp
-                  </label>
-                  <select id="meeting-organizer" name="organizerId" class="form-select stitch-input" aria-label="Người tổ chức">
-                    <option value="1">Nguyễn Văn Quản Trị (ID: 1 - Quản trị)</option>
-                    <option value="2">Trần Thị Thư Ký (ID: 2 - Hành chính)</option>
-                    <option value="3">Lê Văn Trưởng Phòng (ID: 3 - Kỹ thuật)</option>
-                    <option value="4">Phạm Hoàng Nhân Viên (ID: 4 - Kỹ thuật)</option>
-                    <option value="5">Đỗ Quang Minh (ID: 5 - Quản trị)</option>
-                    <option value="6">Đoàn Ngọc Mạnh (ID: 6 - Kỹ thuật)</option>
-                    <option value="7">Đào Đức Mạnh (ID: 7 - Kỹ thuật)</option>
-                    <option value="8">Hoàng Minh Khánh (ID: 8 - Kỹ thuật)</option>
-                    <option value="9">Nguyễn Minh Lượng (ID: 9 - Kỹ thuật)</option>
-                    <option value="10">Hoàng Văn Khuyến (ID: 10 - Kiểm thử)</option>
-                    <option value="11">Triệu Quốc Khánh (ID: 11 - Kiểm thử)</option>
-                    <option value="12">Vũ Thị Thanh Ngân (ID: 12 - Thiết kế)</option>
-                    <option value="13">Ngô Đức Khải (ID: 13 - Kiểm thử)</option>
-                    <option value="14">Hà Sỹ Nguyên (ID: 14 - Kỹ thuật)</option>
-                  </select>
-                </div>
-
-                <div class="stitch-form-group mt-3" id="group-status">
+                <div class="stitch-form-group" id="group-status">
                   <label for="meeting-status" class="stitch-label mb-1">
                     <i class="bi bi-flag text-primary me-1"></i> Trạng thái
                   </label>
@@ -1861,7 +1840,7 @@
   <script src="js/components/meetingReminderToast.js?v=1.0"></script>
 
   <!-- JavaScript nghiệp vụ chính & Khởi tạo CSDL -->
-  <script src="main.js?v=1.23"></script>
+  <script src="main.js?v=1.24"></script>
 
   <!-- JavaScript Phân quyền giao diện RBAC & Phòng VIP -->
   <script src="rbac.js?v=1.0"></script>

@@ -65,27 +65,16 @@ window.getCurrentUser = getActiveAuthUser;
 
 function getCurrentOrganizerId() {
   const authUser = getActiveAuthUser();
-  const isAdmin = Boolean(
-    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
-      ? window.AuthState.isAdmin()
-      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
-  );
-  const organizerSelect = document.getElementById("meeting-organizer");
+  const orgIdInput = document.getElementById("meeting-organizer-id") || document.getElementById("meeting-organizer");
 
-  // Nếu là Admin, có quyền chọn người tổ chức khác qua dropdown
-  if (isAdmin && organizerSelect && organizerSelect.value) {
-    const val = Number(organizerSelect.value);
-    if (!isNaN(val) && val > 0) return val;
-  }
-
-  // Nếu là Nhân viên / Non-admin, BẮT BUỘC là tài khoản đang đăng nhập
+  // Người tổ chức mặc định là tài khoản đang đăng nhập
   if (authUser) {
     const authId = Number(authUser.userId || authUser.id || 0);
     if (authId > 0) return authId;
   }
 
-  if (organizerSelect && organizerSelect.value) {
-    const val = Number(organizerSelect.value);
+  if (orgIdInput && orgIdInput.value) {
+    const val = Number(orgIdInput.value);
     if (!isNaN(val) && val > 0) return val;
   }
 
@@ -95,8 +84,6 @@ window.getCurrentOrganizerId = getCurrentOrganizerId;
 
 function syncMeetingOrganizerOptions(selectedId = null) {
   const select = document.getElementById("meeting-organizer");
-  if (!select) return;
-
   const authUser = getActiveAuthUser();
   if (authUser && Array.isArray(USERS) && !USERS.some(u => u.id === Number(authUser.userId || authUser.id))) {
     const authId = Number(authUser.userId || authUser.id);
@@ -113,15 +100,19 @@ function syncMeetingOrganizerOptions(selectedId = null) {
 
   const activeId = selectedId ? Number(selectedId) : getCurrentOrganizerId();
 
-  if (Array.isArray(USERS) && USERS.length > 0) {
-    select.innerHTML = USERS.map(u => `
-      <option value="${u.id}" ${Number(u.id) === Number(activeId) ? 'selected' : ''}>
-        ${escapeHTML(u.name)} (ID: ${u.id} - ${escapeHTML(u.department || u.role)})
-      </option>
-    `).join("");
+  if (select) {
+    if (select.tagName === "SELECT" && Array.isArray(USERS) && USERS.length > 0) {
+      select.innerHTML = USERS.map(u => `
+        <option value="${u.id}" ${Number(u.id) === Number(activeId) ? 'selected' : ''}>
+          ${escapeHTML(u.name)} (ID: ${u.id} - ${escapeHTML(u.department || u.role)})
+        </option>
+      `).join("");
+    }
+    select.value = String(activeId);
   }
 
-  select.value = String(activeId);
+  const orgIdInput = document.getElementById("meeting-organizer-id");
+  if (orgIdInput) orgIdInput.value = String(activeId);
 }
 window.syncMeetingOrganizerOptions = syncMeetingOrganizerOptions;
 
@@ -3835,10 +3826,18 @@ function validateMeetingForm(editId = null) {
     : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin');
 
   let activeOrgId = organizerId;
+  if (!activeOrgId) {
+    const orgIdInput = document.getElementById("meeting-organizer-id") || document.getElementById("meeting-organizer");
+    if (orgIdInput && orgIdInput.value) activeOrgId = Number(orgIdInput.value);
+  }
   // Nếu là Nhân viên (hoặc không phải Admin), người tổ chức bắt buộc là chính tài khoản đang đăng nhập
   if (!isAdmin && authUser) {
     activeOrgId = Number(authUser.userId || authUser.id || activeOrgId);
   }
+  if (!activeOrgId && authUser) {
+    activeOrgId = Number(authUser.userId || authUser.id || 1);
+  }
+  if (!activeOrgId) activeOrgId = 1;
 
   let organizerObj = USERS.find(u => u.id === activeOrgId);
   if (!organizerObj && authUser) {
