@@ -549,25 +549,8 @@
       // Nút đăng xuất trên header hoặc dropdown
       const logoutBtn = document.getElementById('btn-header-logout');
       if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-          e.preventDefault();
-          let shouldLogout = false;
-          if (typeof window.showConfirmDialog === 'function') {
-            shouldLogout = await window.showConfirmDialog({
-              title: 'Đăng xuất tài khoản',
-              message: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống Enterprise Sync không?',
-              confirmText: 'Đăng xuất',
-              cancelText: 'Ở lại',
-              type: 'danger',
-              icon: 'bi-box-arrow-right'
-            });
-          } else {
-            shouldLogout = confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?');
-          }
-          if (shouldLogout) {
-            AuthState.logout('login.html');
-          }
-        });
+        logoutBtn.removeEventListener('click', handleUserLogout);
+        logoutBtn.addEventListener('click', handleUserLogout);
       }
 
       // Chuyển đổi tab
@@ -1022,12 +1005,57 @@
   });
 
   // ============================================================================
-  // 8. KHỞI TẠO TỰ ĐỘNG & XUẤT TOÀN CỤC
+  // 8. ĐĂNG XUẤT TOÀN CỤC CHUẨN XÁC NHẬN (GLOBAL LOGOUT HANDLER)
   // ============================================================================
-  document.addEventListener('DOMContentLoaded', function () {
+  async function handleUserLogout(e) {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    let shouldLogout = false;
+    try {
+      if (typeof window.showConfirmDialog === 'function') {
+        shouldLogout = await window.showConfirmDialog({
+          title: 'Đăng xuất tài khoản',
+          message: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống Enterprise Sync không?',
+          confirmText: 'Đăng xuất',
+          cancelText: 'Ở lại',
+          type: 'danger',
+          icon: 'bi-box-arrow-right'
+        });
+      } else {
+        shouldLogout = window.confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?');
+      }
+    } catch (err) {
+      console.warn('[handleUserLogout dialog error]:', err);
+      shouldLogout = window.confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?');
+    }
+
+    if (shouldLogout) {
+      if (window.AuthState && typeof window.AuthState.logout === 'function') {
+        window.AuthState.logout('login.html');
+      } else {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      }
+    }
+  }
+
+  // ============================================================================
+  // 9. KHỞI TẠO TỰ ĐỘNG & XUẤT TOÀN CỤC
+  // ============================================================================
+  function bootAuth() {
     AuthModal.init();
     AuthState.init();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootAuth);
+  } else {
+    bootAuth();
+  }
 
   // Xuất ra phạm vi toàn cục để main.js và các module khác sử dụng
   window.AuthState = AuthState;
@@ -1035,5 +1063,6 @@
   window.AuthAPI = AuthAPI;
   window.AuthModal = AuthModal;
   window.showToast = showToast;
+  window.handleUserLogout = handleUserLogout;
 
 })(window, document);

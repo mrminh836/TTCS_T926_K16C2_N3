@@ -369,8 +369,10 @@
    */
   function bindProfilePageEvents(user, allMeetings) {
     // 1. Nút Đăng xuất
-    document.getElementById('btn-profile-logout')?.addEventListener('click', () => {
-      if (typeof window.showConfirmDialog === 'function') {
+    document.getElementById('btn-profile-logout')?.addEventListener('click', (e) => {
+      if (typeof window.handleUserLogout === 'function') {
+        window.handleUserLogout(e);
+      } else if (typeof window.showConfirmDialog === 'function') {
         window.showConfirmDialog({
           title: 'Đăng xuất tài khoản',
           message: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?',

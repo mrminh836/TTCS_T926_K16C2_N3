@@ -3,46 +3,42 @@
  * COMPONENT: MODAL XÁC NHẬN CHUẨN STITCH ENTERPRISE (CONFIRM MODAL)
  * Dự án: Meeting Management System – ICTU (Enterprise Sync)
  * Cung cấp: window.showConfirmDialog(options) trả về Promise<boolean>
+ * Đồng thời hỗ trợ callback onConfirm và desc cho tương thích ngược
  * ==============================================================================
  */
 
 (function (window, document) {
   'use strict';
 
-  let activeResolve = null;
-
-  /**
-   * Tạo hoặc lấy container modal xác nhận trong DOM
-   */
   function ensureConfirmModalDOM() {
-    let overlay = document.getElementById('app-confirm-modal-overlay');
+    let overlay = document.getElementById('confirm-modal-overlay');
     if (overlay) return overlay;
 
     overlay = document.createElement('div');
-    overlay.id = 'app-confirm-modal-overlay';
-    overlay.className = 'confirm-modal-overlay hidden';
+    overlay.id = 'confirm-modal-overlay';
+    overlay.className = 'modal-overlay hidden';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-labelledby', 'confirm-modal-title');
-    overlay.setAttribute('aria-describedby', 'confirm-modal-message');
 
     overlay.innerHTML = `
-      <div class="confirm-modal-backdrop" id="confirm-modal-backdrop"></div>
-      <div class="confirm-modal-card">
-        <div class="confirm-modal-body">
-          <div class="confirm-modal-icon-wrapper" id="confirm-modal-icon-wrapper">
-            <i class="bi bi-exclamation-triangle-fill" id="confirm-modal-icon"></i>
+      <div class="confirm-dialog-card">
+        <div class="confirm-dialog-header">
+          <div class="confirm-dialog-icon danger" id="confirm-modal-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
           </div>
-          <div class="confirm-modal-text">
-            <h3 class="confirm-modal-title" id="confirm-modal-title">Xác nhận thao tác</h3>
-            <p class="confirm-modal-message" id="confirm-modal-message">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+          <div>
+            <h4 id="confirm-modal-title" class="confirm-dialog-title">Xác nhận thao tác</h4>
+            <p id="confirm-modal-desc" class="confirm-dialog-desc">
+              Bạn có chắc chắn muốn thực hiện hành động này không?
+            </p>
           </div>
         </div>
-        <div class="confirm-modal-actions">
-          <button type="button" class="btn btn-outline-secondary confirm-modal-btn-cancel" id="confirm-modal-btn-cancel">
+        <div class="confirm-dialog-actions">
+          <button type="button" class="btn btn-secondary" id="btn-confirm-cancel">
             Hủy bỏ
           </button>
-          <button type="button" class="btn btn-danger confirm-modal-btn-confirm" id="confirm-modal-btn-confirm">
+          <button type="button" class="btn btn-danger" id="btn-confirm-submit">
             Xác nhận
           </button>
         </div>
@@ -50,115 +46,100 @@
     `;
 
     document.body.appendChild(overlay);
-
-    // Gắn sự kiện đóng / hủy
-    const backdrop = overlay.querySelector('#confirm-modal-backdrop');
-    const cancelBtn = overlay.querySelector('#confirm-modal-btn-cancel');
-    const confirmBtn = overlay.querySelector('#confirm-modal-btn-confirm');
-
-    const handleCancel = () => closeConfirmModal(false);
-    const handleConfirm = () => closeConfirmModal(true);
-
-    if (backdrop) backdrop.addEventListener('click', handleCancel);
-    if (cancelBtn) cancelBtn.addEventListener('click', handleCancel);
-    if (confirmBtn) confirmBtn.addEventListener('click', handleConfirm);
-
-    // Lắng nghe phím ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
-        closeConfirmModal(false);
-      }
-    });
-
     return overlay;
   }
 
   /**
-   * Đóng modal và resolve Promise
-   */
-  function closeConfirmModal(result) {
-    const overlay = document.getElementById('app-confirm-modal-overlay');
-    if (overlay) {
-      overlay.classList.add('hidden');
-      overlay.classList.remove('active');
-    }
-    if (typeof activeResolve === 'function') {
-      const resolve = activeResolve;
-      activeResolve = null;
-      resolve(Boolean(result));
-    }
-  }
-
-  /**
-   * Hiển thị hộp thoại xác nhận đẹp mắt chuẩn SaaS
+   * Hiển thị hộp thoại xác nhận chuyên nghiệp chuẩn SaaS Enterprise
    * @param {Object} options
    * @param {string} options.title - Tiêu đề hộp thoại
-   * @param {string} options.message - Nội dung thông điệp
+   * @param {string} [options.message] - Nội dung thông điệp
+   * @param {string} [options.desc] - Nội dung thông điệp (tương thích ngược)
    * @param {string} [options.confirmText='Xác nhận'] - Nhãn nút xác nhận
    * @param {string} [options.cancelText='Hủy bỏ'] - Nhãn nút hủy
    * @param {string} [options.type='danger'] - danger | warning | info | primary
-   * @param {string} [options.icon] - Bootstrap icon class (tùy chọn)
+   * @param {boolean} [options.isDanger] - Tương thích ngược với main.js
+   * @param {Function} [options.onConfirm] - Callback khi xác nhận (tương thích ngược)
+   * @param {string} [options.icon] - Icon class
    * @returns {Promise<boolean>}
    */
   function showConfirmDialog(options = {}) {
-    const {
-      title = 'Xác nhận thao tác',
-      message = 'Bạn có chắc chắn muốn thực hiện hành động này không?',
-      confirmText = 'Xác nhận',
-      cancelText = 'Hủy bỏ',
-      type = 'danger',
-      icon = null
-    } = options;
-
     const overlay = ensureConfirmModalDOM();
 
-    const titleEl = overlay.querySelector('#confirm-modal-title');
-    const messageEl = overlay.querySelector('#confirm-modal-message');
-    const cancelBtn = overlay.querySelector('#confirm-modal-btn-cancel');
-    const confirmBtn = overlay.querySelector('#confirm-modal-btn-confirm');
-    const iconWrapper = overlay.querySelector('#confirm-modal-icon-wrapper');
-    const iconEl = overlay.querySelector('#confirm-modal-icon');
+    const title = options.title || 'Xác nhận thao tác';
+    const desc = options.message || options.desc || 'Bạn có chắc chắn muốn thực hiện hành động này không?';
+    const cancelText = options.cancelText || 'Hủy bỏ';
+    const confirmText = options.confirmText || 'Xác nhận';
+    const isDanger = options.isDanger !== undefined ? options.isDanger : (options.type !== 'primary');
+    const onConfirm = typeof options.onConfirm === 'function' ? options.onConfirm : null;
+
+    const titleEl = overlay.querySelector('#confirm-modal-title') || document.getElementById('confirm-modal-title');
+    const descEl = overlay.querySelector('#confirm-modal-desc') || document.getElementById('confirm-modal-desc');
+    const btnCancel = overlay.querySelector('#btn-confirm-cancel') || document.getElementById('btn-confirm-cancel');
+    const btnSubmit = overlay.querySelector('#btn-confirm-submit') || document.getElementById('btn-confirm-submit');
+    const iconWrapper = overlay.querySelector('#confirm-modal-icon') || document.getElementById('confirm-modal-icon');
 
     if (titleEl) titleEl.textContent = title;
-    if (messageEl) messageEl.textContent = message;
-    if (cancelBtn) cancelBtn.textContent = cancelText;
-    if (confirmBtn) {
-      confirmBtn.textContent = confirmText;
-      // Đặt class nút theo type
-      confirmBtn.className = 'btn confirm-modal-btn-confirm';
-      if (type === 'danger') {
-        confirmBtn.classList.add('btn-danger', 'confirm-btn-danger');
-      } else if (type === 'warning') {
-        confirmBtn.classList.add('btn-warning', 'confirm-btn-warning');
-      } else if (type === 'primary') {
-        confirmBtn.classList.add('btn-primary', 'stitch-btn-primary');
-      } else {
-        confirmBtn.classList.add('btn-secondary');
-      }
+    if (descEl) descEl.textContent = desc;
+    if (btnCancel) btnCancel.textContent = cancelText;
+    if (btnSubmit) {
+      btnSubmit.textContent = confirmText;
+      btnSubmit.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
     }
-
-    // Đặt class icon wrapper
-    if (iconWrapper && iconEl) {
-      iconWrapper.className = `confirm-modal-icon-wrapper type-${type}`;
-      let iconClass = icon;
-      if (!iconClass) {
-        if (type === 'danger') iconClass = 'bi-exclamation-triangle-fill';
-        else if (type === 'warning') iconClass = 'bi-exclamation-circle-fill';
-        else if (type === 'info') iconClass = 'bi-info-circle-fill';
-        else iconClass = 'bi-question-circle-fill';
-      }
-      iconEl.className = `bi ${iconClass}`;
+    if (iconWrapper) {
+      iconWrapper.className = isDanger ? 'confirm-dialog-icon danger' : 'confirm-dialog-icon warning';
     }
-
-    overlay.classList.remove('hidden');
-    // Kích hoạt animation
-    requestAnimationFrame(() => {
-      overlay.classList.add('active');
-      if (confirmBtn) confirmBtn.focus();
-    });
 
     return new Promise((resolve) => {
-      activeResolve = resolve;
+      let resolved = false;
+
+      const cleanup = () => {
+        overlay.classList.add('hidden');
+        btnCancel?.removeEventListener('click', onCancelClick);
+        btnSubmit?.removeEventListener('click', onSubmitClick);
+        overlay.removeEventListener('click', onOverlayClick);
+        document.removeEventListener('keydown', onEsc);
+      };
+
+      const finish = (result) => {
+        if (resolved) return;
+        resolved = true;
+        cleanup();
+        if (result && onConfirm) {
+          try {
+            onConfirm();
+          } catch (err) {
+            console.error('[showConfirmDialog onConfirm error]:', err);
+          }
+        }
+        resolve(Boolean(result));
+      };
+
+      const onCancelClick = (e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        finish(false);
+      };
+
+      const onSubmitClick = (e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        finish(true);
+      };
+
+      const onOverlayClick = (e) => {
+        if (e.target === overlay) finish(false);
+      };
+
+      const onEsc = (e) => {
+        if (e.key === 'Escape') finish(false);
+      };
+
+      btnCancel?.addEventListener('click', onCancelClick);
+      btnSubmit?.addEventListener('click', onSubmitClick);
+      overlay.addEventListener('click', onOverlayClick);
+      document.addEventListener('keydown', onEsc);
+
+      overlay.classList.remove('hidden');
+      if (btnSubmit) btnSubmit.focus();
     });
   }
 

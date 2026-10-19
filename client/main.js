@@ -8060,7 +8060,11 @@ function getNextId() {
 // 14. HỘP THOẠI XÁC NHẬN CHUYÊN NGHIỆP & HỦY/XÓA CUỘC HỌP (PHẦN V & VII SPEC)
 // =====================================================
 
-function showConfirmDialog({ title, desc, cancelText = 'Giữ cuộc họp', confirmText = 'Xác nhận hủy', isDanger = true, onConfirm }) {
+function showMeetingConfirmDialog(options = {}) {
+  if (window.showConfirmDialog && typeof window.showConfirmDialog === 'function' && window.showConfirmDialog !== showMeetingConfirmDialog) {
+    return window.showConfirmDialog(options);
+  }
+  const { title, desc, cancelText = 'Giữ cuộc họp', confirmText = 'Xác nhận hủy', isDanger = true, onConfirm } = options;
   const overlay = document.getElementById('confirm-modal-overlay');
   if (!overlay) return;
 
@@ -8118,7 +8122,7 @@ function confirmCancelMeeting(id) {
     return;
   }
 
-  showConfirmDialog({
+  showMeetingConfirmDialog({
     title: 'Hủy cuộc họp này?',
     desc: `Bạn có chắc chắn muốn hủy cuộc họp "${meeting.title}" không? Hành động này có thể ảnh hưởng đến những người tham gia.`,
     cancelText: 'Giữ cuộc họp',
@@ -8889,7 +8893,7 @@ window.exportToCSV = exportToCSV;
 window.getInitials = getInitials;
 window.getHostColor = getHostColor;
 window.confirmCancelMeeting = confirmCancelMeeting;
-window.showConfirmDialog = showConfirmDialog;
+// window.showConfirmDialog được cung cấp bởi confirmModal.js (Promise-based SaaS Modal)
 window.saveMeeting = saveMeeting;
 window.closeMeetingModal = closeMeetingModal;
 window.closeDetailModal = closeDetailModal;
