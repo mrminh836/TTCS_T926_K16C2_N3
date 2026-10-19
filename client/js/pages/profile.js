@@ -347,7 +347,7 @@
                     </td>
                     <td>${statusBadge}</td>
                     <td class="text-end">
-                      <button type="button" class="btn btn-light btn-sm border px-2.5 py-1" onclick="if(window.viewMeetingDetail) window.viewMeetingDetail(${m.id || m.meetingId || 0})">
+                      <button type="button" class="btn btn-light btn-sm border px-2.5 py-1" onclick="if(window.openDetailModal) { window.openDetailModal(${m.id || m.meetingId || 0}); } else if(window.viewMeetingDetail) { window.viewMeetingDetail(${m.id || m.meetingId || 0}); }">
                         <i class="bi bi-eye me-1"></i> Chi tiết
                       </button>
                     </td>

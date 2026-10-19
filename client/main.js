@@ -3665,7 +3665,8 @@ const MeetingAPI = {
 
   async updateParticipantStatus(meetingId, userId, responseStatus) {
     try {
-      const res = await fetch(`http://localhost:3000/api/meetings/${meetingId}/participants/${userId}/status`, {
+      const fetchFn = window.apiFetch || fetch;
+      const res = await fetchFn(`/api/meetings/${meetingId}/participants/${userId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ responseStatus })
@@ -8285,6 +8286,9 @@ function openDetailModal(id) {
       <h4 class="detail-meeting-title">${escapeHTML(meeting.title)}</h4>
     </div>
 
+    <!-- Hộp phản hồi lời mời tham gia (RSVP) -->
+    <div id="detail-rsvp-container" class="detail-rsvp-card mb-3 d-none"></div>
+
     <!-- 2. Core 2-Column Metrics Grid: Thời gian & Phòng họp -->
     <div class="detail-metrics-grid">
       <!-- Card Thời gian -->
@@ -8436,6 +8440,49 @@ function openDetailModal(id) {
       if (res.success && res.data && res.data.participants) {
         const pListEl = document.getElementById("detail-participants-list");
         const summaryEl = document.getElementById("detail-participant-summary-badges");
+        const rsvpContainer = document.getElementById("detail-rsvp-container");
+
+        // Tìm người dùng hiện tại trong danh sách mời để hiển thị khối tương tác RSVP
+        const currentUser = (window.AuthState && typeof window.AuthState.getUser === 'function') ? window.AuthState.getUser() : null;
+        const currentUserId = currentUser ? Number(currentUser.id || currentUser.userId) : null;
+        const myP = (res.data.participants || []).find(p => 
+          Number(p.userId || p.id) === currentUserId || 
+          (currentUser && (p.username === currentUser.username || (p.email && currentUser.email && p.email.toLowerCase() === currentUser.email.toLowerCase())))
+        );
+
+        if (rsvpContainer && myP) {
+          const myStatus = myP.responseStatus || "Pending";
+          let statusBadge = `<span class="badge bg-secondary-subtle text-secondary border">Chờ phản hồi</span>`;
+          if (myStatus === "Accepted") statusBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle">Đã đồng ý tham gia</span>`;
+          else if (myStatus === "Declined") statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Đã từ chối tham gia</span>`;
+          else if (myStatus === "Tentative") statusBadge = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Đang cân nhắc</span>`;
+
+          rsvpContainer.innerHTML = `
+            <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div>
+                <div class="fw-semibold text-slate-800 small d-flex align-items-center gap-1.5">
+                  <i class="bi bi-envelope-paper-heart-fill text-primary"></i> Lời mời tham gia cuộc họp của bạn:
+                </div>
+                <div class="small mt-1 text-secondary">
+                  Trạng thái hiện tại: ${statusBadge}
+                </div>
+              </div>
+              <div class="btn-group btn-group-sm" role="group" aria-label="Phản hồi tham gia cuộc họp">
+                <button type="button" class="btn ${myStatus === 'Accepted' ? 'btn-success' : 'btn-outline-success'} fw-semibold px-2.5 py-1" onclick="handleParticipantRSVP(${meeting.id}, ${myP.userId || currentUserId}, 'Accepted')" title="Xác nhận đồng ý tham gia cuộc họp">
+                  <i class="bi bi-check-circle-fill me-1"></i> Đồng ý
+                </button>
+                <button type="button" class="btn ${myStatus === 'Tentative' ? 'btn-warning' : 'btn-outline-warning text-dark'} fw-semibold px-2.5 py-1" onclick="handleParticipantRSVP(${meeting.id}, ${myP.userId || currentUserId}, 'Tentative')" title="Cân nhắc (chưa chắc chắn)">
+                  <i class="bi bi-question-circle-fill me-1"></i> Cân nhắc
+                </button>
+                <button type="button" class="btn ${myStatus === 'Declined' ? 'btn-danger' : 'btn-outline-danger'} fw-semibold px-2.5 py-1" onclick="handleParticipantRSVP(${meeting.id}, ${myP.userId || currentUserId}, 'Declined')" title="Từ chối tham gia cuộc họp">
+                  <i class="bi bi-x-circle-fill me-1"></i> Từ chối
+                </button>
+              </div>
+            </div>
+          `;
+          rsvpContainer.classList.remove("d-none");
+        }
+
         if (pListEl && res.data.participants.length > 0) {
           pListEl.innerHTML = res.data.participants.map(p => {
             let statusBadge = '';
@@ -8475,6 +8522,48 @@ function openDetailModal(id) {
     }).catch(() => {});
   }
 }
+
+// Hàm phản hồi lời mời tham gia cuộc họp (RSVP - Accepted / Declined / Tentative)
+window.handleParticipantRSVP = async function(meetingId, userId, responseStatus) {
+  try {
+    const fetchFn = window.apiFetch || fetch;
+    const res = await fetchFn(`/api/meetings/${meetingId}/participants/${userId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ responseStatus })
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) {}
+
+    if (data.success || res.ok) {
+      if (typeof window.showToast === "function") {
+        const msg = responseStatus === "Accepted"
+          ? "Đã xác nhận: Bạn đã đồng ý tham gia cuộc họp!"
+          : (responseStatus === "Declined" ? "Đã phản hồi: Bạn đã từ chối tham gia cuộc họp." : "Đã phản hồi: Bạn đang cân nhắc tham gia cuộc họp.");
+        window.showToast(msg, responseStatus === "Declined" ? "warning" : "success");
+      }
+      if (Array.isArray(window.meetings)) {
+        const m = window.meetings.find(item => item.id === meetingId);
+        if (m && Array.isArray(m.participants)) {
+          const p = m.participants.find(item => Number(item.id || item.userId) === Number(userId));
+          if (p) p.responseStatus = responseStatus;
+        }
+      }
+      if (typeof openDetailModal === "function") {
+        openDetailModal(meetingId);
+      }
+    } else {
+      if (typeof window.showToast === "function") {
+        window.showToast(data.message || "Không thể cập nhật phản hồi lời mời.", "error");
+      }
+    }
+  } catch (err) {
+    console.error("[handleParticipantRSVP error]:", err);
+    if (typeof window.showToast === "function") {
+      window.showToast("Lỗi khi gửi phản hồi: " + err.message, "error");
+    }
+  }
+};
 
 window.openDetailModal = openDetailModal;
 
@@ -8879,6 +8968,7 @@ async function initializeEnterpriseData() {
 // Xuất toàn bộ modal triggers và APIs ra window scope cho các trang con
 window.openAddModal = openAddModal;
 window.openDetailModal = openDetailModal;
+window.viewMeetingDetail = openDetailModal;
 window.openEditModal = openEditModal;
 window.openRoomQRModal = openRoomQRModal;
 window.openEditRoomModal = openEditRoomModal;
