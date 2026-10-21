@@ -6,4 +6,6 @@ dist/
 .agents/
 QA/*.png
 QA/**/*.png
+TTCS_T926_K16C2_N3/
+TTCS_K16C2_N3/
 

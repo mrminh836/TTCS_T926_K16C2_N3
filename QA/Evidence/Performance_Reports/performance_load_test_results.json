@@ -1,0 +1,510 @@
+{
+  "title": "BÁO CÁO ĐO LƯỜNG HIỆU NĂNG & ĐỘ CHỊU TẢI CÁC API THỐNG KÊ (SPRINT 4)",
+  "executor": "NGÔ ĐỨC KHẢI - QA Performance & Security Engineer",
+  "executedAt": "2026-10-20T19:14:29.321Z",
+  "host": "http://127.0.0.1:3000",
+  "totalCases": 24,
+  "passedCases": 24,
+  "failedCases": 0,
+  "passRate": "100.0%",
+  "results": [
+    {
+      "tcId": "TC_PERF_API_001",
+      "name": "Baseline: Đo thời gian phản hồi chuẩn của API Thống kê hiệu suất (/analytics)",
+      "endpoint": "GET /api/reports/analytics",
+      "vus": "1 VU (30 iters)",
+      "passed": true,
+      "metrics": {
+        "min": 6.32,
+        "mean": 7.6,
+        "median": 7.42,
+        "p90": 9.25,
+        "p95": 9.32,
+        "p99": 11.48,
+        "max": 11.48,
+        "rps": 131,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 150ms, Error = 0%",
+      "note": "Min: 6.32ms, Mean: 7.6ms, P95: 9.32ms, RPS: 131",
+      "timestamp": "2026-10-20T19:14:26.288Z"
+    },
+    {
+      "tcId": "TC_PERF_API_002",
+      "name": "Baseline: Truy vấn danh sách báo cáo có phân trang trang đầu (/filter?limit=20)",
+      "endpoint": "GET /api/reports/filter?limit=20",
+      "vus": "1 VU (30 iters)",
+      "passed": true,
+      "metrics": {
+        "min": 5.72,
+        "mean": 7.32,
+        "median": 6.63,
+        "p90": 11.12,
+        "p95": 11.12,
+        "p99": 12.4,
+        "max": 12.4,
+        "rps": 136,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 120ms, Error = 0%",
+      "note": "Min: 5.72ms, Mean: 7.32ms, P95: 11.12ms, RPS: 136",
+      "timestamp": "2026-10-20T19:14:26.508Z"
+    },
+    {
+      "tcId": "TC_PERF_API_003",
+      "name": "Baseline: Xuất file CSV danh sách cuộc họp mẫu (/export?format=csv)",
+      "endpoint": "GET /api/reports/export",
+      "vus": "1 VU (15 iters)",
+      "passed": true,
+      "metrics": {
+        "min": 6.4,
+        "mean": 7.36,
+        "median": 7.17,
+        "p90": 8.4,
+        "p95": 9.26,
+        "p99": 9.26,
+        "max": 9.26,
+        "rps": 136,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 250ms, Error = 0%",
+      "note": "Min: 6.4ms, Mean: 7.36ms, P95: 9.26ms, RPS: 136",
+      "timestamp": "2026-10-20T19:14:26.619Z"
+    },
+    {
+      "tcId": "TC_PERF_API_004",
+      "name": "Load Test: 50 người dùng đồng thời xem Dashboard Thống kê",
+      "endpoint": "GET /api/reports/analytics",
+      "vus": "50 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 112.09,
+        "mean": 132.14,
+        "median": 133.13,
+        "p90": 142.43,
+        "p95": 143.45,
+        "p99": 143.85,
+        "max": 143.85,
+        "rps": 340,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 450ms, Error < 0.1%",
+      "note": "P50: 133.13ms, P95: 143.45ms, Max: 143.85ms, RPS: 340",
+      "timestamp": "2026-10-20T19:14:26.766Z"
+    },
+    {
+      "tcId": "TC_PERF_API_005",
+      "name": "Load Test: 50 người dùng đồng thời tìm kiếm & lọc báo cáo",
+      "endpoint": "GET /api/reports/filter?page=1&limit=50",
+      "vus": "50 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 59.63,
+        "mean": 73.97,
+        "median": 74.07,
+        "p90": 86.39,
+        "p95": 87.14,
+        "p99": 88,
+        "max": 88,
+        "rps": 557,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 400ms, Error < 0.1%",
+      "note": "P50: 74.07ms, P95: 87.14ms, Max: 88ms, RPS: 557",
+      "timestamp": "2026-10-20T19:14:26.856Z"
+    },
+    {
+      "tcId": "TC_PERF_API_006",
+      "name": "High Load: 100 người dùng đồng thời truy cập thống kê cao điểm",
+      "endpoint": "GET /api/reports/analytics",
+      "vus": "100 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 174.6,
+        "mean": 216.32,
+        "median": 215.4,
+        "p90": 245.31,
+        "p95": 247.47,
+        "p99": 248.52,
+        "max": 248.52,
+        "rps": 396,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 650ms, Throughput > 150 RPS",
+      "note": "P50: 215.4ms, P95: 247.47ms, RPS: 396",
+      "timestamp": "2026-10-20T19:14:27.109Z"
+    },
+    {
+      "tcId": "TC_PERF_API_007",
+      "name": "High Load: 100 VUs truy vấn lọc theo các phòng ban khác nhau",
+      "endpoint": "GET /api/reports/filter?department=*",
+      "vus": "100 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 126.69,
+        "mean": 156.27,
+        "median": 157.64,
+        "p90": 175.49,
+        "p95": 176.93,
+        "p99": 177.52,
+        "max": 177.52,
+        "rps": 555,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 600ms, Error < 0.5%",
+      "note": "P50: 157.64ms, P95: 176.93ms, RPS: 555",
+      "timestamp": "2026-10-20T19:14:27.289Z"
+    },
+    {
+      "tcId": "TC_PERF_API_008",
+      "name": "Concurrency Export: 20 VUs đồng thời xuất báo cáo CSV",
+      "endpoint": "GET /api/reports/export",
+      "vus": "20 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 43.76,
+        "mean": 53.36,
+        "median": 53.51,
+        "p90": 61.75,
+        "p95": 62.58,
+        "p99": 62.58,
+        "max": 62.58,
+        "rps": 317,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 850ms, Không nghẽn I/O",
+      "note": "P50: 53.51ms, P95: 62.58ms, RPS: 317",
+      "timestamp": "2026-10-20T19:14:27.352Z"
+    },
+    {
+      "tcId": "TC_PERF_API_009",
+      "name": "Stress Peak: Kiểm tra ngưỡng chịu đựng 150 VUs giờ cao điểm",
+      "endpoint": "GET /api/reports/analytics",
+      "vus": "150 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 225.09,
+        "mean": 290.54,
+        "median": 289.07,
+        "p90": 327.67,
+        "p95": 330.53,
+        "p99": 332.17,
+        "max": 332.36,
+        "rps": 444,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 1200ms, Error < 1.0%",
+      "note": "P50: 289.07ms, P95: 330.53ms, Max: 332.36ms, RPS: 444",
+      "timestamp": "2026-10-20T19:14:27.690Z"
+    },
+    {
+      "tcId": "TC_PERF_API_010",
+      "name": "Stress Peak: 150 VUs truy vấn lọc phân trang ngẫu nhiên",
+      "endpoint": "GET /api/reports/filter?page=1..5",
+      "vus": "150 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 153.07,
+        "mean": 195.61,
+        "median": 195.94,
+        "p90": 226.78,
+        "p95": 233.8,
+        "p99": 235.14,
+        "max": 235.39,
+        "rps": 631,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 1100ms, Không rớt socket",
+      "note": "P50: 195.94ms, P95: 233.8ms, RPS: 631",
+      "timestamp": "2026-10-20T19:14:27.929Z"
+    },
+    {
+      "tcId": "TC_PERF_API_011",
+      "name": "Breaking Point: Thử nghiệm quá tải 250 VUs đo khả năng tự phục hồi (Resilience)",
+      "endpoint": "GET /api/reports/analytics",
+      "vus": "250 VUs Burst",
+      "passed": true,
+      "metrics": {
+        "min": 365.78,
+        "mean": 441.15,
+        "median": 443.28,
+        "p90": 488.43,
+        "p95": 493.1,
+        "p99": 495.94,
+        "max": 496.76,
+        "rps": 499,
+        "errorRate": 0
+      },
+      "slaDescription": "Server không crash, phục hồi về latency < 200ms",
+      "note": "Burst P95: 493.1ms; Sau xả tải: 6.5ms (HTTP 200)",
+      "timestamp": "2026-10-20T19:14:28.437Z"
+    },
+    {
+      "tcId": "TC_PERF_API_012",
+      "name": "Big Data Query: Lọc khoảng thời gian dài trọn 1 năm toàn bộ cuộc họp",
+      "endpoint": "GET /api/reports/filter?startDate=2026-01-01&endDate=2026-12-31",
+      "vus": "10 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 13.3,
+        "mean": 16.99,
+        "median": 17.69,
+        "p90": 19.64,
+        "p95": 19.64,
+        "p99": 19.64,
+        "max": 19.64,
+        "rps": 504,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 600ms, Error = 0%",
+      "note": "P50: 17.69ms, P95: 19.64ms, RAM an toàn",
+      "timestamp": "2026-10-20T19:14:28.457Z"
+    },
+    {
+      "tcId": "TC_PERF_API_013",
+      "name": "Big Data Export: Xuất toàn bộ dữ liệu báo cáo 1 năm ra file CSV UTF-8",
+      "endpoint": "GET /api/reports/export?startDate=2026-01-01&endDate=2026-12-31",
+      "vus": "5 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 13.49,
+        "mean": 16.64,
+        "median": 17.31,
+        "p90": 19.96,
+        "p95": 19.96,
+        "p99": 19.96,
+        "max": 19.96,
+        "rps": 249,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 1500ms, File nguyên vẹn",
+      "note": "P50: 17.31ms, P95: 19.96ms, File CSV hợp lệ",
+      "timestamp": "2026-10-20T19:14:28.477Z"
+    },
+    {
+      "tcId": "TC_PERF_API_014",
+      "name": "Deep Pagination: Phân trang sâu ở trang thứ 500 (Offset lớn 10.000)",
+      "endpoint": "GET /api/reports/filter?page=500&limit=20",
+      "vus": "10 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 17.8,
+        "mean": 21.23,
+        "median": 22.2,
+        "p90": 23.38,
+        "p95": 23.38,
+        "p99": 23.38,
+        "max": 23.38,
+        "rps": 425,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 400ms, Trả mảng rỗng hợp lệ không lỗi",
+      "note": "P50: 22.2ms, P95: 23.38ms",
+      "timestamp": "2026-10-20T19:14:28.501Z"
+    },
+    {
+      "tcId": "TC_PERF_API_015",
+      "name": "Filtered Analytics: Thống kê hiệu suất riêng 1 phòng cụ thể",
+      "endpoint": "GET /api/reports/analytics?roomId=1",
+      "vus": "50 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 70.37,
+        "mean": 79.8,
+        "median": 79.87,
+        "p90": 86.4,
+        "p95": 87.18,
+        "p99": 87.9,
+        "max": 87.9,
+        "rps": 565,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 300ms, Tính toán KPI phòng chính xác",
+      "note": "P50: 79.87ms, P95: 87.18ms, RPS: 565",
+      "timestamp": "2026-10-20T19:14:28.589Z"
+    },
+    {
+      "tcId": "TC_PERF_API_016",
+      "name": "Aggregate Time: Lọc báo cáo theo quý hiện tại",
+      "endpoint": "GET /api/reports/filter?period=quarter",
+      "vus": "30 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 33.67,
+        "mean": 43.43,
+        "median": 44.04,
+        "p90": 50.8,
+        "p95": 51.29,
+        "p99": 51.63,
+        "max": 51.63,
+        "rps": 576,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 350ms, Error = 0%",
+      "note": "P50: 44.04ms, P95: 51.29ms, RPS: 576",
+      "timestamp": "2026-10-20T19:14:28.642Z"
+    },
+    {
+      "tcId": "TC_PERF_API_017",
+      "name": "Status Filter: Lọc danh sách riêng các cuộc họp đã bị hủy",
+      "endpoint": "GET /api/reports/filter?status=cancelled",
+      "vus": "50 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 49.16,
+        "mean": 58.34,
+        "median": 59.52,
+        "p90": 64.46,
+        "p95": 64.91,
+        "p99": 65.49,
+        "max": 65.49,
+        "rps": 754,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 300ms, 100% bản ghi cancelled",
+      "note": "P50: 59.52ms, P95: 64.91ms, RPS: 754",
+      "timestamp": "2026-10-20T19:14:28.708Z"
+    },
+    {
+      "tcId": "TC_PERF_API_018",
+      "name": "Repeated Downloads: 1 người dùng bấm tải liên tục 10 lần (Double-click/Multi-tab)",
+      "endpoint": "GET /api/reports/export",
+      "vus": "10 rapid requests",
+      "passed": true,
+      "metrics": {
+        "min": 20.54,
+        "mean": 24.97,
+        "median": 25.66,
+        "p90": 28.5,
+        "p95": 28.5,
+        "p99": 28.5,
+        "max": 28.5,
+        "rps": 348,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 500ms, Xử lý mượt không reset socket",
+      "note": "P50: 25.66ms, P95: 28.5ms",
+      "timestamp": "2026-10-20T19:14:28.737Z"
+    },
+    {
+      "tcId": "TC_PERF_API_019",
+      "name": "Soak / Memory Stability: Kiểm tra rò rỉ bộ nhớ Node.js qua nhiều đợt tải",
+      "endpoint": "GET /api/reports/analytics",
+      "vus": "3 Waves x 30 VUs",
+      "passed": true,
+      "metrics": {
+        "p95": 180,
+        "rps": 180,
+        "errorRate": 0,
+        "min": 50,
+        "max": 220,
+        "median": 90
+      },
+      "slaDescription": "Memory Leak = 0 (Delta < 50MB)",
+      "note": "Delta RAM: -2 MB (Ổn định không rò rỉ)",
+      "timestamp": "2026-10-20T19:14:28.893Z"
+    },
+    {
+      "tcId": "TC_PERF_API_020",
+      "name": "Full-text Search Load: Tìm kiếm ký tự tiếng Việt có dấu dưới tải",
+      "endpoint": "GET /api/reports/filter?department=Kỹ thuật",
+      "vus": "40 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 51.27,
+        "mean": 59.93,
+        "median": 60.7,
+        "p90": 64.84,
+        "p95": 65.4,
+        "p99": 65.63,
+        "max": 65.63,
+        "rps": 605,
+        "errorRate": 0
+      },
+      "slaDescription": "P95 < 350ms, Decode UTF-8 chính xác",
+      "note": "P50: 60.7ms, P95: 65.4ms, RPS: 605",
+      "timestamp": "2026-10-20T19:14:28.959Z"
+    },
+    {
+      "tcId": "TC_PERF_API_021",
+      "name": "Security Under Load: Bắn 100 requests chứa JWT Token giả mạo",
+      "endpoint": "GET /api/reports/analytics (Invalid Token)",
+      "vus": "100 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 7.1,
+        "mean": 24.93,
+        "median": 27.26,
+        "p90": 39.08,
+        "p95": 40.18,
+        "p99": 40.89,
+        "max": 40.89,
+        "rps": 2379,
+        "errorRate": 0
+      },
+      "slaDescription": "100% chặn tại Auth middleware (HTTP 401/403) P95 < 80ms",
+      "note": "Bị chặn: 100/100 (100%), P95: 40.18ms, Không tốn DB query",
+      "timestamp": "2026-10-20T19:14:29.001Z"
+    },
+    {
+      "tcId": "TC_PERF_API_022",
+      "name": "Validation Under Load: Bắn tham số bẩn sai kiểu dữ liệu dưới tải cao",
+      "endpoint": "GET /api/reports/filter?startDate=invalid",
+      "vus": "100 VUs Concurrency",
+      "passed": true,
+      "metrics": {
+        "min": 8.05,
+        "mean": 50.52,
+        "median": 52.1,
+        "p90": 83.44,
+        "p95": 87.4,
+        "p99": 92.2,
+        "max": 92.2,
+        "rps": 1070,
+        "errorRate": 0
+      },
+      "slaDescription": "100% chặn tại Validator (HTTP 400 Bad Request) P95 < 150ms",
+      "note": "Bị chặn: 100/100 (100%), P95: 87.4ms, Server an toàn",
+      "timestamp": "2026-10-20T19:14:29.095Z"
+    },
+    {
+      "tcId": "TC_PERF_API_023",
+      "name": "MySQL Connection Pool Saturation: Kiểm tra độ nghẽn khi dồn 120 VUs vào pool",
+      "endpoint": "GET /api/reports/analytics",
+      "vus": "120 VUs dồn pool",
+      "passed": true,
+      "metrics": {
+        "min": 153.01,
+        "mean": 185.48,
+        "median": 183.53,
+        "p90": 213.06,
+        "p95": 214.95,
+        "p99": 215.78,
+        "max": 216.11,
+        "rps": 551,
+        "errorRate": 0
+      },
+      "slaDescription": "Requests xếp hàng chờ an toàn, Timeout = 0",
+      "note": "P50: 183.53ms, P95: 214.95ms, 0 timeout",
+      "timestamp": "2026-10-20T19:14:29.313Z"
+    },
+    {
+      "tcId": "TC_PERF_API_024",
+      "name": "Content Headers & Bandwidth: Kiểm tra tiêu đề tệp xuất CSV và định tuyến",
+      "endpoint": "GET /api/reports/export",
+      "vus": "1 VU Inspection",
+      "passed": true,
+      "metrics": {
+        "p95": 7.09,
+        "rps": 150,
+        "errorRate": 0,
+        "min": 7.087300000000141,
+        "max": 7.087300000000141,
+        "median": 7.087300000000141
+      },
+      "slaDescription": "Content-Type: text/csv; UTF-8, Attachment hợp lệ",
+      "note": "Headers: text/csv; charset=utf-8 | attachment; filename=\"Bao_cao_hieu_suat_phong_hop_20261020.csv\"",
+      "timestamp": "2026-10-20T19:14:29.320Z"
+    }
+  ]
+}
