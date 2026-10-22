@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bug_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#180707"/>
+      <stop offset="100%" stop-color="#2d1212"/>
+    </linearGradient>
+    <filter id="shadow4" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="860" height="540" rx="14" ry="14" fill="url(#bug_bg)"/>
+  <rect x="0" y="0" width="860" height="46" rx="14" ry="14" fill="#3f1313"/>
+  <circle cx="24" cy="23" r="6" fill="#ef4444"/>
+  <circle cx="44" cy="23" r="6" fill="#f59e0b"/>
+  <circle cx="64" cy="23" r="6" fill="#10b981"/>
+  <text x="430" y="28" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#fca5a5">Kiểm thử Kịch bản Chặn Đặt Phòng VIP Trái Phép (Security Policy Enforcement)</text>
+
+  <g transform="translate(30, 68)">
+    <!-- Bug Header Banner -->
+    <rect width="800" height="66" rx="8" ry="8" fill="#7f1d1d" stroke="#dc2626" filter="url(#shadow4)"/>
+    <text x="20" y="28" font-family="sans-serif" font-size="14" font-weight="700" fill="#fef2f2">⚠️ PHÁT HIỆN LỖI NGHIỆP VỤ BẢO MẬT: BUG-RBAC-01 (SEVERITY: HIGH)</text>
+    <text x="20" y="48" font-family="sans-serif" font-size="12" fill="#fecaca">Endpoint POST /api/meetings chưa gắn Middleware chặn đặt phòng VIP đối với Role="Employee"</text>
+    <rect x="670" y="16" width="110" height="34" rx="6" ry="6" fill="#b91c1c"/>
+    <text x="725" y="38" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">FAILED ✗</text>
+
+    <!-- Request Inspector -->
+    <g transform="translate(0, 80)">
+      <rect width="390" height="230" rx="8" ry="8" fill="#1a0c0c" stroke="#5c1d1d"/>
+      <rect x="0" y="0" width="390" height="32" rx="8" ry="8" fill="#2d1212"/>
+      <text x="15" y="21" font-family="monospace" font-size="11.5" font-weight="700" fill="#f87171">REQUEST PAYLOAD (Employee Thử Nghiệm)</text>
+
+      <text x="15" y="55" font-family="monospace" font-size="11" fill="#fca5a5">POST /api/meetings HTTP/1.1</text>
+      <text x="15" y="73" font-family="monospace" font-size="11" fill="#fca5a5">Authorization: Bearer &lt;Token_Role_Employee&gt;</text>
+      <text x="15" y="91" font-family="monospace" font-size="11" fill="#fca5a5">Content-Type: application/json</text>
+      <text x="15" y="115" font-family="monospace" font-size="11" fill="#94a3b8">{</text>
+      <text x="25" y="133" font-family="monospace" font-size="11" fill="#e2e8f0">  "title": "Họp thử phòng VIP cấp cao",</text>
+      <text x="25" y="151" font-family="monospace" font-size="11" fill="#f87171">  "roomId": 5, // Phòng Focus &amp; Phỏng Vấn (VIP)</text>
+      <text x="25" y="169" font-family="monospace" font-size="11" fill="#e2e8f0">  "organizerId": 4, // Role = Employee</text>
+      <text x="25" y="187" font-family="monospace" font-size="11" fill="#e2e8f0">  "startTime": "2026-11-01 09:00:00",</text>
+      <text x="25" y="205" font-family="monospace" font-size="11" fill="#e2e8f0">  "endTime": "2026-11-01 10:30:00"</text>
+      <text x="15" y="222" font-family="monospace" font-size="11" fill="#94a3b8">}</text>
+
+      <!-- Expected vs Actual Response -->
+      <g transform="translate(410, 0)">
+        <rect width="390" height="110" rx="8" ry="8" fill="#14532d" stroke="#22c55e"/>
+        <text x="15" y="24" font-family="sans-serif" font-size="12" font-weight="700" fill="#86efac">KẾT QUẢ MONG ĐỢI (EXPECTED REQUIREMENT)</text>
+        <text x="15" y="48" font-family="monospace" font-size="11" fill="#dcfce7">HTTP/1.1 403 Forbidden</text>
+        <text x="15" y="66" font-family="monospace" font-size="10.5" fill="#f0fdf4">{"success": false, "message": "Bạn không có thẩm</text>
+        <text x="15" y="84" font-family="monospace" font-size="10.5" fill="#f0fdf4">quyền đặt phòng VIP này. Vui lòng liên hệ Admin."}</text>
+
+        <rect y="120" width="390" height="110" rx="8" ry="8" fill="#450a0a" stroke="#ef4444"/>
+        <text x="15" y="144" font-family="sans-serif" font-size="12" font-weight="700" fill="#fca5a5">KẾT QUẢ THỰC TẾ (ACTUAL BEHAVIOR — BUG!)</text>
+        <text x="15" y="168" font-family="monospace" font-size="11" fill="#fecaca">HTTP/1.1 201 Created (LỖI NGHIỆP VỤ LỚN)</text>
+        <text x="15" y="186" font-family="monospace" font-size="10.5" fill="#fee2e2">Server vẫn insert CSDL MySQL bảng Bookings!</text>
+        <text x="15" y="204" font-family="sans-serif" font-size="10.5" fill="#fca5a5">→ Backend thiếu Middleware check phòng VIP theo Role.</text>
+      </g>
+    </g>
+
+    <!-- Recommendation -->
+    <g transform="translate(0, 325)">
+      <rect width="800" height="55" rx="6" ry="6" fill="#291818" stroke="#7f1d1d"/>
+      <text x="15" y="22" font-family="sans-serif" font-size="11" font-weight="700" fill="#f87171">ĐỀ XUẤT KHẮC PHỤC DÀNH CHO BACKEND (HÀ SỸ NGUYÊN):</text>
+      <text x="15" y="40" font-family="sans-serif" font-size="11" fill="#fecaca">Bổ sung Middleware verifyVipRoomPermission tại meetingRoutes.js trước khi gọi meetingController.createMeeting.</text>
+    </g>
+  </g>
+</svg>

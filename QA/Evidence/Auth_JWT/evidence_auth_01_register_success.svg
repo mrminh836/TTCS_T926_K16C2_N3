@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620">
+  <defs>
+    <filter id="sh_a1" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="900" height="620" rx="10" ry="10" fill="#f8fafc"/>
+  
+    <rect width="900" height="42" fill="#0f172a" rx="10" ry="10"/>
+    <rect y="32" width="900" height="10" fill="#0f172a"/>
+    <circle cx="24" cy="21" r="6" fill="#ef4444"/>
+    <circle cx="44" cy="21" r="6" fill="#f59e0b"/>
+    <circle cx="64" cy="21" r="6" fill="#10b981"/>
+    <text x="450" y="26" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-size="12" font-weight="600" fill="#94a3b8">Xác Thực Người Dùng • Đăng Ký Tài Khoản Mới Thành Công (HTTP 201 Created)</text>
+    
+
+  <!-- Split Card Form Layout -->
+  <g transform="translate(150, 70)" filter="url(#sh_a1)">
+    <rect width="600" height="500" rx="16" ry="16" fill="#ffffff" stroke="#e2e8f0"/>
+
+    <!-- Form Header -->
+    <rect width="600" height="80" rx="16" ry="16" fill="#1e40af"/>
+    <rect y="64" width="600" height="16" fill="#1e40af"/>
+    <text x="30" y="38" font-family="sans-serif" font-size="20" font-weight="800" fill="#ffffff">Đăng Ký Tài Khoản Doanh Nghiệp</text>
+    <text x="30" y="62" font-family="sans-serif" font-size="12" fill="#bfdbfe">Hệ thống Quản lý Cuộc họp &amp; Đặt phòng Doanh nghiệp (Enterprise Sync)</text>
+
+    <!-- Success Alert Box -->
+    <g transform="translate(30, 95)">
+      <rect width="540" height="55" rx="8" ry="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+      <circle cx="28" cy="27" r="14" fill="#10b981"/>
+      <path d="M22 27 L26 31 L34 22" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="54" y="24" font-family="sans-serif" font-size="13" font-weight="700" fill="#065f46">Đăng ký tài khoản thành công! (HTTP 201 Created)</text>
+      <text x="54" y="42" font-family="sans-serif" font-size="11.5" fill="#047857">Tài khoản "khuyen.hv" đã sẵn sàng. Mật khẩu đã được mã hóa BCrypt an toàn.</text>
+    </g>
+
+    <!-- Filled Inputs Preview -->
+    <g transform="translate(30, 165)">
+      <!-- Full Name -->
+      <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Họ và tên nhân viên</text>
+      <rect y="24" width="540" height="38" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="14" y="48" font-family="sans-serif" font-size="13" fill="#0f172a">Hoàng Văn Khuyến</text>
+
+      <!-- Username & Email Row -->
+      <g transform="translate(0, 75)">
+        <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Tên đăng nhập (Username)</text>
+        <rect y="24" width="255" height="38" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="14" y="48" font-family="sans-serif" font-size="13" fill="#0f172a">khuyen.hv</text>
+
+        <text x="285" y="15" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Email cơ quan</text>
+        <rect x="285" y="24" width="255" height="38" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="299" y="48" font-family="sans-serif" font-size="13" fill="#0f172a">khuyen.hv@enterprise.vn</text>
+      </g>
+
+      <!-- Password fields -->
+      <g transform="translate(0, 150)">
+        <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Mật khẩu khởi tạo</text>
+        <rect y="24" width="255" height="38" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="14" y="48" font-family="sans-serif" font-size="15" fill="#0f172a">••••••••••••</text>
+
+        <text x="285" y="15" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Vai trò mặc định (Role)</text>
+        <rect x="285" y="24" width="255" height="38" rx="6" ry="6" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="299" y="48" font-family="sans-serif" font-size="13" font-weight="700" fill="#1d4ed8">USER (Nhân viên / Khách)</text>
+      </g>
+
+      <!-- Security Hash Info Box -->
+      <g transform="translate(0, 230)">
+        <rect width="540" height="42" rx="6" ry="6" fill="#f1f5f9" stroke="#e2e8f0"/>
+        <text x="14" y="18" font-family="monospace" font-size="10.5" fill="#475569">PasswordHash CSDL: $2b$10$eK2...s9Z (Băm BCrypt 10 vòng)</text>
+        <text x="14" y="32" font-family="sans-serif" font-size="10" fill="#16a34a">✓ Tuyệt đối không lưu plain-text • Khóa chống chiếm quyền Admin</text>
+      </g>
+    </g>
+
+    <!-- Action Button -->
+    <g transform="translate(30, 440)">
+      <rect width="540" height="42" rx="8" ry="8" fill="#2563eb"/>
+      <text x="270" y="26" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#ffffff">Chuyển sang Đăng nhập ngay →</text>
+    </g>
+  </g>
+</svg>

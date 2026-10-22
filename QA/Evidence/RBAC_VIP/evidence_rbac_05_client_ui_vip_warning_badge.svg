@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="modal_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="860" height="540" rx="14" ry="14" fill="url(#modal_bg)"/>
+  <rect x="0" y="0" width="860" height="46" rx="14" ry="14" fill="#1e293b"/>
+  <circle cx="24" cy="23" r="6" fill="#ef4444"/>
+  <circle cx="44" cy="23" r="6" fill="#f59e0b"/>
+  <circle cx="64" cy="23" r="6" fill="#10b981"/>
+  <text x="430" y="28" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#94a3b8">Kiểm thử Modal Đặt Phòng Client — Đánh giá Cảnh báo Badge VIP &amp; Disable Option</text>
+
+  <!-- Modal Box -->
+  <g transform="translate(130, 65)">
+    <rect width="600" height="445" rx="12" ry="12" fill="#ffffff" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.5))"/>
+    
+    <!-- Modal Header -->
+    <rect width="600" height="50" rx="12" ry="12" fill="#f8fafc"/>
+    <text x="25" y="32" font-family="sans-serif" font-size="15" font-weight="700" fill="#0f172a">Đặt Lịch Cuộc Họp Mới (Create New Meeting)</text>
+    <text x="565" y="32" font-family="sans-serif" font-size="18" fill="#64748b">×</text>
+
+    <!-- Modal Form Fields -->
+    <g transform="translate(25, 65)">
+      <!-- Title -->
+      <text x="0" y="14" font-family="sans-serif" font-size="12" font-weight="600" fill="#334155">Tiêu đề cuộc họp</text>
+      <rect y="22" width="550" height="36" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="12" y="45" font-family="sans-serif" font-size="13" fill="#0f172a">Họp trao đổi kỹ thuật tuần 42</text>
+
+      <!-- Room Selection Dropdown -->
+      <g transform="translate(0, 72)">
+        <text x="0" y="14" font-family="sans-serif" font-size="12" font-weight="600" fill="#334155">Chọn phòng họp</text>
+        <rect y="22" width="550" height="150" rx="6" ry="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+
+        <!-- Option 1 -->
+        <rect x="4" y="26" width="542" height="32" fill="#eff6ff"/>
+        <text x="15" y="47" font-family="sans-serif" font-size="12.5" fill="#1e40af">RM-001: Phòng Tokyo — Sức chứa: 20 người (Khả dụng)</text>
+
+        <!-- Option 2 (Standard) -->
+        <text x="15" y="78" font-family="sans-serif" font-size="12.5" fill="#334155">RM-002: Phòng Silicon — Sức chứa: 12 người (Khả dụng)</text>
+
+        <!-- Option 3 (VIP Room - BUG finding) -->
+        <rect x="4" y="90" width="542" height="38" fill="#fff1f2" stroke="#fda4af"/>
+        <text x="15" y="114" font-family="sans-serif" font-size="12.5" font-weight="600" fill="#be123c">RM-005: Phòng VIP / Phỏng vấn (Hạ Long) — 10 người</text>
+        <rect x="430" y="97" width="105" height="24" rx="4" ry="4" fill="#ef4444"/>
+        <text x="482" y="113" text-anchor="middle" font-family="sans-serif" font-size="10.5" font-weight="700" fill="#ffffff">VIP RESTRICTED</text>
+
+        <!-- Option 4 (Executive VIP) -->
+        <text x="15" y="152" font-family="sans-serif" font-size="12.5" fill="#64748b">RM-008: Executive Suite Tràng An (VIP / 16 chỗ)</text>
+      </g>
+
+      <!-- Bug Callout Banner inside modal -->
+      <g transform="translate(0, 240)">
+        <rect width="550" height="70" rx="6" ry="6" fill="#fef2f2" stroke="#dc2626"/>
+        <text x="12" y="22" font-family="sans-serif" font-size="11.5" font-weight="700" fill="#b91c1c">⚠️ GHI NHẬN LỖI GIAO DIỆN CLIENT: BUG-RBAC-02</text>
+        <text x="12" y="42" font-family="sans-serif" font-size="11" fill="#7f1d1d">Tài khoản Employee vẫn click chọn được Phòng VIP RM-005 mà không bị disabled,</text>
+        <text x="12" y="58" font-family="sans-serif" font-size="11" fill="#7f1d1d">nút "Xác nhận đặt phòng" bên dưới không bị khóa.</text>
+      </g>
+
+      <!-- Footer Buttons -->
+      <g transform="translate(0, 325)">
+        <rect x="330" y="0" width="100" height="38" rx="6" ry="6" fill="#e2e8f0"/>
+        <text x="380" y="24" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#475569">Hủy bỏ</text>
+
+        <rect x="440" y="0" width="110" height="38" rx="6" ry="6" fill="#3b82f6"/>
+        <text x="495" y="24" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#ffffff">Đặt phòng</text>
+      </g>
+    </g>
+  </g>
+</svg>

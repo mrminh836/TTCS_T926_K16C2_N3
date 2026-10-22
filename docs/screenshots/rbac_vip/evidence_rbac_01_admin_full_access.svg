@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="admin_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="860" height="540" rx="14" ry="14" fill="url(#admin_bg)"/>
+  <rect x="0" y="0" width="860" height="46" rx="14" ry="14" fill="#1e293b"/>
+  <circle cx="24" cy="23" r="6" fill="#ef4444"/>
+  <circle cx="44" cy="23" r="6" fill="#f59e0b"/>
+  <circle cx="64" cy="23" r="6" fill="#10b981"/>
+  <text x="430" y="28" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#94a3b8">Bảng điều khiển Quản trị viên (Admin Portal) — Toàn quyền Quản trị &amp; Đặt phòng VIP</text>
+
+  <g transform="translate(30, 70)">
+    <!-- Header Card -->
+    <rect width="800" height="74" rx="10" ry="10" fill="#334155" filter="url(#shadow)"/>
+    <circle cx="42" cy="37" r="22" fill="#ef4444"/>
+    <text x="42" y="44" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#ffffff">👑</text>
+    <text x="80" y="30" font-family="sans-serif" font-size="16" font-weight="700" fill="#f8fafc">Nguyễn Văn Quản Trị (admin)</text>
+    <text x="80" y="52" font-family="sans-serif" font-size="12" fill="#94a3b8">admin@enterprise.vn • UserID: 1</text>
+
+    <!-- Role Badges -->
+    <rect x="520" y="22" width="120" height="30" rx="15" ry="15" fill="#ef4444"/>
+    <text x="580" y="42" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">ROLE: ADMIN</text>
+    <rect x="655" y="22" width="125" height="30" rx="15" ry="15" fill="#10b981"/>
+    <text x="717" y="42" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">FULL ACCESS</text>
+
+    <!-- Permission Grid -->
+    <g transform="translate(0, 95)">
+      <rect width="250" height="150" rx="8" ry="8" fill="#1e293b" stroke="#475569"/>
+      <rect x="15" y="15" width="34" height="34" rx="8" ry="8" fill="#3b82f6"/>
+      <text x="32" y="38" text-anchor="middle" font-size="18" fill="#fff">🏢</text>
+      <text x="60" y="32" font-family="sans-serif" font-size="14" font-weight="700" fill="#f1f5f9">Quản lý Phòng họp</text>
+      <text x="60" y="48" font-family="sans-serif" font-size="11" fill="#64748b">CRUD 8 Phòng họp</text>
+      <text x="15" y="80" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Thêm/Sửa/Xóa phòng</text>
+      <text x="15" y="105" font-family="sans-serif" font-size="12" fill="#10b981" font-weight="600">✓ Đặt phòng VIP: CẤP PHÉP</text>
+      <text x="15" y="130" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Chuyển trạng thái Bảo trì</text>
+
+      <rect x="275" y="0" width="250" height="150" rx="8" ry="8" fill="#1e293b" stroke="#475569"/>
+      <rect x="290" y="15" width="34" height="34" rx="8" ry="8" fill="#8b5cf6"/>
+      <text x="307" y="38" text-anchor="middle" font-size="18" fill="#fff">🎛️</text>
+      <text x="335" y="32" font-family="sans-serif" font-size="14" font-weight="700" fill="#f1f5f9">Quản trị Thiết bị</text>
+      <text x="335" y="48" font-family="sans-serif" font-size="11" fill="#64748b">10 Danh mục thiết bị</text>
+      <text x="290" y="80" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ CRUD thiết bị doanh nghiệp</text>
+      <text x="290" y="105" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Theo dõi bảo hành / bảo trì</text>
+      <text x="290" y="130" font-family="sans-serif" font-size="12" fill="#10b981" font-weight="600">✓ Mượn kèm không giới hạn</text>
+
+      <rect x="550" y="0" width="250" height="150" rx="8" ry="8" fill="#1e293b" stroke="#475569"/>
+      <rect x="565" y="15" width="34" height="34" rx="8" ry="8" fill="#f59e0b"/>
+      <text x="582" y="38" text-anchor="middle" font-size="18" fill="#fff">👥</text>
+      <text x="610" y="32" font-family="sans-serif" font-size="14" font-weight="700" fill="#f1f5f9">Phân quyền User</text>
+      <text x="610" y="48" font-family="sans-serif" font-size="11" fill="#64748b">12 Nhân viên nội bộ</text>
+      <text x="565" y="80" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Cấp phát Token RBAC</text>
+      <text x="565" y="105" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Chỉ định Role: Manager/Emp</text>
+      <text x="565" y="130" font-family="sans-serif" font-size="12" fill="#10b981" font-weight="600">✓ Can thiệp hủy cuộc họp</text>
+    </g>
+
+    <!-- VIP Booking Banner -->
+    <g transform="translate(0, 265)">
+      <rect width="800" height="85" rx="8" ry="8" fill="#064e3b" stroke="#059669"/>
+      <text x="20" y="32" font-family="sans-serif" font-size="14" font-weight="700" fill="#a7f3d0">🌟 ĐẶT PHÒNG VIP THÀNH CÔNG (HTTP 201 CREATED)</text>
+      <text x="20" y="55" font-family="monospace" font-size="12" fill="#ecfdf5">POST /api/meetings • RoomID: 5 ("Phòng Focus &amp; Phỏng Vấn Hạ Long" - VIP / Phỏng vấn)</text>
+      <text x="20" y="73" font-family="sans-serif" font-size="11" fill="#6ee7b7">Xác thực Token Role="Admin" • Bypass kiểm tra hạn chế quyền đặt phòng chính sách công ty</text>
+      <rect x="670" y="24" width="110" height="36" rx="6" ry="6" fill="#10b981"/>
+      <text x="725" y="46" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">PASSED ✓</text>
+    </g>
+  </g>
+</svg>

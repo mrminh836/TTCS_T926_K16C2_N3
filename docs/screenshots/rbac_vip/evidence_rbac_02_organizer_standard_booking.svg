@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="org_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="shadow2" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="860" height="540" rx="14" ry="14" fill="url(#org_bg)"/>
+  <rect x="0" y="0" width="860" height="46" rx="14" ry="14" fill="#1e293b"/>
+  <circle cx="24" cy="23" r="6" fill="#ef4444"/>
+  <circle cx="44" cy="23" r="6" fill="#f59e0b"/>
+  <circle cx="64" cy="23" r="6" fill="#10b981"/>
+  <text x="430" y="28" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="600" fill="#94a3b8">Cổng Người Đặt Lịch (Organizer / Manager Portal) — Đặt phòng &amp; Mời người dự</text>
+
+  <g transform="translate(30, 70)">
+    <!-- Header Card -->
+    <rect width="800" height="74" rx="10" ry="10" fill="#334155" filter="url(#shadow2)"/>
+    <circle cx="42" cy="37" r="22" fill="#3b82f6"/>
+    <text x="42" y="44" text-anchor="middle" font-size="20" fill="#ffffff">👔</text>
+    <text x="80" y="30" font-family="sans-serif" font-size="16" font-weight="700" fill="#f8fafc">Lê Văn Trưởng Phòng (manager)</text>
+    <text x="80" y="52" font-family="sans-serif" font-size="12" fill="#94a3b8">manager@enterprise.vn • UserID: 3</text>
+
+    <!-- Role Badges -->
+    <rect x="490" y="22" width="140" height="30" rx="15" ry="15" fill="#2563eb"/>
+    <text x="560" y="42" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">ROLE: MANAGER</text>
+    <rect x="645" y="22" width="135" height="30" rx="15" ry="15" fill="#059669"/>
+    <text x="712" y="42" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">VIP PRIVILEGE ✓</text>
+
+    <!-- Scope Grid -->
+    <g transform="translate(0, 95)">
+      <!-- Panel 1 -->
+      <rect width="385" height="150" rx="8" ry="8" fill="#1e293b" stroke="#3b82f6"/>
+      <text x="20" y="32" font-family="sans-serif" font-size="14" font-weight="700" fill="#93c5fd">Quyền Hạn Cho Phép (Allowed)</text>
+      <text x="20" y="62" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Đặt phòng họp tiêu chuẩn (Hội nghị, Tech Lab)</text>
+      <text x="20" y="87" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Đặt phòng VIP theo thẩm quyền Trưởng phòng</text>
+      <text x="20" y="112" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Mời danh sách nhân viên &amp; theo dõi phản hồi</text>
+      <text x="20" y="137" font-family="sans-serif" font-size="12" fill="#cbd5e1">✓ Chỉnh sửa / Hủy cuộc họp do chính mình tạo (Owner)</text>
+
+      <!-- Panel 2 -->
+      <rect x="415" y="0" width="385" height="150" rx="8" ry="8" fill="#1e293b" stroke="#ef4444"/>
+      <text x="435" y="32" font-family="sans-serif" font-size="14" font-weight="700" fill="#fca5a5">Giới Hạn Bị Chặn (Forbidden - 403)</text>
+      <text x="435" y="62" font-family="sans-serif" font-size="12" fill="#94a3b8">✗ Không thể truy cập trang /admin quản trị hệ thống</text>
+      <text x="435" y="87" font-family="sans-serif" font-size="12" fill="#94a3b8">✗ Không thể chỉnh sửa hoặc hủy cuộc họp của người khác</text>
+      <text x="435" y="112" font-family="sans-serif" font-size="12" fill="#94a3b8">✗ Không có quyền CRUD danh mục phòng &amp; thiết bị</text>
+      <text x="435" y="137" font-family="sans-serif" font-size="12" fill="#94a3b8">✗ Không thể thay đổi vai trò tài khoản nhân viên khác</text>
+    </g>
+
+    <!-- Test execution callout -->
+    <g transform="translate(0, 265)">
+      <rect width="800" height="85" rx="8" ry="8" fill="#1e3a8a" stroke="#3b82f6"/>
+      <text x="20" y="30" font-family="sans-serif" font-size="13" font-weight="700" fill="#bfdbfe">KẾT QUẢ THỬ NGHIỆM: ĐẶT PHÒNG THÀNH CÔNG VỚI VAI TRÒ MANAGER</text>
+      <text x="20" y="52" font-family="monospace" font-size="12" fill="#ffffff">POST /api/meetings • RoomID: 1 ("Phòng Tokyo - Hội nghị") • Status: 201 Created</text>
+      <text x="20" y="72" font-family="sans-serif" font-size="11" fill="#93c5fd">Tạo cuộc họp ID #104 thành công • Tự động gắn OrganizerID: 3 • Sẵn sàng gửi thư mời</text>
+      <rect x="670" y="24" width="110" height="36" rx="6" ry="6" fill="#10b981"/>
+      <text x="725" y="46" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#ffffff">PASSED ✓</text>
+    </g>
+  </g>
+</svg>

@@ -1,6 +1,40 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  Docker Compose - Hệ thống Quản lý Cuộc họp Doanh nghiệp
+#  Dự án: TTCS_T926_K16C2_N3 | Sprint 4 - Production-Ready Configuration
+#
+#  KIẾN TRÚC DỊCH VỤ:
+#  ┌─────────┐    ┌─────────────┐    ┌──────────┐    ┌────────────┐
+#  │ Frontend │──▶│   Backend   │──▶│  MySQL   │    │ phpMyAdmin │
+#  │ (Nginx)  │    │ (Node.js)   │    │   8.0    │    │  (DB GUI)  │
+#  │ :8080    │    │ :3000       │    │ :3306    │    │ :8082      │
+#  └─────────┘    └─────────────┘    └──────────┘    └────────────┘
+#
+#  DEPLOY 1-CLICK: docker-compose up -d --build
+# ═══════════════════════════════════════════════════════════════════════════
+
 services:
   # ==========================================
-  # Service Backend (Node.js Express)
+  # Service Frontend (Nginx Reverse Proxy + SPA)
+  # ==========================================
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: meeting_frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - meeting_net
+    labels:
+      - "com.meeting.service=frontend"
+      - "com.meeting.description=Nginx serving SPA + API reverse proxy"
+
+  # ==========================================
+  # Service Backend (Node.js Express API)
   # ==========================================
   backend:
     build:
@@ -15,22 +49,35 @@ services:
         required: false
     environment:
       PORT: ${PORT:-3000}
-      DB_HOST: ${DB_HOST:-mysql_db}
+      DB_HOST: mysql_db
       DB_PORT: ${DB_PORT:-3306}
       DB_USER: ${DB_USER:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root123}
       DB_NAME: ${DB_NAME:-meeting_management}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      NODE_ENV: ${NODE_ENV:-development}
     volumes:
       # Mount mã nguồn để hot-reload khi dev (không cần rebuild image)
       - ./server:/app
       - ./client:/client
+      - ./database:/database
       # Giữ node_modules độc lập trong container
       - /app/node_modules
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r => { if (r.status < 500) process.exit(0); else process.exit(1); }).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
     depends_on:
       mysql_db:
         condition: service_healthy
     networks:
       - meeting_net
+    labels:
+      - "com.meeting.service=backend"
+      - "com.meeting.description=Node.js Express REST API"
 
   # ==========================================
   # Service Database (MySQL 8.0)
@@ -40,15 +87,25 @@ services:
     container_name: meeting_mysql
     restart: unless-stopped
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "${MYSQL_HOST_PORT:-3308}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root123}
       MYSQL_DATABASE: ${DB_NAME:-meeting_management}
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
     volumes:
       # Volume lưu trữ bền vững dữ liệu MySQL
       - mysql_data:/var/lib/mysql
       # Tự động import schema khởi tạo lần đầu
       - ./database/init_database.sql:/docker-entrypoint-initdb.d/init_database.sql
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=200
+      --innodb-buffer-pool-size=256M
+      --slow-query-log=1
+      --long-query-time=2
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root123}"]
       interval: 10s
@@ -57,6 +114,9 @@ services:
       start_period: 30s
     networks:
       - meeting_net
+    labels:
+      - "com.meeting.service=database"
+      - "com.meeting.description=MySQL 8.0 database"
 
   # ==========================================
   # Service phpMyAdmin (Database UI)
@@ -78,6 +138,9 @@ services:
         condition: service_healthy
     networks:
       - meeting_net
+    labels:
+      - "com.meeting.service=phpmyadmin"
+      - "com.meeting.description=phpMyAdmin database management UI"
 
 # ==========================================
 # Volumes

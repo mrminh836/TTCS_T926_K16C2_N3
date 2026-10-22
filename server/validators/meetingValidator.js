@@ -224,7 +224,14 @@ function validateMeetingInput(input, options = {}) {
  * Express Middleware xác thực dữ liệu cuộc họp
  */
 function validateMeetingMiddleware(req, res, next) {
-    const result = validateMeetingInput(req.body);
+    const input = { ...req.body };
+    if ((input.organizerId === undefined || input.organizerId === null) && req.user) {
+        input.organizerId = req.user.userId || req.user.id;
+    }
+    if (!input.participantIds && Array.isArray(input.participants)) {
+        input.participantIds = input.participants;
+    }
+    const result = validateMeetingInput(input);
     if (!result.isValid) {
         return res.status(400).json({
             success: false,

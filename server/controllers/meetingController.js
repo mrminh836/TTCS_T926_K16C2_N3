@@ -18,6 +18,20 @@ const createMeeting = async (req, res, next) => {
 
         const meetingData = validation.data;
 
+        // ── Bảo vệ danh tính Người tổ chức (RBAC Organizer Enforcement) ──
+        // Nếu người dùng không phải Admin, người tổ chức (organizerId) BẮT BUỘC là chính người dùng đã đăng nhập (req.user)
+        const userRole = (req.user && req.user.role) ? String(req.user.role).trim().toLowerCase() : '';
+        const tokenUserId = (req.user && (req.user.userId || req.user.id)) ? Number(req.user.userId || req.user.id) : null;
+
+        if (userRole !== 'admin' && tokenUserId) {
+            meetingData.organizerId = tokenUserId;
+            if (!Array.isArray(meetingData.participantIds)) {
+                meetingData.participantIds = [tokenUserId];
+            } else if (!meetingData.participantIds.includes(tokenUserId)) {
+                meetingData.participantIds.push(tokenUserId);
+            }
+        }
+
         // 2. Thực hiện tạo cuộc họp với transaction an toàn
         const result = await Meeting.create(meetingData);
 
@@ -55,7 +69,7 @@ const createMeeting = async (req, res, next) => {
  */
 const getMeetings = async (req, res, next) => {
     try {
-        const { date, startDate, endDate, status, page, limit } = req.query;
+        const { date, startDate, endDate, status, page, limit, sortOrder } = req.query;
 
         // ── Validate định dạng ngày (YYYY-MM-DD) ──
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -115,14 +129,21 @@ const getMeetings = async (req, res, next) => {
         if (parsedLimit < 1) parsedLimit = 1;
         if (parsedLimit > 100) parsedLimit = 100;
 
-        // ── Gọi Model để lấy dữ liệu ──
+        // ── Trích xuất danh tính và vai trò từ Token đã xác thực (req.user từ verifyJWT) ──
+        const currentUserId = (req.user && (req.user.userId || req.user.id)) ? Number(req.user.userId || req.user.id) : null;
+        const currentUserRole = (req.user && req.user.role) ? String(req.user.role).trim() : '';
+
+        // ── Gọi Model để lấy dữ liệu với RBAC lọc trực tiếp trong truy vấn ──
         const result = await Meeting.getAll({
             date,
             startDate,
             endDate,
             status,
             page: parsedPage,
-            limit: parsedLimit
+            limit: parsedLimit,
+            userId: currentUserId,
+            userRole: currentUserRole,
+            sortOrder: sortOrder || 'DESC'
         });
 
         return res.status(200).json({
@@ -151,24 +172,24 @@ const updateMeeting = async (req, res) => {
             return res.status(400).json({ message: "ID cuộc họp không hợp lệ. Vui lòng nhập số." });
         }
 
-        const { title, description, startTime, endTime, organizerId, roomId, isRecurring, participantIds } = req.body;
+        const { title, description, startTime, endTime, organizerId, roomId, isRecurring, participantIds, equipmentIds } = req.body;
 
         // 1. Validate dữ liệu
         if (!title || !startTime || !endTime || !organizerId || !roomId) {
-            return res.status(400).json({ message: "Vui lòng nhập đủ các trường bắt buộc." });
+            return res.status(400).json({ success: false, message: "Vui lòng nhập đủ các trường bắt buộc." });
         }
 
         if (new Date(startTime) >= new Date(endTime)) {
-            return res.status(400).json({ message: "Thời gian kết thúc phải sau thời gian bắt đầu." });
+            return res.status(400).json({ success: false, message: "Thời gian kết thúc phải sau thời gian bắt đầu." });
         }
 
         // 2. Chặn trùng giờ (loại trừ chính nó)
         const isOverlap = await Meeting.checkOverlapUpdate(roomId, startTime, endTime, meetingId);
         if (isOverlap) {
-            return res.status(409).json({ message: "Cập nhật thất bại! Phòng này đã có cuộc họp khác trong khung giờ bạn chọn." });
+            return res.status(409).json({ success: false, message: "Cập nhật thất bại! Phòng này đã có cuộc họp khác trong khung giờ bạn chọn." });
         }
 
-        // 3. Thực thi cập nhật (kèm đồng bộ bảng Meeting_Participants)
+        // 3. Thực thi cập nhật (kèm đồng bộ bảng Meeting_Participants và Booking_Equipments)
         await Meeting.update(meetingId, { 
             title, 
             description, 
@@ -177,22 +198,27 @@ const updateMeeting = async (req, res) => {
             organizerId, 
             roomId, 
             isRecurring, 
-            participantIds 
+            participantIds,
+            equipmentIds
         });
 
         return res.status(200).json({
+            success: true,
             message: "Cập nhật cuộc họp thành công",
-            data: { meetingId, title, roomId, startTime, endTime, participantIds }
+            data: { meetingId, title, roomId, startTime, endTime, participantIds, equipmentIds }
         });
 
     } catch (error) {
-        // BẮT LỖI 404 NẾU CUỘC HỌP KHÔNG TỒN TẠI
-        if (error.status === 404) {
-            return res.status(404).json({ message: error.message });
+        // Bắt lỗi nghiệp vụ đã định nghĩa mã status (400, 404, 409...)
+        if (error.status) {
+            return res.status(error.status).json({
+                success: false,
+                message: error.message
+            });
         }
 
         console.error("Lỗi cập nhật cuộc họp:", error);
-        return res.status(500).json({ message: "Lỗi server nội bộ." });
+        return res.status(500).json({ success: false, message: "Lỗi server nội bộ." });
     }
 };
 
@@ -216,6 +242,24 @@ const getMeetingById = async (req, res, next) => {
                 success: false,
                 message: `Cuộc họp với ID ${meetingId} không tồn tại.`
             });
+        }
+
+        // ── Kiểm tra quyền truy cập chi tiết cuộc họp (RBAC Detail Protection) ──
+        // Admin: Được phép xem chi tiết mọi cuộc họp.
+        // Nhân viên / Người dùng khác: Chỉ được xem nếu là Người tổ chức (Organizer) HOẶC là Người tham gia (Participant)
+        const userRole = (req.user && req.user.role) ? String(req.user.role).trim().toLowerCase() : '';
+        const currentUserId = (req.user && (req.user.userId || req.user.id)) ? Number(req.user.userId || req.user.id) : null;
+
+        if (userRole !== 'admin') {
+            const isOrganizer = Number(meeting.organizerId) === currentUserId;
+            const isParticipant = Array.isArray(meeting.participants) && meeting.participants.some(p => Number(p.userId) === currentUserId);
+
+            if (!isOrganizer && !isParticipant) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Bạn không có quyền truy cập thông tin chi tiết cuộc họp này."
+                });
+            }
         }
 
         return res.status(200).json({

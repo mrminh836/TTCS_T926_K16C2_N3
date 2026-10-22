@@ -6,6 +6,10 @@ const cors = require('cors');
 const meetingRoutes = require('./routes/meetingRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const healthRoutes = require('./routes/healthRoutes');
+const userRoutes = require('./routes/userRoutes');
+const equipmentRoutes = require('./routes/equipmentRoutes');
+const authRoutes = require('./routes/authRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
 
@@ -17,29 +21,28 @@ app.use(express.static(clientPath));
 app.use('/client', express.static(clientPath));
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api', meetingRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', healthRoutes);
+app.use('/api', userRoutes);
+app.use('/api', equipmentRoutes);
+app.use('/api', reportRoutes);
 
-// Hỗ trợ trực tiếp các đường dẫn /rooms song song với /api/rooms
+// Hỗ trợ trực tiếp các đường dẫn song song với /api/...
+app.use('/auth', authRoutes);
 app.use('/', roomRoutes);
+app.use('/', userRoutes);
+app.use('/', equipmentRoutes);
+app.use('/', reportRoutes);
+
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 // Xử lý Route 404 (Không tìm thấy endpoint)
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: `Tuyến đường không tồn tại: ${req.method} ${req.originalUrl}`
-    });
-});
+app.use(notFoundHandler);
 
 // Middleware xử lý lỗi toàn cục (Global Error Handler)
-app.use((err, req, res, next) => {
-    console.error('Lỗi máy chủ:', err);
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message || 'Lỗi server nội bộ.'
-    });
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

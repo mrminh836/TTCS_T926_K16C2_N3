@@ -87,10 +87,15 @@ describe('1. Unit Tests: participantValidator', () => {
     });
 });
 
+const jwtHelper = require('../utils/jwtHelper');
+const adminToken = jwtHelper.generateToken({ userId: 1, username: 'admin', role: 'Admin' });
+const authHeaders = { 'Authorization': `Bearer ${adminToken}` };
+const jsonAuthHeaders = { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' };
+
 describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
 
     it('TC-API-001: GET /api/meetings/1/participants - Lấy danh sách và summary thành công (200 OK)', async () => {
-        const response = await fetch(`${BASE_URL}/meetings/1/participants`);
+        const response = await fetch(`${BASE_URL}/meetings/1/participants`, { headers: authHeaders });
         assert.equal(response.status, 200);
 
         const body = await response.json();
@@ -111,7 +116,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
     });
 
     it('TC-API-002: GET /api/meetings/999999/participants - Meeting không tồn tại -> 404 Not Found', async () => {
-        const response = await fetch(`${BASE_URL}/meetings/999999/participants`);
+        const response = await fetch(`${BASE_URL}/meetings/999999/participants`, { headers: authHeaders });
         assert.equal(response.status, 404);
 
         const body = await response.json();
@@ -122,7 +127,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
     it('TC-API-003: PATCH /api/meetings/1/participants/2/status - Cập nhật trạng thái thành Accepted (200 OK)', async () => {
         const response = await fetch(`${BASE_URL}/meetings/1/participants/2/status`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonAuthHeaders,
             body: JSON.stringify({ responseStatus: 'Accepted' })
         });
         assert.equal(response.status, 200);
@@ -132,7 +137,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
         assert.equal(body.data.responseStatus, 'Accepted');
 
         // Kiểm tra lại bằng GET
-        const checkRes = await fetch(`${BASE_URL}/meetings/1/participants`);
+        const checkRes = await fetch(`${BASE_URL}/meetings/1/participants`, { headers: authHeaders });
         const checkBody = await checkRes.json();
         const p = checkBody.data.participants.find(item => item.userId === 2);
         assert.ok(p);
@@ -142,7 +147,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
     it('TC-API-004: PATCH /api/meetings/1/participants/2/status - Cập nhật trạng thái thành Declined (200 OK)', async () => {
         const response = await fetch(`${BASE_URL}/meetings/1/participants/2/status`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonAuthHeaders,
             body: JSON.stringify({ responseStatus: 'Declined' })
         });
         assert.equal(response.status, 200);
@@ -155,7 +160,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
     it('TC-API-005: PATCH /api/meetings/1/participants/2/status - Trạng thái không hợp lệ -> 400 Bad Request', async () => {
         const response = await fetch(`${BASE_URL}/meetings/1/participants/2/status`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonAuthHeaders,
             body: JSON.stringify({ responseStatus: 'InvalidStatus' })
         });
         assert.equal(response.status, 400);
@@ -168,7 +173,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
     it('TC-API-006: PATCH /api/meetings/1/participants/999999/status - User không nằm trong meeting -> 404 Not Found', async () => {
         const response = await fetch(`${BASE_URL}/meetings/1/participants/999999/status`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonAuthHeaders,
             body: JSON.stringify({ responseStatus: 'Accepted' })
         });
         assert.equal(response.status, 404);
@@ -181,7 +186,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
     it('TC-API-007: POST /api/meetings/1/participants - Thêm người tham gia mới (201 Created)', async () => {
         const response = await fetch(`${BASE_URL}/meetings/1/participants`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonAuthHeaders,
             body: JSON.stringify({ participantIds: [4] })
         });
         assert.equal(response.status, 201);
@@ -191,7 +196,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
         assert.ok(body.data);
 
         // Kiểm tra người mới có trạng thái Pending
-        const checkRes = await fetch(`${BASE_URL}/meetings/1/participants`);
+        const checkRes = await fetch(`${BASE_URL}/meetings/1/participants`, { headers: authHeaders });
         const checkBody = await checkRes.json();
         const p = checkBody.data.participants.find(item => item.userId === 4);
         assert.ok(p);
@@ -202,7 +207,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
         // Cập nhật cuộc họp 1 với danh sách người tham gia mới: [1, 2, 5]
         const updateRes = await fetch(`${BASE_URL}/meetings/1`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonAuthHeaders,
             body: JSON.stringify({
                 title: 'Họp giao ban đầu tuần (Đã cập nhật)',
                 startTime: '2026-10-12 08:30:00',
@@ -216,7 +221,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
         assert.equal(updateRes.status, 200);
 
         // Kiểm tra danh sách người tham gia sau khi cập nhật
-        const checkRes = await fetch(`${BASE_URL}/meetings/1/participants`);
+        const checkRes = await fetch(`${BASE_URL}/meetings/1/participants`, { headers: authHeaders });
         const checkBody = await checkRes.json();
         const userIds = checkBody.data.participants.map(p => p.userId);
 
@@ -228,7 +233,7 @@ describe('2. Integration Tests: API /api/meetings/:id/participants', () => {
     });
 
     it('TC-API-009: GET /api/meetings/1 - Lấy chi tiết cuộc họp kèm danh sách người tham gia và trạng thái phản hồi', async () => {
-        const res = await fetch(`${BASE_URL}/meetings/1`);
+        const res = await fetch(`${BASE_URL}/meetings/1`, { headers: authHeaders });
         assert.equal(res.status, 200);
 
         const body = await res.json();

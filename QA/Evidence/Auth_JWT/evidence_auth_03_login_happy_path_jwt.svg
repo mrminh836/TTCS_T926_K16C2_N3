@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620">
+  <defs>
+    <filter id="sh_a3" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="900" height="620" rx="10" ry="10" fill="#f8fafc"/>
+  
+    <rect width="900" height="42" fill="#0f172a" rx="10" ry="10"/>
+    <rect y="32" width="900" height="10" fill="#0f172a"/>
+    <circle cx="24" cy="21" r="6" fill="#ef4444"/>
+    <circle cx="44" cy="21" r="6" fill="#f59e0b"/>
+    <circle cx="64" cy="21" r="6" fill="#10b981"/>
+    <text x="450" y="26" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-size="12" font-weight="600" fill="#94a3b8">Đăng Nhập Thành Công • Phát Hành JWT Token &amp; Lưu Vào LocalStorage (HTTP 200 OK)</text>
+    
+
+  <g transform="translate(40, 70)">
+    <!-- Left Pane: Login Card -->
+    <g filter="url(#sh_a3)">
+      <rect width="400" height="500" rx="16" ry="16" fill="#ffffff" stroke="#e2e8f0"/>
+      <rect width="400" height="70" rx="16" ry="16" fill="#2563eb"/>
+      <rect y="54" width="400" height="16" fill="#2563eb"/>
+      <text x="24" y="35" font-family="sans-serif" font-size="18" font-weight="800" fill="#ffffff">Đăng Nhập Hệ Thống</text>
+      <text x="24" y="55" font-family="sans-serif" font-size="11.5" fill="#dbeafe">Enterprise Sync Portal</text>
+
+      <g transform="translate(24, 90)">
+        <text x="0" y="15" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Tên đăng nhập hoặc Email</text>
+        <rect y="24" width="352" height="38" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="14" y="48" font-family="sans-serif" font-size="13" fill="#0f172a">khuyen.hv</text>
+
+        <text x="0" y="85" font-family="sans-serif" font-size="12" font-weight="600" fill="#475569">Mật khẩu</text>
+        <rect y="94" width="352" height="38" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1"/>
+        <text x="14" y="118" font-family="sans-serif" font-size="15" fill="#0f172a">••••••••••••</text>
+
+        <!-- Status 200 OK Banner -->
+        <rect y="150" width="352" height="50" rx="8" ry="8" fill="#ecfdf5" stroke="#a7f3d0"/>
+        <text x="14" y="172" font-family="sans-serif" font-size="12" font-weight="700" fill="#065f46">✓ HTTP 200 OK: Đăng nhập thành công!</text>
+        <text x="14" y="190" font-family="sans-serif" font-size="11" fill="#047857">Token đã được cấp phát và đồng bộ vào Client AuthState.</text>
+
+        <rect y="220" width="352" height="42" rx="8" ry="8" fill="#16a34a"/>
+        <text x="176" y="246" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#ffffff">Đang chuyển vào Hệ thống...</text>
+      </g>
+    </g>
+
+    <!-- Right Pane: Developer JWT Inspector -->
+    <g transform="translate(430, 0)" filter="url(#sh_a3)">
+      <rect width="390" height="500" rx="16" ry="16" fill="#0f172a" stroke="#334155"/>
+      <rect width="390" height="40" rx="16" ry="16" fill="#1e293b"/>
+      <rect y="30" width="390" height="10" fill="#1e293b"/>
+      <circle cx="20" cy="20" r="5" fill="#38bdf8"/>
+      <text x="35" y="24" font-family="monospace" font-size="12" font-weight="700" fill="#f8fafc">Client Storage &amp; JWT Payload Inspector</text>
+
+      <g transform="translate(20, 60)">
+        <text x="0" y="15" font-family="sans-serif" font-size="11" font-weight="700" fill="#38bdf8">1. LOCALSTORAGE ('accessToken'):</text>
+        <rect y="25" width="350" height="85" rx="6" ry="6" fill="#020617" stroke="#1e293b"/>
+        <text x="10" y="45" font-family="monospace" font-size="9" fill="#f43f5e">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.</text>
+        <text x="10" y="65" font-family="monospace" font-size="9" fill="#a855f7">eyJ1c2VySWQiOjEwLCJ1c2VybmFtZSI6ImtodXllbi5odiIsInJvbGUiOiJFbXBsb3llZSJ9.</text>
+        <text x="10" y="85" font-family="monospace" font-size="9" fill="#06b6d4">4kGZ_37vW...9x8A2M</text>
+        <text x="10" y="100" font-family="sans-serif" font-size="9" fill="#94a3b8">(Header . Payload . Signature)</text>
+
+        <text x="0" y="135" font-family="sans-serif" font-size="11" font-weight="700" fill="#38bdf8">2. DECODED USER PAYLOAD:</text>
+        <rect y="145" width="350" height="130" rx="6" ry="6" fill="#020617" stroke="#1e293b"/>
+        <text x="10" y="168" font-family="monospace" font-size="11" fill="#e2e8f0">&#123;</text>
+        <text x="24" y="188" font-family="monospace" font-size="11" fill="#38bdf8">"userId": <tspan fill="#f59e0b">10</tspan>,</text>
+        <text x="24" y="206" font-family="monospace" font-size="11" fill="#38bdf8">"username": <tspan fill="#34d399">"khuyen.hv"</tspan>,</text>
+        <text x="24" y="224" font-family="monospace" font-size="11" fill="#38bdf8">"role": <tspan fill="#34d399">"Employee"</tspan>,</text>
+        <text x="24" y="242" font-family="monospace" font-size="11" fill="#38bdf8">"exp": <tspan fill="#f59e0b">1792474800</tspan> <tspan fill="#64748b">(24h valid)</tspan></text>
+        <text x="10" y="262" font-family="monospace" font-size="11" fill="#e2e8f0">&#125;</text>
+
+        <text x="0" y="300" font-family="sans-serif" font-size="11" font-weight="700" fill="#38bdf8">3. TỰ ĐỘNG GẮN TOKEN VÀO API HEADER:</text>
+        <rect y="310" width="350" height="50" rx="6" ry="6" fill="#020617" stroke="#1e293b"/>
+        <text x="10" y="332" font-family="monospace" font-size="10.5" fill="#facc15">Authorization: Bearer eyJhbGciOi...</text>
+        <text x="10" y="350" font-family="sans-serif" font-size="10" fill="#10b981">✓ Mọi request API tự động xác thực danh tính</text>
+      </g>
+    </g>
+  </g>
+</svg>

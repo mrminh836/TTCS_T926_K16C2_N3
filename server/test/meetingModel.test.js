@@ -53,6 +53,12 @@ describe('Meeting Model - (Kiểm thử Unit Test Model & Transaction)', () => {
                 if (lowerSql.includes('from rooms where roomid')) {
                     return [[{ RoomID: params ? params[0] : 1, RoomName: 'Phòng Hội Nghị A', Capacity: 20, Status: 'Active' }]];
                 }
+                if (lowerSql.includes('from equipments where equipmentid in')) {
+                    return [[{ EquipmentID: 5, EquipmentName: 'Máy chiếu HD', Status: 'Available' }]];
+                }
+                if (lowerSql.includes('from booking_equipments be')) {
+                    return [[]]; // Không bị trùng thiết bị
+                }
                 if (lowerSql.includes("bookingstatus = 'confirmed'")) {
                     return [[]]; // Không bị trùng
                 }
@@ -62,7 +68,7 @@ describe('Meeting Model - (Kiểm thử Unit Test Model & Transaction)', () => {
                 if (lowerSql.includes('insert into bookings')) {
                     return [{ insertId: 2001 }];
                 }
-                return [{}];
+                return [[]];
             };
 
             const mockConnection = {

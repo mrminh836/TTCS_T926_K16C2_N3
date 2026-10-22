@@ -9,7 +9,13 @@ const db = require('../config/database');
 
 async function runMigrations() {
     console.log('--- BẮT ĐẦU CHẠY DATABASE MIGRATIONS ---');
-    const migrationsDir = path.resolve(__dirname, '../../database/migrations');
+    let migrationsDir = path.resolve(__dirname, '../../database/migrations');
+    if (!fs.existsSync(migrationsDir)) {
+        const altDir = path.resolve('/database/migrations');
+        if (fs.existsSync(altDir)) {
+            migrationsDir = altDir;
+        }
+    }
 
     if (!fs.existsSync(migrationsDir)) {
         console.error(`Thư mục migration không tồn tại: ${migrationsDir}`);
@@ -29,15 +35,23 @@ async function runMigrations() {
             console.log(`Đang chạy migration: ${file}...`);
             const sqlContent = fs.readFileSync(filePath, 'utf8');
 
-            // Tách các câu lệnh theo dấu ;
+            // Loại bỏ dòng comment và tách các câu lệnh theo dấu ;
             const statements = sqlContent
-                .split(/;\s*$/m)
-                .map(s => s.trim())
-                .filter(s => s.length > 0 && !s.startsWith('--'));
+                .split(';')
+                .map(s => s.replace(/^--.*$/gm, '').trim())
+                .filter(s => s.length > 0);
 
             for (const statement of statements) {
                 if (statement.length > 0) {
-                    await connection.query(statement);
+                    try {
+                        await connection.query(statement);
+                    } catch (stmtErr) {
+                        if (stmtErr.code === 'ER_DUP_FIELDNAME' || stmtErr.code === 'ER_DUP_KEYNAME') {
+                            console.log(`  ℹ Đã tồn tại cấu trúc (bỏ qua): ${stmtErr.message}`);
+                        } else {
+                            throw stmtErr;
+                        }
+                    }
                 }
             }
             console.log(`✓ Hoàn thành migration: ${file}`);

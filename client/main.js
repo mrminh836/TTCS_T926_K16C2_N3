@@ -7,243 +7,114 @@
 
 
 // =====================================================
-// 1. DỮ LIỆU CHUẨN DATABASE (ROOMS, MEETINGS, USERS)
+// =====================================================
+// 1. DỮ LIỆU ĐỘNG TỪ DATABASE QUA BACKEND API
+// (Khi không chạy database/backend: hệ thống không có dữ liệu;
+//  Chỉ khi khởi động backend và database: nạp dữ liệu thực tế)
 // =====================================================
 
-let ROOMS = [
-  {
-    id: 1,
-    code: "RM-001",
-    name: "Phòng Tokyo (Tầng 4)",
-    floor: "Tầng 4, Tòa A",
-    capacity: 20,
-    status: "Active",
-    type: "Hội nghị",
-    qrCode: "QR-ROOM-001",
-    equipments: ["Máy chiếu Full HD", "Màn hình TV 75\"", "Micro & Loa họp"],
-    description: "Phòng họp hội thảo tiêu chuẩn cao, view thoáng, cách âm tốt, chuyên tổ chức họp ban giám đốc và đối tác."
-  },
-  {
-    id: 2,
-    code: "RM-002",
-    name: "Phòng Silicon (Tầng 2)",
-    floor: "Tầng 2, Tòa B",
-    capacity: 12,
-    status: "Active",
-    type: "Nhóm / Tech",
-    qrCode: "QR-ROOM-002",
-    equipments: ["Màn hình TV 75\"", "Bảng trắng viết", "Micro & Loa họp"],
-    description: "Phòng họp nhóm kỹ thuật, trang bị bảng trắng lớn và màn hình TV cho daily sprint và pairing."
-  },
-  {
-    id: 3,
-    code: "RM-003",
-    name: "Phòng Hội Nghị A",
-    floor: "Tầng 1, Tòa Trung tâm",
-    capacity: 30,
-    status: "Active",
-    type: "Hội trường lớn",
-    qrCode: "QR-ROOM-003",
-    equipments: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\"", "Bảng trắng viết"],
-    description: "Hội trường đa năng phục vụ họp toàn thể phòng ban, đào tạo nội bộ và workshop công nghệ."
-  },
-  {
-    id: 4,
-    code: "RM-004",
-    name: "Phòng Grand Board",
-    floor: "Tầng 5, Tòa A",
-    capacity: 50,
-    status: "Maintenance",
-    type: "Đại sảnh / Board",
-    qrCode: "QR-ROOM-004",
-    equipments: ["Máy chiếu Full HD", "Micro & Loa họp", "Màn hình TV 75\""],
-    description: "Phòng họp cấp cao Ban Lãnh đạo, hiện đang tiến hành bảo trì nâng cấp hệ thống âm thanh vòm."
-  },
-  {
-    id: 5,
-    code: "RM-005",
-    name: "Phòng VIP",
-    floor: "Tầng 3, Tòa VIP",
-    capacity: 10,
-    status: "Active",
-    type: "VIP / Phỏng vấn",
-    qrCode: "QR-ROOM-005",
-    equipments: ["Màn hình TV 75\"", "Micro & Loa họp"],
-    description: "Không gian sang trọng, yên tĩnh, chuyên dành cho phỏng vấn lãnh đạo và tiếp khách ngoại giao."
-  }
-];
+let ROOMS = [];
+let USERS = [];
+let EQUIPMENTS = [];
+let meetings = [];
 
-const USERS = [
-  { id: 1, name: "Nguyễn Văn An", email: "an.nguyen@company.com", role: "Employee", department: "Kỹ thuật", avatar: "NA", color: "#2563eb" },
-  { id: 2, name: "Trần Thu Hà", email: "ha.tran@company.com", role: "Manager", department: "Quản trị", avatar: "TH", color: "#7c3aed" },
-  { id: 3, name: "Lê Minh Tuấn", email: "tuan.le@company.com", role: "Employee", department: "Kỹ thuật", avatar: "MT", color: "#0891b2" },
-  { id: 4, name: "Hoàng Bảo Ngọc", email: "ngoc.hoang@company.com", role: "HR Lead", department: "Nhân sự", avatar: "BN", color: "#db2777" },
-  { id: 5, name: "Phạm Quốc Dũng", email: "dung.pham@company.com", role: "Tech Lead", department: "Kỹ thuật", avatar: "QD", color: "#d97706" },
-  { id: 6, name: "Vũ Tuấn Kiệt", email: "kiet.vu@company.com", role: "Director", department: "Ban Giám đốc", avatar: "TK", color: "#4f46e5" },
-  { id: 7, name: "Hoàng Minh Khánh", email: "khanh.hoang@company.com", role: "Frontend Dev", department: "Kỹ thuật", avatar: "MK", color: "#059669" },
-  { id: 8, name: "Nguyễn Minh Lượng", email: "luong.nguyen@company.com", role: "Frontend Dev", department: "Kỹ thuật", avatar: "ML", color: "#2563eb" },
-  { id: 9, name: "Vũ Thị Thanh Ngân", email: "ngan.vu@company.com", role: "UI/UX Designer", department: "Thiết kế", avatar: "TN", color: "#e11d48" },
-  { id: 10, name: "Đặng Hùng", email: "hung.dang@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "DH", color: "#9333ea" },
-  { id: 11, name: "Hà Sỹ Nguyên", email: "nguyen.ha@company.com", role: "Backend Lead", department: "Kỹ thuật", avatar: "SN", color: "#0d9488" },
-  { id: 12, name: "Đoàn Ngọc Mạnh", email: "manh.doan@company.com", role: "Backend Dev", department: "Kỹ thuật", avatar: "NM", color: "#0284c7" },
-  { id: 13, name: "Đào Đức Mạnh", email: "manh.dao@company.com", role: "Backend Dev", department: "Kỹ thuật", avatar: "DM", color: "#16a34a" },
-  { id: 14, name: "Hoàng Văn Khuyến", email: "khuyen.hoang@company.com", role: "QA Lead", department: "Kiểm thử", avatar: "VK", color: "#ca8a04" },
-  { id: 15, name: "Ngô Đức Khải", email: "khai.ngo@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "DK", color: "#ea580c" },
-  { id: 16, name: "Triệu Quốc Khánh", email: "khanh.trieu@company.com", role: "QA Engineer", department: "Kiểm thử", avatar: "QK", color: "#65a30d" },
-  { id: 17, name: "Đỗ Quang Minh", email: "minh.do@company.com", role: "Scrum Master", department: "Quản trị", avatar: "QM", color: "#475569" }
-];
-
-const EQUIPMENTS = [
-  { id: 1, name: "Máy chiếu Full HD", type: "Visual", status: "Available" },
-  { id: 2, name: "Màn hình TV 75\"", type: "Display", status: "Available" },
-  { id: 3, name: "Micro & Loa họp", type: "Audio", status: "Available" },
-  { id: 4, name: "Bảng trắng viết", type: "Stationery", status: "Available" }
-];
-
-let meetings = [
-  {
-    id: 1,
-    title: "Họp Sprint Review nhóm K16C2",
-    tag: "Sprint 24",
-    date: "2026-09-26",
-    startTime: "09:00",
-    endTime: "10:30",
-    time: "09:00 - 10:30",
-    roomId: 3,
-    roomName: "Phòng Hội Nghị A",
-    capacity: 30,
-    organizerId: 1,
-    host: "Nguyễn Văn An",
-    participants: [
-      "Nguyễn Văn An",
-      "Trần Thu Hà",
-      "Lê Minh Tuấn",
-      "Phạm Quốc Dũng"
-    ],
-    participantIds: [1, 2, 3, 5],
-    status: "in-progress",
-    notes: "Đánh giá kết quả Sprint và thống nhất công việc cho Sprint tiếp theo."
-  },
-
-  {
-    id: 2,
-    title: "Họp Ban điều hành Quý 4/2026",
-    tag: "Quan trọng",
-    date: "2026-09-26",
-    startTime: "14:00",
-    endTime: "16:00",
-    time: "14:00 - 16:00",
-    roomId: 1,
-    roomName: "Phòng Tokyo (Tầng 4)",
-    capacity: 20,
-    organizerId: 2,
-    host: "Trần Thu Hà",
-    participants: [
-      "Trần Thu Hà",
-      "Nguyễn Minh Lượng",
-      "Đặng Hùng",
-      "Vũ Tuấn Kiệt"
-    ],
-    participantIds: [2, 8, 10, 6],
-    status: "scheduled",
-    notes: "Báo cáo chỉ số tăng trưởng doanh thu và phê duyệt ngân sách R&D."
-  },
-
-  {
-    id: 3,
-    title: "Sync Design System & UI/UX Audit",
-    tag: "Thiết kế",
-    date: "2026-09-27",
-    startTime: "10:00",
-    endTime: "11:00",
-    time: "10:00 - 11:00",
-    roomId: 2,
-    roomName: "Phòng Silicon (Tầng 2)",
-    capacity: 12,
-    organizerId: 3,
-    host: "Lê Minh Tuấn",
-    participants: [
-      "Lê Minh Tuấn",
-      "Vũ Thị Thanh Ngân",
-      "Hoàng Minh Khánh"
-    ],
-    participantIds: [3, 9, 7],
-    status: "scheduled",
-    notes: "Rà soát tính nhất quán của bộ component Form và Dashboard."
-  },
-
-  {
-    id: 4,
-    title: "Phỏng vấn ứng viên Senior Frontend Lead",
-    tag: "Tuyển dụng",
-    date: "2026-09-27",
-    startTime: "15:00",
-    endTime: "15:45",
-    time: "15:00 - 15:45",
-    roomId: 5,
-    roomName: "Phòng VIP",
-    capacity: 10,
-    organizerId: 4,
-    host: "Hoàng Bảo Ngọc",
-    participants: [
-      "Hoàng Bảo Ngọc",
-      "Nguyễn Minh Lượng",
-      "Hoàng Minh Khánh"
-    ],
-    participantIds: [4, 8, 7],
-    status: "scheduled",
-    notes: "Đánh giá chuyên môn kỹ thuật và kinh nghiệm React/Tailwind."
-  },
-
-  {
-    id: 5,
-    title: "Daily Standup Đội phát triển Core Platform",
-    tag: "Hằng ngày",
-    date: "2026-09-25",
-    startTime: "08:45",
-    endTime: "09:15",
-    time: "08:45 - 09:15",
-    roomId: 2,
-    roomName: "Phòng Silicon (Tầng 2)",
-    capacity: 12,
-    organizerId: 5,
-    host: "Phạm Quốc Dũng",
-    participants: [
-      "Phạm Quốc Dũng",
-      "Đặng Hùng",
-      "Lê Minh Tuấn"
-    ],
-    participantIds: [5, 10, 3],
-    status: "completed",
-    notes: "Cập nhật tiến độ API Gateway và giải quyết blocker."
-  },
-
-  {
-    id: 6,
-    title: "Kick-off Dự án Chuyển đổi số Khách hàng",
-    tag: "Dự án mới",
-    date: "2026-09-24",
-    startTime: "14:00",
-    endTime: "15:30",
-    time: "14:00 - 15:30",
-    roomId: 4,
-    roomName: "Phòng Grand Board",
-    capacity: 50,
-    organizerId: 6,
-    host: "Vũ Tuấn Kiệt",
-    participants: [
-      "Vũ Tuấn Kiệt",
-      "Trần Thu Hà",
-      "Nguyễn Văn An"
-    ],
-    participantIds: [6, 2, 1],
-    status: "cancelled",
-    notes: "Thống nhất phạm vi triển khai và kế hoạch bàn giao milestone 1."
-  }
-];
+// Đồng bộ 2 chiều với window scope để các module trang truy cập dữ liệu mới nhất
+try {
+  Object.defineProperty(window, 'ROOMS', {
+    get() { return ROOMS; },
+    set(v) { ROOMS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'USERS', {
+    get() { return USERS; },
+    set(v) { USERS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'EQUIPMENTS', {
+    get() { return EQUIPMENTS; },
+    set(v) { EQUIPMENTS = v; },
+    configurable: true
+  });
+  Object.defineProperty(window, 'meetings', {
+    get() { return meetings; },
+    set(v) { meetings = v; },
+    configurable: true
+  });
+} catch (e) {
+  window.ROOMS = ROOMS;
+  window.USERS = USERS;
+  window.EQUIPMENTS = EQUIPMENTS;
+  window.meetings = meetings;
+}
 
 let currentStatusFilter = "";
 let currentRoomFilter = "";
+
+function getActiveAuthUser() {
+  if (window.AuthState && typeof window.AuthState.getUser === 'function') {
+    return window.AuthState.getUser();
+  }
+  try {
+    const raw = localStorage.getItem('currentUser') || localStorage.getItem('user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+window.getCurrentUser = getActiveAuthUser;
+
+function getCurrentOrganizerId() {
+  const authUser = getActiveAuthUser();
+  const orgIdInput = document.getElementById("meeting-organizer-id") || document.getElementById("meeting-organizer");
+
+  // Người tổ chức mặc định là tài khoản đang đăng nhập
+  if (authUser) {
+    const authId = Number(authUser.userId || authUser.id || 0);
+    if (authId > 0) return authId;
+  }
+
+  if (orgIdInput && orgIdInput.value) {
+    const val = Number(orgIdInput.value);
+    if (!isNaN(val) && val > 0) return val;
+  }
+
+  return 1;
+}
+window.getCurrentOrganizerId = getCurrentOrganizerId;
+
+function syncMeetingOrganizerOptions(selectedId = null) {
+  const select = document.getElementById("meeting-organizer");
+  const authUser = getActiveAuthUser();
+  if (authUser && Array.isArray(USERS) && !USERS.some(u => u.id === Number(authUser.userId || authUser.id))) {
+    const authId = Number(authUser.userId || authUser.id);
+    USERS.push({
+      id: authId,
+      name: authUser.fullName || authUser.name || authUser.username || "Thành viên",
+      email: authUser.email || "",
+      role: authUser.role || "Employee",
+      department: authUser.department || (authUser.role === "Admin" || authUser.role === "Manager" ? "Quản trị" : "Kỹ thuật"),
+      avatar: getInitials(authUser.fullName || authUser.name || "Thành viên"),
+      color: getHostColor(authUser.fullName || authUser.name || "Thành viên")
+    });
+  }
+
+  const activeId = selectedId ? Number(selectedId) : getCurrentOrganizerId();
+
+  if (select) {
+    if (select.tagName === "SELECT" && Array.isArray(USERS) && USERS.length > 0) {
+      select.innerHTML = USERS.map(u => `
+        <option value="${u.id}" ${Number(u.id) === Number(activeId) ? 'selected' : ''}>
+          ${escapeHTML(u.name)} (ID: ${u.id} - ${escapeHTML(u.department || u.role)})
+        </option>
+      `).join("");
+    }
+    select.value = String(activeId);
+  }
+
+  const orgIdInput = document.getElementById("meeting-organizer-id");
+  if (orgIdInput) orgIdInput.value = String(activeId);
+}
+window.syncMeetingOrganizerOptions = syncMeetingOrganizerOptions;
 
 function getInitials(name) {
   if (!name) return "MP";
@@ -276,21 +147,21 @@ function calcDurationString(start, end) {
 
 function exportToCSV() {
   const headers = [
-    "Mã cuộc họp (MeetingID)",
-    "Tiêu đề (Title)",
-    "Nhãn phân loại (Tag)",
+    "Mã cuộc họp",
+    "Tiêu đề cuộc họp",
+    "Phân loại",
     "Ngày họp",
-    "Thời gian (StartTime - EndTime)",
-    "Phòng họp (RoomName)",
-    "Sức chứa (Capacity)",
-    "Mã phòng (RoomID)",
-    "Người tổ chức (Host)",
-    "Mã người tổ chức (OrganizerID)",
-    "Người tham gia (Participants)",
-    "Trạng thái đặt phòng (BookingStatus)",
-    "Lặp lại định kỳ (IsRecurring)",
-    "Thiết bị yêu cầu (Equipments)",
-    "Mô tả / Ghi chú (Description)"
+    "Thời gian",
+    "Phòng họp",
+    "Sức chứa",
+    "Mã phòng",
+    "Người chủ trì",
+    "Mã người chủ trì",
+    "Người tham gia",
+    "Trạng thái",
+    "Lặp lại định kỳ",
+    "Thiết bị phòng họp",
+    "Nội dung / Ghi chú"
   ];
   const rows = meetings.map(m => [
     m.id,
@@ -387,19 +258,7 @@ function calcDuration() {
     return false;
   }
 
-  // Chống đặt trong quá khứ nếu là tạo mới
-  if (!isEdit && date) {
-    const selectedStart = new Date(`${date}T${start}:00`);
-    if (selectedStart.getTime() < Date.now() - 60000) {
-      if (timeErrorText) timeErrorText.textContent = "Thời gian bắt đầu không thể diễn ra trong quá khứ.";
-      timeErrorMsg.classList.remove("hidden");
-      durationBadge.className = "stitch-duration-badge error";
-      durationText.innerText = "Thời gian trong quá khứ";
-      startInput.classList.add("has-error", "is-invalid");
-      durationBadge.classList.remove("hidden");
-      return false;
-    }
-  }
+  // (Kiểm tra thời gian quá khứ được thực hiện khi người dùng bấm nút Tạo cuộc họp trong validateMeetingForm)
 
   // Hợp lệ
   timeErrorMsg.classList.add("hidden");
@@ -444,43 +303,133 @@ const roomDeleteOverlay = document.getElementById("room-delete-overlay");
 
 
 // =====================================================
-// 3. ROUTER
+// 3. ROUTER & ĐIỀU HƯỚNG TRANG NÂNG CAO (SPA ROUTER)
 // =====================================================
+
+// Xuất các hàm render sang window để router.js và các page modules sử dụng
+window.renderHome = renderHome;
+window.renderMeetingsPage = renderMeetingsPage;
+window.renderAdminRoomsPage = renderAdminRoomsPage;
+window.renderAdminEquipmentsPage = renderAdminEquipmentsPage;
+window.render404 = render404;
+
+function registerAppRoutes() {
+  if (!window.AppRouter) return;
+
+  // 1. Routes dành cho Người dùng (Bắt buộc xác thực requireAuth theo chuẩn QLNS_QLTKPM)
+  AppRouter.add('/', renderHome, { title: 'Trang chủ - Dashboard', requireAuth: true });
+  AppRouter.add('/home', renderHome, { title: 'Trang chủ - Dashboard', requireAuth: true });
+  AppRouter.add('/meetings', () => {
+    if (window.handleMeetingsRoute) window.handleMeetingsRoute();
+    else renderMeetingsPage();
+  }, { title: 'Danh sách Cuộc họp', requireAuth: true });
+
+  AppRouter.add('/meetings/create', () => {
+    if (window.handleMeetingCreateRoute) window.handleMeetingCreateRoute();
+    else {
+      renderMeetingsPage();
+      setTimeout(() => { if (typeof openAddModal === 'function') openAddModal(); }, 100);
+    }
+  }, { title: 'Tạo Cuộc họp Mới', requireAuth: true });
+
+  AppRouter.add('/meetings/:id', (params) => {
+    if (window.handleMeetingDetailRoute) window.handleMeetingDetailRoute(params);
+    else {
+      renderMeetingsPage();
+      setTimeout(() => { if (typeof openDetailModal === 'function') openDetailModal(Number(params.id)); }, 100);
+    }
+  }, { title: 'Chi tiết Cuộc họp', requireAuth: true });
+
+  AppRouter.add('/calendar', () => {
+    if (window.renderCalendarPage) window.renderCalendarPage();
+    else renderMeetingsPage();
+  }, { title: 'Lịch họp Doanh nghiệp', requireAuth: true });
+
+  AppRouter.add('/rooms', () => {
+    if (window.renderRoomsUserPage) window.renderRoomsUserPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Tra cứu Phòng họp', requireAuth: true });
+
+  AppRouter.add('/equipment', () => {
+    if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
+    else renderAdminEquipmentsPage();
+  }, { title: 'Danh mục Trang thiết bị', requireAuth: true });
+
+  AppRouter.add('/equipments', () => {
+    if (window.renderEquipmentUserPage) window.renderEquipmentUserPage();
+    else renderAdminEquipmentsPage();
+  }, { title: 'Danh mục Trang thiết bị', requireAuth: true });
+
+  AppRouter.add('/profile', () => {
+    if (window.renderProfilePage) window.renderProfilePage();
+    else renderHome();
+  }, { title: 'Hồ sơ cá nhân', requireAuth: true });
+
+  // Route Đăng nhập chuyên dụng
+  AppRouter.add('/login', () => {
+    window.location.href = 'login.html';
+  }, { title: 'Đăng nhập hệ thống' });
+
+  // 2. Routes dành riêng cho Quản trị viên (Admin)
+  AppRouter.add('/admin', () => {
+    if (window.renderAdminDashboardPage) window.renderAdminDashboardPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Tổng quan Quản trị', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/admin/rooms', renderAdminRoomsPage, { title: 'Quản lý Phòng họp (Admin)', requireAuth: true, requireAdmin: true });
+  AppRouter.add('/admin/equipment', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAuth: true, requireAdmin: true });
+  AppRouter.add('/admin/equipments', renderAdminEquipmentsPage, { title: 'Quản lý Thiết bị (Admin)', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/admin/users', () => {
+    if (window.renderAdminUsersPage) window.renderAdminUsersPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Quản lý Người dùng (Admin)', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/admin/reports', () => {
+    if (window.renderAdminReportsPage) window.renderAdminReportsPage();
+    else renderAdminRoomsPage();
+  }, { title: 'Báo cáo & Thống kê (Admin)', requireAuth: true, requireAdmin: true });
+
+  AppRouter.add('/404', render404, { title: '404 - Không tìm thấy' });
+}
+
+// Khởi chạy đăng ký routes
+registerAppRoutes();
 
 const routes = {
   "/": renderHome,
   "/home": renderHome,
   "/meetings": renderMeetingsPage,
+  "/calendar": () => (window.renderCalendarPage ? window.renderCalendarPage() : renderMeetingsPage()),
+  "/rooms": () => (window.renderRoomsUserPage ? window.renderRoomsUserPage() : renderAdminRoomsPage()),
+  "/equipment": () => (window.renderEquipmentUserPage ? window.renderEquipmentUserPage() : renderAdminEquipmentsPage()),
+  "/equipments": () => (window.renderEquipmentUserPage ? window.renderEquipmentUserPage() : renderAdminEquipmentsPage()),
+  "/profile": () => (window.renderProfilePage ? window.renderProfilePage() : renderHome()),
+  "/admin": () => (window.renderAdminDashboardPage ? window.renderAdminDashboardPage() : renderAdminRoomsPage()),
   "/admin/rooms": renderAdminRoomsPage,
-  "/rooms": renderAdminRoomsPage,
+  "/admin/equipment": renderAdminEquipmentsPage,
+  "/admin/equipments": renderAdminEquipmentsPage,
+  "/admin/users": () => (window.renderAdminUsersPage ? window.renderAdminUsersPage() : renderAdminRoomsPage()),
+  "/admin/reports": () => (window.renderAdminReportsPage ? window.renderAdminReportsPage() : renderAdminRoomsPage()),
   "/404": render404
 };
 
-
 function getCurrentRoute() {
   const hash = window.location.hash;
-
-  if (!hash || hash === "#") {
-    return "/";
-  }
-
+  if (!hash || hash === "#") return "/";
   return hash.substring(1);
 }
 
-
 function updateActiveNav(route) {
   const navLinks = document.querySelectorAll(".nav-link-custom");
-
   navLinks.forEach((link) => {
     const href = link.getAttribute("href");
     const linkRoute = href ? href.replace("#", "") : "";
-
-    const isHome =
-      (route === "/" || route === "/home") &&
-      (linkRoute === "/" || linkRoute === "/home");
+    const isHome = (route === "/" || route === "/home") && (linkRoute === "/" || linkRoute === "/home");
+    const isAdmin = route.startsWith("/admin") && linkRoute === "/admin";
     const isMatch = route === linkRoute;
 
-    if (isHome || isMatch) {
+    if (isHome || isAdmin || isMatch) {
       link.classList.add("active");
     } else {
       link.classList.remove("active");
@@ -488,326 +437,681 @@ function updateActiveNav(route) {
   });
 }
 
+function initAppShellEvents() {
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = document.getElementById("sidebar-toggle-btn");
+  const toggleIcon = document.getElementById("sidebar-toggle-icon");
+  const mobileBtn = document.getElementById("mobile-menu-btn");
+  const backdrop = document.getElementById("sidebar-backdrop");
+  const userProfileBtn = document.getElementById("user-profile-btn");
+  const userDropdown = document.getElementById("user-dropdown");
+  const notificationsBtn = document.getElementById("notifications-btn");
+  const quickSearch = document.getElementById("header-quick-search");
+
+  // 1. Thu gọn / mở rộng Sidebar trên Desktop
+  if (toggleBtn && sidebar) {
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      const isCollapsed = sidebar.classList.contains("collapsed");
+      if (toggleIcon) {
+        toggleIcon.className = isCollapsed ? "bi bi-chevron-right" : "bi bi-chevron-left";
+      }
+    });
+  }
+
+  // 2. Mở / đóng Sidebar trên Mobile
+  if (mobileBtn && sidebar && backdrop) {
+    mobileBtn.addEventListener("click", () => {
+      sidebar.classList.add("mobile-open");
+      backdrop.classList.add("show");
+    });
+
+    backdrop.addEventListener("click", () => {
+      sidebar.classList.remove("mobile-open");
+      backdrop.classList.remove("show");
+    });
+  }
+
+  // 3. Dropdown người dùng
+  if (userProfileBtn && userDropdown) {
+    userProfileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
+        userDropdown.classList.remove("show");
+      }
+    });
+  }
+
+  // 4. Notifications Dropdown (Bảng thông báo nhỏ chuẩn SaaS)
+  const notificationDropdown = document.getElementById("notification-dropdown");
+  if (notificationsBtn && notificationDropdown) {
+    notificationsBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (userDropdown) userDropdown.classList.remove("show");
+      const isShowing = notificationDropdown.classList.toggle("show");
+      if (isShowing) {
+        renderNotificationDropdown();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!notificationDropdown.contains(e.target) && !notificationsBtn.contains(e.target)) {
+        notificationDropdown.classList.remove("show");
+      }
+    });
+
+    const markAllReadBtn = document.getElementById("btn-mark-all-read");
+    if (markAllReadBtn) {
+      markAllReadBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        sessionStorage.setItem("notifications_read_all", new Date().toISOString().slice(0, 10));
+        const badge = document.getElementById("notifications-badge-dot");
+        if (badge) badge.classList.add("d-none");
+        const countBadge = document.getElementById("notif-unread-count");
+        if (countBadge) countBadge.textContent = "0";
+        document.querySelectorAll(".notification-item.unread").forEach(el => el.classList.remove("unread"));
+      });
+    }
+
+    // Tự động kiểm tra và cập nhật badge thông báo
+    setTimeout(renderNotificationDropdown, 1200);
+  }
+
+  // 5. Quick search in header
+  if (quickSearch) {
+    quickSearch.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const q = quickSearch.value.trim();
+        if (q) {
+          window.location.hash = `#/meetings?q=${encodeURIComponent(q)}`;
+        }
+      }
+    });
+  }
+
+  // 6. Global Modal Close Handlers (Hoạt động thống nhất trên tất cả các trang Admin, Meeting, Calendar...)
+  const closeDetailBtn = document.getElementById("btn-close-detail");
+  const closeDetailBottom = document.getElementById("btn-close-detail-bottom");
+  const detailOverlay = document.getElementById("detail-overlay");
+  const closeModalBtn = document.getElementById("btn-close-modal");
+  const cancelBtn = document.getElementById("btn-cancel");
+  const meetingOverlay = document.getElementById("modal-overlay");
+
+  // Room Modals
+  const closeRoomBtn = document.getElementById("btn-close-room-modal");
+  const cancelRoomBtn = document.getElementById("btn-room-cancel");
+  const successCloseRoomBtn = document.getElementById("btn-room-success-close");
+  const roomModalOverlay = document.getElementById("room-modal-overlay");
+
+  if (closeDetailBtn) {
+    closeDetailBtn.addEventListener("click", () => {
+      if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+    });
+  }
+  if (closeDetailBottom) {
+    closeDetailBottom.addEventListener("click", () => {
+      if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+    });
+  }
+  if (detailOverlay) {
+    detailOverlay.addEventListener("click", (e) => {
+      if (e.target === detailOverlay && typeof window.closeDetailModal === "function") {
+        window.closeDetailModal();
+      }
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+      if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+    });
+  }
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+    });
+  }
+  if (meetingOverlay) {
+    meetingOverlay.addEventListener("click", (e) => {
+      if (e.target === meetingOverlay && typeof window.closeMeetingModal === "function") {
+        window.closeMeetingModal();
+      }
+    });
+  }
+
+  if (closeRoomBtn) {
+    closeRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (cancelRoomBtn) {
+    cancelRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (successCloseRoomBtn) {
+    successCloseRoomBtn.addEventListener("click", () => {
+      if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+    });
+  }
+  if (roomModalOverlay) {
+    roomModalOverlay.addEventListener("click", (e) => {
+      if (e.target === roomModalOverlay && typeof window.closeRoomModal === "function") {
+        window.closeRoomModal();
+      }
+    });
+  }
+
+  const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+  const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+  const closeEquipmentBtn = document.getElementById("btn-close-equipment-modal");
+  const cancelEquipmentBtn = document.getElementById("btn-equipment-cancel");
+  const closeEquipmentDeleteBtn = document.getElementById("btn-close-equipment-delete");
+  const cancelEquipmentDeleteBtn = document.getElementById("btn-cancel-equipment-delete");
+
+  if (closeEquipmentBtn) {
+    closeEquipmentBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+    });
+  }
+  if (cancelEquipmentBtn) {
+    cancelEquipmentBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+    });
+  }
+  if (equipmentModalOverlay) {
+    equipmentModalOverlay.addEventListener("click", (e) => {
+      if (e.target === equipmentModalOverlay && typeof window.closeEquipmentModal === "function") {
+        window.closeEquipmentModal();
+      }
+    });
+  }
+  if (closeEquipmentDeleteBtn) {
+    closeEquipmentDeleteBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+    });
+  }
+  if (cancelEquipmentDeleteBtn) {
+    cancelEquipmentDeleteBtn.addEventListener("click", () => {
+      if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+    });
+  }
+  if (equipmentDeleteOverlay) {
+    equipmentDeleteOverlay.addEventListener("click", (e) => {
+      if (e.target === equipmentDeleteOverlay && typeof window.closeEquipmentDeleteModal === "function") {
+        window.closeEquipmentDeleteModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (detailOverlay && !detailOverlay.classList.contains("hidden")) {
+        if (typeof window.closeDetailModal === "function") window.closeDetailModal();
+      } else if (meetingOverlay && !meetingOverlay.classList.contains("hidden")) {
+        if (typeof window.closeMeetingModal === "function") window.closeMeetingModal();
+      } else if (roomModalOverlay && !roomModalOverlay.classList.contains("hidden")) {
+        if (typeof window.closeRoomModal === "function") window.closeRoomModal();
+      } else {
+        const roomQrOverlay = document.getElementById("room-qr-overlay");
+        const roomDeleteOverlay = document.getElementById("room-delete-overlay");
+        const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+        const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+
+        if (roomQrOverlay && !roomQrOverlay.classList.contains("hidden")) {
+          if (typeof window.closeRoomQRModal === "function") window.closeRoomQRModal();
+        } else if (roomDeleteOverlay && !roomDeleteOverlay.classList.contains("hidden")) {
+          if (typeof window.closeRoomDeleteModal === "function") window.closeRoomDeleteModal();
+        } else if (equipmentModalOverlay && !equipmentModalOverlay.classList.contains("hidden")) {
+          if (typeof window.closeEquipmentModal === "function") window.closeEquipmentModal();
+        } else if (equipmentDeleteOverlay && !equipmentDeleteOverlay.classList.contains("hidden")) {
+          if (typeof window.closeEquipmentDeleteModal === "function") window.closeEquipmentDeleteModal();
+        }
+      }
+    }
+  });
+}
 
 function router() {
+  if (window.AppRouter) {
+    window.AppRouter.handleRouteChange();
+    return;
+  }
   const route = getCurrentRoute();
-
   const page = routes[route] || render404;
-
   page();
   updateActiveNav(route);
 }
 
-
 window.addEventListener("hashchange", router);
-document.addEventListener("DOMContentLoaded", router);
+document.addEventListener("DOMContentLoaded", () => {
+  initAppShellEvents();
+  router();
+});
 
+/**
+ * Render Bảng thông báo nhỏ Dropdown (SaaS Notification Popover)
+ */
+function renderNotificationDropdown() {
+  const container = document.getElementById("notification-items-list");
+  const badgeDot = document.getElementById("notifications-badge-dot");
+  const unreadCountBadge = document.getElementById("notif-unread-count");
+  if (!container) return;
 
-// =====================================================
-// 4. HOME
-// =====================================================
+  const authUser = (typeof getActiveAuthUser === "function") ? getActiveAuthUser() : null;
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id || 0) : 0;
+  const currentUserName = authUser ? (authUser.fullName || authUser.name || authUser.username || "") : "";
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const isReadAll = sessionStorage.getItem("notifications_read_all") === todayStr;
+
+  const allMeetings = Array.isArray(meetings) ? meetings : [];
+  const myMeetings = allMeetings.filter(m => {
+    if (m.status === "cancelled") return false;
+    if (authUser && String(authUser.role).toLowerCase() === "admin") return true;
+    const isHost = Number(m.organizerId) === currentUserId || (currentUserName && m.host === currentUserName);
+    const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+    const isInvited = pIds.includes(currentUserId);
+    return isHost || isInvited;
+  });
+
+  const todayMeetings = myMeetings
+    .filter(m => m.date === todayStr)
+    .sort((a, b) => (a.startTime || "").localeCompare(b.startTime || ""));
+
+  const futureMeetings = myMeetings
+    .filter(m => m.date > todayStr)
+    .sort((a, b) => (a.date || "").localeCompare(b.date || "") || (a.startTime || "").localeCompare(b.startTime || ""))
+    .slice(0, 3);
+
+  const notifications = [];
+
+  todayMeetings.forEach(m => {
+    const [sH, sM] = (m.startTime || "00:00").split(":").map(Number);
+    const [eH, eM] = (m.endTime || "23:59").split(":").map(Number);
+    const startMin = sH * 60 + sM;
+    const endMin = eH * 60 + eM;
+
+    const isOngoing = (nowMinutes >= startMin && nowMinutes <= endMin) || m.status === "in-progress";
+    const isEnded = nowMinutes > endMin || m.status === "completed";
+    const diffMin = startMin - nowMinutes;
+
+    if (isOngoing) {
+      notifications.push({
+        id: m.id,
+        title: m.title,
+        statusType: "ongoing",
+        iconClass: "icon-ongoing",
+        icon: "bi-broadcast",
+        label: "Đang diễn ra",
+        badgeClass: "bg-success text-white",
+        timeText: `Hôm nay • ${m.startTime} - ${m.endTime}`,
+        subText: `${m.roomName || "Phòng họp"} • Cuộc họp đang diễn ra`,
+        isUnread: !isReadAll
+      });
+    } else if (!isEnded) {
+      const isUrgent = diffMin <= 30 && diffMin >= 0;
+      notifications.push({
+        id: m.id,
+        title: m.title,
+        statusType: isUrgent ? "urgent" : "upcoming",
+        iconClass: isUrgent ? "icon-alert" : "icon-upcoming",
+        icon: isUrgent ? "bi-alarm-fill" : "bi-calendar-check",
+        label: isUrgent ? `Sắp bắt đầu (${diffMin}p)` : "Hôm nay",
+        badgeClass: isUrgent ? "bg-warning text-dark" : "bg-primary-subtle text-primary",
+        timeText: `Hôm nay • ${m.startTime} - ${m.endTime}`,
+        subText: `${m.roomName || "Phòng họp"} • Do ${m.host || "Đồng nghiệp"} chủ trì`,
+        isUnread: !isReadAll
+      });
+    }
+  });
+
+  futureMeetings.forEach(m => {
+    const formattedDate = (typeof formatDetailedDate === "function") ? formatDetailedDate(m.date) : m.date;
+    notifications.push({
+      id: m.id,
+      title: m.title,
+      statusType: "future",
+      iconClass: "icon-invited",
+      icon: "bi-calendar-event",
+      label: "Sắp tới",
+      badgeClass: "bg-secondary-subtle text-secondary",
+      timeText: `${formattedDate} • ${m.startTime}`,
+      subText: `${m.roomName || "Phòng họp"}`,
+      isUnread: false
+    });
+  });
+
+  const unreadCount = isReadAll ? 0 : notifications.filter(n => n.isUnread).length;
+  if (unreadCountBadge) unreadCountBadge.textContent = String(unreadCount);
+  if (badgeDot) {
+    if (unreadCount > 0) badgeDot.classList.remove("d-none");
+    else badgeDot.classList.add("d-none");
+  }
+
+  if (notifications.length === 0) {
+    container.innerHTML = `
+      <div class="notification-empty-state">
+        <div class="notification-empty-icon">
+          <i class="bi bi-bell-slash"></i>
+        </div>
+        <div class="notification-empty-title">Không có thông báo mới</div>
+        <div class="notification-empty-desc">Hôm nay bạn không có lịch họp nào sắp tới. Lời mời và lịch họp mới sẽ hiển thị tại đây.</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = notifications.map(n => `
+    <div class="notification-item ${n.isUnread ? "unread" : ""}" onclick="document.getElementById('notification-dropdown')?.classList.remove('show'); if (typeof openDetailModal === 'function') openDetailModal(${n.id});">
+      <div class="notification-item-icon ${n.iconClass}">
+        <i class="bi ${n.icon}"></i>
+      </div>
+      <div class="notification-item-content">
+        <div class="d-flex align-items-center justify-content-between gap-1 mb-1">
+          <span class="badge ${n.badgeClass}" style="font-size: 10px; font-weight: 600;">${n.label}</span>
+          <span class="notification-item-time">${n.timeText}</span>
+        </div>
+        <div class="notification-item-title text-truncate" title="${escapeHTML(n.title)}">
+          ${escapeHTML(n.title)}
+        </div>
+        <div class="notification-item-meta">
+          <span><i class="bi bi-geo-alt me-1 text-primary"></i>${escapeHTML(n.subText)}</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+window.renderNotificationDropdown = renderNotificationDropdown;
 
 // =====================================================
 // 4. HOME (ENTERPRISE HERO LANDING)
 // =====================================================
 
 function renderHome() {
-
-  const totalCount = meetings.length;
-  const scheduledCount = meetings.filter(m => m.status === "scheduled").length;
-
-  app.innerHTML = `
-    <section class="page home-page-enterprise">
-
-      <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        <span>Enterprise Sync • Meeting Suite SaaS</span>
-      </div>
-
-      <h1 class="hero-title">
-        Tối ưu hóa Lịch họp & Phân bổ Tài nguyên Thông minh
-      </h1>
-
-      <p class="hero-subtitle">
-        Giải pháp doanh nghiệp điều phối phòng họp, trang thiết bị và thời gian tự động, loại bỏ 100% tình trạng đặt trùng phòng với cơ chế Row-Lock độc quyền.
-      </p>
-
-      <div class="hero-actions">
-        <a href="#/meetings" class="btn btn-primary stitch-btn-submit hero-btn-main">
-          <i class="bi bi-calendar3 me-2"></i> Vào Quản lý cuộc họp
-        </a>
-
-        <a href="#/admin/rooms" class="btn btn-outline-primary stitch-btn-export hero-btn-sub">
-          <i class="bi bi-door-open-fill me-1"></i> Quản lý phòng họp (Admin)
-        </a>
-
-        <button type="button" onclick="openAddModal()" class="btn btn-outline-secondary stitch-btn-cancel hero-btn-sub">
-          <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp mới
-        </button>
-      </div>
-
-      <div class="hero-metrics-strip mt-5">
-        <div class="hero-metric-item">
-          <div class="hero-metric-number">${totalCount}</div>
-          <div class="hero-metric-label">Cuộc họp trong hệ thống</div>
-        </div>
-        <div class="hero-metric-divider"></div>
-        <div class="hero-metric-item">
-          <div class="hero-metric-number text-primary">${scheduledCount}</div>
-          <div class="hero-metric-label">Sắp diễn ra tuần này</div>
-        </div>
-        <div class="hero-metric-divider"></div>
-        <div class="hero-metric-item">
-          <div class="hero-metric-number text-success">100%</div>
-          <div class="hero-metric-label">Chống xung đột lịch trùng</div>
-        </div>
-      </div>
-
-      <div class="features-grid mt-5">
-        <div class="feature-card">
-          <div class="feature-icon feature-blue">
-            <i class="bi bi-shield-check"></i>
-          </div>
-          <h3 class="feature-title">Chống Đặt Trùng Lịch</h3>
-          <p class="feature-desc">Cơ chế Khóa dòng (FOR UPDATE) chống xung đột Race Condition, bảo đảm an toàn dữ liệu 100%.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon feature-sky">
-            <i class="bi bi-cpu"></i>
-          </div>
-          <h3 class="feature-title">Quản Lý Phòng &amp; Thiết Bị</h3>
-          <p class="feature-desc">Theo dõi trực quan trạng thái sức chứa phòng họp, máy chiếu, màn hình TV và thiết bị kèm theo.</p>
-          <a href="#/admin/rooms" class="text-primary fw-semibold small text-decoration-none mt-2 d-inline-block">
-            Vào cổng quản trị phòng &rarr;
-          </a>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon feature-emerald">
-            <i class="bi bi-arrow-repeat"></i>
-          </div>
-          <h3 class="feature-title">Đồng Bộ & Báo Cáo</h3>
-          <p class="feature-desc">Tích hợp chuẩn hóa Google Calendar, Microsoft 365, thống kê tần suất và xuất báo cáo trực quan.</p>
-        </div>
-      </div>
-
-    </section>
-  `;
-}
-
-
-// =====================================================
-// 5. TRANG QUẢN LÝ CUỘC HỌP (ENTERPRISE STITCH SPEC)
-// =====================================================
-
-function renderMeetingsPage() {
   const totalCount = meetings.length;
   const scheduledCount = meetings.filter(m => m.status === "scheduled").length;
   const inProgressCount = meetings.filter(m => m.status === "in-progress").length;
-  const completedCount = meetings.filter(m => m.status === "completed").length;
-  const cancelledCount = meetings.filter(m => m.status === "cancelled").length;
+  const user = window.AuthState ? window.AuthState.getUser() : null;
+  const userName = user ? (user.fullName || user.username) : "bạn";
+
+  // Lấy các cuộc họp sắp tới gần nhất (tối đa 5 cuộc họp)
+  const upcomingMeetings = meetings
+    .filter(m => m.status === "scheduled" || m.status === "in-progress")
+    .slice(0, 5);
 
   app.innerHTML = `
-    <div id="meetings-section" class="meetings-view-wrapper">
+    <div class="page home-dashboard-page">
 
-      <!-- Breadcrumbs & Page Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
-        <div>
-          <div class="breadcrumb-nav mb-1">
-            <span>Không gian cá nhân</span>
-            <i class="bi bi-chevron-right breadcrumb-separator"></i>
-            <span class="breadcrumb-active">Lịch làm việc</span>
-          </div>
-          <h1 class="page-title m-0">Lịch họp của tôi / Đặt phòng họp</h1>
-          <p class="page-subtitle m-0">Quản lý lịch họp cá nhân, đặt phòng họp và theo dõi các phiên họp tham gia.</p>
+      <!-- Page Header Chuẩn QLNS_QLTKPM -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <nav class="breadcrumb">
+            <span class="breadcrumb-item"><a href="#/">Trang chủ</a></span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Tổng quan</span>
+          </nav>
+          <h1 class="page-header-title">Tổng quan lịch họp</h1>
+          <p class="page-header-subtitle">Theo dõi lịch làm việc và các cuộc họp sắp diễn ra</p>
         </div>
 
-        <div class="header-action-buttons d-flex align-items-center gap-2">
-          <span id="meeting-page-api-badge" class="stitch-badge-api me-1 d-none d-sm-inline-flex" title="Trạng thái kết nối API Backend">
-            <span class="api-dot-status"></span> <span id="meeting-page-api-text">API Live</span>
-          </span>
-
-          <button type="button" id="btn-export-excel" class="btn-stitch-export" title="Xuất danh sách ra file CSV">
-            <i class="bi bi-file-earmark-arrow-down"></i>
-            <span>Xuất báo cáo / Excel</span>
-          </button>
-
-          <button type="button" id="btn-add-meeting" class="btn-stitch-create">
-            <i class="bi bi-plus-circle-fill"></i>
+        <div class="page-header-actions">
+          <button type="button" class="btn btn-primary btn-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
+            <i class="bi bi-plus-lg me-1"></i>
             <span>Tạo cuộc họp mới</span>
           </button>
         </div>
       </div>
 
-      <!-- KPI Overview Cards (3 Metrics) -->
-      <div class="kpi-metrics-grid mb-4">
-        <!-- KPI 1 -->
-        <div class="kpi-card">
-          <div class="kpi-card-body">
-            <div class="kpi-card-content">
-              <span class="kpi-label">Tổng cuộc họp của tôi</span>
-              <div class="kpi-value" id="kpi-total">${totalCount}</div>
-            </div>
-            <div class="kpi-icon-box kpi-blue">
-              <i class="bi bi-calendar-week"></i>
-            </div>
+      <!-- Stats Grid: 3 Thẻ Chỉ số Chuẩn QLNS_QLTKPM -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Cuộc họp sắp tới</span>
+            <span class="stat-value text-primary">${scheduledCount}</span>
+            <span class="stat-meta"><i class="bi bi-clock-history text-primary"></i> Phiên họp cần chuẩn bị</span>
           </div>
-          <div class="kpi-delta-row">
-            <span class="kpi-chip-positive">
-              <i class="bi bi-graph-up-arrow"></i> +12%
-            </span>
-            <span class="kpi-delta-text">so với tuần trước</span>
+          <div class="stat-icon icon-blue">
+            <i class="bi bi-calendar-check"></i>
           </div>
-          <div class="kpi-bottom-bar bar-blue"></div>
         </div>
 
-        <!-- KPI 2 -->
-        <div class="kpi-card">
-          <div class="kpi-card-body">
-            <div class="kpi-card-content">
-              <span class="kpi-label">Sắp diễn ra hôm nay</span>
-              <div class="kpi-value d-flex align-items-baseline gap-1">
-                <span id="kpi-scheduled">${scheduledCount}</span>
-                <span class="kpi-value-unit">cuộc họp</span>
-              </div>
-            </div>
-            <div class="kpi-icon-box kpi-sky">
-              <i class="bi bi-clock-history"></i>
-            </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Phòng họp khả dụng</span>
+            <span class="stat-value text-success">${(window.ROOMS || []).length} phòng</span>
+            <span class="stat-meta"><i class="bi bi-check-circle text-success"></i> Sẵn sàng đặt lịch</span>
           </div>
-          <div class="kpi-delta-row">
-            <span class="kpi-chip-neutral">
-              <span class="pulse-dot-primary"></span> 09:00 AM
-            </span>
-            <span class="kpi-delta-text truncate">Gần nhất: Sprint Review</span>
+          <div class="stat-icon icon-green">
+            <i class="bi bi-door-open"></i>
           </div>
-          <div class="kpi-bottom-bar bar-sky"></div>
         </div>
 
-        <!-- KPI 3 -->
-        <div class="kpi-card">
-          <div class="kpi-card-body">
-            <div class="kpi-card-content">
-              <span class="kpi-label">Đang diễn ra</span>
-              <div class="kpi-value d-flex align-items-baseline gap-1">
-                <span id="kpi-inprogress">${inProgressCount}</span>
-                <span class="kpi-value-unit">phòng live</span>
-              </div>
-            </div>
-            <div class="kpi-icon-box kpi-amber">
-              <i class="bi bi-broadcast"></i>
-            </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Tổng số cuộc họp</span>
+            <span class="stat-value text-dark">${totalCount}</span>
+            <span class="stat-meta"><i class="bi bi-layers text-secondary"></i> Toàn bộ hệ thống</span>
           </div>
-          <div class="kpi-delta-row">
-            <span class="kpi-chip-live">
-              <span class="ping-dot-live"></span> Đang diễn ra
-            </span>
-            <span class="kpi-delta-text truncate">Phòng họp trực tiếp</span>
+          <div class="stat-icon icon-purple">
+            <i class="bi bi-calendar3"></i>
           </div>
-          <div class="kpi-bottom-bar bar-amber"></div>
         </div>
       </div>
 
-      <!-- Real-Time Room Quick Availability Finder Widget -->
-      <div class="room-quick-finder-widget mb-4" id="room-quick-finder-section">
-        <div class="room-finder-header">
+      <!-- Danh sách Cuộc họp sắp diễn ra gần nhất trong Card chuẩn -->
+      <div class="card">
+        <div class="card-header">
           <div>
-            <div class="room-finder-title">
-              <i class="bi bi-broadcast text-primary"></i> Tra cứu phòng trống theo thời gian thực
-            </div>
-            <div class="stitch-hint mt-0.5">Kiểm tra ngay tình trạng phòng họp trong toàn bộ tòa nhà theo khung giờ</div>
+            <h5 class="card-title m-0">Cuộc họp sắp tới</h5>
+            <span class="text-secondary small">Các phiên họp gần nhất cần bạn chuẩn bị</span>
           </div>
-          <div class="room-finder-controls">
-            <div class="d-flex align-items-center gap-1">
-              <label for="finder-date" class="visually-hidden">Ngày tra cứu</label>
-              <input type="date" id="finder-date" class="form-control stitch-input stitch-input-sm" style="width: 140px; font-size: 0.78rem;" aria-label="Ngày tra cứu" />
-            </div>
-            <div class="d-flex align-items-center gap-1">
-              <label for="finder-start" class="visually-hidden">Giờ bắt đầu</label>
-              <input type="time" id="finder-start" class="form-control stitch-input stitch-input-sm" value="09:00" style="width: 95px; font-size: 0.78rem;" aria-label="Giờ bắt đầu tra cứu" />
-              <span class="text-muted small">➔</span>
-              <label for="finder-end" class="visually-hidden">Giờ kết thúc</label>
-              <input type="time" id="finder-end" class="form-control stitch-input stitch-input-sm" value="10:30" style="width: 95px; font-size: 0.78rem;" aria-label="Giờ kết thúc tra cứu" />
-            </div>
-            <button type="button" class="btn btn-sm btn-primary px-3" id="btn-finder-book-room" style="font-size: 0.78rem; font-weight: 600;" onclick="openAddModalWithSelection()">
-              <i class="bi bi-plus-lg me-1"></i> Đặt lịch ngay
-            </button>
-          </div>
+          <a href="#/meetings" class="btn btn-secondary btn-sm text-decoration-none">
+            Xem tất cả (${totalCount}) &rarr;
+          </a>
         </div>
-        <div id="finder-room-cards" class="realtime-room-grid">
-          <!-- Populated by renderFinderRoomCards() -->
+
+        <div class="card-body p-0">
+          ${upcomingMeetings.length === 0 ? `
+            <div class="empty-state py-5">
+              <h6 class="empty-state-title fw-bold text-slate-800 mb-1">Hiện tại bạn không có cuộc họp nào sắp tới</h6>
+              <p class="empty-state-desc text-secondary small mb-3">Lịch làm việc của bạn đang trống. Bạn có thể thư thả làm việc hoặc tạo cuộc họp mới.</p>
+              <button type="button" class="btn btn-primary btn-sm" onclick="if (typeof openAddModal === 'function') openAddModal()">
+                <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp mới
+              </button>
+            </div>
+          ` : `
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="small fw-semibold ps-4">TIÊU ĐỀ CUỘC HỌP</th>
+                    <th class="small fw-semibold">THỜI GIAN</th>
+                    <th class="small fw-semibold">PHÒNG HỌP</th>
+                    <th class="small fw-semibold">NGƯỜI TỔ CHỨC</th>
+                    <th class="small fw-semibold text-end pe-4">THAO TÁC</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${upcomingMeetings.map(m => {
+                    const roomName = m.roomName || (m.roomId ? ((window.ROOMS || []).find(r => r.id === m.roomId)?.name) : "Phòng họp");
+                    const hostName = m.host || "Thành viên";
+                    const initials = typeof getInitials === 'function' ? getInitials(hostName) : 'U';
+                    const color = typeof getHostColor === 'function' ? getHostColor(hostName) : '#2563eb';
+                    const timeStr = m.time || (m.startTime ? `${m.startTime} - ${m.endTime}` : '--');
+
+                    return `
+                      <tr>
+                        <td class="ps-4">
+                          <div class="fw-bold text-slate-900">${escapeHTML(m.title)}</div>
+                          ${m.tag ? `<span class="badge bg-light text-secondary border small">${escapeHTML(m.tag)}</span>` : ''}
+                        </td>
+                        <td>
+                          <div class="small fw-medium text-slate-800">${m.date || '--'}</div>
+                          <div class="text-muted small">${timeStr}</div>
+                        </td>
+                        <td>
+                          <div class="small fw-medium text-slate-800"><i class="bi bi-door-closed me-1 text-primary"></i>${escapeHTML(roomName)}</div>
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="user-avatar-tiny" style="background-color: ${color}">${initials}</span>
+                            <span class="small text-slate-800">${escapeHTML(hostName)}</span>
+                          </div>
+                        </td>
+                        <td class="text-end pe-4">
+                          <button type="button" class="btn btn-secondary btn-sm py-1 px-3 fw-medium" onclick="if (typeof openDetailModal === 'function') openDetailModal(${m.id})">
+                            <i class="bi bi-eye me-1"></i>Chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          `}
         </div>
       </div>
 
-      <!-- Toolbar & Multi-Filter Section -->
-      <div class="filter-panel-card mb-4">
-        <!-- Top row: Search + Status Tabs -->
-        <div class="filter-top-row">
-          <div class="search-input-wrapper">
-            <label for="search-meeting" class="visually-hidden">Tìm kiếm cuộc họp</label>
-            <i class="bi bi-search search-icon-left"></i>
-            <input
-              type="text"
-              id="search-meeting"
-              class="stitch-search-field"
-              placeholder="Tìm theo tiêu đề, người tổ chức hoặc nội dung cuộc họp..."
-              aria-label="Tìm kiếm cuộc họp"
-            />
-          </div>
+    </div>
+  `;
+}
 
-          <div class="status-tab-group" id="status-tab-group">
-            <button type="button" class="status-tab-item active" data-status="">
-              Tất cả (${totalCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="scheduled">
-              Sắp tới (${scheduledCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="in-progress">
-              <span class="tab-pulse-dot"></span>
-              Đang diễn ra (${inProgressCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="completed">
-              Đã kết thúc (${completedCount})
-            </button>
-            <button type="button" class="status-tab-item" data-status="cancelled">
-              Đã hủy (${cancelledCount})
-            </button>
-          </div>
+
+// =====================================================
+// 5. TRANG QUẢN LÝ CUỘC HỌP (ENTERPRISE QLNS_QLTKPM SPEC)
+// =====================================================
+
+function renderMeetingsPage() {
+  const authUser = getActiveAuthUser();
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id) : null;
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+
+  // RBAC Lọc danh sách cuộc họp:
+  // Admin: xem toàn bộ doanh nghiệp.
+  // Nhân viên: CHỈ xem cuộc họp do mình tổ chức HOẶC được mời tham gia.
+  const authorizedMeetings = meetings.filter(m => {
+    if (isUserAdmin) return true;
+    if (!currentUserId) return false;
+    const isOrg = Number(m.organizerId) === currentUserId;
+    const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+    const isInvited = pIds.includes(currentUserId);
+    return isOrg || isInvited;
+  });
+
+  const totalCount = authorizedMeetings.length;
+  const scheduledCount = authorizedMeetings.filter(m => m.status === "scheduled").length;
+  const inProgressCount = authorizedMeetings.filter(m => m.status === "in-progress").length;
+  const completedCount = authorizedMeetings.filter(m => m.status === "completed").length;
+  const cancelledCount = authorizedMeetings.filter(m => m.status === "cancelled").length;
+
+  const pageTitle = isUserAdmin ? "Danh sách cuộc họp" : "Cuộc họp của tôi";
+  const pageSubtitle = isUserAdmin
+    ? "Xem, tìm kiếm và quản lý toàn bộ lịch họp doanh nghiệp"
+    : "Danh sách các cuộc họp do bạn tổ chức hoặc được mời tham gia";
+
+  app.innerHTML = `
+    <div id="meetings-section" class="meetings-view-wrapper">
+
+      <!-- Page Header Chuẩn QLNS_QLTKPM -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <nav class="breadcrumb">
+            <span class="breadcrumb-item"><a href="#/">Trang chủ</a></span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item"><a href="#/meetings">Quản lý</a></span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active">Cuộc họp</span>
+          </nav>
+          <h1 class="page-header-title">${escapeHTML(pageTitle)}</h1>
+          <p class="page-header-subtitle">${escapeHTML(pageSubtitle)}</p>
         </div>
 
-        <!-- Secondary Filter Row -->
-        <div class="filter-bottom-row">
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <div class="filter-select-wrapper">
+        <div class="page-header-actions">
+          <button type="button" id="btn-export-excel" class="btn btn-secondary btn-sm" title="Xuất danh sách ra file CSV">
+            <i class="bi bi-download"></i>
+            <span>Xuất Excel</span>
+          </button>
+
+          <button type="button" id="btn-add-meeting" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>
+            <span>Tạo cuộc họp</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toolbar Tìm kiếm & Tab Lọc trạng thái trong Card -->
+      <div class="card mb-4">
+        <div class="card-body p-3">
+          <div class="toolbar">
+            <div class="toolbar-search">
+              <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input
+                  type="text"
+                  id="search-meeting"
+                  placeholder="Tìm theo tên cuộc họp, người tổ chức hoặc nội dung..."
+                  aria-label="Tìm kiếm cuộc họp"
+                />
+              </div>
+            </div>
+
+            <!-- Bộ lọc trạng thái dạng Tab pills -->
+            <div class="toolbar-actions">
+              <div class="status-tab-group" id="status-tab-group">
+                <button type="button" class="status-tab-item active" data-status="">
+                  Tất cả (${totalCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="scheduled">
+                  Sắp tới (${scheduledCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="in-progress">
+                  Đang diễn ra (${inProgressCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="completed">
+                  Đã kết thúc (${completedCount})
+                </button>
+                <button type="button" class="status-tab-item" data-status="cancelled">
+                  Đã hủy (${cancelledCount})
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bộ lọc phòng họp phụ (gọn nhẹ) -->
+          <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-secondary small">
+            <div class="d-flex align-items-center gap-2">
               <label for="filter-room" class="visually-hidden">Lọc theo phòng họp</label>
-              <i class="bi bi-door-open filter-icon-left"></i>
-              <select id="filter-room" class="stitch-select-compact" aria-label="Lọc theo phòng họp">
-                <option value="">Tất cả phòng họp</option>
-                <option value="1">Phòng Tokyo (Tầng 4)</option>
-                <option value="2">Phòng Silicon (Tầng 2)</option>
-                <option value="3">Phòng Hội Nghị A</option>
-                <option value="4">Phòng Grand Board</option>
-                <option value="5">Phòng VIP</option>
+              <select id="filter-room" class="form-select form-select-sm border-0 bg-transparent text-secondary p-0 pe-4" style="width: auto; cursor: pointer;" aria-label="Lọc theo phòng họp">
+                <option value="">Lọc theo phòng: Tất cả</option>
+                ${ROOMS.map(r => `<option value="${r.id}" ${currentRoomFilter === String(r.id) ? "selected" : ""}>${escapeHTML(r.name)}</option>`).join("")}
               </select>
+              <button type="button" id="btn-reset-filters" class="btn btn-link btn-sm text-secondary p-0 text-decoration-none">
+                <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+              </button>
             </div>
-
-            <button type="button" id="btn-reset-filters" class="btn-reset-link">
-              <i class="bi bi-arrow-counterclockwise"></i>
-              <span>Đặt lại bộ lọc</span>
-            </button>
-          </div>
-
-          <div class="filter-stats-text">
-            Hiển thị <span id="filtered-count" class="fw-bold text-dark">${totalCount}</span> cuộc họp
+            <div>
+              Hiển thị <span id="filtered-count" class="fw-bold text-dark">${totalCount}</span> cuộc họp
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Enterprise Data Table Container -->
-      <div class="table-card-container mb-4">
+      <!-- Data Table Card Container -->
+      <div class="card mb-4">
         <div class="table-responsive">
-          <table id="meetings-table" class="stitch-data-table">
+          <table id="meetings-table" class="stitch-data-table data-table w-100 mb-0">
             <thead>
               <tr>
                 <th class="th-title">TIÊU ĐỀ CUỘC HỌP</th>
@@ -822,13 +1126,16 @@ function renderMeetingsPage() {
           </table>
         </div>
 
-        <!-- Empty State -->
-        <div id="empty-state" class="table-empty-state hidden">
-          <div class="empty-icon-circle">
-            <i class="bi bi-calendar-x"></i>
+        <!-- Empty State có hướng dẫn rõ ràng cho người dùng mới -->
+        <div id="empty-state" class="empty-state hidden py-5 text-center">
+          <div class="empty-state-icon mx-auto mb-3" style="width: 64px; height: 64px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 28px;">
+            <i class="bi bi-calendar-plus"></i>
           </div>
-          <h5 class="empty-state-title">Không tìm thấy cuộc họp nào</h5>
-          <p class="empty-state-text">Thử thay đổi từ khóa tìm kiếm hoặc chọn bộ lọc trạng thái khác.</p>
+          <h5 class="empty-state-title fw-bold text-slate-800 mb-1" id="empty-state-title">Bạn chưa có cuộc họp nào</h5>
+          <p class="empty-state-desc text-secondary small mb-3" id="empty-state-desc">Hãy tạo cuộc họp đầu tiên để bắt đầu phân bổ thời gian và làm việc cùng đồng nghiệp.</p>
+          <button type="button" class="btn btn-primary btn-sm px-3 py-2 fw-semibold" onclick="if (typeof openAddModal === 'function') openAddModal()">
+            <i class="bi bi-plus-lg me-1"></i> Tạo cuộc họp đầu tiên
+          </button>
         </div>
 
         <!-- Pagination Footer -->
@@ -935,6 +1242,16 @@ function renderFinderRoomCards() {
 
   const roomsStatus = calculateRoomAvailability(date, start, end, null);
 
+  if (!roomsStatus || roomsStatus.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 text-center py-4 text-muted w-100">
+        <i class="bi bi-door-closed d-block fs-3 mb-2 text-secondary opacity-50"></i>
+        <span>Chưa có dữ liệu phòng họp nào trong hệ thống.</span>
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = roomsStatus.map(room => {
     let cardStatusClass = "status-available";
     let statusText = `<span><i class="bi bi-check-circle-fill me-1 text-success"></i> Sẵn sàng</span><span class="text-primary fw-semibold">Đặt ngay →</span>`;
@@ -986,8 +1303,8 @@ function renderFinderRoomCards() {
   }).join("");
 }
 
-function openAddModalWithSelection(roomId = null, date = null, start = null, end = null) {
-  openAddModal();
+function openAddModalWithSelection(roomId = null, date = null, start = null, end = null, equipmentIds = null) {
+  openAddModal(equipmentIds || []);
   if (roomId) {
     const roomSelect = document.getElementById("meeting-room");
     if (roomSelect) {
@@ -1019,6 +1336,58 @@ function openAddModalWithSelection(roomId = null, date = null, start = null, end
   const idInput = document.getElementById("meeting-id");
   const editId = idInput && idInput.value ? Number(idInput.value) : null;
   renderRealtimeRoomCards(editId);
+}
+
+function openAddModalWithEquipment(equipmentId, roomId = null) {
+  const eqId = Number(equipmentId);
+  const eq = (Array.isArray(EQUIPMENTS) ? EQUIPMENTS : []).find(e => Number(e.id || e.equipmentId) === eqId);
+
+  // Tìm phòng họp có sẵn thiết bị này (nếu có)
+  let targetRoomId = roomId;
+  if (!targetRoomId && eq) {
+    const allRooms = Array.isArray(ROOMS) ? ROOMS : [];
+    const equippedRoom = allRooms.find(r => (r.equipmentNames || []).includes(eq.name) && r.status === "Active");
+    if (equippedRoom) {
+      targetRoomId = equippedRoom.id;
+    }
+  }
+
+  // Mở modal tạo cuộc họp và tick chọn sẵn thiết bị
+  openAddModal([eqId]);
+
+  // Nếu xác định được phòng có thiết bị -> chọn phòng
+  if (targetRoomId) {
+    const roomSelect = document.getElementById("meeting-room");
+    if (roomSelect) {
+      roomSelect.value = String(targetRoomId);
+      roomSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    const idInput = document.getElementById("meeting-id");
+    const editId = idInput && idInput.value ? Number(idInput.value) : null;
+    renderRealtimeRoomCards(editId);
+  }
+
+  // Tự động mở rộng phần "Tùy chọn nâng cao" để hiển thị rõ danh sách thiết bị
+  const advancedDetails = document.getElementById("section-advanced");
+  if (advancedDetails) {
+    advancedDetails.open = true;
+  }
+
+  // Scroll và tạo hiệu ứng highlight thẻ thiết bị vừa chọn
+  setTimeout(() => {
+    const eqCard = document.getElementById(`eq-card-${eqId}`);
+    if (eqCard) {
+      eqCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      eqCard.classList.add("eq-card-highlighted");
+      setTimeout(() => eqCard.classList.remove("eq-card-highlighted"), 2500);
+    }
+  }, 150);
+
+  // Hiển thị thông báo Toast
+  const eqName = eq ? eq.name : `Thiết bị #${eqId}`;
+  if (typeof window.showToast === "function") {
+    window.showToast(`Đã tự động chọn "${eqName}" cho cuộc họp!`, "success");
+  }
 }
 
 // =====================================================
@@ -1089,6 +1458,7 @@ function getFilteredRooms() {
   });
 }
 
+// =====================================================
 function renderAdminRoomsPage() {
   const totalRooms = ROOMS.length;
   const activeRooms = ROOMS.filter(r => (r.status || "").trim().toLowerCase() === "active").length;
@@ -1102,23 +1472,11 @@ function renderAdminRoomsPage() {
   app.innerHTML = `
     <div id="admin-rooms-section" class="admin-rooms-view-wrapper">
 
-      <!-- Breadcrumbs & Page Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+      <!-- Header chuẩn Enterprise SaaS -->
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <div>
-          <div class="breadcrumb-nav mb-1">
-            <span>Quản trị hệ thống</span>
-            <i class="bi bi-chevron-right breadcrumb-separator"></i>
-            <span class="breadcrumb-active">Danh mục phòng họp</span>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <h1 class="page-title m-0">Quản lý Danh mục Phòng họp</h1>
-            <span class="admin-badge-indicator">
-              <i class="bi bi-shield-lock-fill"></i> Admin Portal
-            </span>
-          </div>
-          <p class="page-subtitle m-0">
-            Quản trị trạng thái hoạt động, sức chứa, trang thiết bị và mã QR Check-in tức thì cho toàn bộ phòng họp doanh nghiệp.
-          </p>
+          <h1 class="admin-page-title m-0">Quản lý Phòng họp</h1>
+          <p class="admin-page-subtitle text-secondary small m-0 mt-1">Cấu hình danh mục phòng họp, sức chứa và mã QR check-in cửa</p>
         </div>
 
         <div class="header-action-buttons d-flex align-items-center gap-2">
@@ -1596,6 +1954,11 @@ function renderAdminRoomsTable() {
             <div>
               <div class="room-name-text" onclick="openRoomQRModal(${room.id})" title="Nhấp để xem chi tiết phòng">
                 ${escapeHTML(room.name)}
+                ${(typeof isRestrictedRoom === "function" && isRestrictedRoom(room)) ? `
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1 px-1.5 py-0.5 rounded fw-semibold" style="font-size: 0.68rem;" title="Phòng VIP / Giới hạn quyền đặt">
+                    <i class="bi bi-shield-lock-fill"></i> VIP
+                  </span>
+                ` : ''}
               </div>
               <div class="room-location-text">
                 <i class="bi bi-geo-alt"></i>
@@ -1668,6 +2031,10 @@ function renderAdminRoomsTable() {
       </tr>
     `;
   }).join("");
+
+  if (typeof applyRoleUI === "function") {
+    applyRoleUI();
+  }
 }
 
 function updateRoomStatusTabs() {
@@ -1817,12 +2184,12 @@ const RoomAPI = {
     if (!badge || !text) return;
     if (this.isBackendConnected) {
       badge.classList.remove("offline");
-      badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật";
-      text.textContent = "API Live (Port 3000)";
+      badge.title = "Hệ thống kết nối trực tuyến";
+      text.textContent = "Trực tuyến";
     } else {
       badge.classList.add("offline");
-      badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
-      text.textContent = "Client Fallback";
+      badge.title = "Hệ thống đang hoạt động ở chế độ cục bộ";
+      text.textContent = "Chế độ ngoại tuyến";
     }
   },
 
@@ -1837,9 +2204,8 @@ const RoomAPI = {
         this.isBackendConnected = true;
         this.updateStatusBadge();
         const serverRooms = json.data || json;
-        if (Array.isArray(serverRooms) && serverRooms.length > 0) {
+        if (Array.isArray(serverRooms)) {
           ROOMS = serverRooms;
-          persistRoomsToStorage();
         }
         return { success: true, data: ROOMS, isFallback: false };
       }
@@ -1847,7 +2213,9 @@ const RoomAPI = {
       this.isBackendConnected = false;
       this.updateStatusBadge();
     }
-    return { success: true, data: ROOMS, isFallback: true };
+    // Khi Backend không chạy: dữ liệu phòng họp là RỖNG
+    ROOMS = [];
+    return { success: false, data: [], isFallback: false };
   },
 
   async create(roomData) {
@@ -2039,25 +2407,999 @@ const RoomAPI = {
 };
 
 function persistRoomsToStorage() {
-  try {
-    localStorage.setItem("STITCH_ROOMS_DATA", JSON.stringify(ROOMS));
-  } catch (e) {
-    console.warn("Lỗi khi lưu phòng vào localStorage:", e);
-  }
+  // Không lưu dữ liệu mock tĩnh vào localStorage
 }
 
 function loadPersistedRooms() {
+  // Dữ liệu chỉ nạp trực tiếp từ backend MySQL qua API, không nạp cache cục bộ
+}
+
+// =====================================================
+// 6D. QUẢN TRỊ DANH MỤC THIẾT BỊ (ADMIN EQUIPMENTS MODULE)
+// =====================================================
+
+const EQUIPMENT_API_URL = "http://localhost:3000/api/equipments";
+
+const EquipmentAPI = {
+  isBackendConnected: false,
+
+  async getAll() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(EQUIPMENT_API_URL, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        const list = json.data || json;
+        if (Array.isArray(list)) {
+          EQUIPMENTS = list.map(eq => ({
+            id: Number(eq.equipmentId || eq.id),
+            name: eq.equipmentName || eq.name,
+            type: eq.type || 'Thiết bị',
+            status: eq.status || 'Available',
+            icon: getEquipmentIconClass(eq)
+          }));
+        }
+        return { success: true, data: EQUIPMENTS, isFallback: false };
+      }
+    } catch (err) {
+      this.isBackendConnected = false;
+    }
+    // Khi Backend không chạy: dữ liệu thiết bị là RỖNG
+    EQUIPMENTS = [];
+    return { success: false, data: [], isFallback: false };
+  },
+
+  async create(data) {
+    try {
+      const res = await fetch(EQUIPMENT_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          equipmentName: data.name,
+          type: data.type,
+          status: data.status
+        })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const created = json.data;
+        const mapped = {
+          id: Number(created.equipmentId || created.id),
+          name: created.equipmentName || created.name,
+          type: created.type || 'Thiết bị',
+          status: created.status || 'Available',
+          icon: getEquipmentIconClass(created)
+        };
+        const idx = EQUIPMENTS.findIndex(e => e.id === mapped.id);
+        if (idx >= 0) EQUIPMENTS[idx] = mapped;
+        else EQUIPMENTS.push(mapped);
+        return { success: true, data: mapped };
+      }
+      return { success: false, message: json.message || "Không thể tạo thiết bị." };
+    } catch (err) {
+      const maxId = EQUIPMENTS.reduce((max, e) => Math.max(max, e.id), 0);
+      const newId = maxId + 1;
+      const newEq = {
+        id: newId,
+        name: data.name,
+        type: data.type || "Thiết bị",
+        status: data.status || "Available",
+        icon: getEquipmentIconClass(data)
+      };
+      EQUIPMENTS.push(newEq);
+      return { success: true, data: newEq, isFallback: true };
+    }
+  },
+
+  async update(id, data) {
+    try {
+      const res = await fetch(`${EQUIPMENT_API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          equipmentName: data.name,
+          type: data.type,
+          status: data.status
+        })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const updated = json.data;
+        const mapped = {
+          id: Number(updated.equipmentId || updated.id),
+          name: updated.equipmentName || updated.name,
+          type: updated.type || 'Thiết bị',
+          status: updated.status || 'Available',
+          icon: getEquipmentIconClass(updated)
+        };
+        const idx = EQUIPMENTS.findIndex(e => e.id === id);
+        if (idx >= 0) EQUIPMENTS[idx] = mapped;
+        return { success: true, data: mapped };
+      }
+      return { success: false, message: json.message || "Không thể cập nhật thiết bị." };
+    } catch (err) {
+      const idx = EQUIPMENTS.findIndex(e => e.id === id);
+      if (idx >= 0) {
+        EQUIPMENTS[idx].name = data.name;
+        EQUIPMENTS[idx].type = data.type;
+        EQUIPMENTS[idx].status = data.status;
+        EQUIPMENTS[idx].icon = getEquipmentIconClass(data);
+        return { success: true, data: EQUIPMENTS[idx], isFallback: true };
+      }
+      return { success: false, message: err.message };
+    }
+  },
+
+  async updateStatus(id, newStatus) {
+    try {
+      const res = await fetch(`${EQUIPMENT_API_URL}/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const idx = EQUIPMENTS.findIndex(e => e.id === id);
+        if (idx >= 0) EQUIPMENTS[idx].status = newStatus;
+        return { success: true, data: json.data };
+      }
+      return { success: false, message: json.message || "Không thể cập nhật trạng thái thiết bị." };
+    } catch (err) {
+      const idx = EQUIPMENTS.findIndex(e => e.id === id);
+      if (idx >= 0) {
+        EQUIPMENTS[idx].status = newStatus;
+        return { success: true, data: EQUIPMENTS[idx], isFallback: true };
+      }
+      return { success: false, message: err.message };
+    }
+  },
+
+  async delete(id) {
+    try {
+      const res = await fetch(`${EQUIPMENT_API_URL}/${id}`, {
+        method: "DELETE"
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        EQUIPMENTS = EQUIPMENTS.filter(e => e.id !== id);
+        return { success: true, message: json.message };
+      }
+      return {
+        success: false,
+        status: res.status,
+        message: json.message || "Không thể xóa thiết bị.",
+        conflictCount: json.conflictCount || 0
+      };
+    } catch (err) {
+      EQUIPMENTS = EQUIPMENTS.filter(e => e.id !== id);
+      return { success: true, message: "Đã xóa thiết bị khỏi bộ nhớ cục bộ." };
+    }
+  }
+};
+
+let equipmentFilterState = {
+  search: "",
+  status: "all",
+  type: "all",
+  sortBy: "id-asc"
+};
+
+function getEquipmentVisualMeta(eq) {
+  const name = (eq.name || eq.equipmentName || "").toLowerCase();
+  const type = (eq.type || "").toLowerCase();
+  if (name.includes("máy chiếu") || type.includes("máy chiếu") || type.includes("projector")) {
+    return { icon: "bi-projector-fill", typeClass: "type-projector", label: "Máy chiếu" };
+  }
+  if (name.includes("màn hình") || name.includes("tv") || type.includes("màn hình") || type.includes("display")) {
+    return { icon: "bi-tv-fill", typeClass: "type-tv", label: "Màn hình tương tác" };
+  }
+  if (name.includes("camera") || name.includes("webcam") || type.includes("camera")) {
+    return { icon: "bi-camera-video-fill", typeClass: "type-camera", label: "Camera hội nghị" };
+  }
+  if (name.includes("micro") || name.includes("mic") || type.includes("micro")) {
+    return { icon: "bi-mic-fill", typeClass: "type-mic", label: "Micro hội nghị" };
+  }
+  if (name.includes("loa") || type.includes("loa") || type.includes("audio") || type.includes("âm thanh")) {
+    return { icon: "bi-speaker-fill", typeClass: "type-speaker", label: "Thiết bị âm thanh" };
+  }
+  if (name.includes("bảng") || type.includes("bảng") || type.includes("whiteboard")) {
+    return { icon: "bi-easel-fill", typeClass: "type-board", label: "Bảng trắng" };
+  }
+  if (name.includes("mạng") || type.includes("mạng") || type.includes("switch") || type.includes("hub")) {
+    return { icon: "bi-router-fill", typeClass: "type-network", label: "Thiết bị mạng" };
+  }
+  return { icon: "bi-cpu-fill", typeClass: "type-other", label: eq.type || "Thiết bị" };
+}
+
+function filterEquipmentsList() {
+  return EQUIPMENTS.filter(eq => {
+    if (equipmentFilterState.search) {
+      const q = equipmentFilterState.search.trim().toLowerCase();
+      const matchName = (eq.name || eq.equipmentName || "").toLowerCase().includes(q);
+      const matchType = (eq.type || "").toLowerCase().includes(q);
+      const matchId = `eq-${eq.id}`.toLowerCase().includes(q) || String(eq.id) === q;
+      if (!matchName && !matchType && !matchId) return false;
+    }
+
+    if (equipmentFilterState.status !== "all") {
+      const s = (eq.status || "").toLowerCase();
+      if (s !== equipmentFilterState.status.toLowerCase()) return false;
+    }
+
+    if (equipmentFilterState.type !== "all") {
+      const t = (eq.type || "").toLowerCase();
+      if (!t.includes(equipmentFilterState.type.toLowerCase())) return false;
+    }
+
+    return true;
+  });
+}
+
+function renderAdminEquipmentsPage() {
+  const totalEquipments = EQUIPMENTS.length;
+  const availableEquipments = EQUIPMENTS.filter(e => (e.status || "").toLowerCase() === "available").length;
+  const maintenanceEquipments = EQUIPMENTS.filter(e => (e.status || "").toLowerCase() === "maintenance").length;
+  const brokenEquipments = EQUIPMENTS.filter(e => (e.status || "").toLowerCase() === "broken").length;
+
+  app.innerHTML = `
+    <div id="admin-equipments-section" class="admin-equipments-view-wrapper">
+
+      <!-- Header chuẩn Enterprise SaaS -->
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+        <div>
+          <h1 class="admin-page-title m-0">Quản lý Trang thiết bị</h1>
+          <p class="admin-page-subtitle text-secondary small m-0 mt-1">Kiểm soát số lượng, chủng loại và tình trạng kỹ thuật thiết bị</p>
+        </div>
+
+        <div class="header-action-buttons d-flex align-items-center gap-2">
+          <button type="button" id="btn-export-equipments-csv" class="btn-stitch-export" title="Xuất danh sách thiết bị ra file CSV">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            <span>Xuất CSV / Excel</span>
+          </button>
+
+          <button type="button" id="btn-add-equipment" class="btn-stitch-create" onclick="openAddEquipmentModal()">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Thêm thiết bị mới</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Overview Cards (4 Metrics) -->
+      <div class="equipment-kpi-grid">
+        <!-- KPI 1: Tổng số thiết bị -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Tổng số thiết bị</span>
+              <div class="kpi-value" id="eq-kpi-total">${totalEquipments}</div>
+            </div>
+            <div class="kpi-icon-box kpi-blue">
+              <i class="bi bi-cpu-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-neutral">
+              <i class="bi bi-hdd-stack"></i> Danh mục toàn hệ thống
+            </span>
+            <span class="kpi-delta-text">Trang bị phòng họp</span>
+          </div>
+          <div class="kpi-bottom-bar bar-blue"></div>
+        </div>
+
+        <!-- KPI 2: Có sẵn / Sẵn sàng phục vụ -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Sẵn sàng phục vụ</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="eq-kpi-available">${availableEquipments}</span>
+                <span class="kpi-value-unit">thiết bị</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box kpi-emerald">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-positive">
+              <i class="bi bi-check-lg"></i> Có thể mượn ngay
+            </span>
+            <span class="kpi-delta-text">${totalEquipments > 0 ? Math.round((availableEquipments / totalEquipments) * 100) : 0}% khả dụng</span>
+          </div>
+          <div class="kpi-bottom-bar bar-emerald"></div>
+        </div>
+
+        <!-- KPI 3: Đang bảo trì -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Đang bảo trì / Kiểm tra</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="eq-kpi-maintenance">${maintenanceEquipments}</span>
+                <span class="kpi-value-unit">thiết bị</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box kpi-amber">
+              <i class="bi bi-tools"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-live">
+              <span class="ping-dot-live"></span> Đang kiểm định
+            </span>
+            <span class="kpi-delta-text">Tạm dừng cho mượn</span>
+          </div>
+          <div class="kpi-bottom-bar bar-amber"></div>
+        </div>
+
+        <!-- KPI 4: Hư hỏng / Chờ thay -->
+        <div class="kpi-card">
+          <div class="kpi-card-body">
+            <div class="kpi-card-content">
+              <span class="kpi-label">Hỏng hóc kỹ thuật</span>
+              <div class="kpi-value d-flex align-items-baseline gap-1">
+                <span id="eq-kpi-broken">${brokenEquipments}</span>
+                <span class="kpi-value-unit">thiết bị</span>
+              </div>
+            </div>
+            <div class="kpi-icon-box" style="background: #fef2f2; color: #dc2626;">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+          </div>
+          <div class="kpi-delta-row">
+            <span class="kpi-chip-neutral text-danger" style="background: #fee2e2; border-color: #fca5a5;">
+              <i class="bi bi-x-circle"></i> Chờ sửa chữa
+            </span>
+            <span class="kpi-delta-text">Cần xử lý kỹ thuật</span>
+          </div>
+          <div class="kpi-bottom-bar" style="background: #ef4444;"></div>
+        </div>
+      </div>
+
+      <!-- Filter Panel & Toolbar -->
+      <div class="equipment-filter-card">
+        <div class="row g-3 align-items-center">
+
+          <!-- Search Input -->
+          <div class="col-lg-4 col-md-6">
+            <div class="search-input-wrapper">
+              <i class="bi bi-search search-input-icon"></i>
+              <input
+                type="text"
+                id="equipment-search-input"
+                class="form-control table-search-input"
+                placeholder="Tìm theo tên thiết bị, mã (#EQ-01), loại..."
+                aria-label="Tìm kiếm thiết bị"
+                value="${escapeHTML(equipmentFilterState.search)}"
+              />
+              ${equipmentFilterState.search ? `
+                <button type="button" id="btn-clear-equipment-search" class="btn-clear-search" aria-label="Xóa tìm kiếm">
+                  <i class="bi bi-x-circle-fill"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Status Tabs -->
+          <div class="col-lg-5 col-md-6">
+            <div class="d-flex align-items-center gap-1 flex-wrap" role="tablist">
+              <button
+                type="button"
+                id="tab-eq-status-all"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'all' ? 'active' : ''}"
+                data-status="all">
+                <span>Tất cả</span>
+                <span class="tab-count" id="eq-tab-count-all">${totalEquipments}</span>
+              </button>
+
+              <button
+                type="button"
+                id="tab-eq-status-available"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'Available' ? 'active' : ''}"
+                data-status="Available">
+                <span>Có sẵn</span>
+                <span class="tab-count" id="eq-tab-count-avail">${availableEquipments}</span>
+              </button>
+
+              <button
+                type="button"
+                id="tab-eq-status-maintenance"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'Maintenance' ? 'active' : ''}"
+                data-status="Maintenance">
+                <span>Bảo trì</span>
+                <span class="tab-count" id="eq-tab-count-maint">${maintenanceEquipments}</span>
+              </button>
+
+              <button
+                type="button"
+                id="tab-eq-status-broken"
+                class="equipment-status-tab-btn ${equipmentFilterState.status === 'Broken' ? 'active' : ''}"
+                data-status="Broken">
+                <span>Hư hỏng</span>
+                <span class="tab-count" id="eq-tab-count-broken">${brokenEquipments}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Dropdown Filter & Reset -->
+          <div class="col-lg-3 col-md-12 d-flex align-items-center gap-2">
+            <select id="equipment-category-filter" class="form-select stitch-input" aria-label="Lọc theo phân loại thiết bị">
+              <option value="all" ${equipmentFilterState.type === 'all' ? 'selected' : ''}>Tất cả phân loại</option>
+              <option value="Máy chiếu" ${equipmentFilterState.type === 'Máy chiếu' ? 'selected' : ''}>Máy chiếu</option>
+              <option value="Màn hình" ${equipmentFilterState.type === 'Màn hình' ? 'selected' : ''}>Màn hình tương tác</option>
+              <option value="Camera" ${equipmentFilterState.type === 'Camera' ? 'selected' : ''}>Camera hội nghị</option>
+              <option value="Micro" ${equipmentFilterState.type === 'Micro' ? 'selected' : ''}>Micro hội nghị</option>
+              <option value="Thiết bị âm thanh" ${equipmentFilterState.type === 'Thiết bị âm thanh' ? 'selected' : ''}>Thiết bị âm thanh</option>
+              <option value="Bảng trắng" ${equipmentFilterState.type === 'Bảng trắng' ? 'selected' : ''}>Bảng trắng</option>
+            </select>
+
+            <button type="button" id="btn-reset-equipment-filter" class="btn btn-outline-secondary stitch-btn-cancel flex-shrink-0" title="Đặt lại bộ lọc" aria-label="Đặt lại bộ lọc">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Equipment Table Card -->
+      <div class="stitch-table-card">
+        <div class="stitch-table-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="stitch-table-title">Danh sách thiết bị trang bị phòng họp</span>
+            <span class="stitch-table-count" id="equipment-table-count">Đang tải...</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="stitch-hint"><i class="bi bi-shield-check text-success me-1"></i>Kiểm soát lịch mượn trùng giờ thời gian thực</span>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table stitch-table align-middle" id="admin-equipments-table">
+            <thead>
+              <tr>
+                <th style="width: 44px;" class="text-center">
+                  <input type="checkbox" id="check-all-equipments" class="stitch-checkbox" aria-label="Chọn tất cả thiết bị" />
+                </th>
+                <th style="width: 100px;" class="text-center">Mã TB</th>
+                <th style="min-width: 260px;">Tên thiết bị &amp; Nhận diện</th>
+                <th style="width: 170px;">Phân loại</th>
+                <th style="width: 160px;" class="text-center">Trạng thái vận hành</th>
+                <th style="width: 160px;" class="text-center">Điều phối bảo trì</th>
+                <th style="width: 120px;" class="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="admin-equipments-tbody">
+              <!-- Render by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer -->
+        <div class="stitch-table-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="stitch-table-info" id="equipment-footer-info"></div>
+          <div class="stitch-pagination d-flex align-items-center gap-1">
+            <button type="button" class="btn-page-nav disabled" aria-label="Trang trước"><i class="bi bi-chevron-left"></i></button>
+            <span class="btn-page-nav active">1</span>
+            <button type="button" class="btn-page-nav disabled" aria-label="Trang kế tiếp"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  setupAdminEquipmentEvents();
+  renderAdminEquipmentsTable();
+}
+
+function renderAdminEquipmentsTable() {
+  const tbody = document.getElementById("admin-equipments-tbody");
+  if (!tbody) return;
+
+  const filtered = filterEquipmentsList();
+  const countEl = document.getElementById("equipment-table-count");
+  const footerEl = document.getElementById("equipment-footer-info");
+
+  if (countEl) countEl.textContent = `${filtered.length} thiết bị`;
+  if (footerEl) footerEl.textContent = `Hiển thị ${filtered.length} trên tổng số ${EQUIPMENTS.length} thiết bị`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center py-5">
+          <div class="empty-state-card text-center py-4">
+            <i class="bi bi-cpu text-muted" style="font-size: 2.5rem;"></i>
+            <h5 class="fw-bold text-dark mt-2">Không tìm thấy thiết bị nào</h5>
+            <p class="text-secondary small">Không có thiết bị phù hợp với điều kiện tìm kiếm hoặc bộ lọc hiện tại.</p>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="resetEquipmentFilters()">
+              <i class="bi bi-arrow-counterclockwise me-1"></i> Đặt lại bộ lọc
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    const meta = getEquipmentVisualMeta(eq);
+    const statusLower = (eq.status || "available").toLowerCase();
+
+    // Badge status
+    let statusBadge = "";
+    if (statusLower === "available") {
+      statusBadge = `<span class="eq-status-badge status-available"><span class="status-dot"></span>Có sẵn</span>`;
+    } else if (statusLower === "maintenance") {
+      statusBadge = `<span class="eq-status-badge status-maintenance"><span class="status-dot"></span>Đang bảo trì</span>`;
+    } else {
+      statusBadge = `<span class="eq-status-badge status-broken"><span class="status-dot"></span>Hư hỏng</span>`;
+    }
+
+    // Nút chuyển bảo trì nhanh
+    let toggleBtn = "";
+    if (statusLower === "available") {
+      toggleBtn = `
+        <button type="button" class="btn-action-status-toggle to-maintenance"
+          onclick="handleQuickToggleEquipmentStatus(${eqId}, 'Available')"
+          title="Chuyển thiết bị sang trạng thái bảo trì">
+          <i class="bi bi-tools"></i>
+          <span>Bảo trì</span>
+        </button>
+      `;
+    } else if (statusLower === "maintenance") {
+      toggleBtn = `
+        <button type="button" class="btn-action-status-toggle to-available"
+          onclick="handleQuickToggleEquipmentStatus(${eqId}, 'Maintenance')"
+          title="Hoàn tất bảo trì, đưa thiết bị về trạng thái sẵn sàng">
+          <i class="bi bi-check2-circle"></i>
+          <span>Hoàn tất bảo trì</span>
+        </button>
+      `;
+    } else {
+      toggleBtn = `
+        <button type="button" class="btn-action-status-toggle to-available"
+          onclick="handleQuickToggleEquipmentStatus(${eqId}, 'Broken')"
+          title="Khôi phục thiết bị về trạng thái sẵn sàng">
+          <i class="bi bi-arrow-repeat"></i>
+          <span>Khôi phục</span>
+        </button>
+      `;
+    }
+
+    return `
+      <tr class="equipment-table-row" data-id="${eqId}">
+        <td class="text-center">
+          <input type="checkbox" class="stitch-checkbox equipment-row-checkbox" value="${eqId}" aria-label="Chọn thiết bị ${escapeHTML(eq.name || eq.equipmentName)}" />
+        </td>
+        <td class="text-center font-monospace small fw-bold text-secondary">
+          #EQ-${String(eqId).padStart(2, '0')}
+        </td>
+        <td>
+          <div class="equipment-row-item">
+            <div class="equipment-icon-avatar ${meta.typeClass}">
+              <i class="bi ${meta.icon}"></i>
+            </div>
+            <div>
+              <div class="equipment-name-title">${escapeHTML(eq.name || eq.equipmentName)}</div>
+              <div class="equipment-code-text">Mã định danh hệ thống: EQ-SYS-${eqId}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="equipment-category-badge">
+            <i class="bi ${meta.icon} text-primary"></i>
+            <span>${escapeHTML(eq.type || meta.label)}</span>
+          </span>
+        </td>
+        <td class="text-center">
+          ${statusBadge}
+        </td>
+        <td class="text-center">
+          ${toggleBtn}
+        </td>
+        <td class="text-center">
+          <div class="d-flex align-items-center justify-content-center gap-1">
+            <button type="button" class="btn-action-icon btn-edit"
+              onclick="openEditEquipmentModal(${eqId})"
+              title="Chỉnh sửa thông tin thiết bị"
+              aria-label="Chỉnh sửa thiết bị ${escapeHTML(eq.name || eq.equipmentName)}">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button type="button" class="btn-action-icon btn-delete"
+              onclick="openEquipmentDeleteModal(${eqId})"
+              title="Xóa thiết bị"
+              aria-label="Xóa thiết bị ${escapeHTML(eq.name || eq.equipmentName)}">
+              <i class="bi bi-trash3-fill"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  if (typeof applyRoleUI === "function") {
+    applyRoleUI();
+  }
+}
+
+function setupAdminEquipmentEvents() {
+  const searchInput = document.getElementById("equipment-search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      equipmentFilterState.search = e.target.value;
+      renderAdminEquipmentsPage();
+      const inputAfter = document.getElementById("equipment-search-input");
+      if (inputAfter) {
+        inputAfter.focus();
+        inputAfter.setSelectionRange(inputAfter.value.length, inputAfter.value.length);
+      }
+    });
+  }
+
+  const btnClearSearch = document.getElementById("btn-clear-equipment-search");
+  if (btnClearSearch) {
+    btnClearSearch.addEventListener("click", () => {
+      equipmentFilterState.search = "";
+      renderAdminEquipmentsPage();
+    });
+  }
+
+  document.querySelectorAll(".equipment-status-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const status = btn.getAttribute("data-status");
+      equipmentFilterState.status = status;
+      renderAdminEquipmentsPage();
+    });
+  });
+
+  const categoryFilter = document.getElementById("equipment-category-filter");
+  if (categoryFilter) {
+    categoryFilter.addEventListener("change", (e) => {
+      equipmentFilterState.type = e.target.value;
+      renderAdminEquipmentsTable();
+    });
+  }
+
+  const btnReset = document.getElementById("btn-reset-equipment-filter");
+  if (btnReset) {
+    btnReset.addEventListener("click", resetEquipmentFilters);
+  }
+
+  const btnAdd = document.getElementById("btn-add-equipment");
+  if (btnAdd) {
+    btnAdd.addEventListener("click", openAddEquipmentModal);
+  }
+
+  const btnExport = document.getElementById("btn-export-equipments-csv");
+  if (btnExport) {
+    btnExport.addEventListener("click", exportEquipmentsToCSV);
+  }
+
+  const checkAll = document.getElementById("check-all-equipments");
+  if (checkAll) {
+    checkAll.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      document.querySelectorAll(".equipment-row-checkbox").forEach(cb => {
+        cb.checked = isChecked;
+      });
+    });
+  }
+}
+
+function resetEquipmentFilters() {
+  equipmentFilterState.search = "";
+  equipmentFilterState.status = "all";
+  equipmentFilterState.type = "all";
+  renderAdminEquipmentsPage();
+}
+
+function openAddEquipmentModal() {
+  const overlay = document.getElementById("equipment-modal-overlay");
+  const form = document.getElementById("equipment-form");
+  const title = document.getElementById("equipment-modal-title");
+  const submitText = document.getElementById("equipment-submit-text");
+  const errorBox = document.getElementById("equipment-form-error");
+
+  if (form) form.reset();
+  if (errorBox) errorBox.classList.add("d-none");
+  const idInput = document.getElementById("equipment-id");
+  if (idInput) idInput.value = "";
+  if (title) title.textContent = "Thêm thiết bị mới";
+  if (submitText) submitText.textContent = "Thêm thiết bị";
+
+  updateEquipmentStatusAlertDesc("Available");
+
+  if (overlay) overlay.classList.remove("hidden");
+  setTimeout(() => {
+    const nameInput = document.getElementById("equipment-name");
+    if (nameInput) nameInput.focus();
+  }, 100);
+}
+
+function openEditEquipmentModal(id) {
+  const eq = EQUIPMENTS.find(e => e.id === id);
+  if (!eq) return;
+
+  const overlay = document.getElementById("equipment-modal-overlay");
+  const title = document.getElementById("equipment-modal-title");
+  const submitText = document.getElementById("equipment-submit-text");
+  const errorBox = document.getElementById("equipment-form-error");
+
+  if (errorBox) errorBox.classList.add("d-none");
+  if (title) title.textContent = "Chỉnh sửa thông tin thiết bị";
+  if (submitText) submitText.textContent = "Cập nhật thiết bị";
+
+  const idInput = document.getElementById("equipment-id");
+  const nameInput = document.getElementById("equipment-name");
+  const typeSelect = document.getElementById("equipment-type");
+  const statusSelect = document.getElementById("equipment-status");
+
+  if (idInput) idInput.value = eq.id;
+  if (nameInput) nameInput.value = eq.name || eq.equipmentName;
+  if (typeSelect) typeSelect.value = eq.type || "Thiết bị";
+  if (statusSelect) statusSelect.value = eq.status || "Available";
+
+  updateEquipmentStatusAlertDesc(eq.status || "Available");
+
+  if (overlay) overlay.classList.remove("hidden");
+  setTimeout(() => {
+    if (nameInput) nameInput.focus();
+  }, 100);
+}
+
+function closeEquipmentModal() {
+  const overlay = document.getElementById("equipment-modal-overlay");
+  if (overlay) overlay.classList.add("hidden");
+  const errorBox = document.getElementById("equipment-form-error");
+  if (errorBox) errorBox.classList.add("d-none");
+  const nameInput = document.getElementById("equipment-name");
+  if (nameInput) nameInput.classList.remove("is-invalid");
+}
+
+function updateEquipmentStatusAlertDesc(status) {
+  const descEl = document.getElementById("equipment-status-alert-desc");
+  if (!descEl) return;
+  if (status === "Available") {
+    descEl.textContent = "Thiết bị ở trạng thái 'Có sẵn' sẽ được hiển thị cho người dùng chọn mượn khi đặt lịch phòng họp.";
+  } else if (status === "Maintenance") {
+    descEl.textContent = "Thiết bị đang bảo trì sẽ bị khóa (disable) trên giao diện đặt phòng và hệ thống sẽ tự động chặn mượn.";
+  } else {
+    descEl.textContent = "Thiết bị hư hỏng sẽ được đánh dấu để phòng kỹ thuật kiểm tra và tạm thời không thể đưa vào sử dụng.";
+  }
+}
+
+async function saveEquipment(event) {
+  if (event) event.preventDefault();
+
+  const idVal = document.getElementById("equipment-id").value;
+  const nameInput = document.getElementById("equipment-name");
+  const typeSelect = document.getElementById("equipment-type");
+  const statusSelect = document.getElementById("equipment-status");
+  const errorBox = document.getElementById("equipment-form-error");
+  const errorMsg = document.getElementById("equipment-form-error-msg");
+  const spinner = document.getElementById("equipment-submit-spinner");
+  const submitBtn = document.getElementById("btn-equipment-submit");
+
+  const name = nameInput.value.trim();
+  const type = typeSelect.value;
+  const status = statusSelect.value;
+
+  // Validation ca biên (Boundary Checks)
+  if (!name || name.length < 2) {
+    nameInput.classList.add("is-invalid");
+    if (errorBox) {
+      errorBox.classList.remove("d-none");
+      errorMsg.textContent = "Vui lòng nhập tên thiết bị hợp lệ (tối thiểu 2 ký tự).";
+    }
+    nameInput.focus();
+    return;
+  }
+  if (name.length > 100) {
+    nameInput.classList.add("is-invalid");
+    if (errorBox) {
+      errorBox.classList.remove("d-none");
+      errorMsg.textContent = "Tên thiết bị không được vượt quá 100 ký tự.";
+    }
+    nameInput.focus();
+    return;
+  }
+  if (/[<>]/.test(name)) {
+    nameInput.classList.add("is-invalid");
+    if (errorBox) {
+      errorBox.classList.remove("d-none");
+      errorMsg.textContent = "Tên thiết bị không được chứa ký tự đặc biệt nguy hiểm (<, >).";
+    }
+    nameInput.focus();
+    return;
+  }
+  nameInput.classList.remove("is-invalid");
+  if (errorBox) errorBox.classList.add("d-none");
+
+  // Loading
+  if (spinner) spinner.classList.remove("hidden");
+  if (submitBtn) submitBtn.disabled = true;
+
   try {
-    const saved = localStorage.getItem("STITCH_ROOMS_DATA");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        ROOMS = parsed;
+    let res;
+    if (idVal) {
+      res = await EquipmentAPI.update(Number(idVal), { name, type, status });
+    } else {
+      res = await EquipmentAPI.create({ name, type, status });
+    }
+
+    if (res && res.success) {
+      closeEquipmentModal();
+      const current = getCurrentRoute();
+      if (current.includes("equipment")) {
+        if (current.startsWith("/admin")) {
+          renderAdminEquipmentsPage();
+        } else if (typeof window.renderEquipmentUserPage === "function") {
+          window.renderEquipmentUserPage();
+        }
+      }
+    } else {
+      if (errorBox) {
+        errorBox.classList.remove("d-none", "hidden");
+        errorMsg.textContent = res ? res.message : "Đã xảy ra lỗi khi lưu thiết bị.";
       }
     }
-  } catch (e) {
-    console.warn("Lỗi khi đọc phòng từ localStorage:", e);
+  } catch (err) {
+    if (errorBox) {
+      errorBox.classList.remove("d-none", "hidden");
+      errorMsg.textContent = err.message || "Lỗi hệ thống khi lưu thiết bị.";
+    }
+  } finally {
+    if (spinner) spinner.classList.add("hidden");
+    if (submitBtn) submitBtn.disabled = false;
   }
+}
+
+async function handleQuickToggleEquipmentStatus(id, currentStatus) {
+  let newStatus = "Maintenance";
+  if (currentStatus === "Maintenance" || currentStatus === "Broken") {
+    newStatus = "Available";
+  }
+
+  const res = await EquipmentAPI.updateStatus(id, newStatus);
+  if (res && res.success) {
+    const current = getCurrentRoute();
+    if (current.includes("equipment")) {
+      if (current.startsWith("/admin")) {
+        renderAdminEquipmentsPage();
+      } else if (typeof window.renderEquipmentUserPage === "function") {
+        window.renderEquipmentUserPage();
+      }
+    }
+  } else {
+    alert(res ? res.message : "Không thể thay đổi trạng thái thiết bị.");
+  }
+}
+
+function openEquipmentDeleteModal(id) {
+  const eq = EQUIPMENTS.find(e => e.id === id);
+  if (!eq) return;
+
+  window.currentDeletingEquipmentId = id;
+  const overlay = document.getElementById("equipment-delete-overlay");
+  const content = document.getElementById("equipment-delete-content");
+
+  const activeMeetingUsing = meetings.filter(m =>
+    m.equipmentIds && m.equipmentIds.includes(id) &&
+    (m.status === "scheduled" || m.status === "in-progress")
+  );
+
+  let warningNote = "";
+  if (activeMeetingUsing.length > 0) {
+    warningNote = `
+      <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div>
+          <strong>Cảnh báo ràng buộc:</strong> Thiết bị này đang được mượn trong <strong>${activeMeetingUsing.length} cuộc họp</strong> đang/sắp diễn ra. Backend sẽ kiểm tra chặn xóa (409 Conflict) để bảo toàn tính toàn vẹn.
+        </div>
+      </div>
+    `;
+  }
+
+  if (content) {
+    content.innerHTML = `
+      ${warningNote}
+      <div class="p-3 bg-light rounded-3 border mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="equipment-icon-avatar ${getEquipmentVisualMeta(eq).typeClass}">
+            <i class="bi ${getEquipmentVisualMeta(eq).icon}"></i>
+          </div>
+          <div>
+            <div class="fw-bold text-dark fs-6">${escapeHTML(eq.name || eq.equipmentName)}</div>
+            <div class="text-secondary small font-monospace">Mã TB: #EQ-${String(id).padStart(2, '0')} • Phân loại: ${escapeHTML(eq.type || 'Thiết bị')}</div>
+          </div>
+        </div>
+      </div>
+      <p class="text-danger small mb-0">
+        <i class="bi bi-info-circle me-1"></i>
+        Hành động này sẽ xóa vĩnh viễn thiết bị khỏi danh mục hệ thống. Bạn có chắc chắn muốn thực hiện?
+      </p>
+    `;
+  }
+
+  if (overlay) overlay.classList.remove("hidden");
+}
+
+function closeEquipmentDeleteModal() {
+  const overlay = document.getElementById("equipment-delete-overlay");
+  if (overlay) overlay.classList.add("hidden");
+  window.currentDeletingEquipmentId = null;
+}
+
+async function confirmDeleteEquipment() {
+  const id = window.currentDeletingEquipmentId;
+  if (!id) return;
+
+  const btnConfirm = document.getElementById("btn-confirm-equipment-delete");
+  if (btnConfirm) btnConfirm.disabled = true;
+
+  try {
+    const res = await EquipmentAPI.delete(id);
+    if (res && res.success) {
+      closeEquipmentDeleteModal();
+      const current = getCurrentRoute();
+      if (current.includes("equipment")) {
+        if (current.startsWith("/admin")) {
+          renderAdminEquipmentsPage();
+        } else if (typeof window.renderEquipmentUserPage === "function") {
+          window.renderEquipmentUserPage();
+        }
+      }
+    } else {
+      const content = document.getElementById("equipment-delete-content");
+      if (content) {
+        content.innerHTML = `
+          <div class="alert alert-danger d-flex align-items-start gap-2 mb-0">
+            <i class="bi bi-x-octagon-fill fs-5 mt-1"></i>
+            <div>
+              <strong>Không thể xóa thiết bị (409 Conflict):</strong><br>
+              ${escapeHTML(res.message || "Thiết bị đang được sử dụng trong các cuộc họp sắp diễn ra.")}
+              <div class="mt-2 text-dark small">Vui lòng hủy lịch mượn hoặc điều phối thiết bị thay thế trước khi xóa.</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+  } catch (err) {
+    alert("Lỗi khi xóa thiết bị: " + err.message);
+  } finally {
+    if (btnConfirm) btnConfirm.disabled = false;
+  }
+}
+
+function exportEquipmentsToCSV() {
+  const headers = [
+    "Mã thiết bị",
+    "Tên thiết bị",
+    "Phân loại",
+    "Trạng thái vận hành",
+    "Mã định danh hệ thống"
+  ];
+
+  const rows = EQUIPMENTS.map(eq => [
+    `"EQ-${String(eq.id).padStart(2, '0')}"`,
+    `"${(eq.name || eq.equipmentName || '').replace(/"/g, '""')}"`,
+    `"${(eq.type || 'Thiết bị').replace(/"/g, '""')}"`,
+    `"${eq.status || 'Available'}"`,
+    `"EQ-SYS-${eq.id}"`
+  ]);
+
+  const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `danh_muc_thiet_bi_${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 // =====================================================
@@ -2065,46 +3407,119 @@ function loadPersistedRooms() {
 // =====================================================
 
 function persistMeetingsToStorage() {
-  try {
-    localStorage.setItem("STITCH_MEETINGS_DATA", JSON.stringify(meetings));
-  } catch (e) {
-    console.warn("Lỗi khi lưu cuộc họp vào localStorage:", e);
-  }
+  // Không lưu dữ liệu mock tĩnh vào localStorage
 }
 
 function loadPersistedMeetings() {
-  try {
-    const saved = localStorage.getItem("STITCH_MEETINGS_DATA");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        meetings = parsed.map(m => {
-          if (!m.participantIds && m.participants) {
-            m.participantIds = m.participants.map(name => {
-              const u = USERS.find(user => user.name.toLowerCase() === name.toLowerCase());
-              return u ? u.id : null;
-            }).filter(Boolean);
-            if (m.organizerId && !m.participantIds.includes(m.organizerId)) {
-              m.participantIds.unshift(m.organizerId);
-            }
-          }
-          return m;
-        });
-      }
-    }
-  } catch (e) {
-    console.warn("Lỗi khi đọc cuộc họp từ localStorage:", e);
-  }
+  // Dữ liệu chỉ nạp trực tiếp từ backend MySQL qua API, không dùng cache
 }
 
 // =====================================================
-// 6F. MEETING API SERVICE (RESTful WITH GRACEFUL FALLBACK)
+// 6F. MEETING API SERVICE (RESTful WITH DATABASE SYNC)
 // =====================================================
 
 const MEETING_API_URL = "http://localhost:3000/api/meetings";
 
 const MeetingAPI = {
   isBackendConnected: false,
+
+  async getAll() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+      const token = (window.AuthState && typeof window.AuthState.getToken === 'function')
+        ? window.AuthState.getToken()
+        : (localStorage.getItem('accessToken') || null);
+      const reqHeaders = { 'Accept': 'application/json' };
+      if (token) {
+        reqHeaders['Authorization'] = `Bearer ${token}`;
+      }
+
+      const fetchFn = window.apiFetch || fetch;
+      const res = await fetchFn(`${MEETING_API_URL}?limit=100`, {
+        headers: reqHeaders,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const json = await res.json();
+        this.isBackendConnected = true;
+        this.updateStatusBadges();
+        const serverMeetings = json.data || json;
+        if (Array.isArray(serverMeetings)) {
+          let parsedMeetings = serverMeetings.map(m => {
+            const startD = new Date(m.startTime);
+            const endD = new Date(m.endTime);
+            const dateStr = !isNaN(startD.getTime()) ? startD.toISOString().slice(0, 10) : "";
+            const startHHMM = !isNaN(startD.getTime()) ? startD.toTimeString().slice(0, 5) : "";
+            const endHHMM = !isNaN(endD.getTime()) ? endD.toTimeString().slice(0, 5) : "";
+
+            const parsedParticipantIds = Array.isArray(m.participantIds)
+              ? m.participantIds.map(Number).filter(id => !isNaN(id) && id > 0)
+              : (typeof m.participantIds === 'string'
+                  ? m.participantIds.split(',').map(Number).filter(id => !isNaN(id) && id > 0)
+                  : (m.organizerId ? [Number(m.organizerId)] : []));
+
+            const parsedParticipantNames = Array.isArray(m.participantNames)
+              ? m.participantNames
+              : (Array.isArray(m.participants)
+                  ? m.participants
+                  : (typeof m.participantNames === 'string' ? m.participantNames.split(',').map(s => s.trim()) : [m.organizerName || "Admin"]));
+
+            return {
+              id: m.meetingId || m.id,
+              meetingId: m.meetingId || m.id,
+              title: m.title || "Cuộc họp",
+              tag: m.isRecurring ? "Định kỳ" : "Thường kỳ",
+              date: dateStr,
+              startTime: startHHMM,
+              endTime: endHHMM,
+              time: `${startHHMM} - ${endHHMM}`,
+              roomId: m.roomId,
+              roomName: m.roomName || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.name) || "Phòng họp",
+              capacity: m.roomCapacity || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.capacity) || 20,
+              organizerId: m.organizerId,
+              host: m.organizerName || "Admin",
+              participants: parsedParticipantNames,
+              participantIds: parsedParticipantIds,
+              participantNames: parsedParticipantNames,
+              status: m.bookingStatus ? m.bookingStatus.toLowerCase() : "scheduled",
+              notes: m.description || ""
+            };
+          });
+
+          // ── RBAC Lọc dữ liệu nghiêm ngặt phía Client (Defense-in-depth) ──
+          const authUser = getActiveAuthUser();
+          const currentUserId = authUser ? Number(authUser.userId || authUser.id) : null;
+          const isUserAdmin = Boolean(
+            (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+              ? window.AuthState.isAdmin()
+              : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+          );
+
+          if (!isUserAdmin && currentUserId) {
+            parsedMeetings = parsedMeetings.filter(m => {
+              const isOrg = Number(m.organizerId) === currentUserId;
+              const pIds = Array.isArray(m.participantIds) ? m.participantIds.map(Number) : [];
+              const isInvited = pIds.includes(currentUserId);
+              return isOrg || isInvited;
+            });
+          }
+
+          meetings = parsedMeetings;
+        }
+        return { success: true, data: meetings, isFallback: false };
+      }
+    } catch (err) {
+      this.isBackendConnected = false;
+      this.updateStatusBadges();
+    }
+    // Khi Backend không chạy: dữ liệu cuộc họp là RỖNG
+    meetings = [];
+    return { success: false, data: [], isFallback: false };
+  },
 
   async checkHealth() {
     try {
@@ -2130,12 +3545,12 @@ const MeetingAPI = {
       if (!badge || !text) return;
       if (this.isBackendConnected) {
         badge.classList.remove("offline");
-        badge.title = "Backend Server đang hoạt động - Sẵn sàng đồng bộ CSDL thật (Port 3000)";
-        text.textContent = "API Live (Port 3000)";
+        badge.title = "Hệ thống kết nối trực tuyến";
+        text.textContent = "Trực tuyến";
       } else {
         badge.classList.add("offline");
-        badge.title = "Backend Server chưa bật - Tự động kích hoạt Client Fallback an toàn";
-        text.textContent = "Client Fallback";
+        badge.title = "Hệ thống đang hoạt động ở chế độ cục bộ";
+        text.textContent = "Chế độ ngoại tuyến";
       }
     });
   },
@@ -2258,6 +3673,61 @@ const MeetingAPI = {
       return await res.json();
     } catch (err) {
       return { success: false, message: err.message };
+    }
+  },
+
+  async getUsers(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (filters.search) params.append("search", filters.search);
+      if (filters.role) params.append("role", filters.role);
+      const queryStr = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetch(`http://localhost:3000/api/users${queryStr}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const rawUsers = json.data || json;
+      if (Array.isArray(rawUsers)) {
+        USERS = rawUsers.map(u => ({
+          id: u.userId || u.id,
+          name: u.fullName || u.name,
+          email: u.email,
+          role: u.role || 'Employee',
+          department: u.department || (u.role === 'Admin' || u.role === 'Manager' ? 'Quản trị' : 'Kỹ thuật'),
+          avatar: getInitials(u.fullName || u.name),
+          color: getHostColor(u.fullName || u.name)
+        }));
+      }
+      return { success: true, data: USERS };
+    } catch (err) {
+      USERS = [];
+      return { success: false, data: [], message: err.message };
+    }
+  },
+
+  async getAvailableEquipments(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (filters.date) params.append("date", filters.date);
+      if (filters.startTime) params.append("startTime", filters.startTime);
+      if (filters.endTime) params.append("endTime", filters.endTime);
+      if (filters.type) params.append("type", filters.type);
+      if (filters.excludeMeetingId) params.append("excludeMeetingId", filters.excludeMeetingId);
+      const res = await fetch(`http://localhost:3000/api/equipments/available?${params.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      return { success: false, data: [], message: err.message };
+    }
+  },
+
+  async getAllEquipments() {
+    try {
+      const res = await fetch("http://localhost:3000/api/equipments");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json;
+    } catch (err) {
+      return { success: false, data: [], message: err.message };
     }
   }
 };
@@ -2480,6 +3950,24 @@ function validateMeetingForm(editId = null) {
     if (!firstErrorField) firstErrorField = roomSelect;
   }
 
+  // 4b. Kiểm tra quyền đặt phòng giới hạn / VIP (RBAC Restricted Room)
+  if (roomObj && typeof isRestrictedRoom === "function" && isRestrictedRoom(roomObj)) {
+    if (typeof can === "function" && !can("book_restricted_room")) {
+      isValid = false;
+      const restrictedMsg = `Phòng "${roomObj.name}" là phòng VIP / Giới hạn dành riêng cho Ban Giám Đốc. Tài khoản của bạn không có quyền đặt phòng này.`;
+      if (roomError) {
+        roomError.textContent = restrictedMsg;
+        roomError.classList.remove("hidden");
+      }
+      if (roomConflictAlert && roomConflictText) {
+        roomConflictText.innerHTML = `<i class="bi bi-shield-lock-fill text-danger me-1"></i> ${escapeHTML(restrictedMsg)}`;
+        roomConflictAlert.classList.remove("hidden");
+      }
+      if (roomSelect) roomSelect.classList.add("has-error", "is-invalid");
+      if (!firstErrorField) firstErrorField = roomSelect;
+    }
+  }
+
   // 5. Kiểm tra trùng lịch phòng phía Client (Conflict Pre-check)
   if (isValid && roomObj && date && startTime && endTime) {
     const conflictingMeeting = checkMeetingRoomConflict(roomId, date, startTime, endTime, editId);
@@ -2495,8 +3983,36 @@ function validateMeetingForm(editId = null) {
   }
 
   // 6. Kiểm tra Người tổ chức (Organizer)
-  const organizerObj = USERS.find(u => u.id === organizerId);
-  if (!organizerId || !organizerObj) {
+  const authUser = getActiveAuthUser();
+  const isAdmin = (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+    ? window.AuthState.isAdmin()
+    : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin');
+
+  let activeOrgId = organizerId;
+  if (!activeOrgId) {
+    const orgIdInput = document.getElementById("meeting-organizer-id") || document.getElementById("meeting-organizer");
+    if (orgIdInput && orgIdInput.value) activeOrgId = Number(orgIdInput.value);
+  }
+  // Nếu là Nhân viên (hoặc không phải Admin), người tổ chức bắt buộc là chính tài khoản đang đăng nhập
+  if (!isAdmin && authUser) {
+    activeOrgId = Number(authUser.userId || authUser.id || activeOrgId);
+  }
+  if (!activeOrgId && authUser) {
+    activeOrgId = Number(authUser.userId || authUser.id || 1);
+  }
+  if (!activeOrgId) activeOrgId = 1;
+
+  let organizerObj = USERS.find(u => u.id === activeOrgId);
+  if (!organizerObj && authUser) {
+    organizerObj = {
+      id: activeOrgId,
+      name: authUser.fullName || authUser.username || "Thành viên",
+      email: authUser.email || "",
+      department: authUser.department || "Nhân viên"
+    };
+  }
+
+  if (!activeOrgId || !organizerObj) {
     isValid = false;
     if (organizerSelect) organizerSelect.classList.add("has-error", "is-invalid");
   }
@@ -2523,8 +4039,8 @@ function validateMeetingForm(editId = null) {
   }
 
   // Luôn đảm bảo Người tổ chức (Host) có mặt trong danh sách
-  if (organizerId && !participantIds.includes(organizerId)) {
-    participantIds.unshift(organizerId);
+  if (activeOrgId && !participantIds.includes(activeOrgId)) {
+    participantIds.unshift(activeOrgId);
   }
   if (organizerObj && !participants.includes(organizerObj.name)) {
     participants.unshift(organizerObj.name);
@@ -2583,12 +4099,7 @@ function validateMeetingForm(editId = null) {
       globalError.classList.remove("hidden");
     }
 
-    const modalCard = document.querySelector(".meeting-modal-card");
-    if (modalCard) {
-      modalCard.classList.remove("stitch-shake");
-      void modalCard.offsetWidth;
-      modalCard.classList.add("stitch-shake");
-    }
+    // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
 
     if (firstErrorField) {
       firstErrorField.focus();
@@ -2609,7 +4120,7 @@ function validateMeetingForm(editId = null) {
       timeDisplay: `${startTime} - ${endTime}`,
       roomId,
       roomObj,
-      organizerId,
+      organizerId: activeOrgId,
       organizerObj,
       participants,
       participantIds,
@@ -2620,6 +4131,131 @@ function validateMeetingForm(editId = null) {
       endTimeISO: `${date}T${endTime}:00`
     }
   };
+}
+
+// =====================================================
+// 6H. KHỐI HIỂN THỊ TRẠNG THÁI THIẾT BỊ VÀ BADGE (STITCH SPEC)
+// =====================================================
+
+function getEquipmentIconClass(eq) {
+  if (eq.icon) return eq.icon;
+  const name = (eq.name || eq.equipmentName || "").toLowerCase();
+  const type = (eq.type || "").toLowerCase();
+  if (name.includes("máy chiếu") || type.includes("máy chiếu") || type.includes("visual")) return "bi-projector-fill";
+  if (name.includes("màn hình") || name.includes("tv") || type.includes("màn hình") || type.includes("display")) return "bi-tv-fill";
+  if (name.includes("camera") || name.includes("webcam") || type.includes("camera")) return "bi-camera-video-fill";
+  if (name.includes("micro") || name.includes("mic") || type.includes("micro")) return "bi-mic-fill";
+  if (name.includes("loa") || type.includes("loa") || type.includes("audio")) return "bi-speaker-fill";
+  if (name.includes("bảng") || type.includes("bảng") || type.includes("stationery")) return "bi-easel-fill";
+  if (name.includes("chia sẻ") || name.includes("trình chiếu")) return "bi-laptop-fill";
+  return "bi-laptop";
+}
+
+function renderEquipmentCheckboxGrid(selectedIds = [], availabilityMap = null) {
+  const container = document.getElementById("equipment-checkbox-group");
+  if (!container) return;
+
+  const summaryEl = document.getElementById("equipment-avail-summary");
+  // Chỉ hiển thị các thiết bị đang hoạt động (loại bỏ bảo trì, hỏng hóc, ngừng hoạt động)
+  const usableEquipments = EQUIPMENTS.filter(eq => {
+    const status = (eq.status || "").toLowerCase();
+    return status !== "maintenance" && status !== "broken" && status !== "inactive";
+  });
+
+  // CHỈ HIỂN THỊ CÁC THIẾT BỊ CÒN TRỐNG (sẵn sàng) HOẶC ĐÃ ĐƯỢC CHỌN CHO PHIÊN HỌP NÀY
+  const displayEquipments = usableEquipments.filter(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    if (availabilityMap !== null) {
+      return availabilityMap.has(eqId) || selectedIds.includes(eqId);
+    }
+    return true;
+  });
+
+  const availableCount = displayEquipments.length;
+  const totalCount = usableEquipments.length;
+
+  if (displayEquipments.length === 0) {
+    container.innerHTML = `
+      <div class="col-12 py-3 text-center text-muted small" style="grid-column: 1 / -1;">
+        <i class="bi bi-info-circle me-1 text-slate-400"></i>
+        Không có thiết bị khả dụng trong khung giờ này.
+      </div>
+    `;
+    if (summaryEl) {
+      summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>0/${totalCount}</strong> thiết bị sẵn sàng`;
+    }
+    return;
+  }
+
+  const html = displayEquipments.map(eq => {
+    const eqId = Number(eq.id || eq.equipmentId);
+    const badgeHTML = `<span class="badge badge-eq-status badge-eq-avail" title="Thiết bị sẵn sàng để sử dụng"><i class="bi bi-check-circle-fill me-1"></i>Có sẵn</span>`;
+    const isChecked = selectedIds.includes(eqId);
+    const iconClass = getEquipmentIconClass(eq);
+    const tooltip = "Thiết bị sẵn sàng phục vụ cuộc họp";
+
+    return `
+      <label class="eq-check-card" for="eq-${eqId}" id="eq-card-${eqId}" data-id="${eqId}" title="${escapeHTML(tooltip)}">
+        <input
+          type="checkbox"
+          class="form-check-input eq-checkbox"
+          value="${eqId}"
+          id="eq-${eqId}"
+          ${isChecked ? "checked" : ""}
+          aria-label="${escapeHTML(eq.name || eq.equipmentName)}"
+        />
+        <div class="eq-card-content">
+          <div class="eq-icon-box">
+            <i class="bi ${iconClass} eq-card-icon"></i>
+          </div>
+          <div class="eq-card-text-group">
+            <span class="eq-card-name" title="${escapeHTML(eq.name || eq.equipmentName)}">${escapeHTML(eq.name || eq.equipmentName)}</span>
+            <span class="eq-card-sub text-muted" title="${escapeHTML(eq.type || 'Thiết bị hội nghị')}">${escapeHTML(eq.type || 'Thiết bị hội nghị')}</span>
+          </div>
+          <div class="eq-card-right ms-auto d-flex align-items-center gap-2">
+            ${badgeHTML}
+            <div class="eq-check-indicator">
+              <i class="bi bi-check-lg"></i>
+            </div>
+          </div>
+        </div>
+      </label>
+    `;
+  }).join("");
+
+  container.innerHTML = html;
+
+  if (summaryEl) {
+    summaryEl.innerHTML = `<i class="bi bi-shield-check me-1"></i><strong>${availableCount}/${totalCount}</strong> thiết bị sẵn sàng`;
+  }
+}
+
+function updateEquipmentCardsAvailability(editId = null) {
+  const dateInput = document.getElementById("meeting-date");
+  const startInput = document.getElementById("meeting-start");
+  const endInput = document.getElementById("meeting-end");
+  const date = dateInput ? dateInput.value : "";
+  const start = startInput ? startInput.value : "";
+  const end = endInput ? endInput.value : "";
+
+  // Thu thập các ID hiện đang được người dùng tick chọn
+  const currentCheckedIds = Array.from(document.querySelectorAll(".eq-checkbox:checked")).map(cb => Number(cb.value));
+
+  if (date && start && end && start < end) {
+    MeetingAPI.getAvailableEquipments({ date, startTime: start, endTime: end, excludeMeetingId: editId }).then(res => {
+      if (res && res.success && Array.isArray(res.data)) {
+        const availIds = new Set(res.data.map(e => Number(e.id || e.equipmentId)));
+        renderEquipmentCheckboxGrid(currentCheckedIds, availIds);
+      } else {
+        renderEquipmentCheckboxGrid(currentCheckedIds, null);
+      }
+    }).catch(err => {
+      console.warn("Lỗi kiểm tra thiết bị khả dụng từ server:", err);
+      renderEquipmentCheckboxGrid(currentCheckedIds, null);
+    });
+  } else {
+    renderEquipmentCheckboxGrid(currentCheckedIds, null);
+  }
 }
 
 function setupMeetingFormValidationEvents() {
@@ -2657,6 +4293,12 @@ function setupMeetingFormValidationEvents() {
 
     // Tự động rà soát trạng thái phòng trống thời gian thực
     renderRealtimeRoomCards(editId);
+
+    // Đồng bộ dropdown phòng họp: chỉ hiển thị phòng còn trống và đang hoạt động
+    syncMeetingRoomOptions();
+
+    // Tự động rà soát và cập nhật Badge trạng thái thiết bị thời gian thực (Luồng 2.3)
+    updateEquipmentCardsAvailability(editId);
 
     if (roomId && date && start && end && start < end) {
       const conflict = checkMeetingRoomConflict(roomId, date, start, end, editId);
@@ -2748,6 +4390,45 @@ function setupMeetingFormValidationEvents() {
   setupParticipantSelectorEvents();
   // Khởi tạo tính năng tùy chọn cuộc họp lặp định kỳ (Sprint 3)
   setupRecurringOptionsEvents();
+
+  // Đảm bảo Form submit và các nút Hủy/Đóng modal luôn được gắn sự kiện trên mọi trang
+  const form = document.getElementById("meeting-form");
+  if (form && !form._hasGlobalSubmitListener) {
+    form._hasGlobalSubmitListener = true;
+    form.addEventListener("submit", saveMeeting);
+  }
+
+  const cancelButton = document.getElementById("btn-cancel");
+  if (cancelButton && !cancelButton._hasGlobalCancelListener) {
+    cancelButton._hasGlobalCancelListener = true;
+    cancelButton.addEventListener("click", closeMeetingModal);
+  }
+
+  const closeModalButton = document.getElementById("btn-close-modal");
+  if (closeModalButton && !closeModalButton._hasGlobalCloseListener) {
+    closeModalButton._hasGlobalCloseListener = true;
+    closeModalButton.addEventListener("click", closeMeetingModal);
+  }
+
+  const btnSuccessClose = document.getElementById("btn-success-close");
+  if (btnSuccessClose && !btnSuccessClose._hasGlobalSuccessCloseListener) {
+    btnSuccessClose._hasGlobalSuccessCloseListener = true;
+    btnSuccessClose.addEventListener("click", closeMeetingModal);
+  }
+
+  const btnSuccessNew = document.getElementById("btn-success-new");
+  if (btnSuccessNew && !btnSuccessNew._hasGlobalSuccessNewListener) {
+    btnSuccessNew._hasGlobalSuccessNewListener = true;
+    btnSuccessNew.addEventListener("click", openAddModal);
+  }
+
+  // Tự động làm sạch query params vô tình do reload GET form
+  if (window.location.search && window.location.search.includes("meeting_title")) {
+    try {
+      const cleanUrl = window.location.pathname + (window.location.hash || "#/");
+      window.history.replaceState({}, document.title, cleanUrl);
+    } catch (e) {}
+  }
 }
 
 // =====================================================
@@ -2767,10 +4448,10 @@ let isParticipantDropdownOpen = false;
  * @param {Array<number|string>} initialIds Danh sách ID hoặc Tên người tham gia
  * @param {number} organizerId ID người tổ chức
  */
-function initParticipantSelector(initialIds = [1], organizerId = 1) {
+function initParticipantSelector(initialIds = null, organizerId = null) {
   selectedParticipantIds.clear();
 
-  const orgId = Number(organizerId) || 1;
+  const orgId = organizerId ? Number(organizerId) : getCurrentOrganizerId();
   selectedParticipantIds.add(orgId);
 
   if (Array.isArray(initialIds)) {
@@ -2816,8 +4497,7 @@ function renderParticipantChips() {
   const container = document.getElementById("participant-selected-chips");
   const countBadge = document.getElementById("participants-selected-count");
   const clearBtn = document.getElementById("btn-clear-participants");
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (!container) return;
 
@@ -2834,7 +4514,20 @@ function renderParticipantChips() {
   }
 
   const chipsHtml = Array.from(selectedParticipantIds).map(userId => {
-    const user = USERS.find(u => u.id === userId);
+    let user = USERS.find(u => u.id === userId);
+    if (!user) {
+      const authUser = getActiveAuthUser();
+      if (authUser && Number(authUser.userId || authUser.id) === userId) {
+        user = {
+          id: userId,
+          name: authUser.fullName || authUser.name || authUser.username || "Thành viên",
+          avatar: getInitials(authUser.fullName || authUser.name || "Thành viên"),
+          color: getHostColor(authUser.fullName || authUser.name || "Thành viên"),
+          role: authUser.role || "Employee",
+          department: authUser.department || "Kỹ thuật"
+        };
+      }
+    }
     if (!user) return "";
 
     const isHost = (user.id === currentOrgId);
@@ -2842,7 +4535,7 @@ function renderParticipantChips() {
     const color = user.color || getHostColor(user.name);
 
     return `
-      <div class="participant-chip ${isHost ? 'is-host' : ''}" data-user-id="${user.id}" title="${escapeHTML(user.name)} • ${escapeHTML(user.role)} (${escapeHTML(user.department)})">
+      <div class="participant-chip ${isHost ? 'is-host' : ''}" data-user-id="${user.id}" title="${escapeHTML(user.name)} • ${escapeHTML(user.role || 'Thành viên')} (${escapeHTML(user.department || 'Doanh nghiệp')})">
         <span class="chip-avatar" style="background: ${color};">${escapeHTML(initials)}</span>
         <span class="chip-name">${escapeHTML(user.name)}</span>
         ${isHost ? '<span class="chip-host-badge" title="Người tổ chức cuộc họp">Host</span>' : `
@@ -2863,8 +4556,7 @@ function renderParticipantChips() {
 function renderParticipantDropdownList() {
   const listEl = document.getElementById("participant-options-list");
   const summaryEl = document.getElementById("dropdown-selection-summary");
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (!listEl) return;
 
@@ -2938,13 +4630,27 @@ function renderParticipantDropdownList() {
 }
 
 /**
+ * Hàm điều phối cập nhật toàn diện khi danh sách người tham gia thay đổi:
+ * Cập nhật chips, dropdown list, cảnh báo quá tải sức chứa và thuật toán gợi ý phòng thời gian thực
+ */
+function triggerParticipantChangeUpdate() {
+  renderParticipantChips();
+  renderParticipantDropdownList();
+  updateParticipantCapacityWarning();
+  syncHiddenParticipantsInput();
+
+  const idInput = document.getElementById("meeting-id");
+  const editId = idInput && idInput.value ? Number(idInput.value) : null;
+  renderRealtimeRoomCards(editId);
+}
+
+/**
  * Toggle trạng thái chọn của một đồng nghiệp
  * @param {number} userId ID đồng nghiệp
  */
 function toggleParticipant(userId) {
   const uid = Number(userId);
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (selectedParticipantIds.has(uid)) {
     // Không cho bỏ chọn Host từ click nếu họ đang là Organizer
@@ -2957,10 +4663,7 @@ function toggleParticipant(userId) {
     selectedParticipantIds.add(uid);
   }
 
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 
   // Focus lại vào input tìm kiếm để tiếp tục thao tác
   const searchInput = document.getElementById("participant-search-input");
@@ -2979,8 +4682,7 @@ function removeParticipant(userId, event) {
     event.stopPropagation();
   }
   const uid = Number(userId);
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   if (uid === currentOrgId) {
     alert("Đồng nghiệp này là Người tổ chức cuộc họp (Host), bắt buộc phải có mặt.");
@@ -2988,26 +4690,19 @@ function removeParticipant(userId, event) {
   }
 
   selectedParticipantIds.delete(uid);
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 }
 
 /**
  * Bỏ chọn tất cả đồng nghiệp (giữ lại Host)
  */
 function clearAllParticipants() {
-  const organizerSelect = document.getElementById("meeting-organizer");
-  const currentOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  const currentOrgId = getCurrentOrganizerId();
 
   selectedParticipantIds.clear();
   selectedParticipantIds.add(currentOrgId);
 
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 }
 
 /**
@@ -3021,10 +4716,7 @@ function selectAllParticipants(dept = "all") {
     }
   });
 
-  renderParticipantChips();
-  renderParticipantDropdownList();
-  updateParticipantCapacityWarning();
-  syncHiddenParticipantsInput();
+  triggerParticipantChangeUpdate();
 }
 
 /**
@@ -3208,10 +4900,7 @@ function setupParticipantSelectorEvents() {
       const newOrgId = Number(organizerSelect.value);
       if (newOrgId) {
         selectedParticipantIds.add(newOrgId);
-        renderParticipantChips();
-        renderParticipantDropdownList();
-        syncHiddenParticipantsInput();
-        updateParticipantCapacityWarning();
+        triggerParticipantChangeUpdate();
       }
     });
   }
@@ -3435,7 +5124,7 @@ function setupRecurringOptionsEvents() {
 // =====================================================
 
 let currentRoomCapFilter = "all";
-let currentOnlyAvailFilter = false;
+let currentOnlyAvailFilter = true;
 let isDropdownRoomView = false;
 
 function calculateRoomAvailability(date, startTime, endTime, editId = null) {
@@ -3485,6 +5174,249 @@ function calculateRoomAvailability(date, startTime, endTime, editId = null) {
   });
 }
 
+/**
+ * Thuật toán tự động gợi ý phòng có sức chứa phù hợp nhất với số lượng người tham gia
+ * (Best-Fit Optimization Room Recommendation Algorithm)
+ * 
+ * Các nguyên lý cốt lõi:
+ * 1. Khả dụng thực tế: Chỉ gợi ý các phòng hoàn toàn trống trong khung giờ (Active, không trùng lịch, không bảo trì).
+ * 2. Đủ sức chứa (Capacity >= N): Ưu tiên tuyệt đối các phòng có sức chứa đủ cho toàn bộ người tham gia đã chọn.
+ * 3. Tối ưu hóa độ dư thừa (Min Slack): Chọn phòng có (capacity - N) nhỏ nhất để tránh lãng phí hội trường lớn.
+ * 4. Tính toán tỷ lệ lấp đầy (Fill Rate): (N / capacity) * 100%.
+ * 5. Ca biên quá tải (Overflow): Nếu không phòng nào đủ chỗ, gợi ý phòng lớn nhất hiện có kèm cảnh báo thiếu chỗ.
+ * 6. Ca biên hết phòng (No Room): Đưa ra thông điệp khuyến nghị đổi khung giờ.
+ *
+ * @param {number} participantCount Số lượng người tham gia
+ * @param {string} date Ngày họp (YYYY-MM-DD)
+ * @param {string} startTime Giờ bắt đầu (HH:mm)
+ * @param {string} endTime Giờ kết thúc (HH:mm)
+ * @param {number|null} editId ID cuộc họp đang sửa (nếu có)
+ * @returns {Object} Kết quả gợi ý { status, room, participantCount, slack, fillRate, message, badgeText, recommendationType, alternatives }
+ */
+function recommendBestFitRoom(participantCount, date, startTime, endTime, editId = null) {
+  const count = Math.max(1, Number(participantCount) || 1);
+  const roomsStatus = calculateRoomAvailability(date, startTime, endTime, editId);
+
+  // 1. Lọc danh sách phòng hoàn toàn khả dụng
+  const availableRooms = roomsStatus.filter(r => r.isAvailable && !r.isMaintenance && !r.isConflict);
+
+  // Ca biên A: Không còn phòng nào trống trong khung giờ
+  if (availableRooms.length === 0) {
+    return {
+      status: "no_room",
+      room: null,
+      participantCount: count,
+      slack: null,
+      fillRate: null,
+      isPerfectMatch: false,
+      message: "Không còn phòng họp nào trống trong khung giờ đã chọn. Vui lòng chuyển sang khung giờ hoặc ngày làm việc khác.",
+      badgeText: "Hết phòng trống",
+      recommendationType: "none",
+      alternatives: []
+    };
+  }
+
+  // 2. Phân loại phòng: Đủ sức chứa (capacity >= count)
+  const fitRooms = availableRooms.filter(r => (Number(r.capacity) || 0) >= count);
+
+  // Ca biên B: Có ít nhất một phòng đủ sức chứa -> Thuật toán Best-Fit
+  if (fitRooms.length > 0) {
+    fitRooms.sort((a, b) => {
+      const capA = Number(a.capacity) || 0;
+      const capB = Number(b.capacity) || 0;
+      const slackA = capA - count;
+      const slackB = capB - count;
+
+      // Ưu tiên 1: Độ dư thừa slack nhỏ nhất (vừa vặn nhất)
+      if (slackA !== slackB) {
+        return slackA - slackB;
+      }
+
+      // Ưu tiên 2: Cùng sức chứa -> ưu tiên phòng nhiều thiết bị hỗ trợ hơn
+      const eqCountA = (a.equipments || []).length;
+      const eqCountB = (b.equipments || []).length;
+      if (eqCountA !== eqCountB) {
+        return eqCountB - eqCountA;
+      }
+
+      // Ưu tiên 3: ID nhỏ hơn
+      return a.id - b.id;
+    });
+
+    const bestRoom = fitRooms[0];
+    const bestCap = Number(bestRoom.capacity) || count;
+    const slack = bestCap - count;
+    const fillRate = Math.min(100, Math.round((count / bestCap) * 100));
+    const isPerfectMatch = slack === 0;
+
+    let message = "";
+    if (isPerfectMatch) {
+      message = `Khớp 100% sức chứa (${bestRoom.capacity} chỗ cho ${count} người). Tận dụng tối đa công suất phòng họp!`;
+    } else {
+      message = `Tối ưu nhất cho ${count} người: Sức chứa ${bestRoom.capacity} chỗ, tỉ lệ lấp đầy ${fillRate}%, dư ${slack} chỗ. Giúp tiết kiệm các phòng họp quy mô lớn hơn.`;
+    }
+
+    const badgeText = isPerfectMatch ? `⭐ Khớp 100% sức chứa` : `⭐ Gợi ý tối ưu (${fillRate}%)`;
+
+    return {
+      status: "optimal",
+      room: bestRoom,
+      participantCount: count,
+      slack,
+      fillRate,
+      isPerfectMatch,
+      message,
+      badgeText,
+      recommendationType: isPerfectMatch ? "perfect" : "best_fit",
+      alternatives: fitRooms.slice(1)
+    };
+  }
+
+  // Ca biên C: Tất cả phòng trống đều nhỏ hơn số người tham gia (Quá tải / Overflow)
+  // Sắp xếp giảm dần theo sức chứa để gợi ý phòng lớn nhất có thể
+  availableRooms.sort((a, b) => {
+    const capA = Number(a.capacity) || 0;
+    const capB = Number(b.capacity) || 0;
+    if (capA !== capB) return capB - capA;
+    return a.id - b.id;
+  });
+
+  const largestRoom = availableRooms[0];
+  const largestCap = Number(largestRoom.capacity) || 0;
+  const shortage = count - largestCap;
+
+  return {
+    status: "overflow",
+    room: largestRoom,
+    participantCount: count,
+    shortage,
+    fillRate: 100,
+    isPerfectMatch: false,
+    message: `Số người (${count}) vượt quá sức chứa mọi phòng trống. Gợi ý phòng lớn nhất khả dụng là "${largestRoom.name}" (${largestCap} chỗ, thiếu ${shortage} chỗ).`,
+    badgeText: `Phòng lớn nhất (${largestCap} chỗ)`,
+    recommendationType: "overflow_largest",
+    alternatives: availableRooms.slice(1)
+  };
+}
+
+/**
+ * Render Banner gợi ý phòng thông minh trong modal tạo/sửa cuộc họp
+ * @param {Object} recommendation Kết quả từ recommendBestFitRoom
+ * @param {number} selectedRoomId ID phòng đang được người dùng chọn
+ */
+function renderSmartRecommendationBanner(recommendation, selectedRoomId) {
+  const box = document.getElementById("smart-room-recommendation-box");
+  if (!box) return;
+
+  if (!recommendation) {
+    box.innerHTML = "";
+    return;
+  }
+
+  const { status, room, participantCount, message, fillRate, slack, shortage } = recommendation;
+
+  if (status === "no_room") {
+    box.innerHTML = `
+      <div class="smart-room-recommendation-card is-no-room mb-2.5" role="status" aria-live="polite">
+        <div class="recommendation-content">
+          <div class="recommendation-header">
+            <span class="recommendation-badge-pill" style="background: #fee2e2; color: #991b1b;">
+              <i class="bi bi-calendar-x-fill me-1"></i> Hết phòng trống
+            </span>
+          </div>
+          <div class="recommendation-body">
+            <div class="small text-danger fw-semibold">
+              ${escapeHTML(message)}
+            </div>
+            <div class="recommendation-desc text-muted">
+              Gợi ý: Thử đổi khung giờ sớm hơn, muộn hơn hoặc chọn ngày làm việc khác.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (!room) {
+    box.innerHTML = "";
+    return;
+  }
+
+  const isCurrentRoomSelected = room.id === selectedRoomId;
+  const isOverflow = status === "overflow";
+
+  let headerBadgeHtml = "";
+  if (isOverflow) {
+    headerBadgeHtml = `
+      <span class="recommendation-badge-pill" style="background: #fef3c7; color: #92400e;">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i> Quá tải sức chứa
+      </span>
+      <span class="recommendation-util-pill" style="background: #fee2e2; color: #991b1b;">
+        Thiếu ${shortage} chỗ
+      </span>
+    `;
+  } else {
+    headerBadgeHtml = `
+      <span class="recommendation-badge-pill">
+        <i class="bi bi-magic me-1"></i> Gợi ý thuật toán thông minh
+      </span>
+      <span class="recommendation-util-pill">
+        <i class="bi bi-pie-chart-fill me-1"></i> Lấp đầy ${fillRate}% (Dư ${slack} chỗ)
+      </span>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="smart-room-recommendation-card ${isOverflow ? 'is-overflow' : ''} mb-2.5" role="region" aria-label="Gợi ý phòng họp tối ưu nhất">
+      <div class="recommendation-content">
+        <div class="recommendation-header">
+          ${headerBadgeHtml}
+        </div>
+        <div class="recommendation-body">
+          <div>
+            <span class="recommendation-room-name">
+              <i class="bi bi-door-closed-fill text-primary me-1"></i> ${escapeHTML(room.name)}
+            </span>
+            <span class="recommendation-room-meta ms-1">
+              (${room.capacity} chỗ • ${escapeHTML(room.floor || 'Tòa nhà')})
+            </span>
+          </div>
+          <p class="recommendation-desc mb-0">
+            ${escapeHTML(message)}
+          </p>
+        </div>
+      </div>
+      <div class="recommendation-action">
+        ${isCurrentRoomSelected ? `
+          <button type="button" class="btn-stitch-recommend is-applied" disabled title="Phòng này đang được chọn">
+            <i class="bi bi-check-circle-fill me-1 text-success"></i> Đang áp dụng
+          </button>
+        ` : `
+          <button type="button" class="btn-stitch-recommend" id="btn-apply-smart-room" onclick="applySmartRoomRecommendation(${room.id})" title="Tự động chọn phòng tối ưu này">
+            <i class="bi bi-lightning-charge-fill me-1"></i> Áp dụng gợi ý
+          </button>
+        `}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Tự động chọn phòng được thuật toán gợi ý và cuộn mượt đến thẻ phòng
+ * @param {number} roomId ID phòng
+ */
+function applySmartRoomRecommendation(roomId) {
+  selectRealtimeRoom(roomId);
+  const targetCard = document.querySelector(`.realtime-room-card[data-room-id="${roomId}"]`);
+  if (targetCard) {
+    targetCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    targetCard.classList.remove("pulse-highlight");
+    void targetCard.offsetWidth;
+    targetCard.classList.add("pulse-highlight");
+  }
+}
+
 function renderRealtimeRoomCards(editId = null) {
   const container = document.getElementById("realtime-room-grid");
   if (!container) return;
@@ -3519,6 +5451,13 @@ function renderRealtimeRoomCards(editId = null) {
   if (elBusy) elBusy.textContent = String(busyCount);
   if (elMaint) elMaint.textContent = String(maintCount);
 
+  // 1. Chạy thuật toán gợi ý phòng có sức chứa phù hợp nhất (Best-Fit Optimization)
+  const participantCount = selectedParticipantIds ? selectedParticipantIds.size : 1;
+  const recommendation = recommendBestFitRoom(participantCount, date, startTime, endTime, editId);
+
+  // 2. Render Smart Recommendation Banner phía trên grid
+  renderSmartRecommendationBanner(recommendation, selectedRoomId);
+
   // Lọc theo Sức chứa & Chỉ phòng trống
   let filtered = roomsStatus;
   if (currentOnlyAvailFilter) {
@@ -3546,6 +5485,11 @@ function renderRealtimeRoomCards(editId = null) {
 
   container.innerHTML = filtered.map(room => {
     const isSelected = room.id === selectedRoomId;
+    const isRecommended = recommendation && recommendation.room && recommendation.room.id === room.id;
+    const isRestricted = typeof isRestrictedRoom === "function" ? isRestrictedRoom(room) : false;
+    const canBookVIP = typeof can === "function" ? can("book_restricted_room") : true;
+    const isLockedVIP = isRestricted && !canBookVIP;
+
     let cardStatusClass = "status-available";
     let statusBadgeHtml = `
       <div class="room-card-status-bar">
@@ -3554,7 +5498,15 @@ function renderRealtimeRoomCards(editId = null) {
       </div>
     `;
 
-    if (room.isMaintenance) {
+    if (isLockedVIP) {
+      cardStatusClass = "status-busy rbac-room-locked";
+      statusBadgeHtml = `
+        <div class="room-card-status-bar" title="Phòng VIP giới hạn quyền đặt cho Quản trị viên & Tổ chức">
+          <span><i class="bi bi-shield-lock-fill me-1 text-danger"></i> Phòng VIP giới hạn</span>
+          <span class="text-danger fw-semibold">Đã khóa</span>
+        </div>
+      `;
+    } else if (room.isMaintenance) {
       cardStatusClass = "status-maintenance";
       statusBadgeHtml = `
         <div class="room-card-status-bar">
@@ -3574,10 +5526,21 @@ function renderRealtimeRoomCards(editId = null) {
     }
 
     const eqChips = (room.equipments || []).slice(0, 3).map(eq => `<span class="room-eq-pill">${escapeHTML(eq)}</span>`).join("");
+    const recommendBadgeHtml = isRecommended ? `
+      <div class="room-recommend-badge" title="${escapeHTML(recommendation.message)}">
+        <i class="bi bi-stars"></i> ${escapeHTML(recommendation.badgeText)}
+      </div>
+    ` : "";
+
+    const vipBadgeHtml = isRestricted ? `
+      <span class="rbac-restricted-badge ${isLockedVIP ? 'is-locked' : 'is-vip'}" title="${isLockedVIP ? 'Phòng VIP giới hạn - Tài khoản của bạn không có quyền đặt' : 'Phòng VIP / Giới hạn quyền đặt'}">
+        <i class="bi bi-shield-lock-fill"></i> ${isLockedVIP ? 'VIP • Đã khóa' : 'Phòng VIP'}
+      </span>
+    ` : "";
 
     return `
       <div
-        class="realtime-room-card ${cardStatusClass} ${isSelected ? 'is-selected' : ''}"
+        class="realtime-room-card ${cardStatusClass} ${isSelected ? 'is-selected' : ''} ${isRecommended ? 'is-recommended' : ''}"
         data-room-id="${room.id}"
         role="radio"
         aria-checked="${isSelected}"
@@ -3585,9 +5548,13 @@ function renderRealtimeRoomCards(editId = null) {
         onclick="selectRealtimeRoom(${room.id})"
         onkeydown="if(event.key==='Enter'||event.key===' '){selectRealtimeRoom(${room.id});event.preventDefault();}"
       >
+        ${recommendBadgeHtml}
         <div class="room-card-top">
           <div>
-            <div class="room-card-name">${escapeHTML(room.name)}</div>
+            <div class="d-flex align-items-center gap-1.5 flex-wrap">
+              <div class="room-card-name">${escapeHTML(room.name)}</div>
+              ${vipBadgeHtml}
+            </div>
             <div class="d-flex align-items-center gap-1 mt-0.5">
               <span class="room-card-code">${escapeHTML(room.code || `RM-00${room.id}`)}</span>
               <span class="text-muted" style="font-size: 0.7rem;">• ${escapeHTML(room.type || 'Phòng họp')}</span>
@@ -3620,6 +5587,22 @@ function renderRealtimeRoomCards(editId = null) {
 function selectRealtimeRoom(roomId) {
   const room = ROOMS.find(r => r.id === roomId);
   if (!room) return;
+
+  // RBAC: Chặn chọn phòng VIP / Giới hạn nếu không đủ quyền
+  if (typeof isRestrictedRoom === "function" && isRestrictedRoom(room)) {
+    if (typeof can === "function" && !can("book_restricted_room")) {
+      const roomConflictAlert = document.getElementById("room-conflict-alert");
+      const roomConflictText = document.getElementById("room-conflict-text");
+      if (roomConflictAlert && roomConflictText) {
+        roomConflictText.innerHTML = `<i class="bi bi-shield-lock-fill text-danger me-1"></i> Phòng <strong>${escapeHTML(room.name)}</strong> là phòng VIP giới hạn dành riêng cho Ban Giám Đốc. Tài khoản của bạn không có quyền đặt phòng này.`;
+        roomConflictAlert.classList.remove("hidden");
+      }
+      if (typeof window.showToast === "function") {
+        window.showToast(`Phòng "${room.name}" là phòng VIP giới hạn. Bạn không có quyền đặt phòng này.`, "error");
+      }
+      return;
+    }
+  }
 
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
@@ -3667,12 +5650,12 @@ function selectRealtimeRoom(roomId) {
 
 function resetRoomFilters() {
   currentRoomCapFilter = "all";
-  currentOnlyAvailFilter = false;
+  currentOnlyAvailFilter = true;
   document.querySelectorAll("[data-cap-filter]").forEach(b => {
     b.classList.toggle("active", b.getAttribute("data-cap-filter") === "all");
   });
   const btnToggleOnlyAvail = document.getElementById("btn-toggle-only-avail");
-  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.remove("active");
+  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.add("active");
   const idInput = document.getElementById("meeting-id");
   const editId = idInput && idInput.value ? Number(idInput.value) : null;
   renderRealtimeRoomCards(editId);
@@ -3900,12 +5883,6 @@ function validateRoomForm(editId = null) {
       globalError.classList.remove("hidden");
       if (globalErrorText) globalErrorText.textContent = "Vui lòng kiểm tra lại các trường được đánh dấu đỏ trước khi lưu.";
     }
-    const formCard = document.querySelector(".room-modal-card");
-    if (formCard) {
-      formCard.classList.remove("stitch-shake");
-      void formCard.offsetWidth; // Trigger reflow để kích hoạt lại animation
-      formCard.classList.add("stitch-shake");
-    }
     if (firstErrorField) {
       firstErrorField.focus();
     }
@@ -4076,7 +6053,9 @@ function openEditRoomModal(roomId) {
   const successView = document.getElementById("room-success-view");
 
   if (modalTitle) modalTitle.textContent = "Chỉnh sửa phòng họp";
-  if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết phòng ${room.name}`;
+  const cleanName = (room.name || "").trim();
+  const displayName = /^phòng\s+/i.test(cleanName) ? cleanName : `phòng ${cleanName}`;
+  if (modalSubtitle) modalSubtitle.textContent = `Cập nhật thông tin chi tiết ${displayName}`;
   if (submitText) submitText.textContent = "Cập nhật phòng họp";
 
   if (form) form.classList.remove("hidden");
@@ -4696,11 +6675,11 @@ function confirmDeleteRoom(roomId) {
           <div>
             <h5 class="text-danger fw-bold mb-1">Ràng buộc nghiệp vụ: Không thể xóa phòng họp</h5>
             <p class="text-secondary small mb-2">
-              Phòng họp <strong>"${escapeHTML(room.name)}"</strong> hiện đang có <strong>${activeMeetings.length} cuộc họp</strong> đã xác nhận sắp diễn ra hoặc đang diễn ra. Theo quy chuẩn bảo đảm toàn vẹn dữ liệu hệ thống (Luồng 1.3), bạn không được phép xóa phòng này.
+              Phòng họp <strong>"${escapeHTML(room.name)}"</strong> hiện đang có <strong>${activeMeetings.length} cuộc họp</strong> đã xác nhận sắp diễn ra hoặc đang diễn ra. Để bảo đảm tính liên tục của lịch làm việc, bạn không thể xóa phòng này.
             </p>
             <div class="alert alert-warning py-2 px-3 small mb-0">
               <i class="bi bi-lightbulb-fill text-warning me-1"></i>
-              <strong>Khuyến nghị:</strong> Bạn có thể chuyển trạng thái phòng sang <strong>"Bảo trì" (Maintenance)</strong> để tạm dừng nhận lịch mới mà không làm gián đoạn các cuộc họp đã lên lịch.
+              <strong>Khuyến nghị:</strong> Bạn có thể chuyển trạng thái phòng sang <strong>"Bảo trì"</strong> để tạm dừng tiếp nhận lịch đặt mới.
             </div>
           </div>
         </div>
@@ -4831,25 +6810,90 @@ function syncMeetingRoomOptions() {
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
     const currentVal = roomSelect.value;
-    roomSelect.innerHTML = ROOMS.map(r => `
-      <option value="${r.id}" ${r.status !== 'Active' ? 'disabled' : ''}>
-        ${escapeHTML(r.name)} (${r.capacity} chỗ)${r.status !== 'Active' ? ' - [' + (r.status === 'Maintenance' ? 'Bảo trì' : 'Tạm ngừng') + ']' : ''}
-      </option>
-    `).join("");
+    const dateInput = document.getElementById("meeting-date");
+    const startInput = document.getElementById("meeting-start");
+    const endInput = document.getElementById("meeting-end");
+    const idInput = document.getElementById("meeting-id");
+    const editId = idInput && idInput.value ? Number(idInput.value) : null;
+    const date = dateInput ? dateInput.value : "";
+    const start = startInput ? startInput.value : "";
+    const end = endInput ? endInput.value : "";
 
-    if (currentVal && ROOMS.some(r => r.id === parseInt(currentVal, 10))) {
-      roomSelect.value = currentVal;
+    // 1. Chỉ lấy các phòng đang hoạt động (Active), loại bỏ hoàn toàn phòng bảo trì (Maintenance) và Inactive
+    let roomsToShow = ROOMS.filter(r => r.status === "Active");
+
+    // 2. Nếu đã chọn ngày và khung giờ hợp lệ, chỉ hiển thị các phòng còn trống (không trùng lịch)
+    if (date && start && end && start < end) {
+      roomsToShow = roomsToShow.filter(r => {
+        // Nếu là phòng đang được chọn trong cuộc họp đang sửa thì giữ lại
+        if (editId && currentVal && Number(currentVal) === r.id) return true;
+        const conflict = checkMeetingRoomConflict(r.id, date, start, end, editId);
+        return !conflict;
+      });
+    }
+
+    if (roomsToShow.length === 0) {
+      roomSelect.innerHTML = `<option value="">-- Không có phòng trống trong khung giờ này --</option>`;
+      const roomHint = document.getElementById("room-capacity-hint");
+      if (roomHint) roomHint.textContent = "Không còn phòng trống";
+    } else {
+      const canBookVIP = typeof can === "function" ? can("book_restricted_room") : true;
+
+      roomSelect.innerHTML = `
+        <option value="">-- Chọn phòng họp (${roomsToShow.length} phòng khả dụng) --</option>
+        ${roomsToShow.map(r => {
+          const isRestricted = typeof isRestrictedRoom === "function" && isRestrictedRoom(r);
+          const isLocked = isRestricted && !canBookVIP;
+          const prefix = isLocked ? "[VIP - Khóa] " : (isRestricted ? "[VIP] " : "");
+          const suffix = isLocked ? " - Chỉ dành cho Ban Giám Đốc" : "";
+          const disabledAttr = isLocked ? "disabled" : "";
+          return `
+            <option value="${r.id}" ${disabledAttr} ${isLocked ? 'data-rbac-locked="true"' : ''}>
+              ${prefix}${escapeHTML(r.name)} (${r.capacity} chỗ - ${escapeHTML(r.floor || 'Tầng 1')}${suffix})
+            </option>
+          `;
+        }).join("")}
+      `;
+
+      // Chọn phòng đầu tiên khả dụng và không bị khóa bởi RBAC
+      const availableRoomsForUser = roomsToShow.filter(r => {
+        if (typeof isRestrictedRoom === "function" && isRestrictedRoom(r)) {
+          return canBookVIP;
+        }
+        return true;
+      });
+
+      if (currentVal && roomsToShow.some(r => r.id === parseInt(currentVal, 10))) {
+        const curRoomObj = roomsToShow.find(r => r.id === parseInt(currentVal, 10));
+        const curLocked = curRoomObj && typeof isRestrictedRoom === "function" && isRestrictedRoom(curRoomObj) && !canBookVIP;
+        if (!curLocked) {
+          roomSelect.value = currentVal;
+        } else if (availableRoomsForUser.length > 0) {
+          roomSelect.value = String(availableRoomsForUser[0].id);
+        }
+      } else if (availableRoomsForUser.length > 0) {
+        roomSelect.value = String(availableRoomsForUser[0].id);
+        const roomHint = document.getElementById("room-capacity-hint");
+        if (roomHint) {
+          roomHint.textContent = `Sức chứa: ${availableRoomsForUser[0].capacity} chỗ • ${availableRoomsForUser[0].floor || 'Tầng 1'}`;
+        }
+      }
     }
   }
 
   const filterRoom = document.getElementById("filter-room");
   if (filterRoom) {
-    const currFilter = filterRoom.value;
+    const currentFilter = filterRoom.value;
+    const activeRooms = ROOMS.filter(r => r.status === "Active");
     filterRoom.innerHTML = `
-      <option value="all">Tất cả phòng</option>
-      ${ROOMS.map(r => `<option value="${r.id}">${escapeHTML(r.name)}</option>`).join("")}
+      <option value="">Tất cả phòng họp</option>
+      ${activeRooms.map(r => `
+        <option value="${r.id}">${escapeHTML(r.name)}</option>
+      `).join("")}
     `;
-    if (currFilter) filterRoom.value = currFilter;
+    if (currentFilter && activeRooms.some(r => String(r.id) === currentFilter)) {
+      filterRoom.value = currentFilter;
+    }
   }
 }
 
@@ -5039,9 +7083,25 @@ function renderMeetingTable() {
 
   if (!list || !table || !empty) return;
 
+  const authUser = getActiveAuthUser();
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id) : null;
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+
   const keyword = (searchInput ? searchInput.value : "").trim().toLowerCase();
 
   const filteredMeetings = meetings.filter(meeting => {
+    // RBAC: Nếu là nhân viên, CHỈ hiển thị nếu mình là người tổ chức HOẶC được mời tham gia
+    if (!isUserAdmin && currentUserId) {
+      const isOrg = Number(meeting.organizerId) === currentUserId;
+      const pIds = Array.isArray(meeting.participantIds) ? meeting.participantIds.map(Number) : [];
+      const isInvited = pIds.includes(currentUserId);
+      if (!isOrg && !isInvited) return false;
+    }
+
     const title = (meeting.title || "").toLowerCase();
     const roomName = (meeting.roomName || meeting.location || "").toLowerCase();
     const host = (meeting.host || "").toLowerCase();
@@ -5207,24 +7267,40 @@ function renderMeetingTable() {
       </td>
 
       <td class="td-actions text-end">
-        <div class="stitch-actions-wrapper">
-          <button type="button" class="btn-stitch-icon" data-action="detail" data-id="${meeting.id}" title="Xem chi tiết">
-            <i class="bi bi-eye"></i>
+        <div class="d-inline-flex align-items-center gap-1">
+          <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2 fw-medium" data-action="detail" data-id="${meeting.id}" title="Xem chi tiết cuộc họp">
+            <i class="bi bi-eye me-1"></i>Chi tiết
           </button>
 
-          <button type="button" class="btn-stitch-icon" data-action="edit" data-id="${meeting.id}" title="Chỉnh sửa">
-            <i class="bi bi-pencil"></i>
-          </button>
+          ${(typeof canEditMeeting === "function" ? canEditMeeting(meeting) : true) ? `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-secondary" data-action="edit" data-id="${meeting.id}" title="Chỉnh sửa cuộc họp">
+              <i class="bi bi-pencil"></i>
+            </button>
+          ` : `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-muted" disabled style="opacity: 0.45; cursor: not-allowed;" title="Chỉ người tổ chức hoặc Quản trị viên mới được sửa cuộc họp này">
+              <i class="bi bi-lock-fill"></i>
+            </button>
+          `}
 
-          <button type="button" class="btn-stitch-icon btn-stitch-delete" data-action="delete" data-id="${meeting.id}" title="Xóa cuộc họp">
-            <i class="bi bi-trash3"></i>
-          </button>
+          ${(typeof canCancelMeeting === "function" ? canCancelMeeting(meeting) : true) ? `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-danger" data-action="delete" data-id="${meeting.id}" title="Hủy cuộc họp này">
+              <i class="bi bi-trash3"></i>
+            </button>
+          ` : `
+            <button type="button" class="btn btn-light btn-sm py-1 px-2 text-muted" disabled style="opacity: 0.45; cursor: not-allowed;" title="Chỉ người tổ chức hoặc Quản trị viên mới được hủy cuộc họp này">
+              <i class="bi bi-trash3 text-muted"></i>
+            </button>
+          `}
         </div>
       </td>
     `;
 
     list.appendChild(row);
   });
+
+  if (typeof applyRoleUI === "function") {
+    applyRoleUI();
+  }
 }
 
 
@@ -5279,10 +7355,24 @@ function handleMeetingAction(event) {
 // 10. THÊM CUỘC HỌP (STITCH FORM SPEC)
 // =====================================================
 
-function openAddModal() {
+function openAddModal(initialEquipmentIds = []) {
   if (typeof MeetingAPI !== "undefined") {
     MeetingAPI.checkHealth();
   }
+
+  // RBAC: Chặn nếu người dùng không có quyền tạo cuộc họp
+  if (typeof can === 'function' && !can('book_meeting')) {
+    if (typeof window.showToast === 'function') {
+      window.showToast('Tài khoản của bạn không có quyền đặt cuộc họp mới.', 'error');
+    } else {
+      alert('Tài khoản của bạn không có quyền đặt cuộc họp mới.');
+    }
+    return;
+  }
+
+  const preselectedEqIds = Array.isArray(initialEquipmentIds)
+    ? initialEquipmentIds.map(Number).filter(id => !isNaN(id) && id > 0)
+    : (initialEquipmentIds ? [Number(initialEquipmentIds)].filter(id => !isNaN(id) && id > 0) : []);
 
   const form = document.getElementById("meeting-form");
   const title = document.getElementById("modal-title");
@@ -5321,7 +7411,7 @@ function openAddModal() {
 
   const roomSelect = document.getElementById("meeting-room");
   if (roomSelect) {
-    const firstActiveRoom = ROOMS.find(r => r.status === "Active") || ROOMS[0];
+    const firstActiveRoom = ROOMS.find(r => r.status === "Active" && (typeof can !== "function" || can("book_restricted_room") || !isRestrictedRoom(r))) || ROOMS[0];
     roomSelect.value = firstActiveRoom ? String(firstActiveRoom.id) : "1";
     const roomHint = document.getElementById("room-capacity-hint");
     if (roomHint && firstActiveRoom) {
@@ -5329,9 +7419,35 @@ function openAddModal() {
     }
   }
 
+  const authUser = getActiveAuthUser();
+  const currentUserId = authUser ? Number(authUser.userId || authUser.id || 1) : 1;
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+
+  // Đồng bộ options người tổ chức theo danh sách nhân viên thực tế
+  syncMeetingOrganizerOptions(currentUserId);
+
   const organizerSelect = document.getElementById("meeting-organizer");
-  if (organizerSelect) organizerSelect.value = "1";
-  const defaultOrgId = Number(organizerSelect ? organizerSelect.value : 1);
+  if (organizerSelect) {
+    organizerSelect.value = String(currentUserId);
+    const groupOrg = document.getElementById("group-organizer");
+    if (groupOrg) {
+      groupOrg.style.display = isUserAdmin ? "" : "none";
+    }
+  }
+
+  const orgIdInput = document.getElementById("meeting-organizer-id");
+  if (orgIdInput) orgIdInput.value = String(currentUserId);
+
+  const defaultOrgId = isUserAdmin
+    ? (Number(organizerSelect && organizerSelect.value ? organizerSelect.value : currentUserId) || currentUserId)
+    : currentUserId;
+
+  selectedParticipantIds.clear();
+  selectedParticipantIds.add(defaultOrgId);
   initParticipantSelector([defaultOrgId], defaultOrgId);
 
   const tagInput = document.getElementById("meeting-tag");
@@ -5353,19 +7469,21 @@ function openAddModal() {
     const typeSelect = document.getElementById("recurring-type");
     if (typeSelect) typeSelect.value = "weekly";
   }
-  document.querySelectorAll(".eq-checkbox").forEach(cb => { cb.checked = false; });
+  document.querySelectorAll(".eq-checkbox").forEach(cb => {
+    cb.checked = preselectedEqIds.includes(Number(cb.value));
+  });
 
   const descCount = document.getElementById("desc-char-count");
   if (descCount) descCount.textContent = "0/2000 ký tự";
 
-  // Reset các bộ lọc phòng & view mode về mặc định
+  // Reset các bộ lọc phòng & view mode về mặc định (chỉ phòng còn trống)
   currentRoomCapFilter = "all";
-  currentOnlyAvailFilter = false;
+  currentOnlyAvailFilter = true;
   document.querySelectorAll("[data-cap-filter]").forEach(b => {
     b.classList.toggle("active", b.getAttribute("data-cap-filter") === "all");
   });
   const btnToggleOnlyAvail = document.getElementById("btn-toggle-only-avail");
-  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.remove("active");
+  if (btnToggleOnlyAvail) btnToggleOnlyAvail.classList.add("active");
 
   // Reset trạng thái nút chọn nhanh ngày (active: today)
   document.querySelectorAll("[data-date-preset]").forEach(b => {
@@ -5390,8 +7508,13 @@ function openAddModal() {
 
   calcDuration();
   renderRealtimeRoomCards(null);
+  renderEquipmentCheckboxGrid(preselectedEqIds);
+  updateEquipmentCardsAvailability(null);
 
   modalOverlay.classList.remove("hidden");
+  if (typeof applyMeetingModalRBAC === "function") {
+    applyMeetingModalRBAC();
+  }
   if (titleInput) {
     setTimeout(() => titleInput.focus(), 100);
   }
@@ -5411,6 +7534,16 @@ function openEditModal(id) {
 
   if (!meeting) {
     alert("Không tìm thấy cuộc họp.");
+    return;
+  }
+
+  // RBAC: Kiểm tra quyền chỉnh sửa cuộc họp (Admin hoặc chính Organizer)
+  if (typeof canEditMeeting === "function" && !canEditMeeting(meeting)) {
+    if (typeof window.showToast === "function") {
+      window.showToast("Bạn không có quyền chỉnh sửa cuộc họp này.", "error");
+    } else {
+      alert("Bạn không có quyền chỉnh sửa cuộc họp này.");
+    }
     return;
   }
 
@@ -5461,7 +7594,22 @@ function openEditModal(id) {
       roomHint.textContent = `Sức chứa: ${roomObj.capacity} chỗ • ${roomObj.floor}`;
     }
   }
-  if (organizerSelect) organizerSelect.value = meeting.organizerId ? String(meeting.organizerId) : "1";
+  const authUser = getActiveAuthUser();
+  const isUserAdmin = Boolean(
+    (window.AuthState && typeof window.AuthState.isAdmin === 'function')
+      ? window.AuthState.isAdmin()
+      : (authUser && authUser.role && String(authUser.role).toLowerCase() === 'admin')
+  );
+  syncMeetingOrganizerOptions(meeting.organizerId || 1);
+  if (organizerSelect) {
+    organizerSelect.value = meeting.organizerId ? String(meeting.organizerId) : "1";
+    const groupOrg = document.getElementById("group-organizer");
+    if (groupOrg) {
+      groupOrg.style.display = isUserAdmin ? "" : "none";
+    }
+  }
+  const orgIdInput = document.getElementById("meeting-organizer-id");
+  if (orgIdInput) orgIdInput.value = meeting.organizerId ? String(meeting.organizerId) : "1";
 
   // Nhãn cuộc họp (Tag)
   const tagInput = document.getElementById("meeting-tag");
@@ -5523,14 +7671,16 @@ function openEditModal(id) {
   }
 
   const eqIds = meeting.equipmentIds || [];
-  document.querySelectorAll(".eq-checkbox").forEach(cb => {
-    cb.checked = eqIds.includes(Number(cb.value));
-  });
+  renderEquipmentCheckboxGrid(eqIds);
+  updateEquipmentCardsAvailability(meeting.id);
 
   calcDuration();
   renderRealtimeRoomCards(meeting.id);
 
   modalOverlay.classList.remove("hidden");
+  if (typeof applyMeetingModalRBAC === "function") {
+    applyMeetingModalRBAC();
+  }
   if (titleInput) {
     setTimeout(() => titleInput.focus(), 100);
   }
@@ -5651,27 +7801,19 @@ async function saveMeeting(event) {
           const globalErrorTitle = document.getElementById("global-error-title");
           const globalErrorDesc = document.getElementById("global-error-desc");
           if (globalError && globalErrorTitle && globalErrorDesc) {
-            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch họp định kỳ (409 Conflict)" : "Máy chủ từ chối yêu cầu";
-            globalErrorDesc.innerText = apiResult.message || "Không thể tạo chuỗi lịch họp định kỳ do xung đột phòng.";
+            globalErrorTitle.innerText = apiResult.isConflict ? "Phát hiện trùng lịch phòng họp" : "Không thể tạo chuỗi lịch họp";
+            globalErrorDesc.innerText = apiResult.message || "Không thể tạo chuỗi lịch họp định kỳ do xung đột thời gian.";
             globalError.classList.remove("hidden");
           }
 
-          const modalCard = document.querySelector(".meeting-modal-card");
-          if (modalCard) {
-            modalCard.classList.remove("stitch-shake");
-            void modalCard.offsetWidth;
-            modalCard.classList.add("stitch-shake");
-          }
+          // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
           return;
         }
 
         // Tạo thành công chuỗi recurring!
         isFallback = apiResult.isFallback;
         const createdMeetings = apiResult.data?.meetings || [];
-        const patternId = apiResult.data?.pattern?.patternId || getNextId();
-        syncMsg = !isFallback
-          ? `Đã tạo chuỗi ${createdMeetings.length} buổi họp định kỳ vào CSDL MySQL (Mã chuỗi: #${patternId})`
-          : `Đã lưu chuỗi ${createdMeetings.length} buổi họp định kỳ vào bộ nhớ cục bộ (Local Fallback)`;
+        syncMsg = `Đã tạo thành công chuỗi ${createdMeetings.length} cuộc họp định kỳ.`;
 
         const statusSelect = document.getElementById("meeting-status");
         const status = statusSelect ? statusSelect.value : "scheduled";
@@ -5741,23 +7883,18 @@ async function saveMeeting(event) {
           const globalErrorTitle = document.getElementById("global-error-title");
           const globalErrorDesc = document.getElementById("global-error-desc");
           if (globalError && globalErrorTitle && globalErrorDesc) {
-            globalErrorTitle.innerText = apiResult.isConflict ? "Xung đột lịch đặt phòng (409 Conflict)" : "Máy chủ từ chối yêu cầu";
+            globalErrorTitle.innerText = apiResult.isConflict ? "Phát hiện trùng lịch phòng họp" : "Không thể đặt lịch họp";
             globalErrorDesc.innerText = apiResult.message;
             globalError.classList.remove("hidden");
           }
 
-          const modalCard = document.querySelector(".meeting-modal-card");
-          if (modalCard) {
-            modalCard.classList.remove("stitch-shake");
-            void modalCard.offsetWidth;
-            modalCard.classList.add("stitch-shake");
-          }
+          // Bỏ hiệu ứng rung lắc theo yêu cầu người dùng
 
           if (apiResult.isConflict) {
             const roomConflictAlert = document.getElementById("room-conflict-alert");
             const roomConflictText = document.getElementById("room-conflict-text");
             if (roomConflictAlert && roomConflictText) {
-              roomConflictText.innerHTML = `<strong>Máy chủ thông báo:</strong> ${escapeHTML(apiResult.message)}`;
+              roomConflictText.innerHTML = `<strong>Thông báo:</strong> ${escapeHTML(apiResult.message)}`;
               roomConflictAlert.classList.remove("hidden");
             }
             const roomSelect = document.getElementById("meeting-room");
@@ -5769,10 +7906,10 @@ async function saveMeeting(event) {
         isFallback = apiResult.isFallback;
         if (!isFallback && apiResult.data?.meetingId) {
           finalMeetingId = apiResult.data.meetingId;
-          syncMsg = `Đã đồng bộ trực tiếp vào CSDL MySQL (Mã cuộc họp: #${finalMeetingId})`;
+          syncMsg = `Thông tin cuộc họp đã được lưu thành công.`;
         } else {
           finalMeetingId = getNextId();
-          syncMsg = "Đã lưu vào bộ nhớ cục bộ (Local Store Fallback - Tự động đồng bộ CSDL)";
+          syncMsg = "Thông tin cuộc họp đã được lưu vào hệ thống.";
         }
 
         const statusSelect = document.getElementById("meeting-status");
@@ -5919,41 +8056,91 @@ function getNextId() {
 
 
 // =====================================================
-// 14. XÓA
+// =====================================================
+// 14. HỘP THOẠI XÁC NHẬN CHUYÊN NGHIỆP & HỦY/XÓA CUỘC HỌP (PHẦN V & VII SPEC)
 // =====================================================
 
+function showConfirmDialog({ title, desc, cancelText = 'Giữ cuộc họp', confirmText = 'Xác nhận hủy', isDanger = true, onConfirm }) {
+  const overlay = document.getElementById('confirm-modal-overlay');
+  if (!overlay) return;
+
+  const titleEl = document.getElementById('confirm-modal-title');
+  const descEl = document.getElementById('confirm-modal-desc');
+  const btnCancel = document.getElementById('btn-confirm-cancel');
+  const btnSubmit = document.getElementById('btn-confirm-submit');
+  const iconEl = document.getElementById('confirm-modal-icon');
+
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = desc;
+  if (btnCancel) btnCancel.textContent = cancelText;
+  if (btnSubmit) {
+    btnSubmit.textContent = confirmText;
+    btnSubmit.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
+  }
+  if (iconEl) {
+    iconEl.className = isDanger ? 'confirm-dialog-icon danger' : 'confirm-dialog-icon warning';
+  }
+
+  const closeDialog = () => {
+    overlay.classList.add('hidden');
+    btnCancel?.removeEventListener('click', onCancelClick);
+    btnSubmit?.removeEventListener('click', onSubmitClick);
+    document.removeEventListener('keydown', onEsc);
+  };
+
+  const onCancelClick = () => closeDialog();
+  const onSubmitClick = () => {
+    closeDialog();
+    if (typeof onConfirm === 'function') onConfirm();
+  };
+  const onEsc = (e) => {
+    if (e.key === 'Escape') closeDialog();
+  };
+
+  btnCancel?.addEventListener('click', onCancelClick);
+  btnSubmit?.addEventListener('click', onSubmitClick);
+  document.addEventListener('keydown', onEsc);
+
+  overlay.classList.remove('hidden');
+}
+
+function confirmCancelMeeting(id) {
+  const meeting = meetings.find(item => item.id === id);
+  if (!meeting) return;
+
+  // RBAC: Kiểm tra quyền hủy / xóa cuộc họp (Admin hoặc chính Organizer)
+  if (typeof canCancelMeeting === "function" && !canCancelMeeting(meeting)) {
+    if (typeof window.showToast === "function") {
+      window.showToast("Bạn không có quyền hủy hoặc xóa cuộc họp này.", "error");
+    } else {
+      alert("Bạn không có quyền hủy hoặc xóa cuộc họp này.");
+    }
+    return;
+  }
+
+  showConfirmDialog({
+    title: 'Hủy cuộc họp này?',
+    desc: `Bạn có chắc chắn muốn hủy cuộc họp "${meeting.title}" không? Hành động này có thể ảnh hưởng đến những người tham gia.`,
+    cancelText: 'Giữ cuộc họp',
+    confirmText: 'Xác nhận hủy',
+    isDanger: true,
+    onConfirm: () => {
+      meetings = meetings.filter(item => item.id !== id);
+      persistMeetingsToStorage();
+      renderMeetingTable();
+      updateDashboardStats();
+      if (typeof closeDetailModal === 'function') {
+        closeDetailModal();
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast(`Đã hủy cuộc họp "${meeting.title}" thành công.`, 'success');
+      }
+    }
+  });
+}
+
 function deleteMeeting(id) {
-
-  const meeting =
-    meetings.find(
-      item => item.id === id
-    );
-
-
-  if (!meeting) {
-    return;
-  }
-
-
-  const confirmed =
-    window.confirm(
-      `Bạn có chắc muốn xóa cuộc họp "${meeting.title}" không?`
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  meetings =
-    meetings.filter(
-      item => item.id !== id
-    );
-
-  persistMeetingsToStorage();
-  renderMeetingTable();
-  updateDashboardStats();
+  confirmCancelMeeting(id);
 }
 
 
@@ -5961,21 +8148,101 @@ function deleteMeeting(id) {
 // 15. XEM CHI TIẾT
 // =====================================================
 
+// =====================================================
+// 15. XEM CHI TIẾT CUỘC HỌP (ENTERPRISE STITCH SPEC)
+// =====================================================
+
+function formatDetailedDate(dateStr) {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr + "T00:00:00");
+    if (!isNaN(d.getTime())) {
+      const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+      const dayName = days[d.getDay()];
+      const parts = dateStr.split("-");
+      if (parts.length === 3) {
+        return `${dayName}, ${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
+  } catch (e) {}
+  return formatDate(dateStr);
+}
+
+function renderDetailEquipments(meeting) {
+  const eqNames = (meeting.equipmentNames && meeting.equipmentNames.length)
+    ? meeting.equipmentNames
+    : ((meeting.equipmentIds && meeting.equipmentIds.length)
+        ? meeting.equipmentIds.map(eid => {
+            const found = Array.isArray(EQUIPMENTS) ? EQUIPMENTS.find(e => Number(e.id) === Number(eid)) : null;
+            return found ? (found.name || `Thiết bị #${eid}`) : `Thiết bị #${eid}`;
+          })
+        : []);
+
+  if (!eqNames || eqNames.length === 0) {
+    return `<div class="detail-empty-equipment"><i class="bi bi-info-circle me-1.5 text-slate-400"></i>Không yêu cầu thiết bị bổ sung cho cuộc họp này.</div>`;
+  }
+
+  return eqNames.map(name => {
+    const eqObj = (Array.isArray(EQUIPMENTS) ? EQUIPMENTS.find(e => e.name === name) : null) || { name, type: "" };
+    const iconClass = typeof getEquipmentIconClass === "function" ? getEquipmentIconClass(eqObj) : "bi-laptop";
+    return `
+      <div class="detail-equipment-chip">
+        <i class="bi ${iconClass} text-primary"></i>
+        <span>${escapeHTML(name)}</span>
+      </div>
+    `;
+  }).join("");
+}
+
 function openDetailModal(id) {
-
-  const meeting =
-    meetings.find(
-      item => item.id === id
-    );
-
+  const meetingId = Number(id);
+  let meeting = Array.isArray(meetings) ? meetings.find(item => Number(item.id) === meetingId) : null;
+  if (!meeting && window.meetings && Array.isArray(window.meetings)) {
+    meeting = window.meetings.find(item => Number(item.id) === meetingId);
+  }
 
   if (!meeting) {
+    if (typeof MeetingAPI !== "undefined" && typeof fetch === "function") {
+      fetch(`${MEETING_API_URL}/${meetingId}`)
+        .then(r => r.json())
+        .then(json => {
+          if (json && json.data) {
+            const m = json.data;
+            const startD = new Date(m.startTime);
+            const endD = new Date(m.endTime);
+            const dateStr = !isNaN(startD.getTime()) ? startD.toISOString().slice(0, 10) : "";
+            const startHHMM = !isNaN(startD.getTime()) ? startD.toTimeString().slice(0, 5) : "";
+            const endHHMM = !isNaN(endD.getTime()) ? endD.toTimeString().slice(0, 5) : "";
+            const parsed = {
+              id: m.meetingId || m.id,
+              title: m.title || "Cuộc họp",
+              tag: m.isRecurring ? "Định kỳ" : "Thường kỳ",
+              date: dateStr,
+              startTime: startHHMM,
+              endTime: endHHMM,
+              time: `${startHHMM} - ${endHHMM}`,
+              roomId: m.roomId,
+              roomName: m.roomName || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.name) || "Phòng họp",
+              capacity: m.roomCapacity || (m.roomId && ROOMS.find(r => r.id === m.roomId)?.capacity) || 20,
+              organizerId: m.organizerId,
+              host: m.organizerName || "Admin",
+              participants: [m.organizerName || "Admin"],
+              participantIds: [m.organizerId],
+              status: m.bookingStatus ? m.bookingStatus.toLowerCase() : "scheduled",
+              notes: m.description || "",
+              isRecurring: !!m.isRecurring
+            };
+            meetings.push(parsed);
+            openDetailModal(meetingId);
+          }
+        })
+        .catch(() => {});
+    }
     return;
   }
 
-
-  const roomName = meeting.roomName || (meeting.roomId ? (ROOMS.find(r => r.id === meeting.roomId)?.name) : (meeting.location || "Phòng Tokyo (Tầng 4)"));
-  const roomCapacity = meeting.capacity || (meeting.roomId ? (ROOMS.find(r => r.id === meeting.roomId)?.capacity) : 20);
+  const roomName = meeting.roomName || (meeting.roomId ? (ROOMS.find(r => Number(r.id) === Number(meeting.roomId))?.name) : (meeting.location || "Phòng Tokyo (Tầng 4)"));
+  const roomCapacity = meeting.capacity || (meeting.roomId ? (ROOMS.find(r => Number(r.id) === Number(meeting.roomId))?.capacity) : 20);
   const roomId = meeting.roomId || 1;
   const organizerId = meeting.organizerId || 1;
   const organizerName = meeting.host || "Nguyễn Văn An";
@@ -5986,172 +8253,240 @@ function openDetailModal(id) {
     if (meeting.tag === "Quan trọng") tagClass = "tag-danger";
     else if (meeting.tag === "Sprint 24" || meeting.tag === "Dự án mới") tagClass = "tag-primary";
     else if (meeting.tag === "Thiết kế" || meeting.tag === "Tuyển dụng") tagClass = "tag-sky";
-    tagHtml = `<span class="stitch-tag-chip ${tagClass} ms-2">${escapeHTML(meeting.tag)}</span>`;
+    tagHtml = `<span class="stitch-tag-chip ${tagClass}">${escapeHTML(meeting.tag)}</span>`;
   }
 
   const content = document.getElementById("detail-content");
   if (!content) return;
 
   content.innerHTML = `
-    <div class="mb-3 pb-2 border-bottom">
-      <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small fw-medium">MÃ CUỘC HỌP (MeetingID)</span>
-        <span class="badge bg-light text-dark border">#${meeting.id}</span>
+    <!-- 1. Hero Title & Metadata Banner -->
+    <div class="detail-hero-banner">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="detail-id-pill">#${meeting.id}</span>
+          <span class="detail-type-badge">
+            <i class="bi ${meeting.isRecurring ? 'bi-repeat text-primary' : 'bi-calendar-check text-muted'} me-1"></i>
+            ${meeting.isRecurring ? 'Lịch họp định kỳ' : 'Cuộc họp thường'}
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          ${tagHtml}
+          <span class="${getStatusClass(meeting.status)}">
+            <span class="status-indicator-dot"></span>
+            <span>${getStatusText(meeting.status)}</span>
+          </span>
+        </div>
       </div>
-      <h5 class="fw-bold text-dark m-0 d-flex align-items-center flex-wrap">
-        ${escapeHTML(meeting.title)}
-        ${tagHtml}
-      </h5>
+      <h4 class="detail-meeting-title">${escapeHTML(meeting.title)}</h4>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <div class="p-2 rounded border bg-light">
-          <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-door-open text-primary me-1"></i> PHÒNG HỌP (Rooms)
-          </span>
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
-            <div class="fw-semibold text-primary cursor-pointer" onclick="closeDetailModal(); openRoomQRModal(${roomId});" title="Nhấp để xem chi tiết phòng &amp; mã QR" style="cursor: pointer;">
-              ${escapeHTML(roomName)} <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.75rem;"></i>
-            </div>
-            ${renderCapacityBadge(roomCapacity, { isPill: true })}
+    <!-- 2. Core 2-Column Metrics Grid: Thời gian & Phòng họp -->
+    <div class="detail-metrics-grid">
+      <!-- Card Thời gian -->
+      <div class="detail-metric-card">
+        <div class="metric-icon-box bg-blue-50">
+          <i class="bi bi-calendar3"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-label">THỜI GIAN HỌP</div>
+          <div class="metric-value-primary">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
+          <div class="metric-subtext">
+            <span class="fw-semibold text-slate-800">${formatDetailedDate(meeting.date)}</span>
+            <span class="metric-duration-pill">${calcDurationString(meeting.startTime, meeting.endTime)}</span>
           </div>
-          <div class="small text-muted mt-1">Định danh: <code>RM-00${roomId}</code></div>
+          ${meeting.isRecurring ? `
+            <div class="metric-recurring-badge mt-2">
+              <i class="bi bi-arrow-repeat me-1"></i>${meeting.occurrenceIndex ? `Phiên họp #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp định kỳ'}
+            </div>
+          ` : ''}
         </div>
       </div>
 
-      <div class="col-12 col-md-6">
-        <div class="p-2 rounded border bg-light">
-          <span class="text-muted small d-block mb-0.5">
-            <i class="bi bi-clock-history text-primary me-1"></i> THỜI GIAN (Meetings)
-          </span>
-          <div class="fw-semibold text-dark">${escapeHTML(meeting.time || (meeting.startTime + ' - ' + meeting.endTime))}</div>
-          <div class="small text-muted">Ngày: ${formatDate(meeting.date)} (${calcDurationString(meeting.startTime, meeting.endTime)})</div>
+      <!-- Card Phòng họp -->
+      <div class="detail-metric-card">
+        <div class="metric-icon-box bg-indigo-50">
+          <i class="bi bi-door-open-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-label">PHÒNG HỌP &amp; ĐỊA ĐIỂM</div>
+          <div class="metric-value-primary text-truncate" title="${escapeHTML(roomName)}">${escapeHTML(roomName)}</div>
+          <div class="metric-subtext">
+            <span class="detail-cap-badge"><i class="bi bi-people-fill me-1"></i>${roomCapacity} chỗ</span>
+            <span class="detail-room-code">Định danh: <code>RM-00${roomId}</code></span>
+          </div>
+          <div class="mt-2">
+            <button type="button" class="btn-detail-room-link" onclick="closeDetailModal(); openRoomQRModal(${roomId});">
+              <i class="bi bi-qr-code me-1"></i>Chi tiết phòng &amp; QR <i class="bi bi-box-arrow-up-right ms-0.5"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-person-badge text-primary me-1"></i> NGƯỜI TỔ CHỨC (Users / OrganizerID)
-        </span>
-        <div class="fw-medium text-dark">${escapeHTML(organizerName)} <span class="text-muted small">(ID: ${organizerId})</span></div>
+    <!-- 3. Người chủ trì -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-person-badge text-primary me-1.5"></i>
+        <span>NGƯỜI CHỦ TRÌ</span>
       </div>
-
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-shield-check text-success me-1"></i> TRẠNG THÁI ĐẶT PHÒNG (Bookings)
-        </span>
-        <span class="${getStatusClass(meeting.status)}">
-          ${getStatusText(meeting.status)}
-        </span>
+      <div class="detail-host-row">
+        <div class="detail-avatar-circle" style="background: ${getHostColor(organizerName)};">
+          ${getInitials(organizerName)}
+        </div>
+        <div class="detail-host-info">
+          <div class="detail-host-name">${escapeHTML(organizerName)}</div>
+          <div class="detail-host-role">Chủ trì phiên họp • Mã tài khoản ID: ${organizerId}</div>
+        </div>
       </div>
     </div>
 
-    <div class="mb-3">
-      <div class="d-flex align-items-center justify-content-between mb-1">
-        <span class="text-muted small">
-          <i class="bi bi-people text-primary me-1"></i> NGƯỜI THAM GIA & PHẢN HỒI (Meeting_Participants)
-        </span>
-        <span id="detail-participant-summary-badges" class="small"></span>
+    <!-- 4. Thành viên tham gia -->
+    <div class="detail-section-card">
+      <div class="detail-section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <i class="bi bi-people text-primary me-1.5"></i>
+          <span>THÀNH VIÊN THAM GIA</span>
+        </div>
+        <div id="detail-participant-summary-badges" class="detail-summary-pills"></div>
       </div>
-      <div id="detail-participants-list" class="text-dark small d-flex flex-wrap gap-1">
+      <div id="detail-participants-list" class="detail-participants-grid mt-2">
         ${renderDetailParticipantsHtml(meeting)}
       </div>
     </div>
 
-    <div class="row g-2 mb-3">
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-arrow-repeat text-primary me-1"></i> CUỘC HỌP ĐỊNH KỲ (Meetings.IsRecurring)
-        </span>
-        <div>
-          ${meeting.isRecurring 
-            ? `<span class="badge bg-primary-subtle text-primary border border-primary"><i class="bi bi-arrow-repeat me-1"></i>Có (${meeting.occurrenceIndex ? `Buổi #${meeting.occurrenceIndex}/${meeting.totalOccurrences || '?'}` : 'Lặp lại định kỳ'})</span>` 
-            : '<span class="badge bg-light text-muted border">Không (Cuộc họp một lần)</span>'}
-        </div>
+    <!-- 5. Thiết bị phòng họp yêu cầu -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-laptop text-primary me-1.5"></i>
+        <span>THIẾT BỊ PHÒNG HỌP YÊU CẦU</span>
       </div>
-
-      <div class="col-12 col-md-6">
-        <span class="text-muted small d-block mb-0.5">
-          <i class="bi bi-laptop text-primary me-1"></i> THIẾT BỊ PHÒNG HỌP (Booking_Equipments)
-        </span>
-        <div class="text-dark small">
-          ${(meeting.equipmentNames && meeting.equipmentNames.length) 
-            ? meeting.equipmentNames.map(eq => `<span class="badge bg-light text-dark border me-1">${escapeHTML(eq)}</span>`).join("")
-            : (meeting.equipmentIds && meeting.equipmentIds.length)
-              ? meeting.equipmentIds.map(eid => `<span class="badge bg-light text-dark border me-1">${escapeHTML(EQUIPMENTS.find(e => e.id === eid)?.name || `Thiết bị #${eid}`)}</span>`).join("")
-              : '<span class="text-muted">Không yêu cầu thiết bị bổ sung</span>'}
-        </div>
+      <div class="detail-equipments-wrap mt-2">
+        ${renderDetailEquipments(meeting)}
       </div>
     </div>
 
-    <div>
-      <span class="text-muted small d-block mb-0.5">
-        <i class="bi bi-card-text text-primary me-1"></i> MÔ TẢ (Meetings.Description)
-      </span>
-      <div class="p-2 rounded bg-light border small text-dark">${escapeHTML(meeting.notes || "Không có ghi chú")}</div>
+    <!-- 6. Nội dung cuộc họp -->
+    <div class="detail-section-card">
+      <div class="detail-section-header">
+        <i class="bi bi-card-text text-primary me-1.5"></i>
+        <span>NỘI DUNG CUỘC HỌP</span>
+      </div>
+      <div class="detail-notes-card mt-2">
+        <i class="bi bi-quote detail-quote-icon"></i>
+        <div class="detail-notes-text">${escapeHTML(meeting.notes || "Không có ghi chú bổ sung cho cuộc họp này.")}</div>
+      </div>
     </div>
   `;
 
-  detailOverlay.classList.remove("hidden");
+  // Kiểm tra quyền người dùng để hiển thị nút Chỉnh sửa / Hủy (Phần VII. 28)
+  const currentUser = (window.AuthState && typeof window.AuthState.getCurrentUser === 'function') ? window.AuthState.getCurrentUser() : null;
+  const isAdmin = window.AuthState && typeof window.AuthState.isAdmin === 'function' ? window.AuthState.isAdmin() : false;
+  const isOrganizer = currentUser && (
+    Number(currentUser.id) === Number(organizerId) ||
+    currentUser.username === meeting.host ||
+    currentUser.fullName === meeting.host
+  );
+  const canModify = isAdmin || isOrganizer;
+
+  const actionsEl = document.getElementById("detail-permission-actions");
+  if (actionsEl) {
+    const exportIcsBtn = `
+      <div class="d-inline-flex align-items-center gap-1">
+        <a href="/api/meetings/${meeting.id}/export-ics" class="detail-export-ics-btn" download onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.downloadICS(${meeting.id}, '${escapeHTML(meeting.title)}');" title="Tải tệp iCalendar (.ics) đồng bộ Google Calendar & Outlook">
+          <i class="bi bi-calendar2-plus"></i>
+          <span>Xuất Lịch (.ics)</span>
+        </a>
+        <button type="button" class="detail-export-cal-btn" onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.addToGoogleCalendar(meetings.find(m => m.id === ${meeting.id}) || { id: ${meeting.id}, title: '${escapeHTML(meeting.title)}', date: '${meeting.date}', startTime: '${meeting.startTime}', endTime: '${meeting.endTime}', roomName: '${escapeHTML(roomName)}' });" title="Thêm vào Google Calendar">
+          <i class="bi bi-google text-danger"></i>
+        </button>
+        <button type="button" class="detail-export-cal-btn" onclick="if (window.MeetingReminderToast) window.MeetingReminderToast.addToOutlook(meetings.find(m => m.id === ${meeting.id}) || { id: ${meeting.id}, title: '${escapeHTML(meeting.title)}', date: '${meeting.date}', startTime: '${meeting.startTime}', endTime: '${meeting.endTime}', roomName: '${escapeHTML(roomName)}' });" title="Thêm vào Microsoft Outlook 365">
+          <i class="bi bi-microsoft text-primary"></i>
+        </button>
+      </div>
+    `;
+
+    if (canModify) {
+      actionsEl.innerHTML = `
+        ${exportIcsBtn}
+        <button type="button" class="btn btn-outline-primary btn-sm stitch-detail-action-btn" onclick="closeDetailModal(); openEditModal(${meeting.id});">
+          <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm stitch-detail-action-btn" onclick="confirmCancelMeeting(${meeting.id});">
+          <i class="bi bi-trash3 me-1"></i> Hủy cuộc họp
+        </button>
+      `;
+    } else {
+      actionsEl.innerHTML = exportIcsBtn;
+    }
+  }
+
+  const detailOverlay = document.getElementById("detail-overlay");
+  if (detailOverlay) {
+    detailOverlay.classList.remove("hidden");
+  }
 
   // Truy vấn trực tiếp trạng thái phản hồi của người tham gia từ Backend API
-  MeetingAPI.getParticipants(meeting.id).then(res => {
-    if (res.success && res.data && res.data.participants) {
-      const pListEl = document.getElementById("detail-participants-list");
-      const summaryEl = document.getElementById("detail-participant-summary-badges");
-      if (pListEl && res.data.participants.length > 0) {
-        pListEl.innerHTML = res.data.participants.map(p => {
-          let badgeClass = "bg-warning-subtle text-warning border-warning-subtle";
-          let icon = "bi-clock";
-          let label = "Chờ phản hồi";
-          if (p.responseStatus === "Accepted") {
-            badgeClass = "bg-success-subtle text-success border-success-subtle";
-            icon = "bi-check-circle-fill";
-            label = "Đồng ý";
-          } else if (p.responseStatus === "Declined") {
-            badgeClass = "bg-danger-subtle text-danger border-danger-subtle";
-            icon = "bi-x-circle-fill";
-            label = "Từ chối";
-          } else if (p.responseStatus === "Tentative") {
-            badgeClass = "bg-info-subtle text-info border-info-subtle";
-            icon = "bi-question-circle-fill";
-            label = "Cân nhắc";
-          }
+  if (typeof MeetingAPI !== "undefined" && typeof MeetingAPI.getParticipants === "function") {
+    MeetingAPI.getParticipants(meeting.id).then(res => {
+      if (res.success && res.data && res.data.participants) {
+        const pListEl = document.getElementById("detail-participants-list");
+        const summaryEl = document.getElementById("detail-participant-summary-badges");
+        if (pListEl && res.data.participants.length > 0) {
+          pListEl.innerHTML = res.data.participants.map(p => {
+            let statusBadge = '';
+            if (p.responseStatus === "Accepted") {
+              statusBadge = '<span class="part-status-badge status-accepted"><i class="bi bi-check-circle-fill me-1"></i>Đồng ý</span>';
+            } else if (p.responseStatus === "Declined") {
+              statusBadge = '<span class="part-status-badge status-declined"><i class="bi bi-x-circle-fill me-1"></i>Từ chối</span>';
+            } else if (p.responseStatus === "Tentative") {
+              statusBadge = '<span class="part-status-badge status-tentative"><i class="bi bi-question-circle-fill me-1"></i>Cân nhắc</span>';
+            } else {
+              statusBadge = '<span class="part-status-badge status-pending"><i class="bi bi-clock me-1"></i>Chờ phản hồi</span>';
+            }
 
-          return `
-            <div class="d-inline-flex align-items-center gap-1 border rounded-pill px-2 py-0.5 bg-white small mb-1 shadow-sm">
-              <span class="fw-semibold text-dark">${escapeHTML(p.fullName)}</span>
-              <span class="badge ${badgeClass} border rounded-pill" style="font-size: 10px;">
-                <i class="bi ${icon} me-1"></i>${label}
-              </span>
-            </div>
+            const pInitials = getInitials(p.fullName);
+            const pColor = getHostColor(p.fullName);
+
+            return `
+              <div class="detail-participant-pill">
+                <div class="part-avatar" style="background: ${pColor};">${pInitials}</div>
+                <div class="part-info">
+                  <span class="part-name" title="${escapeHTML(p.fullName)}">${escapeHTML(p.fullName)}</span>
+                  ${statusBadge}
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+        if (summaryEl && res.data.summary) {
+          const s = res.data.summary;
+          summaryEl.innerHTML = `
+            <span class="part-counter-chip chip-accepted"><i class="bi bi-check-circle-fill me-1"></i>${s.accepted} đồng ý</span>
+            <span class="part-counter-chip chip-pending"><i class="bi bi-clock-fill me-1"></i>${s.pending} chờ</span>
+            <span class="part-counter-chip chip-declined"><i class="bi bi-x-circle-fill me-1"></i>${s.declined} từ chối</span>
           `;
-        }).join("");
+        }
       }
-      if (summaryEl && res.data.summary) {
-        const s = res.data.summary;
-        summaryEl.innerHTML = `
-          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill me-1">${s.accepted} đồng ý</span>
-          <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill me-1">${s.declined} từ chối</span>
-          <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">${s.pending} chờ</span>
-        `;
-      }
-    }
-  });
+    }).catch(() => {});
+  }
 }
 
+window.openDetailModal = openDetailModal;
 
 // =====================================================
 // 16. ĐÓNG MODAL
 // =====================================================
 
 function closeMeetingModal() {
-  modalOverlay.classList.add("hidden");
+  const overlay = document.getElementById("modal-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
   clearMeetingFormErrors();
-  closeParticipantDropdown();
+  if (typeof closeParticipantDropdown === "function") {
+    closeParticipantDropdown();
+  }
 
   const form = document.getElementById("meeting-form");
   const successView = document.getElementById("success-view");
@@ -6172,12 +8507,15 @@ function closeMeetingModal() {
   if (recurringInput) recurringInput.checked = false;
   document.querySelectorAll(".eq-checkbox").forEach(cb => { cb.checked = false; });
 }
-
+window.closeMeetingModal = closeMeetingModal;
 
 function closeDetailModal() {
-
-  detailOverlay.classList.add("hidden");
+  const overlay = document.getElementById("detail-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
 }
+window.closeDetailModal = closeDetailModal;
 
 
 // =====================================================
@@ -6185,21 +8523,9 @@ function closeDetailModal() {
 // =====================================================
 
 function formatDate(date) {
-
-  if (!date) {
-    return "";
-  }
-
-
-  const parts =
-    date.split("-");
-
-
-  if (parts.length !== 3) {
-    return date;
-  }
-
-
+  if (!date) return "";
+  const parts = date.split("-");
+  if (parts.length !== 3) return date;
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
@@ -6209,29 +8535,30 @@ function formatDate(date) {
 // =====================================================
 
 function getStatusText(status) {
-
+  if (!status) return "Sắp diễn ra";
+  const s = String(status).trim().toLowerCase();
   const statusMap = {
-
     scheduled: "Sắp diễn ra",
-
+    confirmed: "Sắp diễn ra",
+    active: "Sắp diễn ra",
     "in-progress": "Đang diễn ra",
-
+    inprogress: "Đang diễn ra",
+    ongoing: "Đang diễn ra",
     completed: "Đã hoàn thành",
-
-    cancelled: "Đã hủy"
-
+    cancelled: "Đã hủy",
+    canceled: "Đã hủy",
+    pending: "Chờ xác nhận"
   };
-
-
-  return (
-    statusMap[status] ||
-    "Không xác định"
-  );
+  return statusMap[s] || "Sắp diễn ra";
 }
 
-
 function getStatusClass(status) {
-  return `stitch-status-pill status-${status}`;
+  const s = String(status || "scheduled").trim().toLowerCase();
+  if (s === "confirmed" || s === "scheduled" || s === "active") return "stitch-status-pill status-scheduled";
+  if (s === "in-progress" || s === "inprogress" || s === "ongoing") return "stitch-status-pill status-in-progress";
+  if (s === "completed") return "stitch-status-pill status-completed";
+  if (s === "cancelled" || s === "canceled") return "stitch-status-pill status-cancelled";
+  return `stitch-status-pill status-${s}`;
 }
 
 
@@ -6358,6 +8685,57 @@ if (btnCloseRoomDelete) {
   btnCloseRoomDelete.addEventListener("click", closeRoomDeleteModal);
 }
 
+// Modal Quản trị Thiết bị
+const equipmentModalOverlay = document.getElementById("equipment-modal-overlay");
+const equipmentDeleteOverlay = document.getElementById("equipment-delete-overlay");
+
+const equipmentForm = document.getElementById("equipment-form");
+if (equipmentForm) {
+  equipmentForm.addEventListener("submit", saveEquipment);
+}
+
+const equipmentNameInput = document.getElementById("equipment-name");
+if (equipmentNameInput) {
+  equipmentNameInput.addEventListener("input", () => {
+    equipmentNameInput.classList.remove("is-invalid");
+    const errorBox = document.getElementById("equipment-form-error");
+    if (errorBox) errorBox.classList.add("d-none");
+  });
+}
+
+const btnCloseEquipmentModal = document.getElementById("btn-close-equipment-modal");
+if (btnCloseEquipmentModal) {
+  btnCloseEquipmentModal.addEventListener("click", closeEquipmentModal);
+}
+
+const btnEquipmentCancel = document.getElementById("btn-equipment-cancel");
+if (btnEquipmentCancel) {
+  btnEquipmentCancel.addEventListener("click", closeEquipmentModal);
+}
+
+const equipmentStatusSelect = document.getElementById("equipment-status");
+if (equipmentStatusSelect) {
+  equipmentStatusSelect.addEventListener("change", (e) => {
+    updateEquipmentStatusAlertDesc(e.target.value);
+  });
+}
+
+// Modal Xóa Thiết bị
+const btnCloseEquipmentDelete = document.getElementById("btn-close-equipment-delete");
+if (btnCloseEquipmentDelete) {
+  btnCloseEquipmentDelete.addEventListener("click", closeEquipmentDeleteModal);
+}
+
+const btnCancelEquipmentDelete = document.getElementById("btn-cancel-equipment-delete");
+if (btnCancelEquipmentDelete) {
+  btnCancelEquipmentDelete.addEventListener("click", closeEquipmentDeleteModal);
+}
+
+const btnConfirmEquipmentDelete = document.getElementById("btn-confirm-equipment-delete");
+if (btnConfirmEquipmentDelete) {
+  btnConfirmEquipmentDelete.addEventListener("click", confirmDeleteEquipment);
+}
+
 // Click ra ngoài modal
 if (roomModalOverlay) {
   roomModalOverlay.addEventListener("click", function (event) {
@@ -6379,6 +8757,22 @@ if (roomDeleteOverlay) {
   roomDeleteOverlay.addEventListener("click", function (event) {
     if (event.target === roomDeleteOverlay) {
       closeRoomDeleteModal();
+    }
+  });
+}
+
+if (equipmentModalOverlay) {
+  equipmentModalOverlay.addEventListener("click", function (event) {
+    if (event.target === equipmentModalOverlay) {
+      closeEquipmentModal();
+    }
+  });
+}
+
+if (equipmentDeleteOverlay) {
+  equipmentDeleteOverlay.addEventListener("click", function (event) {
+    if (event.target === equipmentDeleteOverlay) {
+      closeEquipmentDeleteModal();
     }
   });
 }
@@ -6428,6 +8822,18 @@ document.addEventListener(
       closeRoomDeleteModal();
     }
 
+    if (
+      equipmentModalOverlay && !equipmentModalOverlay.classList.contains("hidden")
+    ) {
+      closeEquipmentModal();
+    }
+
+    if (
+      equipmentDeleteOverlay && !equipmentDeleteOverlay.classList.contains("hidden")
+    ) {
+      closeEquipmentDeleteModal();
+    }
+
   }
 );
 
@@ -6436,20 +8842,137 @@ document.addEventListener(
 // 22. KHỞI ĐỘNG ROUTER & ĐỒNG BỘ CSDL
 // =====================================================
 
-loadPersistedRooms();
-loadPersistedMeetings();
+async function initializeEnterpriseData() {
+  // Xóa cache mock cũ để đảm bảo không còn dữ liệu tĩnh tồn đọng
+  try {
+    localStorage.removeItem("STITCH_ROOMS_DATA");
+    localStorage.removeItem("STITCH_MEETINGS_DATA");
+  } catch (e) {}
+
+  // Nạp dữ liệu đồng thời từ backend RESTful API kết nối MySQL Database
+  await Promise.allSettled([
+    RoomAPI.getAll(),
+    MeetingAPI.getAll(),
+    EquipmentAPI.getAll(),
+    MeetingAPI.getUsers(),
+    RoomAPI.checkHealth(),
+    MeetingAPI.checkHealth()
+  ]);
+
+  // Đồng bộ lại select options phòng họp theo dữ liệu nhận được từ DB
+  syncMeetingRoomOptions();
+
+  // Đồng bộ select options người tổ chức và khởi tạo selector người tham gia theo user đang đăng nhập
+  const authUser = getActiveAuthUser();
+  const initialOrgId = (authUser && Number(authUser.userId || authUser.id)) || 1;
+  syncMeetingOrganizerOptions(initialOrgId);
+  initParticipantSelector([initialOrgId], initialOrgId);
+
+  // Render lại route hiện tại với dữ liệu thực tế từ Database
+  router();
+}
+
+// Xuất toàn bộ modal triggers và APIs ra window scope cho các trang con
+window.openAddModal = openAddModal;
+window.openDetailModal = openDetailModal;
+window.openEditModal = openEditModal;
+window.openRoomQRModal = openRoomQRModal;
+window.openEditRoomModal = openEditRoomModal;
+window.openAddRoomModal = openAddRoomModal;
+window.confirmDeleteRoom = confirmDeleteRoom;
+window.openAddEquipmentModal = openAddEquipmentModal;
+window.openEditEquipmentModal = openEditEquipmentModal;
+window.openEquipmentDeleteModal = openEquipmentDeleteModal;
+window.openAddModalWithSelection = openAddModalWithSelection;
+window.openAddModalWithEquipment = openAddModalWithEquipment;
+window.exportToCSV = exportToCSV;
+window.getInitials = getInitials;
+window.getHostColor = getHostColor;
+window.confirmCancelMeeting = confirmCancelMeeting;
+window.showConfirmDialog = showConfirmDialog;
+window.saveMeeting = saveMeeting;
+window.closeMeetingModal = closeMeetingModal;
+window.closeDetailModal = closeDetailModal;
+window.closeRoomModal = closeRoomModal;
+window.saveRoom = saveRoom;
+window.closeRoomQRModal = closeRoomQRModal;
+window.closeRoomDeleteModal = closeRoomDeleteModal;
+window.closeEquipmentModal = closeEquipmentModal;
+window.saveEquipment = saveEquipment;
+window.closeEquipmentDeleteModal = closeEquipmentDeleteModal;
+window.confirmDeleteEquipment = confirmDeleteEquipment;
+window.initParticipantSelector = initParticipantSelector;
+window.renderParticipantChips = renderParticipantChips;
+window.getCurrentOrganizerId = getCurrentOrganizerId;
+window.syncMeetingOrganizerOptions = syncMeetingOrganizerOptions;
+window.RoomAPI = RoomAPI;
+window.MeetingAPI = MeetingAPI;
+window.EquipmentAPI = EquipmentAPI;
+
 setupRoomFormValidationEvents();
 setupMeetingFormValidationEvents();
-RoomAPI.checkHealth().then(async (connected) => {
-  if (connected) {
-    await RoomAPI.getAll();
-    syncMeetingRoomOptions();
-    const current = getCurrentRoute();
-    if (current === "/admin/rooms" || current === "/rooms" || current === "/" || current === "/home") {
-      router();
+
+// =====================================================
+// 23. BẪY LỖI & GIÁM SÁT KẾT NỐI MẠNG (ONLINE/OFFLINE NETWORK DETECTION)
+// =====================================================
+function setupNetworkStatusListeners() {
+  const offlineBanner = document.getElementById("offline-notification-banner");
+  const retryBtn = document.getElementById("offline-banner-retry-btn");
+
+  function updateNetworkUI(isOnline) {
+    if (!offlineBanner) return;
+    if (isOnline) {
+      offlineBanner.classList.add("hidden");
+    } else {
+      offlineBanner.classList.remove("hidden");
     }
   }
-});
-MeetingAPI.checkHealth();
-syncMeetingRoomOptions();
-router();
+
+  // Khởi tạo trạng thái ban đầu
+  if (typeof navigator !== "undefined") {
+    updateNetworkUI(navigator.onLine);
+  }
+
+  window.addEventListener("offline", () => {
+    updateNetworkUI(false);
+    if (typeof showToast === "function") {
+      showToast("Mất kết nối mạng Internet. Hệ thống đang ở chế độ ngoại tuyến.", "error");
+    }
+  });
+
+  window.addEventListener("online", () => {
+    updateNetworkUI(true);
+    if (typeof showToast === "function") {
+      showToast("Đã khôi phục kết nối mạng thành công!", "success");
+    }
+    initializeEnterpriseData();
+  });
+
+  if (retryBtn) {
+    retryBtn.addEventListener("click", async () => {
+      retryBtn.disabled = true;
+      retryBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang thử lại...';
+      try {
+        const ping = await fetch("/api/users/profile", { method: "GET", cache: "no-store" }).catch(() => null);
+        if (ping || (typeof navigator !== "undefined" && navigator.onLine)) {
+          updateNetworkUI(true);
+          await initializeEnterpriseData();
+          if (typeof showToast === "function") {
+            showToast("Kết nối máy chủ thành công!", "success");
+          }
+        } else {
+          updateNetworkUI(false);
+          if (typeof showToast === "function") {
+            showToast("Vẫn chưa thể kết nối tới máy chủ.", "warning");
+          }
+        }
+      } finally {
+        retryBtn.disabled = false;
+        retryBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Thử kết nối lại';
+      }
+    });
+  }
+}
+
+setupNetworkStatusListeners();
+initializeEnterpriseData();

@@ -1,0 +1,15 @@
+<svg width="450" height="220" xmlns="http://www.w3.org/2000/svg">
+  <rect width="450" height="220" rx="12" fill="#0f172a"/>
+  <rect x="2" y="2" width="446" height="216" rx="10" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <text x="25" y="38" font-family="Segoe UI, sans-serif" font-size="17" font-weight="bold" fill="#38bdf8">⚡ QA PERFORMANCE &amp; LOAD TEST SUITE</text>
+  <text x="25" y="65" font-family="Segoe UI, sans-serif" font-size="13" fill="#94a3b8">Module: Analytics, Filter &amp; Export APIs</text>
+  <line x1="25" y1="78" x2="425" y2="78" stroke="#334155" stroke-width="1"/>
+  <text x="25" y="105" font-family="Segoe UI, sans-serif" font-size="14" fill="#e2e8f0">Tổng số Test Cases:</text>
+  <text x="320" y="105" font-family="Segoe UI, sans-serif" font-size="14" font-weight="bold" fill="#38bdf8">24 / 24</text>
+  <text x="25" y="133" font-family="Segoe UI, sans-serif" font-size="14" fill="#e2e8f0">Kết quả Đạt (PASS):</text>
+  <text x="320" y="133" font-family="Segoe UI, sans-serif" font-size="14" font-weight="bold" fill="#22c55e">24 (100.0%)</text>
+  <text x="25" y="161" font-family="Segoe UI, sans-serif" font-size="14" fill="#e2e8f0">Thông lượng tối đa (RPS):</text>
+  <text x="320" y="161" font-family="Segoe UI, sans-serif" font-size="14" font-weight="bold" fill="#f59e0b">&gt; 300 RPS</text>
+  <text x="25" y="189" font-family="Segoe UI, sans-serif" font-size="14" fill="#e2e8f0">Thời gian phản hồi P95:</text>
+  <text x="320" y="189" font-family="Segoe UI, sans-serif" font-size="14" font-weight="bold" fill="#a855f7">&lt; 350 ms</text>
+</svg>

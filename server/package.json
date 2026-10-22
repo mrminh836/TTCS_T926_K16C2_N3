@@ -7,12 +7,19 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test",
+    "test:auth": "node --test test/auth.test.js",
+    "test:rbac": "node --test test/authMiddleware.test.js test/authIntegration.test.js",
+    "test:auth-qa": "node ../QA/AutomatedTests/run_auth_tests.js",
+    "test:equipment": "node ../QA/AutomatedTests/run_equipment_conflict_tests.js",
+    "test:equipment-crud": "node ../QA/AutomatedTests/run_equipment_crud_tests.js",
     "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.24.4"
   }
 }
